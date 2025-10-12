@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoveGuru: Core App Features</title>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The SPA is designed to transform the linear PRD into an exploratory experience. It starts with a high-level vision, then presents the core user journeys in an interactive tabbed section ("How It Works") allowing users to self-select their persona (Customer, Driver, Admin) without scrolling through irrelevant information. This is more user-friendly than the original document's sequential lists. Key metrics are visualized in a dynamic "KPI Dashboard" instead of a static table to make goals more tangible. The GTM roadmap is presented as an interactive timeline and a growth chart, which is more effective for showing progress over time than a simple table. This structure prioritizes user engagement and comprehension by turning passive information into an interactive discovery process. -->
+    <!-- Visualization & Content Choices: 1. User Workflows: Report Info (Customer, Driver, Admin flows) -> Goal (Organize/Inform) -> Presentation (Interactive JS-powered tabs) -> Interaction (Click to toggle view) -> Justification (Reduces clutter, user-centric) -> Method (HTML/CSS/JS). 2. KPIs: Report Info (KPI table) -> Goal (Inform/Compare) -> Presentation (Dashboard-style stat cards) -> Interaction (None, visual emphasis) -> Justification (More impactful than a table) -> Method (HTML/Tailwind). 3. GTM Roadmap: Report Info (Roadmap table) -> Goal (Show Change) -> Presentation (Visual timeline + Line Chart) -> Interaction (Chart tooltips on hover) -> Justification (Visualizes growth targets effectively) -> Library (Chart.js on Canvas). 4. Features: Report Info (Features table) -> Goal (Organize) -> Presentation (Icon-based grid cards) -> Interaction (None) -> Justification (Improves scannability over a dense table) -> Method (HTML/Tailwind). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #475569; /* Slate 600 */
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .tab-button.active {
+            background-color: #4f46e5;
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+         .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- Header -->
+    <header class="bg-white/90 backdrop-blur-sm sticky top-0 z-50 border-b border-slate-200">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold tracking-tighter text-slate-900">
+                <a href="index.html" class="gradient-text">MoveGuru Strategy</a>
+            </div>
+            <div class="hidden md:flex items-center space-x-6 text-slate-700 font-medium">
+                <a href="https://www.dataknobs.com/proposals/06cf678902/1-app/" class="text-violet-600 font-semibold border-b-2 border-violet-600 pb-1">Core App</a>
+                <a href="https://www.dataknobs.com/proposals/06cf678902/2-ai-assistant/" class="hover:text-violet-500 transition-colors">AI Advantage</a>
+                <a href="https://www.dataknobs.com/proposals/06cf678902/3-website-geo/" class="hover:text-violet-500 transition-colors">Growth Engine</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+            <!-- Hero Section -->
+        <section class="py-20 md:py-24 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
+                    Product Requirements: On-Demand Intra-City Logistics Platform
+                </h1>
+                <p class="text-lg md:text-xl text-slate-600 max-w-4xl mx-auto">
+                    Version 1.0 | October 2025 | Status: Draft
+                </p>
+                <p class="mt-4 text-base text-slate-500">Inspiration: Porter, Uncle Delivery, Blowhorn</p>
+            </div>
+        </section>
+
+        <!-- Product Vision -->
+        <section id="vision" class="py-20 bg-slate-50">
+            <div class="container mx-auto px-6">
+                <div class="section-header">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Product Vision & Executive Summary</h2>
+                </div>
+                <div class="max-w-4xl mx-auto text-center">
+                    <p class="text-2xl font-semibold italic text-slate-800 mb-6">“Simplify city logistics — make moving goods as easy as booking a cab.”</p>
+                    <p class="mb-4">This page specifies the requirements for building an on-demand intra-city logistics platform that allows individuals and small businesses to book 2-wheelers, tempos, and trucks for same-day or scheduled delivery of goods.</p>
+                    <p>MoveGuru platform connects customers with verified driver-partners via a mobile app and web interface, providing real-time pricing, live tracking, secure payments, and digital proof of delivery. The goal is to launch an MVP in one metro city (Bengaluru or Delhi-NCR) and then expand to other Tier-1 cities.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works (Interactive Tabs) -->
+        <section id="how-it-works" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">A Seamless Experience for Everyone</h2>
+                    <p class="text-slate-600 mt-2 max-w-3xl mx-auto">MoveGuru platform is designed with three core user groups in mind. Select a role below to see how MoveGuru empowers them with a simple, efficient workflow.</p>
+                </div>
+
+                <!-- Tab Buttons -->
+                <div class="flex justify-center space-x-2 md:space-x-4 mb-10">
+                    <button id="customer-tab" class="tab-button active text-sm md:text-base font-semibold py-3 px-6 rounded-full transition-all duration-300">I'm a Customer</button>
+                    <button id="driver-tab" class="tab-button text-sm md:text-base font-semibold py-3 px-6 rounded-full transition-all duration-300 bg-white text-slate-700">I'm a Driver</button>
+                    <button id="admin-tab" class="tab-button text-sm md:text-base font-semibold py-3 px-6 rounded-full transition-all duration-300 bg-white text-slate-700">I'm an Admin</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div id="tab-content" class="max-w-4xl mx-auto">
+                    <!-- Customer Flow -->
+                    <div id="customer-content" class="space-y-4">
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                            <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">1</div>
+                            <p>Simple OTP login to access the app.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                            <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">2</div>
+                            <p>Enter pickup/drop locations and select vehicle type (2-Wheeler, Tempo, etc.).</p>
+                        </div>
+                         <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                            <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">3</div>
+                            <p>Receive an instant fare quote and confirm the booking.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                            <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">4</div>
+                            <p>Live-track the driver's location and receive real-time ETA updates.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                            <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">5</div>
+                            <p>Verify delivery with a secure OTP and pay via app or Cash on Delivery.</p>
+                        </div>
+                    </div>
+                    <!-- Driver Flow -->
+                    <div id="driver-content" class="hidden space-y-4">
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                             <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">1</div>
+                            <p>Easy sign-up with digital document upload for quick KYC verification.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                             <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">2</div>
+                            <p>Go online to start receiving job requests from nearby customers.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                             <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">3</div>
+                            <p>Accept jobs, navigate to pickup, and confirm with OTP.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                             <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">4</div>
+                            <p>Complete delivery with OTP/photo confirmation.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                             <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">5</div>
+                            <p>Receive instant and transparent payout summaries for completed trips.</p>
+                        </div>
+                    </div>
+                    <!-- Admin Flow -->
+                    <div id="admin-content" class="hidden space-y-4">
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                            <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">1</div>
+                            <p>Monitor all live trips on a central operations dashboard.</p>
+                        </div>
+                         <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                            <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">2</div>
+                            <p>Manage pricing, operational zones, and surge rules dynamically.</p>
+                        </div>
+                         <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                            <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">3</div>
+                            <p>Streamline driver onboarding via a managed KYC approval queue.</p>
+                        </div>
+                         <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex items-center gap-4">
+                            <div class="bg-violet-100 text-violet-600 font-bold w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full">4</div>
+                            <p>Handle customer support tickets, disputes, and refunds efficiently.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Features -->
+        <section id="features" class="py-20 bg-slate-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Core Platform Features</h2>
+                    <p class="text-slate-600 mt-2 max-w-2xl mx-auto">Our platform is built on a foundation of powerful, reliable features designed to deliver a best-in-class logistics experience.</p>
+                </div>
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-lg text-slate-800">Booking & Pricing Engine</h3>
+                        <p class="text-sm mt-1">Instantly quotes fares based on distance, vehicle, and real-time demand.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-lg text-slate-800">Intelligent Driver Matching</h3>
+                        <p class="text-sm mt-1">Intelligently auto-assigns the nearest available and verified driver to a new job.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-lg text-slate-800">Live GPS Tracking</h3>
+                        <p class="text-sm mt-1">Provides real-time GPS location sharing and dynamic ETA updates for full transparency.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-lg text-slate-800">Secure & Multi-Modal Payments</h3>
+                        <p class="text-sm mt-1">Integrates UPI, card, netbanking, and Cash on Delivery options.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-lg text-slate-800">Automated KYC Verification</h3>
+                        <p class="text-sm mt-1">Ensures all drivers are verified via official documents for safety and trust.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-lg text-slate-800">Digital Invoices & ePOD</h3>
+                        <p class="text-sm mt-1">Generates GST-compliant invoices and digital proof of delivery for every trip.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-lg text-slate-800">Multi-Stop Deliveries</h3>
+                        <p class="text-sm mt-1">Allows users to add multiple drop-off points within a single, optimized trip.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-lg text-slate-800">Scheduled Bookings</h3>
+                        <p class="text-sm mt-1">Gives users the flexibility to book trips for a future date and time.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Roadmap -->
+        <section id="roadmap" class="py-20 bg-white">
+             <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Our Go-to-Market Roadmap</h2>
+                    <p class="text-slate-600 mt-2 max-w-3xl mx-auto">We are planning a phased rollout to ensure a stable and scalable launch, focusing on validating the core product before aggressive expansion.</p>
+                </div>
+                
+                <!-- Timeline -->
+                <div class="relative max-w-5xl mx-auto">
+                    <div class="border-l-2 border-slate-200 absolute h-full top-0 left-4 md:left-1/2 md:-translate-x-1/2"></div>
+                    <!-- Phase 1 -->
+                    <div class="mb-12 flex justify-between items-center w-full md:flex-row-reverse">
+                        <div class="order-1 md:w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-violet-500 shadow-xl w-8 h-8 rounded-full">
+                            <h1 class="mx-auto font-semibold text-sm text-white">1</h1>
+                        </div>
+                        <div class="order-1 bg-slate-50 border border-slate-200 rounded-lg shadow-sm w-full md:w-5/12 px-6 py-4">
+                            <h3 class="font-bold text-slate-800 text-lg">Pilot (Months 1–3)</h3>
+                            <p class="text-sm leading-snug tracking-wide text-slate-600 text-opacity-100">Launch the MVP in Bengaluru to validate our core pricing and dispatch algorithms with early adopters.</p>
+                        </div>
+                    </div>
+                    <!-- Phase 2 -->
+                    <div class="mb-12 flex justify-between items-center w-full">
+                        <div class="order-1 md:w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-violet-500 shadow-xl w-8 h-8 rounded-full">
+                            <h1 class="mx-auto text-white font-semibold text-sm">2</h1>
+                        </div>
+                        <div class="order-1 bg-slate-50 border border-slate-200 rounded-lg shadow-sm w-full md:w-5/12 px-6 py-4">
+                            <h3 class="font-bold text-slate-800 text-lg">Scale (Months 4–6)</h3>
+                            <p class="text-sm leading-snug tracking-wide text-slate-600 text-opacity-100">Expand the driver network and launch in two new metro areas (Mumbai, Hyderabad) with a goal of reaching 10,000 trips/day.</p>
+                        </div>
+                    </div>
+                     <!-- Phase 3 -->
+                    <div class="flex justify-between items-center w-full md:flex-row-reverse">
+                        <div class="order-1 md:w-5/12"></div>
+                        <div class="z-20 flex items-center order-1 bg-violet-500 shadow-xl w-8 h-8 rounded-full">
+                            <h1 class="mx-auto font-semibold text-sm text-white">3</h1>
+                        </div>
+                        <div class="order-1 bg-slate-50 border border-slate-200 rounded-lg shadow-sm w-full md:w-5/12 px-6 py-4">
+                            <h3 class="font-bold text-slate-800 text-lg">Growth (Months 6–12)</h3>
+                            <p class="text-sm leading-snug tracking-wide text-slate-600 text-opacity-100">Onboard SME & business accounts across 6 metro cities, aiming for 100,000 users and achieving positive unit economics.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth Chart -->
+                <div class="mt-20">
+                     <div class="chart-container">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- KPI Dashboard -->
+        <section id="kpis" class="py-20 bg-slate-50">
+            <div class="container mx-auto px-6">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Year 1 Performance Goals</h2>
+                    <p class="text-slate-600 mt-2 max-w-2xl mx-auto">These are the key metrics that will define MoveGuru success and drive our focus on reliability, efficiency, and user satisfaction.</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-6xl mx-auto text-center">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-4xl font-bold gradient-text">≥90%</div>
+                        <p class="text-sm font-medium text-slate-500 mt-2">Booking Success Rate</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-4xl font-bold gradient-text">≤30s</div>
+                        <p class="text-sm font-medium text-slate-500 mt-2">Driver Allocation Time</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-4xl font-bold gradient-text">4.5/5</div>
+                        <p class="text-sm font-medium text-slate-500 mt-2">Average User Rating</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-4xl font-bold gradient-text">5k+</div>
+                        <p class="text-sm font-medium text-slate-500 mt-2">Active Drivers (6 Mo.)</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm col-span-2 md:col-span-1 lg:col-span-1">
+                        <div class="text-4xl font-bold gradient-text">≤2%</div>
+                        <p class="text-sm font-medium text-slate-500 mt-2">Pricing Complaint Rate</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white">
+        <div class="container mx-auto px-6 py-12 text-center">
+            <div class="mb-4">
+                <a href="https://www.dataknobs.com/proposals/06cf678902/" class="text-slate-600 hover:text-slate-900 transition-colors mx-4">Strategy Hub</a>
+                <a href="https://www.dataknobs.com/proposals/06cf678902/1-app/" class="font-semibold text-violet-600 hover:text-violet-800 transition-colors mx-4">Core App</a>
+                <a href="https://www.dataknobs.com/proposals/06cf678902/2-ai-assistant/" class="text-slate-600 hover:text-slate-900 transition-colors mx-4">AI Assistant</a>
+                <a href="https://www.dataknobs.com/proposals/06cf678902/3-website-geo/" class="text-slate-600 hover:text-slate-900 transition-colors mx-4">Website & GEO</a>
+            </div>
+            <p class="text-slate-500 text-sm">&copy; 2025 Dataknobs Inc. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = {
+                customer: {
+                    button: document.getElementById('customer-tab'),
+                    content: document.getElementById('customer-content')
+                },
+                driver: {
+                    button: document.getElementById('driver-tab'),
+                    content: document.getElementById('driver-content')
+                },
+                admin: {
+                    button: document.getElementById('admin-tab'),
+                    content: document.getElementById('admin-content')
+                }
+            };
+
+            function switchTab(activeTabKey) {
+                if (!tabs.customer.button) return;
+                Object.keys(tabs).forEach(key => {
+                    const is_active = key === activeTabKey;
+                    tabs[key].button.classList.toggle('active', is_active);
+                    tabs[key].button.classList.toggle('bg-white', !is_active);
+                    tabs[key].button.classList.toggle('text-slate-700', !is_active);
+                    tabs[key].content.classList.toggle('hidden', !is_active);
+                });
+            }
+
+            if (tabs.customer.button) {
+                tabs.customer.button.addEventListener('click', () => switchTab('customer'));
+                tabs.driver.button.addEventListener('click', () => switchTab('driver'));
+                tabs.admin.button.addEventListener('click', () => switchTab('admin'));
+            }
+
+            // Chart.js implementation
+            const ctx = document.getElementById('growthChart')?.getContext('2d');
+            if (ctx) {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(79, 70, 229, 0.5)');
+                gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12'],
+                        datasets: [{
+                            label: 'Daily Trips',
+                            data: [0, 100, 500, 2000, 6000, 10000, 12000, 15000, 20000, 25000, 30000, 35000],
+                            borderColor: '#4f46e5',
+                            backgroundColor: gradient,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#4f46e5',
+                            pointBorderColor: '#fff',
+                            pointHoverRadius: 7,
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#4f46e5',
+                        }, {
+                            label: 'Total Users',
+                            data: [0, 500, 2000, 8000, 20000, 40000, 55000, 70000, 80000, 90000, 95000, 100000],
+                            borderColor: '#9ca3af',
+                            fill: false,
+                            tension: 0.4,
+                            pointBackgroundColor: '#9ca3af',
+                            pointBorderColor: '#fff',
+                             pointHoverRadius: 7,
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#9ca3af',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                 ticks: {
+                                    callback: function(value) {
+                                        if (value >= 1000) {
+                                            return (value / 1000) + 'k';
+                                        }
+                                        return value;
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Projected Growth: Daily Trips & Total Users (Year 1)',
+                                font: { size: 16, weight: '600' },
+                                color: '#1e293b'
+                            },
+                            tooltip: {
+                                 callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('en-US').format(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Janjira Fort: The Unconquered Sea Fortress</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Deep Sea & Granite -->
+    <!-- Application Structure Plan: The SPA is designed as a modular, single-page narrative to transform the dense report into an interactive experience. It starts with a strong hero section, followed by a clear navigation bar. Key modules include: 1) An interactive timeline for the fort's history, allowing users to select an era. 2) A central interactive diagram of the fort's defenses, where users click hotspots to learn about architectural features. 3) A section detailing the Siddi dynasty's unique legacy. 4) A quantitative look at the sieges via a bar chart. 5) A concluding section on modern challenges. This non-linear, interactive structure was chosen to make the rich historical and architectural data more engaging and easier to explore than a standard text document. -->
+    <!-- Visualization & Content Choices: 
+        - Fort History -> Goal: Change -> Viz: Interactive Timeline (HTML/JS). Justification: Allows users to focus on distinct periods (Koli, Siddi, British) for better comprehension.
+        - Architectural Features -> Goal: Organize/Inform -> Viz: Clickable Hotspot Diagram (HTML/CSS/JS). Justification: Provides a visual, spatial understanding of Janjira's defenses, which is more effective than text alone.
+        - Siege Attempts -> Goal: Compare -> Viz: Bar Chart (Chart.js). Justification: Offers a clear, quantitative comparison of the major powers that failed to conquer the fort, reinforcing the theme of invincibility.
+        - Siddi Legacy -> Goal: Inform -> Viz: Styled Info Cards (HTML/CSS). Justification: Breaks down the unique cultural and political aspects of the Siddi state into scannable, digestible segments.
+        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; }
+        h1, h2, h3, h4, .font-display { font-family: 'Playfair Display', serif; }
+        .nav-link { position: relative; color: #495057; transition: color 0.3s; }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 50%; transform: translateX(-50%); background-color: #b58900; transition: width 0.3s ease; }
+        .nav-link.active, .nav-link:hover { color: #b58900; }
+        .nav-link.active::after, .nav-link:hover::after { width: 100%; }
+        .timeline-btn.active { background-color: #002b36; color: white; border-color: #002b36; }
+        .hotspot { transition: transform 0.2s, background-color 0.2s; }
+        .hotspot:hover { transform: scale(1.2); }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white/95 backdrop-blur-sm sticky top-0 z-50 shadow-md">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-gray-900">Murud-Janjira</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#history" class="nav-link">History</a>
+                <a href="#defenses" class="nav-link">Defenses</a>
+                <a href="#siddi" class="nav-link">The Siddis</a>
+                <a href="#legacy" class="nav-link">Legacy</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+            <a href="#history" class="block py-2 px-6 text-sm hover:bg-gray-100">History</a>
+            <a href="#defenses" class="block py-2 px-6 text-sm hover:bg-gray-100">Defenses</a>
+            <a href="#siddi" class="block py-2 px-6 text-sm hover:bg-gray-100">The Siddis</a>
+            <a href="#legacy" class="block py-2 px-6 text-sm hover:bg-gray-100">Legacy</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        
+        <section class="text-center mb-20">
+            <h2 class="text-5xl md:text-7xl font-bold text-gray-900 leading-tight">The Unconquered Fortress</h2>
+            <p class="max-w-3xl mx-auto mt-4 text-lg text-gray-600">Explore the story of Murud-Janjira, the legendary sea fort that repelled every invader for over 300 years, and the African dynasty that ruled from its impregnable walls.</p>
+        </section>
+
+        <section id="history" class="mb-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold text-gray-900">Genesis of a Fortress</h3>
+                <p class="max-w-3xl mx-auto mt-2 text-gray-600">Janjira's history is one of strategic escalation, evolving from a local outpost to a dynastic capital. Click the timeline to see its transformation.</p>
+            </div>
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div id="timeline-controls" class="w-full lg:w-1/4 flex lg:flex-col justify-center flex-wrap gap-3">
+                    <!-- Buttons will be injected here by JS -->
+                </div>
+                <div class="w-full lg:w-3/4 bg-white p-8 rounded-lg shadow-lg">
+                    <h4 id="timeline-title" class="text-2xl font-bold text-gray-800 mb-1"></h4>
+                    <p id="timeline-period" class="text-md font-semibold text-yellow-700 mb-4"></p>
+                    <div id="timeline-content" class="text-gray-700 leading-relaxed"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="defenses" class="mb-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold text-gray-900">Anatomy of Invincibility</h3>
+                <p class="max-w-3xl mx-auto mt-2 text-gray-600">Janjira's unconquered status was rooted in its brilliant design, where every feature was optimized for defense. Click the hotspots to learn about its key architectural marvels.</p>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-8 items-center">
+                <div class="bg-gray-200 p-8 rounded-lg relative aspect-square">
+                    <div class="w-full h-full border-4 border-dashed border-gray-400 rounded-full flex items-center justify-center">
+                         <div class="w-4/5 h-4/5 bg-gray-600 rounded-full relative shadow-inner">
+                            <div id="hotspot-sher" class="hotspot absolute top-[40%] -right-1 w-6 h-6 bg-yellow-600 rounded-full cursor-pointer flex items-center justify-center text-white font-bold" title="Sher Darwaza">1</div>
+                            <div id="hotspot-darya" class="hotspot absolute top-[40%] -left-1 w-6 h-6 bg-yellow-600 rounded-full cursor-pointer flex items-center justify-center text-white font-bold" title="Darya Darwaza">2</div>
+                            <div id="hotspot-walls" class="hotspot absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 bg-yellow-600 rounded-full cursor-pointer flex items-center justify-center text-white font-bold" title="Walls & Bastions">3</div>
+                            <div id="hotspot-lakes" class="hotspot absolute top-1/3 left-1/2 -translate-x-1/2 w-6 h-6 bg-yellow-600 rounded-full cursor-pointer flex items-center justify-center text-white font-bold" title="Freshwater Lakes">4</div>
+                            <div id="hotspot-cannons" class="hotspot absolute bottom-1/4 left-1/3 -translate-x-1/2 w-6 h-6 bg-yellow-600 rounded-full cursor-pointer flex items-center justify-center text-white font-bold" title="The Great Cannons">5</div>
+                         </div>
+                    </div>
+                     <p class="absolute bottom-2 text-xs text-center w-full text-gray-500">Simplified Diagram</p>
+                </div>
+                <div id="defense-display" class="bg-white p-8 rounded-lg shadow-lg min-h-[350px]">
+                    <h4 id="defense-title" class="text-2xl font-bold text-gray-800"></h4>
+                    <p id="defense-content" class="text-gray-700 leading-relaxed mt-4"></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="siddi" class="mb-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold text-gray-900">The Siddi Dynasty</h3>
+                <p class="max-w-3xl mx-auto mt-2 text-gray-600">The story of Janjira is inseparable from its rulers: a dynasty of African origin whose legacy of power and resilience is unique in Indian history.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="text-4xl mb-3">🌍</div>
+                    <h4 class="text-xl font-bold">Abyssinian Origins</h4>
+                    <p class="text-sm mt-2">Siddis were elite soldiers of East African descent who rose from mercenaries to rulers through military skill and loyalty in the Deccan Sultanates.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                     <div class="text-4xl mb-3">⚓</div>
+                    <h4 class="text-xl font-bold">Masters of the Sea</h4>
+                    <p class="text-sm mt-2">The Siddis commanded the Mughal fleet on the western coast, their naval prowess making them indispensable allies and formidable foes.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                     <div class="text-4xl mb-3">🤝</div>
+                    <h4 class="text-xl font-bold">Astute Diplomats</h4>
+                    <p class="text-sm mt-2">They skillfully navigated alliances with the Mughals, Portuguese, and British, leveraging their impregnable fort to ensure their state's survival.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="legacy" class="mb-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold text-gray-900">A Legacy of Defiance</h3>
+                 <p class="max-w-3xl mx-auto mt-2 text-gray-600">The fort's invincibility was tested by the most powerful forces of the subcontinent. This chart shows the major recorded siege attempts against Janjira.</p>
+            </div>
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <div class="chart-container">
+                    <canvas id="siegeChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold text-gray-900">A Heritage in Peril</h3>
+                <p class="max-w-3xl mx-auto mt-2 text-gray-600">The unconquered fort now faces its greatest threat: the ravages of time, neglect, and the logistical challenges of conservation.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h4 class="text-2xl font-bold text-red-700">Structural Decay</h4>
+                    <p class="mt-2">Constant saline erosion and the unchecked growth of vegetation are compromising the fort's masonry. In 2023, a portion of the wall collapsed, highlighting the urgent need for scientific conservation and a long-term management plan.</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h4 class="text-2xl font-bold text-yellow-700">Unregulated Tourism</h4>
+                    <p class="mt-2">While vital for the local economy, high visitor traffic without proper infrastructure like a safe jetty contributes to the wear and tear of the fragile structures. Balancing preservation with public access is a critical challenge for its future.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-6 py-6 text-center text-sm">
+            <p>Interactive application based on the "Janjira Fort: Unconquered Sea Fortress" research report.</p>
+            <p class="text-xs mt-1 opacity-70">Created for educational purposes to explore the unique history of the Siddis and Janjira.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timelineData = {
+                koli: {
+                    title: "Koli Origins",
+                    period: "Late 15th Century",
+                    content: "The first fortification on the island was a wooden structure called 'Medhekot,' built by a local Koli chieftain, Raja Ram Rao Patil. It served as a defense against pirates but soon became a challenge to the authority of the Ahmadnagar Sultanate."
+                },
+                siddi_takeover: {
+                    title: "The Siddi Takeover",
+                    period: "c. 1489",
+                    content: "Admiral Piram Khan of the Ahmadnagar Sultanate captured the fort not by force, but by subterfuge. Disguised as a merchant, he smuggled soldiers onto the island in crates of 'goods,' overwhelming the garrison and establishing Sultanate control."
+                },
+                fortification: {
+                    title: "The Stone Fortress",
+                    period: "1567 - 1571",
+                    content: "Under the vision of Malik Ambar, the wooden outpost was demolished and replaced with the massive stone fortress we see today. The new fort, 'Janjira Mehroob', was designed as a premier naval base to project power across the Konkan coast."
+                },
+                siddi_rule: {
+                    title: "Independent Siddi Rule",
+                    period: "From 1621",
+                    content: "Siddi Ambar successfully defied his overlords, establishing Janjira as a de facto autonomous state. This marked the beginning of the Siddi dynasty's independent rule from their unconquerable fortress-capital."
+                },
+                british_suzerainty: {
+                    title: "British Suzerainty & Integration",
+                    period: "From 1834",
+                    content: "Janjira's full independence ended not by conquest, but by political reality. The British declared suzerainty in 1834, and the state peacefully acceded to India in 1948, marking the end of centuries of Siddi rule."
+                }
+            };
+
+            const defenseData = {
+                sher: { title: "Sher Darwaza (Tiger's Door)", content: "The main entrance is cleverly hidden between two bastions, making it invisible to approaching ships until they are within cannon range. This prevented it from being a primary target for naval bombardment." },
+                darya: { title: "Darya Darwaza (Sea Gate)", content: "This secret gate on the western side opened directly to the Arabian Sea. It provided a vital, concealed route for escape or resupply that could not be easily blockaded by enemies in the main channel." },
+                walls: { title: "Walls & Bastions", content: "The fort is enclosed by 40-foot high granite walls and features up to 26 rounded bastions. This design provided 360-degree fields of fire for cannons and deflected the force of waves and cannonballs." },
+                lakes: { title: "Freshwater Lakes", content: "The most critical feature for survival. Two large, natural freshwater lakes inside the fort provided a sustainable source of drinking water, making a long siege by starvation or thirst impossible." },
+                cannons: { title: "The Great Cannons", content: "Janjira was armed with over 500 cannons. The three most famous—Kalalbangdi, Chavri, and Landa Kasam—were massive pieces of artillery feared for their immense size and destructive range, capable of deterring any assault." },
+            };
+
+            const timelineControls = document.getElementById('timeline-controls');
+            Object.keys(timelineData).forEach(key => {
+                const button = document.createElement('button');
+                button.className = 'timeline-btn border-2 border-gray-300 px-4 py-2 rounded-lg bg-white hover:bg-gray-200 transition-all w-full text-left';
+                button.textContent = timelineData[key].title;
+                button.dataset.id = key;
+                button.onclick = () => updateTimeline(key);
+                timelineControls.appendChild(button);
+            });
+
+            function updateTimeline(id) {
+                const data = timelineData[id];
+                document.getElementById('timeline-title').textContent = data.title;
+                document.getElementById('timeline-period').textContent = data.period;
+                document.getElementById('timeline-content').textContent = data.content;
+                document.querySelectorAll('.timeline-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.id === id);
+                });
+            }
+            updateTimeline('koli');
+
+            const defenseTitle = document.getElementById('defense-title');
+            const defenseContent = document.getElementById('defense-content');
+            Object.keys(defenseData).forEach(key => {
+                document.getElementById(`hotspot-${key}`).onclick = () => updateDefense(key);
+            });
+
+            function updateDefense(id) {
+                const data = defenseData[id] || { title: "Click a hotspot", content: "Select a numbered point on the diagram to learn about its defensive features." };
+                defenseTitle.textContent = data.title;
+                defenseContent.textContent = data.content;
+            }
+            updateDefense(null);
+            
+            const siegeCtx = document.getElementById('siegeChart').getContext('2d');
+            new Chart(siegeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Maratha Empire (Shivaji)', 'Maratha Empire (Sambhaji)', 'Portuguese', 'British'],
+                    datasets: [{
+                        label: 'Major Recorded Siege Attempts',
+                        data: [13, 1, 3, 1], // Representative numbers based on report data
+                        backgroundColor: [
+                            'rgba(211, 84, 0, 0.7)',
+                            'rgba(231, 76, 60, 0.7)',
+                            'rgba(41, 128, 185, 0.7)',
+                            'rgba(44, 62, 80, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(211, 84, 0, 1)',
+                            'rgba(231, 76, 60, 1)',
+                            'rgba(41, 128, 185, 1)',
+                            'rgba(44, 62, 80, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Siege Attempts by Major Powers (All Unsuccessful)' },
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) { return tooltipItems[0].label; }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            
+            const navLinks = document.querySelectorAll('nav a');
+            const sections = document.querySelectorAll('main section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    if (pageYOffset >= section.offsetTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

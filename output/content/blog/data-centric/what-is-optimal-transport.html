@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An Interactive Guide to Optimal Transport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Stone, Teal, Orange) -->
+    <!-- Application Structure Plan: The application is designed as a single-page, vertical narrative to guide users through the complex topic of Optimal Transport (OT). It starts with a simple, intuitive analogy (the "earth mover" problem), progresses to the core mathematical concepts (distributions and transport plans), and culminates in practical data science applications. This step-by-step structure is chosen over a dashboard because the primary goal is education and conceptual understanding, not data exploration. Key interactions include sliders to visualize the transport process, buttons to switch between different data scenarios, and tabs to explore various applications, making the abstract concepts tangible and easier to grasp. -->
+    <!-- Visualization & Content Choices: 
+        - Intro Analogy: Report Info -> Basic concept of moving mass. Goal -> Inform. Viz/Presentation -> Interactive Canvas animation of moving "dirt" to a "hole". Interaction -> Slider controls the animation progress. Justification -> Provides a strong, memorable mental model for OT. Library/Method -> Vanilla JS + Canvas.
+        - Core Problem: Report Info -> Comparing two distributions. Goal -> Organize/Compare. Viz/Presentation -> Two side-by-side bar charts. Interaction -> Buttons to load different preset distribution pairs. Justification -> Clearly frames the problem OT solves. Library/Method -> Chart.js.
+        - Transport Plan: Report Info -> The solution to OT, the coupling matrix. Goal -> Show Relationships. Viz/Presentation -> A bipartite graph on a Canvas showing mass flow between distributions, with the total cost (Wasserstein Distance) displayed. Interaction -> Updates based on the selected distribution pair. Justification -> Visualizes the core "solution" of OT, making the abstract plan concrete. Library/Method -> Vanilla JS + Canvas.
+        - Applications: Report Info -> OT use cases like GANs, Domain Adaptation. Goal -> Inform. Viz/Presentation -> Tabbed section with explanatory text and animated Canvas visuals for each application. Interaction -> Clickable tabs to switch contexts. Justification -> Organizes diverse applications into a digestible format, using animation to show the dynamic nature of OT in practice. Library/Method -> Vanilla JS + Canvas, Chart.js for barycenter viz.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+            color: #292524; /* stone-800 */
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .nav-link.active {
+            color: #0d9488; /* teal-600 */
+            border-bottom-color: #0d9488;
+        }
+        .btn-primary {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0f766e; /* teal-700 */
+        }
+        .btn-secondary {
+            background-color: #e7e5e4; /* stone-200 */
+            color: #44403c; /* stone-700 */
+            transition: background-color 0.3s;
+        }
+        .btn-secondary.active {
+            background-color: #d6d3d1; /* stone-300 */
+            font-weight: 600;
+        }
+        .btn-secondary:hover {
+            background-color: #d6d3d1; /* stone-300 */
+        }
+        .tab-btn.active {
+            border-color: #0d9488; /* teal-600 */
+            color: #0d9488;
+            background-color: #f0fdfa; /* teal-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-30 w-full border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl font-bold text-stone-800">Optimal Transport Explained</h1>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#introduction" class="nav-link text-stone-600 hover:text-teal-600 border-b-2 border-transparent pb-1">Introduction</a>
+                    <a href="#problem" class="nav-link text-stone-600 hover:text-teal-600 border-b-2 border-transparent pb-1">The Problem</a>
+                    <a href="#solution" class="nav-link text-stone-600 hover:text-teal-600 border-b-2 border-transparent pb-1">The Solution</a>
+                    <a href="#applications" class="nav-link text-stone-600 hover:text-teal-600 border-b-2 border-transparent pb-1">Applications</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8 space-y-24">
+
+        <section id="introduction" class="text-center scroll-mt-20">
+            <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">What is Optimal Transport?</h2>
+            <p class="mt-6 text-lg leading-8 text-stone-600">This section introduces the core idea behind Optimal Transport using a simple, intuitive analogy. Imagine you have a pile of dirt and need to move it to fill a hole. Optimal Transport is the mathematical framework for finding the most efficient plan to move the dirt, minimizing the total work (cost) required. This powerful concept can be applied to compare and transform data distributions.</p>
+            
+            <div class="mt-12 bg-white p-6 rounded-xl shadow-lg border border-stone-200">
+                <h3 class="text-xl font-semibold text-stone-800">The Earth Mover's Analogy</h3>
+                <p class="text-stone-600 mt-2">Use the slider to transport the "mass" from the source to the target. Observe how the total cost accumulates based on the amount of mass moved and the distance it travels.</p>
+                <div class="w-full max-w-2xl mx-auto mt-6">
+                    <canvas id="earthMoverCanvas" width="600" height="200"></canvas>
+                </div>
+                <div class="mt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <input id="transportSlider" type="range" min="0" max="100" value="0" class="w-full max-w-xs cursor-pointer">
+                    <div class="bg-orange-100 text-orange-800 font-mono text-lg p-3 rounded-lg w-full sm:w-auto text-center">
+                        Total Cost: <span id="transportCost">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="problem" class="scroll-mt-20">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">The Core Problem: Comparing Distributions</h2>
+                <p class="mt-6 text-lg leading-8 text-stone-600">In data science, we often need to compare different datasets or distributions. Optimal Transport provides a robust way to measure the "distance" between them. This section visualizes the kind of problem OT aims to solve: finding an optimal matching between a source distribution and a target distribution. Select different scenarios to see how the distributions can vary.</p>
+            </div>
+
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white p-6 rounded-xl shadow-lg border border-stone-200">
+                <div class="flex flex-col items-center">
+                    <h3 class="text-lg font-semibold text-stone-800">Source Distribution (μ)</h3>
+                    <div class="chart-container mt-2">
+                        <canvas id="sourceDistChart"></canvas>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <h3 class="text-lg font-semibold text-stone-800">Target Distribution (ν)</h3>
+                    <div class="chart-container mt-2">
+                        <canvas id="targetDistChart"></canvas>
+                    </div>
+                </div>
+            </div>
+             <div class="mt-6 flex flex-wrap justify-center gap-3">
+                <button id="scenario1" class="btn-secondary px-4 py-2 rounded-lg active">Similar Distributions</button>
+                <button id="scenario2" class="btn-secondary px-4 py-2 rounded-lg">Shifted Distributions</button>
+                <button id="scenario3" class="btn-secondary px-4 py-2 rounded-lg">Different Shapes</button>
+            </div>
+        </section>
+
+        <section id="solution" class="scroll-mt-20">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">The Solution: A Transport Plan</h2>
+                <p class="mt-6 text-lg leading-8 text-stone-600">Optimal Transport finds a "transport plan" that specifies how much mass to move from each part of the source to each part of the target to minimize total cost. The visualization below shows this plan as connections between the two distributions. The total cost is known as the Wasserstein or "Earth Mover's" Distance, a powerful metric for comparing distributions.</p>
+            </div>
+             <div class="mt-12 bg-white p-6 rounded-xl shadow-lg border border-stone-200">
+                <h3 class="text-xl font-semibold text-stone-800 text-center">Visualizing the Optimal Transport Plan</h3>
+                <div class="w-full max-w-3xl mx-auto mt-4">
+                    <canvas id="transportPlanCanvas" width="700" height="350"></canvas>
+                </div>
+                <div class="mt-4 flex justify-center">
+                     <div class="bg-teal-100 text-teal-800 font-mono text-lg p-3 rounded-lg">
+                        Wasserstein Distance: <span id="wassersteinDistance">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="applications" class="scroll-mt-20">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Applications in Data Science</h2>
+                <p class="mt-6 text-lg leading-8 text-stone-600">Optimal Transport is not just a theoretical concept; it's a practical tool used to solve real-world problems in machine learning and data analysis. This section explores some key applications. Click through the tabs to see how OT is used for generating new data, adapting models to new domains, and more.</p>
+            </div>
+
+            <div class="mt-12">
+                <div class="border-b border-stone-300">
+                    <nav class="-mb-px flex space-x-6 justify-center" aria-label="Tabs">
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm active" data-tab="gan">Generative Models (GANs)</button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="domain">Domain Adaptation</button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="barycenter">Data Fusion & Barycenters</button>
+                    </nav>
+                </div>
+                <div class="mt-8">
+                    <div id="gan" class="tab-content">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-800">Improving Generative Models</h3>
+                                <p class="mt-4 text-stone-600">Wasserstein GANs (WGANs) use the Wasserstein distance from OT as a loss function. This helps stabilize the training of generative models, allowing them to create more realistic and higher-quality data, such as images. The animation shows a generated distribution (orange) iteratively learning to match the real data distribution (teal) by minimizing the OT distance.</p>
+                                <button id="gan-play" class="btn-primary mt-4 px-4 py-2 rounded-lg">Replay Animation</button>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow border border-stone-200">
+                                <canvas id="ganCanvas" width="400" height="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="domain" class="tab-content hidden">
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-800">Adapting to New Domains</h3>
+                                <p class="mt-4 text-stone-600">Imagine a model trained on one type of data (source) that needs to work on slightly different data (target). OT can be used to align the feature distributions of the source and target domains. This reduces the domain shift and improves the model's performance on the new data without requiring extensive retraining. The animation shows the target data being "transported" to align with the source data.</p>
+                                <button id="domain-play" class="btn-primary mt-4 px-4 py-2 rounded-lg">Replay Animation</button>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow border border-stone-200">
+                                <canvas id="domainCanvas" width="400" height="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="barycenter" class="tab-content hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-800">Fusing and Averaging Datasets</h3>
+                                <p class="mt-4 text-stone-600">Optimal Transport can compute the "average" of several probability distributions, known as the Wasserstein barycenter. This is useful for summarizing or fusing information from multiple sources. For example, it can be used to find a consensus shape from multiple images. The chart shows three different source distributions and their computed barycenter, which represents a balanced compromise between them.</p>
+                            </div>
+                             <div class="bg-white p-6 rounded-lg shadow border border-stone-200">
+                                <div class="chart-container h-96">
+                                    <canvas id="barycenterChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-white border-t border-stone-200 mt-24">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-stone-500 text-sm">
+            <p>An interactive exploration of Optimal Transport concepts.</p>
+        </div>
+    </footer>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const palette = {
+        stone: '#44403c',
+        teal: '#14b8a6',
+        orange: '#f97316',
+        bg: '#f5f5f4',
+        lightTeal: 'rgba(20, 184, 166, 0.2)',
+        lightOrange: 'rgba(249, 115, 22, 0.2)'
+    };
+
+    let sourceChart, targetChart, barycenterChart;
+    let activeScenario = 'scenario1';
+
+    const distributions = {
+        scenario1: {
+            source: [10, 30, 40, 15, 5],
+            target: [12, 28, 42, 13, 5],
+            plan: [[10,0,0,0,0],[2,28,0,0,0],[0,0,40,2,0],[0,0,0,11,4],[0,0,0,0,1]],
+            cost: 21.00
+        },
+        scenario2: {
+            source: [40, 30, 20, 10, 0],
+            target: [0, 10, 20, 30, 40],
+            plan: [[0,10,20,10,0],[0,0,0,20,10],[0,0,0,0,20],[0,0,0,0,10],[0,0,0,0,0]],
+            cost: 200.00
+        },
+        scenario3: {
+            source: [10, 15, 50, 15, 10],
+            target: [30, 20, 0, 20, 30],
+            plan: [[10,0,0,0,0],[15,0,0,0,0],[5,20,0,5,20],[0,0,0,15,0],[0,0,0,0,10]],
+            cost: 165.00
+        }
+    };
+    
+    function normalize(arr) {
+        const sum = arr.reduce((a, b) => a + b, 0);
+        return arr.map(v => v / sum);
+    }
+    
+    function createDistChart(canvasId, data, label, color, bgColor) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        const normalizedData = normalize(data);
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1', '2', '3', '4', '5'],
+                datasets: [{
+                    label: label,
+                    data: normalizedData,
+                    backgroundColor: bgColor,
+                    borderColor: color,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `Mass: ${(context.raw * 100).toFixed(1)}%`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 0.6,
+                        ticks: {
+                            callback: (value) => `${(value * 100).toFixed(0)}%`
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    function drawTransportPlan(canvasId, scenario) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        const data = distributions[scenario];
+        const sourceData = normalize(data.source);
+        const targetData = normalize(data.target);
+        const plan = data.plan.map(row => normalize(row));
+        const totalMass = data.source.reduce((a,b) => a+b, 0);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const numPoints = 5;
+        const ySource = 50;
+        const yTarget = canvas.height - 50;
+        const xMargin = 100;
+        const xSpacing = (canvas.width - 2 * xMargin) / (numPoints - 1);
+        
+        sourceData.forEach((mass, i) => {
+            const x = xMargin + i * xSpacing;
+            ctx.beginPath();
+            ctx.arc(x, ySource, mass * 50 + 5, 0, 2 * Math.PI);
+            ctx.fillStyle = palette.lightTeal;
+            ctx.fill();
+            ctx.strokeStyle = palette.teal;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        });
+        
+        targetData.forEach((mass, i) => {
+            const x = xMargin + i * xSpacing;
+            ctx.beginPath();
+            ctx.arc(x, yTarget, mass * 50 + 5, 0, 2 * Math.PI);
+            ctx.fillStyle = palette.lightOrange;
+            ctx.fill();
+            ctx.strokeStyle = palette.orange;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        });
+
+        data.plan.forEach((row, i) => {
+            row.forEach((transportedMass, j) => {
+                if (transportedMass > 0) {
+                    const x1 = xMargin + i * xSpacing;
+                    const x2 = xMargin + j * xSpacing;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, ySource);
+                    ctx.lineTo(x2, yTarget);
+                    ctx.lineWidth = (transportedMass / totalMass) * 30;
+                    ctx.strokeStyle = 'rgba(128, 128, 128, 0.5)';
+                    ctx.stroke();
+                }
+            });
+        });
+        
+        document.getElementById('wassersteinDistance').textContent = data.cost.toFixed(2);
+    }
+    
+    function updateDistributionCharts(scenario) {
+        const { source, target } = distributions[scenario];
+        if (sourceChart) sourceChart.destroy();
+        if (targetChart) targetChart.destroy();
+        sourceChart = createDistChart('sourceDistChart', source, 'Source', palette.teal, palette.lightTeal);
+        targetChart = createDistChart('targetDistChart', target, 'Target', palette.orange, palette.lightOrange);
+    }
+
+    function initProblemSection() {
+        document.querySelectorAll('#problem .btn-secondary').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelector('#problem .btn-secondary.active').classList.remove('active');
+                button.classList.add('active');
+                activeScenario = button.id;
+                updateDistributionCharts(activeScenario);
+                drawTransportPlan('transportPlanCanvas', activeScenario);
+            });
+        });
+        updateDistributionCharts(activeScenario);
+        drawTransportPlan('transportPlanCanvas', activeScenario);
+    }
+
+    function initEarthMover() {
+        const canvas = document.getElementById('earthMoverCanvas');
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('transportSlider');
+        const costEl = document.getElementById('transportCost');
+        
+        const source = { x: 100, y: 150, width: 100, height: -100 };
+        const target = { x: 400, y: 150, width: 100, height: -100 };
+        const totalMass = source.width * Math.abs(source.height);
+
+        function draw(progress) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#e7e5e4'; // stone-200
+            ctx.fillRect(target.x, target.y, target.width, target.height);
+            ctx.strokeStyle = '#a8a29e'; // stone-400
+            ctx.lineWidth = 2;
+            ctx.strokeRect(target.x, target.y, target.width, target.height);
+            
+            const movedHeight = source.height * progress;
+            const remainingHeight = source.height * (1 - progress);
+            
+            ctx.fillStyle = palette.teal;
+            ctx.fillRect(source.x, source.y, source.width, remainingHeight);
+            
+            ctx.fillStyle = palette.orange;
+            ctx.fillRect(target.x, target.y, target.width, movedHeight);
+
+            if (progress > 0 && progress < 1) {
+                const particleCount = 20;
+                for (let i = 0; i < particleCount; i++) {
+                    const p = (performance.now() / 1000 + i * 0.1) % 1;
+                    const x = source.x + source.width + p * (target.x - (source.x + source.width));
+                    const y = source.y + source.height + Math.sin(p * Math.PI) * -50;
+                    ctx.fillStyle = 'rgba(20, 184, 166, 0.7)';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+        
+        let animationFrame;
+        function animate(progress) {
+            draw(progress);
+            if (progress > 0 && progress < 1) {
+                animationFrame = requestAnimationFrame(() => animate(progress));
+            }
+        }
+        
+        slider.addEventListener('input', () => {
+            cancelAnimationFrame(animationFrame);
+            const progress = slider.value / 100;
+            const distance = target.x - source.x;
+            const cost = totalMass * distance * progress;
+            costEl.textContent = cost.toFixed(2);
+            animate(progress);
+        });
+
+        draw(0);
+    }
+
+    function initTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const targetId = tab.dataset.tab;
+                contents.forEach(content => {
+                    if (content.id === targetId) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    }
+    
+    function animateGan() {
+        const canvas = document.getElementById('ganCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const numPoints = 100;
+        
+        let targetPoints = Array.from({length: numPoints}, () => {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 100 + Math.random() * 20;
+            return {
+                x: 200 + Math.cos(angle) * radius,
+                y: 200 + Math.sin(angle) * radius,
+            };
+        });
+        
+        let generatedPoints = Array.from({length: numPoints}, () => ({
+            x: Math.random() * 400,
+            y: Math.random() * 400
+        }));
+        
+        let frame = 0;
+        const totalFrames = 120;
+        
+        function draw() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            
+            targetPoints.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+                ctx.fillStyle = palette.lightTeal;
+                ctx.fill();
+            });
+            
+            generatedPoints.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+                ctx.fillStyle = palette.orange;
+                ctx.fill();
+            });
+        }
+        
+        function update() {
+            if (frame >= totalFrames) return;
+            const progress = frame / totalFrames;
+            
+            generatedPoints = generatedPoints.map((p, i) => {
+                 const target = targetPoints[i];
+                 return {
+                     x: p.x + (target.x - p.x) * 0.05,
+                     y: p.y + (target.y - p.y) * 0.05,
+                 }
+            });
+            
+            draw();
+            frame++;
+            requestAnimationFrame(update);
+        }
+        
+        document.getElementById('gan-play').onclick = () => {
+            frame = 0;
+            generatedPoints = Array.from({length: numPoints}, () => ({
+                x: Math.random() * 400,
+                y: Math.random() * 400
+            }));
+            update();
+        };
+
+        update();
+    }
+    
+     function animateDomainAdaptation() {
+        const canvas = document.getElementById('domainCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const numPoints = 50;
+
+        const sourcePoints = Array.from({ length: numPoints }, () => ({
+            x: 50 + Math.random() * 100,
+            y: 100 + Math.random() * 200,
+        }));
+        
+        let targetPointsStart = Array.from({ length: numPoints }, () => ({
+            x: 250 + Math.random() * 100,
+            y: 100 + Math.random() * 200,
+        }));
+        let targetPoints = [...targetPointsStart.map(p => ({...p}))];
+        
+        const rotationAngle = -Math.PI / 8;
+        const targetCentroid = { x: 300, y: 200 };
+        const sourceCentroid = { x: 100, y: 200 };
+        
+        let frame = 0;
+        const totalFrames = 100;
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            sourcePoints.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = palette.lightTeal; ctx.fill();
+            });
+            
+            targetPoints.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = palette.orange; ctx.fill();
+            });
+        }
+
+        function update() {
+             if (frame >= totalFrames) return;
+             const progress = frame / totalFrames;
+             
+             targetPoints = targetPointsStart.map(p => {
+                let x = p.x - targetCentroid.x;
+                let y = p.y - targetCentroid.y;
+                
+                let rotatedX = x * Math.cos(rotationAngle * progress) - y * Math.sin(rotationAngle * progress);
+                let rotatedY = x * Math.sin(rotationAngle * progress) + y * Math.cos(rotationAngle * progress);
+                
+                let translatedX = (targetCentroid.x + (sourceCentroid.x - targetCentroid.x) * progress) + rotatedX;
+                let translatedY = targetCentroid.y + rotatedY;
+                
+                return { x: translatedX, y: translatedY };
+            });
+
+             draw();
+             frame++;
+             requestAnimationFrame(update);
+        }
+        
+        document.getElementById('domain-play').onclick = () => {
+            frame = 0;
+            targetPoints = [...targetPointsStart.map(p => ({...p}))];
+            update();
+        };
+        update();
+    }
+    
+    function initBarycenterChart() {
+        const ctx = document.getElementById('barycenterChart').getContext('2d');
+        const data1 = [1, 1, 5, 1, 1];
+        const data2 = [1, 5, 1, 1, 1];
+        const data3 = [1, 1, 1, 5, 1];
+        const barycenter = data1.map((v, i) => (v + data2[i] + data3[i]) / 3);
+
+        barycenterChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Bin 1', 'Bin 2', 'Bin 3', 'Bin 4', 'Bin 5'],
+                datasets: [
+                    { label: 'Source 1', data: normalize(data1), backgroundColor: 'rgba(20, 184, 166, 0.3)' },
+                    { label: 'Source 2', data: normalize(data2), backgroundColor: 'rgba(249, 115, 22, 0.3)' },
+                    { label: 'Source 3', data: normalize(data3), backgroundColor: 'rgba(107, 114, 128, 0.3)' },
+                    { 
+                        label: 'Barycenter', 
+                        data: normalize(barycenter), 
+                        backgroundColor: '#3b82f6', // blue-500
+                        borderColor: '#2563eb', // blue-600
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Wasserstein Barycenter' }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => `${(value * 100).toFixed(0)}%`
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function initNavObserver() {
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                    });
+                }
+            });
+        }, { rootMargin: '-50% 0px -50% 0px' });
+
+        sections.forEach(section => observer.observe(section));
+    }
+
+
+    initEarthMover();
+    initProblemSection();
+    initTabs();
+    animateGan();
+    animateDomainAdaptation();
+    initBarycenterChart();
+    initNavObserver();
+});
+</script>
+
+</body>
+</html>

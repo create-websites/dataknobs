@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to OpenAI Models</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Earthy & Calm -->
+    <!-- Application Structure Plan: The application is structured as a top-down decision funnel to guide developers. It begins with the most fundamental strategic choice (1. General vs. Reasoning) to frame the problem. It then visualizes the key constraints (2. The Trade-Off Axis). Next, it provides a deep dive into the most common decision (3. Flagship Comparison: GPT-4.1 vs GPT-4o) with interactive data. It broadens the scope to cover other necessary tools (4. Specialized Models) and logistical choices (5. Deployment Platforms). Finally, it culminates in the most actionable tool (6. The Selection Matrix), which synthesizes all prior information into direct recommendations. This narrative flow mirrors a developer's decision-making process, making the report's content highly usable. -->
+    <!-- Visualization & Content Choices:
+        - Report Info: General-Purpose (GPT) vs. Reasoning (o-series) models -> Goal: Organize -> Viz: Side-by-side HTML/CSS cards -> Interaction: None -> Justification: Clearly presents the two primary paths at the start of the decision journey. -> Method: HTML/Tailwind.
+        - Report Info: Cost-Performance-Speed Trade-offs (nano, mini, full) -> Goal: Compare Relationships -> Viz: Radar Chart -> Interaction: Hover for tooltips -> Justification: A radar chart is the most intuitive way to visualize a three-dimensional trade-off in a single graphic. -> Library: Chart.js.
+        - Report Info: GPT-4.1 vs. GPT-4o benchmark scores -> Goal: Compare -> Viz: Grouped Bar Chart -> Interaction: Hover for tooltips -> Justification: Directly compares quantitative performance on key metrics like coding and reasoning. -> Library: Chart.js.
+        - Report Info: Specialized Models (Image, Speech, Video) -> Goal: Organize -> Viz: Interactive HTML/CSS tabs -> Interaction: Click to switch views -> Justification: Organizes a large amount of information into a compact space, allowing users to explore their area of interest without being overwhelmed. -> Method: HTML/Tailwind + JS.
+        - Report Info: Model Selection Matrix -> Goal: Organize/Inform -> Viz: Styled HTML Table -> Interaction: None -> Justification: A table is the most effective format for presenting dense, comparative recommendations for direct use. -> Method: HTML/Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFDFB;
+            color: #3C3C3B;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #A0522D;
+            border-bottom-color: #A0522D;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #F0F0F0;
+        }
+        .tab {
+            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab.active {
+            color: #A0522D;
+            border-bottom-color: #A0522D;
+            background-color: #FDFDFB;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-200">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800">OpenAI Model Decision Guide</h1>
+            <div class="hidden lg:flex space-x-8">
+                <a href="#decision-flow" class="nav-link font-medium text-gray-600 pb-1">Core Choice</a>
+                <a href="#tradeoffs" class="nav-link font-medium text-gray-600 pb-1">Trade-Offs</a>
+                <a href="#flagship-battle" class="nav-link font-medium text-gray-600 pb-1">Flagship Battle</a>
+                <a href="#toolbox" class="nav-link font-medium text-gray-600 pb-1">Toolbox</a>
+                <a href="#deployment" class="nav-link font-medium text-gray-600 pb-1">Deployment</a>
+                <a href="#matrix" class="nav-link font-medium text-gray-600 pb-1">Matrix</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-12">
+        <section class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Choosing Your AI Model</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">An interactive guide to navigating OpenAI's ecosystem, helping you select the optimal model based on performance, speed, and cost.</p>
+        </section>
+
+        <section id="decision-flow" class="mb-16 scroll-mt-24">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-2">Start Here: The Fundamental Divide</h3>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">Your first and most critical decision is to identify the nature of your task. Is it a well-defined instruction that needs to be executed efficiently, or a complex problem that requires deep, multi-step reasoning? This choice determines which primary model family you should start with.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card p-6 border-t-4 border-sienna-700">
+                    <h4 class="text-xl font-bold mb-3">GPT-Series (General-Purpose)</h4>
+                    <p class="text-gray-600 mb-4">Choose for speed, cost-efficiency, and executing well-defined tasks. These models are excellent "instruction-followers."</p>
+                    <b class="text-gray-700">Ideal for:</b>
+                    <ul class="mt-2 space-y-1 text-gray-600 list-disc list-inside">
+                        <li>Content Summarization & Generation</li>
+                        <li>Translation & Standard Q&A</li>
+                        <li>Most Real-Time Applications</li>
+                    </ul>
+                </div>
+                <div class="card p-6 border-t-4 border-gray-500">
+                    <h4 class="text-xl font-bold mb-3">o-Series (Reasoning)</h4>
+                    <p class="text-gray-600 mb-4">Choose for accuracy in complex, ambiguous, or high-stakes scenarios. These models "think longer" to find the best solution.</p>
+                    <b class="text-gray-700">Ideal for:</b>
+                    <ul class="mt-2 space-y-1 text-gray-600 list-disc list-inside">
+                        <li>High-Stakes Financial & Legal Analysis</li>
+                        <li>Complex Scientific & Mathematical Problems</li>
+                        <li>Strategic Planning & Decision Making</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="tradeoffs" class="mb-16 scroll-mt-24">
+            <div class="card p-6 md:p-8">
+                <h3 class="text-2xl md:text-3xl font-bold text-center mb-2">The Cost-Performance-Speed Axis</h3>
+                <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">Within each family, models are tiered to manage the trade-offs between intelligence, speed, and cost. `Nano` models prioritize speed and affordability, `Mini` models offer a balance, and `Full-Size` models deliver maximum performance. This chart helps you visualize where each tier sits.</p>
+                <div class="chart-container">
+                    <canvas id="tradeoffChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="flagship-battle" class="mb-16 scroll-mt-24">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-2">Flagship Battle: GPT-4.1 vs. GPT-4o</h3>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">Your choice of flagship model comes down to a "Specialist vs. Generalist" dilemma. GPT-4.1 is the specialist for deep analysis over long contexts, while GPT-4o is the generalist for seamless, real-time multimodal interactions. The chart below shows their performance on key benchmarks.</p>
+            <div class="card p-6 md:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
+                    <div class="lg:col-span-3">
+                         <div class="chart-container h-[450px]">
+                            <canvas id="benchmarkChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 space-y-6">
+                        <div>
+                            <h4 class="font-bold text-lg text-sienna-800">GPT-4.1 (The Analyst)</h4>
+                            <p class="text-gray-600">Optimized for accuracy and deep reasoning over vast amounts of information. Its 1M token context window is a key advantage for processing entire codebases or legal documents.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-teal-800">GPT-4o (The Interactor)</h4>
+                            <p class="text-gray-600">Engineered for speed and natural human-computer interaction. Its natively multimodal architecture delivers real-time voice conversations and visual understanding.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="toolbox" class="mb-16 scroll-mt-24">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-2">Explore the AI Toolbox</h3>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">Beyond general-purpose text models, OpenAI provides a suite of powerful tools for specialized tasks. Use the tabs below to explore the right models for image generation, speech processing, and video creation.</p>
+             <div class="card p-2">
+                <div class="border-b border-gray-200">
+                    <nav class="flex -mb-px" id="tabs">
+                        <button class="tab active" data-target="panel-image">🖼️ Image</button>
+                        <button class="tab" data-target="panel-speech">🗣️ Speech</button>
+                        <button class="tab" data-target="panel-video">🎬 Video</button>
+                    </nav>
+                </div>
+                <div class="p-6">
+                    <div id="panel-image" class="tab-panel">
+                        <h4 class="text-xl font-bold mb-4">Choosing an Image Model</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h5 class="font-semibold text-lg">GPT Image 1 (via GPT-4o)</h5>
+                                <p class="text-gray-600">The state-of-the-art choice for photorealism, complex scenes, and accurately rendering text within images. Best for professional use cases.</p>
+                            </div>
+                             <div>
+                                <h5 class="font-semibold text-lg">DALL·E 3</h5>
+                                <p class="text-gray-600">A strong, accessible choice for artistic styles, illustrations, and creative concepts. Tightly integrated with ChatGPT for easy prompting.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="panel-speech" class="tab-panel hidden">
+                        <h4 class="text-xl font-bold mb-4">Choosing a Speech Model</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h5 class="font-semibold text-lg">GPT-4o Transcribe</h5>
+                                <p class="text-gray-600">The new state-of-the-art for transcription accuracy via API. Use when the lowest word error rate is critical.</p>
+                            </div>
+                             <div>
+                                <h5 class="font-semibold text-lg">Whisper</h5>
+                                <p class="text-gray-600">A highly accurate open-source model. Use when you need full control for offline batch processing or for translations into English.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="panel-video" class="tab-panel hidden">
+                         <h4 class="text-xl font-bold mb-4">The Future of Motion: Sora</h4>
+                         <p class="text-gray-600">Sora is a "world simulator" model capable of generating high-fidelity, minute-long video clips from text prompts. It can also animate still images and edit video. While not yet available via a general API, it signals the next frontier in generative AI.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="deployment" class="mb-16 scroll-mt-24">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-2">The Deployment Decision</h3>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">Choosing your platform is as critical as choosing your model. This decision balances innovation speed with enterprise-grade security and compliance.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="card p-6 text-center">
+                    <h4 class="text-xl font-bold mb-3">Direct OpenAI API</h4>
+                    <p class="text-gray-600">Best for flexibility, control, and access to the absolute latest models. Ideal for startups and custom product development.</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <h4 class="text-xl font-bold mb-3">ChatGPT Interface</h4>
+                    <p class="text-gray-600">Best for internal productivity, ad-hoc research, and non-technical users. Provides access to powerful agentic tools.</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <h4 class="text-xl font-bold mb-3">Microsoft Azure</h4>
+                    <p class="text-gray-600">The mandatory choice for enterprise-grade security, compliance (HIPAA/GDPR), and reliability for mission-critical apps.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="matrix" class="scroll-mt-24">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-2">The Model Selection Matrix</h3>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">Use this matrix for concrete, opinionated recommendations. It balances performance needs with the practical constraints of cost and speed for common developer use cases.</p>
+            <div class="card p-4 md:p-6 overflow-x-auto">
+                 <table class="w-full text-left">
+                    <thead class="border-b border-gray-200">
+                        <tr>
+                            <th class="p-3 font-semibold">Use Case</th>
+                            <th class="p-3 font-semibold">Performance Choice</th>
+                            <th class="p-3 font-semibold">Balanced Choice</th>
+                            <th class="p-3 font-semibold">Cost-Optimized</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr class="text-sm">
+                            <td class="p-3 font-medium">Complex Code Generation</td>
+                            <td class="p-3">`gpt-4.1`</td>
+                            <td class="p-3">`gpt-4o`</td>
+                            <td class="p-3">`gpt-4.1-mini`</td>
+                        </tr>
+                         <tr class="text-sm bg-gray-50">
+                            <td class="p-3 font-medium">Real-Time Voice Assistant</td>
+                            <td class="p-3">`gpt-4o`</td>
+                            <td class="p-3">`gpt-4o-mini`</td>
+                            <td class="p-3">`gpt-4o-mini`</td>
+                        </tr>
+                        <tr class="text-sm">
+                            <td class="p-3 font-medium">High-Stakes Document Review</td>
+                            <td class="p-3">`o3`</td>
+                            <td class="p-3">`gpt-4.1`</td>
+                            <td class="p-3">`o4-mini`</td>
+                        </tr>
+                         <tr class="text-sm bg-gray-50">
+                            <td class="p-3 font-medium">Photorealistic Image w/ Text</td>
+                            <td class="p-3">`gpt-image-1`</td>
+                            <td class="p-3">`dall-e-3` (HD)</td>
+                            <td class="p-3">`dall-e-3` (Std)</td>
+                        </tr>
+                        <tr class="text-sm">
+                            <td class="p-3 font-medium">High-Volume Content Creation</td>
+                            <td class="p-3">`gpt-4.1`</td>
+                            <td class="p-3">`gpt-4o`</td>
+                            <td class="p-3">`gpt-4o-mini`</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-16 bg-white border-t border-gray-200">
+        <div class="container mx-auto px-6 py-4 text-center text-gray-500 text-sm">
+            <p>Data synthesized from "The OpenAI Model Matrix" report. This is a demonstrative application and does not represent real-time data or an official OpenAI tool.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const FONT_DEFAULTS = { family: "'Inter', sans-serif" };
+            const PALETTE = {
+                sienna: 'rgba(160, 82, 45, <alpha>)',
+                teal: 'rgba(0, 128, 128, <alpha>)',
+                gray: 'rgba(107, 114, 128, <alpha>)',
+                text: '#3C3C3B',
+            };
+
+            const globalChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: PALETTE.text, font: FONT_DEFAULTS }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#000', bodyColor: '#333',
+                        borderColor: '#ddd', borderWidth: 1,
+                        padding: 10,
+                        titleFont: { ...FONT_DEFAULTS, weight: 'bold' },
+                        bodyFont: FONT_DEFAULTS,
+                    }
+                }
+            };
+
+            const tradeoffCtx = document.getElementById('tradeoffChart').getContext('2d');
+            new Chart(tradeoffCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Performance', 'Speed', 'Low Cost'],
+                    datasets: [{
+                        label: 'Full-Size',
+                        data: [10, 4, 2],
+                        fill: true,
+                        backgroundColor: PALETTE.sienna.replace('<alpha>', '0.2'),
+                        borderColor: PALETTE.sienna.replace('<alpha>', '1'),
+                        pointBackgroundColor: PALETTE.sienna.replace('<alpha>', '1'),
+                    }, {
+                        label: 'Mini',
+                        data: [7, 7, 7],
+                        fill: true,
+                        backgroundColor: PALETTE.teal.replace('<alpha>', '0.2'),
+                        borderColor: PALETTE.teal.replace('<alpha>', '1'),
+                        pointBackgroundColor: PALETTE.teal.replace('<alpha>', '1'),
+                    }, {
+                        label: 'Nano',
+                        data: [4, 10, 10],
+                        fill: true,
+                        backgroundColor: PALETTE.gray.replace('<alpha>', '0.2'),
+                        borderColor: PALETTE.gray.replace('<alpha>', '1'),
+                        pointBackgroundColor: PALETTE.gray.replace('<alpha>', '1'),
+                    }]
+                },
+                options: {
+                    ...globalChartOptions,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: { font: { ...FONT_DEFAULTS, size: 14 }, color: PALETTE.text },
+                            ticks: { display: false, backdropColor: 'transparent' }
+                        }
+                    }
+                }
+            });
+
+            const benchmarkCtx = document.getElementById('benchmarkChart').getContext('2d');
+            new Chart(benchmarkCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Coding (SWE-bench)', 'Reasoning (MMLU)', 'Instruction Following (IFEval)'],
+                    datasets: [{
+                        label: 'GPT-4.1',
+                        data: [54.6, 90.2, 95.3],
+                        backgroundColor: PALETTE.sienna.replace('<alpha>', '0.8'),
+                    }, {
+                        label: 'GPT-4o',
+                        data: [33.2, 88.7, 88.9],
+                        backgroundColor: PALETTE.teal.replace('<alpha>', '0.8'),
+                    }]
+                },
+                options: {
+                    ...globalChartOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { color: PALETTE.text, font: FONT_DEFAULTS, callback: (v) => v + '%' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: PALETTE.text, font: FONT_DEFAULTS }
+                        }
+                    }
+                }
+            });
+
+            const tabs = document.getElementById('tabs');
+            const panels = document.querySelectorAll('.tab-panel');
+            tabs.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab')) {
+                    tabs.querySelector('.active').classList.remove('active');
+                    e.target.classList.add('active');
+                    
+                    const targetPanelId = e.target.getAttribute('data-target');
+                    panels.forEach(panel => {
+                        if (panel.id === targetPanelId) {
+                            panel.classList.remove('hidden');
+                        } else {
+                            panel.classList.add('hidden');
+                        }
+                    });
+                }
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section[id]');
+            
+            function changeActiveLink() {
+                let index = sections.length;
+                while(--index && window.scrollY + 100 < sections[index].offsetTop) {}
+                navLinks.forEach((link) => link.classList.remove('active'));
+                const activeLink = document.querySelector(`.nav-link[href="#${sections[index].id}"]`);
+                if (activeLink) {
+                   activeLink.classList.add('active');
+                }
+            }
+            changeActiveLink();
+            window.addEventListener('scroll', changeActiveLink);
+
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1921 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+	
+	<head id="ctl00_head1">
+<meta name="google-site-verification" content="RVceKokUCmE6I_4EjvyNso7r-FabKr95sjVmUSOiUAI" />
+<!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-JF94J1W5MC');
+</script><title>
+	Optimal Transport Explained: Applications & Insights
+</title><meta http-equiv="content-type" content="text/html; charset=utf-8" /><meta name="description" content="Discover Optimal Transport, a powerful tool for comparing data distributions, with applications in GANs, domain adaptation, and data fusion." /><meta name="keywords" content="Optimal Transport, Earth Mover&#39;s Distance, Wasserstein Distance, data science, generative models, GANs, WGANs, domain adaptation, data fusion, probability distributions, transport plan, data analysis, machine learning, barycenter, comparing distributions" /><link rel="icon" href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" /><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800" rel="stylesheet" type="text/css" />
+
+<!--		
+		<script src="https://css.dataknobs.com/sites/site-6/site6-1/js/jquery-1.8.3.min.js"></script>
+		<script src="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/init.js?use=mobile,desktop,1000px&amp;mobileUI=1&amp;mobileUI.theme=none"></script>
+		<script src="https://css.dataknobs.com/sites/site-6/site6-1/js/jquery.dropotron-1.2.js"></script>
+		<script src="https://css.dataknobs.com/sites/site-6/site6-1/js/init.js"></script>
+		<noscript>
+			<link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core-desktop.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core-1200px.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core-noscript.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/style.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/style-desktop.css" />
+		</noscript>
+	-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 7]><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/ie7.css" /><![endif]-->
+
+
+	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/js/jquery-1.8.3.min.js"></script>
+	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/init.js?use=mobile,desktop,1000px&amp;mobileUI=1&amp;mobileUI.theme=none"></script>
+	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/js/jquery.dropotron-1.2.js"></script>
+	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/js/init.js"></script>
+	<noscript>
+		<link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core-desktop.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core-1200px.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core-noscript.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/style.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/style-desktop.css" />
+	</noscript>
+	
+	
+
+	<meta name="description" content="Discover Optimal Transport, a powerful tool for comparing data distributions, with applications in GANs, domain adaptation, and data fusion." /><meta name="keywords" content="Optimal Transport, Earth Mover&#39;s Distance, Wasserstein Distance, data science, generative models, GANs, WGANs, domain adaptation, data fusion, probability distributions, transport plan, data analysis, machine learning, barycenter, comparing distributions" /></head>
+  
+	<body class="no-sidebar">
+         
+		<!-- Header Wrapper -->
+			<div id="header-wrapper">
+				<div class="5grid-layout">
+					<div class="row">
+						<div class="12u">
+						
+							<!-- Header -->
+								<header id="header">
+								
+									<!-- Logo -->
+										
+										<div class="inner">
+										
+											<h1> <a id="ctl00_topheader" class="mobileUI-site-name">Optimal Transport Explained: Applications & Insights</a></h1>
+										
+									        
+										</div>
+									
+									
+									<!-- Nav -->
+										<nav id="nav" class="mobileUI-site-nav">
+											<ul>
+												 <li><a id="ctl00_hyperlinkHome" href="https://www.dataknobs.com/">Home</a></li>
+												<!--
+														
+
+    
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl01_title" href="https://www.dataknobs.com/">Home</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl02_title" href="https://www.dataknobs.com/about-dataknobs/">About dataknobs</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl03_title" href="https://www.dataknobs.com/agent-ai/">Agent ai</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl04_title" href="https://www.dataknobs.com/blog/">Blog</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl05_title" href="https://www.dataknobs.com/careers/">Careers</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl06_title" href="https://www.dataknobs.com/causal-inference/">Causal inference</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl07_title" href="https://www.dataknobs.com/consulting/">Consulting</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl08_title" href="https://www.dataknobs.com/customers/">Customers</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl09_title" href="https://www.dataknobs.com/data-centric-ai/">Data centric ai</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl10_title" href="https://www.dataknobs.com/data-products/">Data products</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl11_title" href="https://www.dataknobs.com/datasets-blindspots/">Datasets blindspots</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl12_title" href="https://www.dataknobs.com/embeddings/">Embeddings</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl13_title" href="https://www.dataknobs.com/explore/">Explore</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl14_title" href="https://www.dataknobs.com/fractional-cto-ai/">Fractional cto ai</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl15_title" href="https://www.dataknobs.com/generate-datasets/">Generate datasets</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl16_title" href="https://www.dataknobs.com/generativeai/">Generativeai</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl17_title" href="https://www.dataknobs.com/industry/">Industry</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl18_title" href="https://www.dataknobs.com/partnership/">Partnership</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl19_title" href="https://www.dataknobs.com/privacy/">Privacy</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl20_title" href="https://www.dataknobs.com/products/">Products</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl21_title" href="https://www.dataknobs.com/slides/">Slides</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl22_title" href="https://www.dataknobs.com/solutions/">Solutions</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl23_title" href="https://www.dataknobs.com/use-cases/">Use cases</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articleshome_RepLinks_ctl24_title" href="https://www.dataknobs.com/vector-database/">Vector database</a>
+            </li>	
+
+
+
+
+
+
+
+             
+ 
+ 
+ 
+
+												-->
+                                               
+											</ul>
+										</nav>
+								
+								</header>
+                               
+
+						</div>
+					</div>
+				</div>
+			
+		</div>
+
+		<div id="main-wrapper">
+
+			<div class="main-wrapper-style2">
+
+					<div class="inner">
+
+						<div class="5grid-layout">
+
+							<div class="row">
+
+									
+									<div class="12u mobileUI-main-content">
+										<div id="content">
+
+										<article>
+
+												
+													
+
+
+		
+							
+										
+
+    <header class="major">
+                                         
+					  <h2><span id="ctl00_ContentPlaceHolder1_title">Optimal Transport Explained: Applications & Insights</span></h2>						
+										
+						 <span class="byline"> <span id="ctl00_ContentPlaceHolder1_metadesc">Discover Optimal Transport, a powerful tool for comparing data distributions, with applications in GANs, domain adaptation, and data fusion.</span></span>				
+    </header>       
+     
+
+							
+										
+									<span id="ctl00_ContentPlaceHolder1_labeltext"></span>	
+
+                                                           														
+                            <br />
+                            <br />
+
+                               <table id="ctl00_ContentPlaceHolder1_RepComments" cellspacing="0" border="0">
+	<tr>
+		<td>
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+					
+                   
+
+												 
+               							
+		
+
+      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl01_label2"><font color="Black" size="4"><!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An Interactive Guide to Optimal Transport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Stone, Teal, Orange) -->
+    <!-- Application Structure Plan: The application is designed as a single-page, vertical narrative to guide users through the complex topic of Optimal Transport (OT). It starts with a simple, intuitive analogy (the "earth mover" problem), progresses to the core mathematical concepts (distributions and transport plans), and culminates in practical data science applications. This step-by-step structure is chosen over a dashboard because the primary goal is education and conceptual understanding, not data exploration. Key interactions include sliders to visualize the transport process, buttons to switch between different data scenarios, and tabs to explore various applications, making the abstract concepts tangible and easier to grasp. -->
+    <!-- Visualization & Content Choices: 
+        - Intro Analogy: Report Info -> Basic concept of moving mass. Goal -> Inform. Viz/Presentation -> Interactive Canvas animation of moving "dirt" to a "hole". Interaction -> Slider controls the animation progress. Justification -> Provides a strong, memorable mental model for OT. Library/Method -> Vanilla JS + Canvas.
+        - Core Problem: Report Info -> Comparing two distributions. Goal -> Organize/Compare. Viz/Presentation -> Two side-by-side bar charts. Interaction -> Buttons to load different preset distribution pairs. Justification -> Clearly frames the problem OT solves. Library/Method -> Chart.js.
+        - Transport Plan: Report Info -> The solution to OT, the coupling matrix. Goal -> Show Relationships. Viz/Presentation -> A bipartite graph on a Canvas showing mass flow between distributions, with the total cost (Wasserstein Distance) displayed. Interaction -> Updates based on the selected distribution pair. Justification -> Visualizes the core "solution" of OT, making the abstract plan concrete. Library/Method -> Vanilla JS + Canvas.
+        - Applications: Report Info -> OT use cases like GANs, Domain Adaptation. Goal -> Inform. Viz/Presentation -> Tabbed section with explanatory text and animated Canvas visuals for each application. Interaction -> Clickable tabs to switch contexts. Justification -> Organizes diverse applications into a digestible format, using animation to show the dynamic nature of OT in practice. Library/Method -> Vanilla JS + Canvas, Chart.js for barycenter viz.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+            color: #292524; /* stone-800 */
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .nav-link.active {
+            color: #0d9488; /* teal-600 */
+            border-bottom-color: #0d9488;
+        }
+        .btn-primary {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0f766e; /* teal-700 */
+        }
+        .btn-secondary {
+            background-color: #e7e5e4; /* stone-200 */
+            color: #44403c; /* stone-700 */
+            transition: background-color 0.3s;
+        }
+        .btn-secondary.active {
+            background-color: #d6d3d1; /* stone-300 */
+            font-weight: 600;
+        }
+        .btn-secondary:hover {
+            background-color: #d6d3d1; /* stone-300 */
+        }
+        .tab-btn.active {
+            border-color: #0d9488; /* teal-600 */
+            color: #0d9488;
+            background-color: #f0fdfa; /* teal-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-30 w-full border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl font-bold text-stone-800">Optimal Transport Explained</h1>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#introduction" class="nav-link text-stone-600 hover:text-teal-600 border-b-2 border-transparent pb-1">Introduction</a>
+                    <a href="#problem" class="nav-link text-stone-600 hover:text-teal-600 border-b-2 border-transparent pb-1">The Problem</a>
+                    <a href="#solution" class="nav-link text-stone-600 hover:text-teal-600 border-b-2 border-transparent pb-1">The Solution</a>
+                    <a href="#applications" class="nav-link text-stone-600 hover:text-teal-600 border-b-2 border-transparent pb-1">Applications</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8 space-y-24">
+
+        <section id="introduction" class="text-center scroll-mt-20">
+            <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">What is Optimal Transport?</h2>
+            <p class="mt-6 text-lg leading-8 text-stone-600">This section introduces the core idea behind Optimal Transport using a simple, intuitive analogy. Imagine you have a pile of dirt and need to move it to fill a hole. Optimal Transport is the mathematical framework for finding the most efficient plan to move the dirt, minimizing the total work (cost) required. This powerful concept can be applied to compare and transform data distributions.</p>
+            
+            <div class="mt-12 bg-white p-6 rounded-xl shadow-lg border border-stone-200">
+                <h3 class="text-xl font-semibold text-stone-800">The Earth Mover's Analogy</h3>
+                <p class="text-stone-600 mt-2">Use the slider to transport the "mass" from the source to the target. Observe how the total cost accumulates based on the amount of mass moved and the distance it travels.</p>
+                <div class="w-full max-w-2xl mx-auto mt-6">
+                    <canvas id="earthMoverCanvas" width="600" height="200"></canvas>
+                </div>
+                <div class="mt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <input id="transportSlider" type="range" min="0" max="100" value="0" class="w-full max-w-xs cursor-pointer">
+                    <div class="bg-orange-100 text-orange-800 font-mono text-lg p-3 rounded-lg w-full sm:w-auto text-center">
+                        Total Cost: <span id="transportCost">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="problem" class="scroll-mt-20">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">The Core Problem: Comparing Distributions</h2>
+                <p class="mt-6 text-lg leading-8 text-stone-600">In data science, we often need to compare different datasets or distributions. Optimal Transport provides a robust way to measure the "distance" between them. This section visualizes the kind of problem OT aims to solve: finding an optimal matching between a source distribution and a target distribution. Select different scenarios to see how the distributions can vary.</p>
+            </div>
+
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white p-6 rounded-xl shadow-lg border border-stone-200">
+                <div class="flex flex-col items-center">
+                    <h3 class="text-lg font-semibold text-stone-800">Source Distribution (μ)</h3>
+                    <div class="chart-container mt-2">
+                        <canvas id="sourceDistChart"></canvas>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <h3 class="text-lg font-semibold text-stone-800">Target Distribution (ν)</h3>
+                    <div class="chart-container mt-2">
+                        <canvas id="targetDistChart"></canvas>
+                    </div>
+                </div>
+            </div>
+             <div class="mt-6 flex flex-wrap justify-center gap-3">
+                <button id="scenario1" class="btn-secondary px-4 py-2 rounded-lg active">Similar Distributions</button>
+                <button id="scenario2" class="btn-secondary px-4 py-2 rounded-lg">Shifted Distributions</button>
+                <button id="scenario3" class="btn-secondary px-4 py-2 rounded-lg">Different Shapes</button>
+            </div>
+        </section>
+
+        <section id="solution" class="scroll-mt-20">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">The Solution: A Transport Plan</h2>
+                <p class="mt-6 text-lg leading-8 text-stone-600">Optimal Transport finds a "transport plan" that specifies how much mass to move from each part of the source to each part of the target to minimize total cost. The visualization below shows this plan as connections between the two distributions. The total cost is known as the Wasserstein or "Earth Mover's" Distance, a powerful metric for comparing distributions.</p>
+            </div>
+             <div class="mt-12 bg-white p-6 rounded-xl shadow-lg border border-stone-200">
+                <h3 class="text-xl font-semibold text-stone-800 text-center">Visualizing the Optimal Transport Plan</h3>
+                <div class="w-full max-w-3xl mx-auto mt-4">
+                    <canvas id="transportPlanCanvas" width="700" height="350"></canvas>
+                </div>
+                <div class="mt-4 flex justify-center">
+                     <div class="bg-teal-100 text-teal-800 font-mono text-lg p-3 rounded-lg">
+                        Wasserstein Distance: <span id="wassersteinDistance">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="applications" class="scroll-mt-20">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">Applications in Data Science</h2>
+                <p class="mt-6 text-lg leading-8 text-stone-600">Optimal Transport is not just a theoretical concept; it's a practical tool used to solve real-world problems in machine learning and data analysis. This section explores some key applications. Click through the tabs to see how OT is used for generating new data, adapting models to new domains, and more.</p>
+            </div>
+
+            <div class="mt-12">
+                <div class="border-b border-stone-300">
+                    <nav class="-mb-px flex space-x-6 justify-center" aria-label="Tabs">
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm active" data-tab="gan">Generative Models (GANs)</button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="domain">Domain Adaptation</button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="barycenter">Data Fusion & Barycenters</button>
+                    </nav>
+                </div>
+                <div class="mt-8">
+                    <div id="gan" class="tab-content">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-800">Improving Generative Models</h3>
+                                <p class="mt-4 text-stone-600">Wasserstein GANs (WGANs) use the Wasserstein distance from OT as a loss function. This helps stabilize the training of generative models, allowing them to create more realistic and higher-quality data, such as images. The animation shows a generated distribution (orange) iteratively learning to match the real data distribution (teal) by minimizing the OT distance.</p>
+                                <button id="gan-play" class="btn-primary mt-4 px-4 py-2 rounded-lg">Replay Animation</button>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow border border-stone-200">
+                                <canvas id="ganCanvas" width="400" height="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="domain" class="tab-content hidden">
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-800">Adapting to New Domains</h3>
+                                <p class="mt-4 text-stone-600">Imagine a model trained on one type of data (source) that needs to work on slightly different data (target). OT can be used to align the feature distributions of the source and target domains. This reduces the domain shift and improves the model's performance on the new data without requiring extensive retraining. The animation shows the target data being "transported" to align with the source data.</p>
+                                <button id="domain-play" class="btn-primary mt-4 px-4 py-2 rounded-lg">Replay Animation</button>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow border border-stone-200">
+                                <canvas id="domainCanvas" width="400" height="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="barycenter" class="tab-content hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold text-stone-800">Fusing and Averaging Datasets</h3>
+                                <p class="mt-4 text-stone-600">Optimal Transport can compute the "average" of several probability distributions, known as the Wasserstein barycenter. This is useful for summarizing or fusing information from multiple sources. For example, it can be used to find a consensus shape from multiple images. The chart shows three different source distributions and their computed barycenter, which represents a balanced compromise between them.</p>
+                            </div>
+                             <div class="bg-white p-6 rounded-lg shadow border border-stone-200">
+                                <div class="chart-container h-96">
+                                    <canvas id="barycenterChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-white border-t border-stone-200 mt-24">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-stone-500 text-sm">
+            <p>An interactive exploration of Optimal Transport concepts.</p>
+        </div>
+    </footer>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const palette = {
+        stone: '#44403c',
+        teal: '#14b8a6',
+        orange: '#f97316',
+        bg: '#f5f5f4',
+        lightTeal: 'rgba(20, 184, 166, 0.2)',
+        lightOrange: 'rgba(249, 115, 22, 0.2)'
+    };
+
+    let sourceChart, targetChart, barycenterChart;
+    let activeScenario = 'scenario1';
+
+    const distributions = {
+        scenario1: {
+            source: [10, 30, 40, 15, 5],
+            target: [12, 28, 42, 13, 5],
+            plan: [[10,0,0,0,0],[2,28,0,0,0],[0,0,40,2,0],[0,0,0,11,4],[0,0,0,0,1]],
+            cost: 21.00
+        },
+        scenario2: {
+            source: [40, 30, 20, 10, 0],
+            target: [0, 10, 20, 30, 40],
+            plan: [[0,10,20,10,0],[0,0,0,20,10],[0,0,0,0,20],[0,0,0,0,10],[0,0,0,0,0]],
+            cost: 200.00
+        },
+        scenario3: {
+            source: [10, 15, 50, 15, 10],
+            target: [30, 20, 0, 20, 30],
+            plan: [[10,0,0,0,0],[15,0,0,0,0],[5,20,0,5,20],[0,0,0,15,0],[0,0,0,0,10]],
+            cost: 165.00
+        }
+    };
+    
+    function normalize(arr) {
+        const sum = arr.reduce((a, b) => a + b, 0);
+        return arr.map(v => v / sum);
+    }
+    
+    function createDistChart(canvasId, data, label, color, bgColor) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        const normalizedData = normalize(data);
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1', '2', '3', '4', '5'],
+                datasets: [{
+                    label: label,
+                    data: normalizedData,
+                    backgroundColor: bgColor,
+                    borderColor: color,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `Mass: ${(context.raw * 100).toFixed(1)}%`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 0.6,
+                        ticks: {
+                            callback: (value) => `${(value * 100).toFixed(0)}%`
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    function drawTransportPlan(canvasId, scenario) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        const data = distributions[scenario];
+        const sourceData = normalize(data.source);
+        const targetData = normalize(data.target);
+        const plan = data.plan.map(row => normalize(row));
+        const totalMass = data.source.reduce((a,b) => a+b, 0);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const numPoints = 5;
+        const ySource = 50;
+        const yTarget = canvas.height - 50;
+        const xMargin = 100;
+        const xSpacing = (canvas.width - 2 * xMargin) / (numPoints - 1);
+        
+        sourceData.forEach((mass, i) => {
+            const x = xMargin + i * xSpacing;
+            ctx.beginPath();
+            ctx.arc(x, ySource, mass * 50 + 5, 0, 2 * Math.PI);
+            ctx.fillStyle = palette.lightTeal;
+            ctx.fill();
+            ctx.strokeStyle = palette.teal;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        });
+        
+        targetData.forEach((mass, i) => {
+            const x = xMargin + i * xSpacing;
+            ctx.beginPath();
+            ctx.arc(x, yTarget, mass * 50 + 5, 0, 2 * Math.PI);
+            ctx.fillStyle = palette.lightOrange;
+            ctx.fill();
+            ctx.strokeStyle = palette.orange;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        });
+
+        data.plan.forEach((row, i) => {
+            row.forEach((transportedMass, j) => {
+                if (transportedMass > 0) {
+                    const x1 = xMargin + i * xSpacing;
+                    const x2 = xMargin + j * xSpacing;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, ySource);
+                    ctx.lineTo(x2, yTarget);
+                    ctx.lineWidth = (transportedMass / totalMass) * 30;
+                    ctx.strokeStyle = 'rgba(128, 128, 128, 0.5)';
+                    ctx.stroke();
+                }
+            });
+        });
+        
+        document.getElementById('wassersteinDistance').textContent = data.cost.toFixed(2);
+    }
+    
+    function updateDistributionCharts(scenario) {
+        const { source, target } = distributions[scenario];
+        if (sourceChart) sourceChart.destroy();
+        if (targetChart) targetChart.destroy();
+        sourceChart = createDistChart('sourceDistChart', source, 'Source', palette.teal, palette.lightTeal);
+        targetChart = createDistChart('targetDistChart', target, 'Target', palette.orange, palette.lightOrange);
+    }
+
+    function initProblemSection() {
+        document.querySelectorAll('#problem .btn-secondary').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelector('#problem .btn-secondary.active').classList.remove('active');
+                button.classList.add('active');
+                activeScenario = button.id;
+                updateDistributionCharts(activeScenario);
+                drawTransportPlan('transportPlanCanvas', activeScenario);
+            });
+        });
+        updateDistributionCharts(activeScenario);
+        drawTransportPlan('transportPlanCanvas', activeScenario);
+    }
+
+    function initEarthMover() {
+        const canvas = document.getElementById('earthMoverCanvas');
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('transportSlider');
+        const costEl = document.getElementById('transportCost');
+        
+        const source = { x: 100, y: 150, width: 100, height: -100 };
+        const target = { x: 400, y: 150, width: 100, height: -100 };
+        const totalMass = source.width * Math.abs(source.height);
+
+        function draw(progress) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#e7e5e4'; // stone-200
+            ctx.fillRect(target.x, target.y, target.width, target.height);
+            ctx.strokeStyle = '#a8a29e'; // stone-400
+            ctx.lineWidth = 2;
+            ctx.strokeRect(target.x, target.y, target.width, target.height);
+            
+            const movedHeight = source.height * progress;
+            const remainingHeight = source.height * (1 - progress);
+            
+            ctx.fillStyle = palette.teal;
+            ctx.fillRect(source.x, source.y, source.width, remainingHeight);
+            
+            ctx.fillStyle = palette.orange;
+            ctx.fillRect(target.x, target.y, target.width, movedHeight);
+
+            if (progress > 0 && progress < 1) {
+                const particleCount = 20;
+                for (let i = 0; i < particleCount; i++) {
+                    const p = (performance.now() / 1000 + i * 0.1) % 1;
+                    const x = source.x + source.width + p * (target.x - (source.x + source.width));
+                    const y = source.y + source.height + Math.sin(p * Math.PI) * -50;
+                    ctx.fillStyle = 'rgba(20, 184, 166, 0.7)';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+        
+        let animationFrame;
+        function animate(progress) {
+            draw(progress);
+            if (progress > 0 && progress < 1) {
+                animationFrame = requestAnimationFrame(() => animate(progress));
+            }
+        }
+        
+        slider.addEventListener('input', () => {
+            cancelAnimationFrame(animationFrame);
+            const progress = slider.value / 100;
+            const distance = target.x - source.x;
+            const cost = totalMass * distance * progress;
+            costEl.textContent = cost.toFixed(2);
+            animate(progress);
+        });
+
+        draw(0);
+    }
+
+    function initTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const targetId = tab.dataset.tab;
+                contents.forEach(content => {
+                    if (content.id === targetId) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    }
+    
+    function animateGan() {
+        const canvas = document.getElementById('ganCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const numPoints = 100;
+        
+        let targetPoints = Array.from({length: numPoints}, () => {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 100 + Math.random() * 20;
+            return {
+                x: 200 + Math.cos(angle) * radius,
+                y: 200 + Math.sin(angle) * radius,
+            };
+        });
+        
+        let generatedPoints = Array.from({length: numPoints}, () => ({
+            x: Math.random() * 400,
+            y: Math.random() * 400
+        }));
+        
+        let frame = 0;
+        const totalFrames = 120;
+        
+        function draw() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            
+            targetPoints.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+                ctx.fillStyle = palette.lightTeal;
+                ctx.fill();
+            });
+            
+            generatedPoints.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+                ctx.fillStyle = palette.orange;
+                ctx.fill();
+            });
+        }
+        
+        function update() {
+            if (frame >= totalFrames) return;
+            const progress = frame / totalFrames;
+            
+            generatedPoints = generatedPoints.map((p, i) => {
+                 const target = targetPoints[i];
+                 return {
+                     x: p.x + (target.x - p.x) * 0.05,
+                     y: p.y + (target.y - p.y) * 0.05,
+                 }
+            });
+            
+            draw();
+            frame++;
+            requestAnimationFrame(update);
+        }
+        
+        document.getElementById('gan-play').onclick = () => {
+            frame = 0;
+            generatedPoints = Array.from({length: numPoints}, () => ({
+                x: Math.random() * 400,
+                y: Math.random() * 400
+            }));
+            update();
+        };
+
+        update();
+    }
+    
+     function animateDomainAdaptation() {
+        const canvas = document.getElementById('domainCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const numPoints = 50;
+
+        const sourcePoints = Array.from({ length: numPoints }, () => ({
+            x: 50 + Math.random() * 100,
+            y: 100 + Math.random() * 200,
+        }));
+        
+        let targetPointsStart = Array.from({ length: numPoints }, () => ({
+            x: 250 + Math.random() * 100,
+            y: 100 + Math.random() * 200,
+        }));
+        let targetPoints = [...targetPointsStart.map(p => ({...p}))];
+        
+        const rotationAngle = -Math.PI / 8;
+        const targetCentroid = { x: 300, y: 200 };
+        const sourceCentroid = { x: 100, y: 200 };
+        
+        let frame = 0;
+        const totalFrames = 100;
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            sourcePoints.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = palette.lightTeal; ctx.fill();
+            });
+            
+            targetPoints.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = palette.orange; ctx.fill();
+            });
+        }
+
+        function update() {
+             if (frame >= totalFrames) return;
+             const progress = frame / totalFrames;
+             
+             targetPoints = targetPointsStart.map(p => {
+                let x = p.x - targetCentroid.x;
+                let y = p.y - targetCentroid.y;
+                
+                let rotatedX = x * Math.cos(rotationAngle * progress) - y * Math.sin(rotationAngle * progress);
+                let rotatedY = x * Math.sin(rotationAngle * progress) + y * Math.cos(rotationAngle * progress);
+                
+                let translatedX = (targetCentroid.x + (sourceCentroid.x - targetCentroid.x) * progress) + rotatedX;
+                let translatedY = targetCentroid.y + rotatedY;
+                
+                return { x: translatedX, y: translatedY };
+            });
+
+             draw();
+             frame++;
+             requestAnimationFrame(update);
+        }
+        
+        document.getElementById('domain-play').onclick = () => {
+            frame = 0;
+            targetPoints = [...targetPointsStart.map(p => ({...p}))];
+            update();
+        };
+        update();
+    }
+    
+    function initBarycenterChart() {
+        const ctx = document.getElementById('barycenterChart').getContext('2d');
+        const data1 = [1, 1, 5, 1, 1];
+        const data2 = [1, 5, 1, 1, 1];
+        const data3 = [1, 1, 1, 5, 1];
+        const barycenter = data1.map((v, i) => (v + data2[i] + data3[i]) / 3);
+
+        barycenterChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Bin 1', 'Bin 2', 'Bin 3', 'Bin 4', 'Bin 5'],
+                datasets: [
+                    { label: 'Source 1', data: normalize(data1), backgroundColor: 'rgba(20, 184, 166, 0.3)' },
+                    { label: 'Source 2', data: normalize(data2), backgroundColor: 'rgba(249, 115, 22, 0.3)' },
+                    { label: 'Source 3', data: normalize(data3), backgroundColor: 'rgba(107, 114, 128, 0.3)' },
+                    { 
+                        label: 'Barycenter', 
+                        data: normalize(barycenter), 
+                        backgroundColor: '#3b82f6', // blue-500
+                        borderColor: '#2563eb', // blue-600
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Wasserstein Barycenter' }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => `${(value * 100).toFixed(0)}%`
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function initNavObserver() {
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                    });
+                }
+            });
+        }, { rootMargin: '-50% 0px -50% 0px' });
+
+        sections.forEach(section => observer.observe(section));
+    }
+
+
+    initEarthMover();
+    initProblemSection();
+    initTabs();
+    animateGan();
+    animateDomainAdaptation();
+    initBarycenterChart();
+    initNavObserver();
+});
+</script>
+
+</body>
+</html>
+</font></span>
+    <br />
+
+
+</td>
+	</tr><tr>
+		<td>
+
+
+
+</td>
+	</tr>
+</table>    
+                            <br />
+                            <br />
+                             <div class="fb-activity" data-site="https://www.dataknobs.com/" data-action="likes, recommends" data-colorscheme="light" data-header="true"></div>
+	
+								
+                                <div class="fb-comments" data-href="https://www.dataknobs.com/" data-numposts="5" data-colorscheme="light" data-order-by="reverse_time"></div>
+			
+<!--
+                            <div class="fb-post" data-href="https://www.facebook.com/DiwaliCelebrations" data-width="500"></div>		
+                              <div class="fb-recommendations" data-site="https://www.dataknobs.com/" data-action="likes, recommends" data-colorscheme="light" data-header="true"></div>
+		
+                            -->
+     
+
+    
+
+
+
+												
+									
+		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl01_title" href="https://www.dataknobs.com/data-centric-ai/acive-learning-infographics.html">Acive-learning-infographics</a>
+            	
+&nbsp;&nbsp;
+
+
+
+
+
+												
+									
+		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl02_title" href="https://www.dataknobs.com/data-centric-ai/active-learning-achieve-more-with-less-data.html">Active-learning-achieve-more-</a>
+            	
+&nbsp;&nbsp;
+
+
+
+
+
+												
+									
+		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl03_title" href="https://www.dataknobs.com/data-centric-ai/active-learning.html">Active-learning</a>
+            	
+&nbsp;&nbsp;
+
+
+
+
+
+												
+									
+		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl04_title" href="https://www.dataknobs.com/data-centric-ai/architect-data-sets.html">Architect-data-sets</a>
+            	
+&nbsp;&nbsp;
+
+
+
+
+
+												
+									
+		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl05_title" href="https://www.dataknobs.com/data-centric-ai/architect-dataset-summary.html">Architect-dataset-summary</a>
+            	
+&nbsp;&nbsp;
+
+
+
+
+
+												
+									
+		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl06_title" href="https://www.dataknobs.com/data-centric-ai/blind-spot-ai.html">Blind-spot-ai</a>
+            	
+&nbsp;&nbsp;
+
+
+
+
+
+												
+									
+		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl07_title" href="https://www.dataknobs.com/data-centric-ai/build-data-sets.html">Build-data-sets</a>
+            	
+&nbsp;&nbsp;
+
+
+
+
+
+												
+									
+		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl08_title" href="https://www.dataknobs.com/data-centric-ai/create-data-sets.html">Create-data-sets</a>
+            	
+&nbsp;&nbsp;
+
+
+
+
+
+												
+									
+		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl09_title" href="https://www.dataknobs.com/data-centric-ai/data-centric-ai-playbook.html">Data-centric-ai-playbook</a>
+            	
+&nbsp;&nbsp;
+
+
+
+
+
+												
+									
+		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl10_title" href="https://www.dataknobs.com/data-centric-ai/data-centric-playbook-info.html">Data-centric-playbook-info</a>
+            	
+&nbsp;&nbsp;
+
+
+
+
+
+
+
+             
+ 
+ 
+ 
+	
+						
+		<span id="ctl00_ContentPlaceHolder1_label1"></span>	
+
+                                                           														
+ 
+           <span id="ctl00_ContentPlaceHolder1_ad728_ad">
+</span>
+                                        <br /><br />
+
+    <!--
+				 <a id="ctl00_ContentPlaceHolder1_buttonmain" class="button"></a>
+                                                            <a id="ctl00_ContentPlaceHolder1_buttonall" class="button button-alt"></a>	
+    -->
+												
+
+
+   
+
+    
+
+
+										</article>
+									
+										</div>
+									</div>
+									
+
+							</div>
+
+						</div>
+
+					</div>
+
+			</div>
+
+			
+
+				<div class="main-wrapper-style3">
+					<div class="inner">
+						<div class=5grid-layout>
+							<div class="row">
+								<div class="8u">
+
+									<!-- Article list -->
+									<section class="box-article-list">
+										<h2 class="icon icon-news">Dataknobs Blog</h2>
+
+										<article class="box-excerpt">
+
+											<div>
+												<header>
+													<span class="date">10 Use Cases Built</span>
+													<h3><a href="https://www.dataknobs.com/use-cases/">10 Use Cases Built By Dataknobs</a></h3>
+												</header>
+												<p>
+													
+													Dataknobs has developed a wide range of products and solutions powered by Generative AI (GenAI), Agent AI, and traditional AI to address diverse industry needs. These solutions span finance, healthcare, real estate, e-commerce, and more. Click on to see in-depth look at these use cases -
+													Stocks Earning Call Analysis,  Ecommerce Analysis with GenAI,  Financial  Planner AI Assistant,  Kreatebots,  Kreate Websites,  Kreate CMS, Travel Agent Website,  Real Estate Agent etc.
+												</p>
+											</div>
+										</article>
+						
+										<article class="box-excerpt">
+
+											<div>
+												<header>
+													<span class="date">AI Agent for Business Analysis</span>
+													<h3><a href="https://www.dataknobs.com/products/kreate/kreate-structured-data-insights.html">Analyze reports, dashboard and determine To-do</a></h3>
+												</header>
+												<p>
+													
+													DataKnobs has built an AI Agent for structured data analysis that extracts meaningful insights from diverse datasets such as e-commerce metrics, sales/revenue reports, and sports 
+													scorecards. The agent ingests structured data from sources like CSV files, SQL databases, and APIs, automatically detecting schemas and relationships while standardizing formats.
+													Using statistical analysis, anomaly detection, 
+													and AI-driven forecasting, it identifies trends, correlations, and outliers, providing insights such as sales fluctuations, revenue leaks, and performance metrics.
+												</p>
+											</div>
+										</article>
+										<article class="box-excerpt">
+
+											<div>
+												<header>
+													<span class="date">AI Agent Tutorial</span>
+													<h3><a href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Tutorial</a></h3>
+												</header>
+												<p>
+													Here are slides and AI Agent Tutorial.  Agentic AI refers to AI systems that can autonomously perceive, reason, 
+													and take actions to achieve specific goals without constant human intervention. These AI agents use techniques
+													like reinforcement learning, planning, and memory to adapt and make decisions in dynamic environments. 
+													They are commonly used in automation, robotics, virtual assistants, and decision-making systems.
+												</p>
+											</div>
+										</article>
+
+										<!-- Excerpt -->
+										<article class="box-excerpt">
+
+											<div>
+												<header>
+													<span class="date">Build Dataproducts</span>
+													<h3><a href="https://www.dataknobs.com/data-products/">How Dataknobs help in building data products</a></h3>
+												</header>
+												<p>
+													
+													Building data products using Generative AI (GenAI) and Agentic AI enhances automation, intelligence, and adaptability in data-driven 
+													applications. GenAI can generate structured and unstructured data, automate content creation, enrich datasets, and synthesize 
+													insights from large volumes of information. This helps in scenarios such as automated report generation, anomaly detection, and
+													predictive modeling.
+												</p>
+											</div>
+										</article>
+
+
+										
+
+										<!-- Excerpt -->
+										<article class="box-excerpt">
+
+											<div>
+												<header>
+													<span class="date"> KreateHub</span>
+													<h3><a href="https://www.dataknobs.com/products/kreate/prompt-library-for-genai.html">Create New knowledge with Prompt library</a></h3>
+												</header>
+												<p>
+													At its core, KreateHub is designed to enable creation of new data and the generation of insights from existing datasets. It acts as a bridge between raw data and meaningful outcomes,
+													providing the tools necessary for organizations to experiment, analyze, and optimize their data processes. 
+												</p>
+											</div>
+										</article>
+
+										<!-- Excerpt -->
+										<article class="box-excerpt">
+
+												<div>
+													<header>
+																	<span class="date">Build Budget Plan for GenAI</span>
+																	<h3><a href="https://www.dataknobs.com/generativeai/50-use-cases/how-to-create-genai-budget/">CIO Guide to create GenAI Budget for 2025</a></h3>
+													</header>
+													<p>
+																	CIOs and CTOs can apply GenAI in IT Systems. 
+																	The guide here describe scenarios and solutions for IT system, tech stack, GenAI cost and how to allocate budget.
+																	Once CIO and CTO can apply this to IT system, it can be extended for business use cases across company.
+													</p>
+												</div>
+										</article>
+
+
+
+
+											<article class="box-excerpt">
+
+												<div>
+													<header>
+														<span class="date">RAG For Unstructred and Structred Data</span>
+														<h3><a href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-for-structured-and-unstructred-data.html">RAG Use Cases and Implementation</a></h3>
+													</header>
+													<p>Here are several value propositions for Retrieval-Augmented Generation (RAG) across different contexts: Unstructred Data, Structred Data, Guardrails.</p>
+												</div>
+											</article>
+
+										<article class="box-excerpt">
+
+											<div>
+												<header>
+													<span class="date">Why knobs matter</span>
+													<h3><a href="https://www.dataknobs.com/orthogonal.html">Knobs are levers using which you manage output</a></h3>
+												</header>
+												<p>See Drivetrain appproach for building data product, AI product. It has 4 steps and levers are key to success. Knobs are abstract mechanism on input that you can control.  </p>
+											</div>
+										</article>
+
+									</section>
+								</div>
+								<div class="4u">
+
+									<!-- Spotlight -->
+									<section class="box-spotlight pad-left">
+										<h2 class="icon icon-paper">Our Products</h2>
+										<article>
+
+											<header>
+												<h3><a href="https://www.dataknobs.com/products/kreatebots/">KreateBots</a></h3>
+												<span class="byline">Setup chatbots in minutes</span>
+											</header>
+											<li>Pre built front end that you can configure</li>
+											<li>Pre built Admin App to manage chatbot</li>
+											<li>       Prompt management UI</li>
+											<li>Personalization app </li>
+											<li>Built in chat history</li>
+											<li>Feedback Loop</li>
+											<li>Available on - GCP,Azure,AWS.</li>
+											<li>Add RAG with using few lines of Code. </li>
+											<li>Add FAQ generation to chatbot </li>
+											<footer>
+												<a href="https://www.dataknobs.com/products/kreatebots/" class="button" button-alt button-icon button-icon-paper>KreateBots</a>
+											</footer>
+										</article>
+										<article>
+
+											<header>
+												<h3><a href="https://www.dataknobs.com/products/kreatebots/">KreateWebsites</a></h3>
+												<span class="byline">LLM and AI based Website generation</span>
+											</header>
+											<li>AI powered websites to domainte search</li>
+											<li>Premium Hosting - Azure, GCP,AWS </li>
+											<li> AI  web designer</li>
+											<li> Agent to generate website</li>
+											<li> SEO powered by LLM</li>
+											<li>Content management system for GenAI</li>
+											<li>Buy as Saas Application or managed services</li>
+											<li>Available on Azure Marketplace too.</li>
+											<footer>
+												<a href="https://www.dataknobs.com/products/kreatewebsites/" class="button" button-alt button-icon button-icon-paper>KreateWebsites</a>
+											</footer>
+										</article>
+										<article>
+
+											<header>
+												<h3><a href="https://www.dataknobs.com/products/kreatebots/">Kreate CMS</a></h3>
+												<span class="byline">CMS GenAI</span>
+											</header>
+											<li>CMS for GenAI</li>
+											<li>Lineage for GenAI and Human created content</li>
+											<li>Track GenAI and Human Edited content</li>
+											<li>Trace pages that use content</li>
+											<li>Ability to delete GenAI content</li>
+											<footer>
+												<a href="https://www.dataknobs.com/products/kreate/cms/" class="button" button-alt button-icon button-icon-paper>CMS for Websites and Bots</a>
+											</footer>
+										</article>
+										<article>
+
+											<header>
+												<h3><a href="https://www.dataknobs.com/generativeai/generate-slides.html">Generate Slides</a></h3>
+												<span class="byline">Effortless slides creation</span>
+											</header>
+											<li>Give prompt to generate slides</li>
+											<li>Convert slides into webpages</li>
+											<li>Add SEO to slides webpages</li>
+											<footer>
+												<a href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html" class="button" button-alt button-icon button-icon-paper>Gen AI slides</a>
+											</footer>
+										</article>
+										<article>
+
+											<header>
+												<h3><a href="https://www.dataknobs.com/products/kreate/content/">Content Compass</a></h3>
+												<span class="byline">Your story writing is automated</span>
+											</header>
+											<li>Generate articles</li>
+											<li>Generate images</li>
+											<li>Generate related articles and images</li>
+											<li>Get suggestion what to write next</li>
+											<footer>
+												<a href="https://www.dataknobs.com/products/kreate/content/" class="button" button-alt button-icon button-icon-paper>Content Compass</a>
+											</footer>
+										</article>
+
+										<article>
+
+											<header>
+												<h3><a href=#>Fractional CTO for generative AI and Data Products</a></h3>
+												<span class="byline">Hire expertise without commitment<span>
+											</header>
+											<li>Deliver E2E use case</li>
+											<li>Generative AI expertise</li>
+											<li>Machine Learning expertise</li>
+											<li>Data product building expertise</li>
+											<li>Cloud - AWS, GCP,Azure</li>
+											<footer>
+												<a href="https://www.dataknobs.com/fractional-cto-ai/" class="button" button-icon button-icon-paper>Fractional CTO</a>
+											</footer>
+										</article>
+									</section>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+		</div>
+
+		
+
+		<!-- Footer Wrapper -->
+			<div id="footer-wrapper">
+		
+				<footer id="footer" class="5grid-layout">
+					<div class="row">
+    
+						<div class="3u">
+						
+						
+								<section class="widget-links">
+									<h2>Main pages</h2>
+									<ul class="style2">
+										<a id="ctl00_hyperlink1"></a>
+										
+
+    
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl01_title" href="https://www.dataknobs.com/">Home</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl02_title" href="https://www.dataknobs.com/about-dataknobs/">About dataknobs</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl03_title" href="https://www.dataknobs.com/agent-ai/">Agent ai</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl04_title" href="https://www.dataknobs.com/blog/">Blog</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl05_title" href="https://www.dataknobs.com/careers/">Careers</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl06_title" href="https://www.dataknobs.com/causal-inference/">Causal inference</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl07_title" href="https://www.dataknobs.com/consulting/">Consulting</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl08_title" href="https://www.dataknobs.com/customers/">Customers</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl09_title" href="https://www.dataknobs.com/data-centric-ai/">Data centric ai</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl10_title" href="https://www.dataknobs.com/data-products/">Data products</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl11_title" href="https://www.dataknobs.com/datasets-blindspots/">Datasets blindspots</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl12_title" href="https://www.dataknobs.com/embeddings/">Embeddings</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl13_title" href="https://www.dataknobs.com/explore/">Explore</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl14_title" href="https://www.dataknobs.com/fractional-cto-ai/">Fractional cto ai</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl15_title" href="https://www.dataknobs.com/generate-datasets/">Generate datasets</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl16_title" href="https://www.dataknobs.com/generativeai/">Generativeai</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl17_title" href="https://www.dataknobs.com/industry/">Industry</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl18_title" href="https://www.dataknobs.com/partnership/">Partnership</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl19_title" href="https://www.dataknobs.com/privacy/">Privacy</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl20_title" href="https://www.dataknobs.com/products/">Products</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl21_title" href="https://www.dataknobs.com/slides/">Slides</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl22_title" href="https://www.dataknobs.com/solutions/">Solutions</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl23_title" href="https://www.dataknobs.com/use-cases/">Use cases</a>
+            </li>	
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_Articleshome3_RepLinks_ctl24_title" href="https://www.dataknobs.com/vector-database/">Vector database</a>
+            </li>	
+
+
+
+
+
+
+
+             
+ 
+ 
+ 
+
+									</ul>
+								</section>
+						
+						</div>
+						<div class="3u">
+						
+							
+								<section class="widget-links">
+									<h2>Related Pages </h2>
+									<ul class="style2">
+										
+
+    
+
+
+
+												
+		<li>								
+		<a id="ctl00_articles1_RepLinks_ctl01_title" href="https://www.dataknobs.com/data-centric-ai/acive-learning-infographics.html">Acive-learning-infographics</a>
+            </li>	
+    <br />
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articles1_RepLinks_ctl02_title" href="https://www.dataknobs.com/data-centric-ai/active-learning-achieve-more-with-less-data.html">Active-learning-achieve-more-</a>
+            </li>	
+    <br />
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articles1_RepLinks_ctl03_title" href="https://www.dataknobs.com/data-centric-ai/active-learning.html">Active-learning</a>
+            </li>	
+    <br />
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articles1_RepLinks_ctl04_title" href="https://www.dataknobs.com/data-centric-ai/architect-data-sets.html">Architect-data-sets</a>
+            </li>	
+    <br />
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articles1_RepLinks_ctl05_title" href="https://www.dataknobs.com/data-centric-ai/architect-dataset-summary.html">Architect-dataset-summary</a>
+            </li>	
+    <br />
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articles1_RepLinks_ctl06_title" href="https://www.dataknobs.com/data-centric-ai/blind-spot-ai.html">Blind-spot-ai</a>
+            </li>	
+    <br />
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articles1_RepLinks_ctl07_title" href="https://www.dataknobs.com/data-centric-ai/build-data-sets.html">Build-data-sets</a>
+            </li>	
+    <br />
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articles1_RepLinks_ctl08_title" href="https://www.dataknobs.com/data-centric-ai/create-data-sets.html">Create-data-sets</a>
+            </li>	
+    <br />
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articles1_RepLinks_ctl09_title" href="https://www.dataknobs.com/data-centric-ai/data-centric-ai-playbook.html">Data-centric-ai-playbook</a>
+            </li>	
+    <br />
+
+
+
+
+
+												
+		<li>								
+		<a id="ctl00_articles1_RepLinks_ctl10_title" href="https://www.dataknobs.com/data-centric-ai/data-centric-playbook-info.html">Data-centric-playbook-info</a>
+            </li>	
+    <br />
+
+
+
+
+
+
+
+             
+ 
+ 
+ 
+
+										
+									</ul>
+								</section>
+						
+						</div>
+						<div class="3u">
+						
+					
+								<section class="widget-links">
+									<h2>Explore more </h2>
+									<ul class="style2">
+										
+
+    
+
+
+
+												
+		<li>					
+			<a id="ctl00_Articlesub1_RepLinks_ctl01_title" href="https://www.dataknobs.com/"><em><b>Home</b></em></a>
+            
+           
+            </li>	
+
+
+
+
+
+												
+		<li>					
+			<a id="ctl00_Articlesub1_RepLinks_ctl02_title" href="https://www.dataknobs.com/data-centric-ai/ml-ops/"><em><b>Ml ops</b></em></a>
+            
+           
+            </li>	
+
+
+
+
+
+												
+		<li>					
+			<a id="ctl00_Articlesub1_RepLinks_ctl03_title" href="https://www.dataknobs.com/data-centric-ai/slides/"><em><b>Slides</b></em></a>
+            
+           
+            </li>	
+
+
+
+
+
+
+
+             
+ 
+ 
+ 
+	
+									</ul>
+								</section>
+						
+						</div>
+						<div class="3u">
+						
+						
+								<section class="widget-contact last">
+									<h2>Contact Us</h2>
+									<ul>
+										
+										<li><a href="https://www.facebook.com/kreatewebsites/" class="facebook">Facebook</a></li>
+										<li><a href="https://www.linkedin.com/company/kreatewebsites/" class="googleplus">Linkedin</a></li>
+									</ul>
+									<p>
+									Redmond, WA <br />
+									USA  </p>
+								</section>
+						
+						</div>
+                        
+					</div>
+					<div class="row">
+						<div class="12u">
+							 <div id="copyright">
+							&copy;  Design: <a id="ctl00_cright">Dataknobs</a> | <a id="ctl00_sitemap"></a>  | <a id="ctl00_privacypolicy" href="https://www.dataknobs.com/privacypolicy.html">Privacy Policy</a> | <a id="ctl00_footerfooter" href="https://www.dataknobs.com/">Dataknobs</a></asp:HyperLink> 
+			</div>
+								 <p></p>
+						</div>
+						</div>
+					
+				</footer>
+			</div>
+
+	</body>
+</html>

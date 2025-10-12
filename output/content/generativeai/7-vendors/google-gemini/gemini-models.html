@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding the Gemini Model Family</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application is designed as an interactive dashboard, not a linear report. The core is a tab-based navigation system allowing users to select a Gemini model (Pro, Flash, Ultra, Nano). Selecting a model dynamically updates the entire content view, including a details card, a comparative radar chart of capabilities, and a list of suitable use cases. This structure facilitates direct comparison and exploration, allowing users to learn based on their interest in a specific model. An additional "Which Model?" interactive guide provides a task-oriented path, asking users about their primary goal (quality, speed, cost, on-device) and recommending a model. This dual approach—exploratory and goal-driven—offers a more usable and intuitive experience than a static document, empowering users to find the information they need efficiently. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Gemini model family (Pro, Flash, Ultra, Nano) characteristics.
+        - Goal: Compare multi-dimensional capabilities of each model.
+        - Viz/Presentation: Interactive Radar Chart (Chart.js/Canvas). This is ideal for showing the 'shape' of a model's strengths across categories like Text, Code, Vision, etc.
+        - Interaction: Clicking model tabs updates the chart, highlighting the selected model's data series. This allows for easy visual comparison against other models.
+        - Justification: A radar chart is far more effective than separate bar charts or a table for comparing multiple entities across the same set of variables.
+        - Goal: Guide users to a specific model.
+        - Viz/Presentation: Interactive Quiz/Selector (HTML/JS).
+        - Interaction: User selects their primary need (e.g., 'Best Quality') via radio buttons, and a text box instantly displays the recommended model and justification.
+        - Justification: This provides a direct, actionable answer to the user's most likely question, simplifying the decision-making process.
+        - All other content is presented in structured HTML/Tailwind cards and lists for clarity and scannability.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .tab.active {
+            border-color: #f59e0b;
+            background-color: #fffbeb;
+            color: #b45309;
+        }
+        .tab:not(.active) {
+            border-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .use-case.active {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">Understanding the Gemini Model Family</h1>
+            <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">An interactive guide to Google's powerful, multimodal AI models. Explore their capabilities and find the right one for your task.</p>
+        </header>
+
+        <main>
+            <section id="model-explorer" class="mb-12">
+                <div class="w-full max-w-4xl mx-auto">
+                    <div id="tabs" class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6" role="tablist">
+                        <button class="tab text-sm md:text-base font-semibold py-3 px-2 rounded-lg border-2 transition-all duration-300" data-model="pro" role="tab" aria-selected="true">Gemini 1.5 Pro</button>
+                        <button class="tab text-sm md:text-base font-semibold py-3 px-2 rounded-lg border-2 transition-all duration-300" data-model="flash" role="tab" aria-selected="false">Gemini 1.5 Flash</button>
+                        <button class="tab text-sm md:text-base font-semibold py-3 px-2 rounded-lg border-2 transition-all duration-300" data-model="ultra" role="tab" aria-selected="false">Gemini 1.0 Ultra</button>
+                        <button class="tab text-sm md:text-base font-semibold py-3 px-2 rounded-lg border-2 transition-all duration-300" data-model="nano" role="tab" aria-selected="false">Gemini 1.0 Nano</button>
+                    </div>
+
+                    <div id="content-container" class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+                    </div>
+                </div>
+            </section>
+
+            <section id="interactive-guide" class="bg-white p-8 rounded-xl shadow-lg border border-slate-200 max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold text-center text-slate-900 mb-2">Which Model Should I Use?</h2>
+                <p class="text-slate-600 text-center mb-6">This section provides a quick recommendation based on your primary goal. Select your main priority to see which model is the best fit. This tool helps simplify your choice by focusing on the most important factor for your project.</p>
+                <div class="grid md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <h3 class="font-semibold text-lg mb-4 text-slate-700">What is your primary goal?</h3>
+                        <div class="space-y-3" id="goal-selector">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+                                <input type="radio" name="goal" value="quality" class="h-5 w-5 text-amber-600 focus:ring-amber-500">
+                                <span class="ml-3 text-slate-700">Highest possible quality and reasoning</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+                                <input type="radio" name="goal" value="speed" class="h-5 w-5 text-amber-600 focus:ring-amber-500">
+                                <span class="ml-3 text-slate-700">Fastest response time and lower cost</span>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+                                <input type="radio" name="goal" value="on-device" class="h-5 w-5 text-amber-600 focus:ring-amber-500">
+                                <span class="ml-3 text-slate-700">Run efficiently on mobile devices</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="recommendation-box" class="bg-slate-50 p-6 rounded-lg border border-slate-200 min-h-[150px] flex items-center justify-center">
+                        <p class="text-slate-500 text-center">Your recommendation will appear here.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12">
+            <p class="text-slate-500">This is an informational tool. For official details, visit the <a href="https://deepmind.google/technologies/gemini/" target="_blank" rel="noopener noreferrer" class="text-amber-600 hover:underline">Official Gemini Page</a>.</p>
+        </footer>
+    </div>
+
+<script>
+const modelData = {
+    pro: {
+        name: 'Gemini 1.5 Pro',
+        description: 'A highly capable model that balances performance and cost. It\'s an excellent general-purpose choice for a wide range of multimodal tasks, featuring a groundbreaking 1 million token context window.',
+        capabilities: { 'Long Context': 10, 'Reasoning': 9, 'Multimodality': 9, 'Cost-Efficiency': 7, 'Speed': 8, 'On-Device': 0 },
+        useCases: ['Complex code analysis', 'Summarizing long videos', 'Enterprise chatbots', 'In-depth text analysis', 'Translating large documents']
+    },
+    flash: {
+        name: 'Gemini 1.5 Flash',
+        description: 'A lighter-weight and faster version of 1.5 Pro, optimized for speed and efficiency. It\'s ideal for high-frequency tasks where low latency is critical, while still retaining a large context window.',
+        capabilities: { 'Long Context': 10, 'Reasoning': 7, 'Multimodality': 8, 'Cost-Efficiency': 10, 'Speed': 10, 'On-Device': 0 },
+        useCases: ['Real-time translation', 'Live captioning', 'High-volume data extraction', 'Fast chatbots', 'Content summarization']
+    },
+    ultra: {
+        name: 'Gemini 1.0 Ultra',
+        description: 'The most powerful and capable model in the 1.0 family, designed for highly complex tasks that require state-of-the-art reasoning and multimodal understanding.',
+        capabilities: { 'Long Context': 7, 'Reasoning': 10, 'Multimodality': 10, 'Cost-Efficiency': 5, 'Speed': 6, 'On-Device': 0 },
+        useCases: ['Scientific research', 'Advanced code generation', 'Creative content collaboration', 'Complex problem-solving', 'Strategic analysis']
+    },
+    nano: {
+        name: 'Gemini 1.0 Nano',
+        description: 'The most efficient model designed to run directly on-device. It provides powerful AI capabilities with low latency and offline functionality for mobile experiences.',
+        capabilities: { 'Long Context': 2, 'Reasoning': 6, 'Multimodality': 7, 'Cost-Efficiency': 9, 'Speed': 9, 'On-Device': 10 },
+        useCases: ['Smart reply suggestions', 'On-device summarization', 'Grammar correction', 'Real-time text generation', 'Offline functionality']
+    }
+};
+
+const recommendationData = {
+    quality: {
+        model: 'Gemini 1.0 Ultra',
+        reason: 'For tasks demanding the highest level of intelligence and complex reasoning, <strong>Ultra</strong> is the top-tier choice.'
+    },
+    speed: {
+        model: 'Gemini 1.5 Flash',
+        reason: '<strong>Flash</strong> is optimized for speed and cost-efficiency, making it perfect for high-volume, low-latency applications.'
+    },
+    on-device: {
+        model: 'Gemini 1.0 Nano',
+        reason: '<strong>Nano</strong> is specifically built to run on-device, enabling fast, offline AI features on mobile platforms.'
+    }
+};
+
+let activeModel = 'pro';
+let capabilitiesChart;
+
+const contentContainer = document.getElementById('content-container');
+const tabs = document.querySelectorAll('.tab');
+const goalSelector = document.getElementById('goal-selector');
+const recommendationBox = document.getElementById('recommendation-box');
+
+function renderContent(modelKey) {
+    const data = modelData[modelKey];
+    const allUseCases = [...new Set(Object.values(modelData).flatMap(m => m.useCases))];
+
+    contentContainer.innerHTML = `
+        <div class="grid md:grid-cols-2 gap-6 md:gap-8 fade-in">
+            <div class="flex flex-col justify-center">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">${data.name}</h2>
+                <p class="text-slate-600 mb-6">${data.description}</p>
+                <h3 class="text-xl font-semibold text-slate-800 mb-3">Ideal For:</h3>
+                <div class="flex flex-wrap gap-2">
+                    ${allUseCases.map(useCase => `
+                        <span class="use-case text-sm font-medium py-1 px-3 rounded-full border ${data.useCases.includes(useCase) ? 'active' : 'bg-slate-100 text-slate-600'}">
+                            ${useCase}
+                        </span>
+                    `).join('')}
+                </div>
+            </div>
+            <div>
+                <h3 class="text-xl font-semibold text-slate-800 mb-4 text-center">Model Capabilities</h3>
+                <div class="chart-container">
+                    <canvas id="capabilitiesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    `;
+    renderChart(modelKey);
+}
+
+function renderChart(currentModelKey) {
+    const ctx = document.getElementById('capabilitiesChart').getContext('2d');
+    const labels = Object.keys(modelData.pro.capabilities);
+    
+    const datasets = Object.keys(modelData).map(key => {
+        const model = modelData[key];
+        const isCurrent = key === currentModelKey;
+        const color = getModelColor(key, isCurrent);
+        return {
+            label: model.name,
+            data: Object.values(model.capabilities),
+            fill: true,
+            backgroundColor: color.bg,
+            borderColor: color.border,
+            pointBackgroundColor: color.border,
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: color.border,
+            borderWidth: isCurrent ? 3 : 1.5,
+        };
+    });
+
+    if (capabilitiesChart) {
+        capabilitiesChart.destroy();
+    }
+
+    capabilitiesChart = new Chart(ctx, {
+        type: 'radar',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.r !== null) {
+                                label += context.parsed.r;
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                r: {
+                    angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                    grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                    pointLabels: { font: { size: 13, weight: '500' }, color: '#475569' },
+                    ticks: {
+                        backdropColor: 'rgba(255, 255, 255, 0.75)',
+                        stepSize: 2,
+                        font: { size: 10 }
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 10
+                }
+            }
+        }
+    });
+}
+
+function getModelColor(modelKey, isCurrent) {
+    const colors = {
+        pro: { bg: 'rgba(245, 158, 11, 0.2)', border: 'rgb(245, 158, 11)' },
+        flash: { bg: 'rgba(59, 130, 246, 0.2)', border: 'rgb(59, 130, 246)' },
+        ultra: { bg: 'rgba(139, 92, 246, 0.2)', border: 'rgb(139, 92, 246)' },
+        nano: { bg: 'rgba(16, 185, 129, 0.2)', border: 'rgb(16, 185, 129)' }
+    };
+    if (!isCurrent) {
+        return { bg: 'rgba(209, 213, 219, 0.2)', border: 'rgb(156, 163, 175)' };
+    }
+    return colors[modelKey];
+}
+
+function updateActiveTab(modelKey) {
+    tabs.forEach(tab => {
+        const isSelected = tab.dataset.model === modelKey;
+        tab.classList.toggle('active', isSelected);
+        tab.setAttribute('aria-selected', isSelected);
+    });
+}
+
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        activeModel = tab.dataset.model;
+        updateActiveTab(activeModel);
+        renderContent(activeModel);
+    });
+});
+
+goalSelector.addEventListener('change', (event) => {
+    const selectedGoal = event.target.value;
+    if (selectedGoal && recommendationData[selectedGoal]) {
+        const recommendation = recommendationData[selectedGoal];
+        recommendationBox.innerHTML = `
+            <div class="text-center fade-in">
+                <p class="text-slate-600 mb-2">For your goal, we recommend:</p>
+                <h4 class="text-xl font-bold text-amber-700">${recommendation.model}</h4>
+                <p class="mt-2 text-slate-600">${recommendation.reason}</p>
+            </div>
+        `;
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateActiveTab(activeModel);
+    renderContent(activeModel);
+});
+</script>
+</body>
+</html>

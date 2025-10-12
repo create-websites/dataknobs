@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infographic: The Power of Weak Supervision</title>
+    <!-- Chosen Palette: Energetic & Playful -->
+    <!-- Application Structure Plan: The infographic follows a linear, top-to-bottom narrative. It starts with a high-level hook defining the problem (the labeling bottleneck). It then explains the core solution (Weak Supervision), visualizes its place among other ML paradigms, details the workflow (The Programmatic Pipeline), explores the key tools (Labeling Functions), and shows its evolution (The LLM Revolution). This storytelling structure simplifies the complex report into a digestible and engaging format. -->
+    <!-- Visualization & Content Choices: 
+        - Data Point: Core problem -> Goal: Inform -> Visualization: Large text stat -> Justification: Grabs attention and highlights the core value proposition immediately.
+        - Data Point: Comparison of ML Paradigms (Table 1) -> Goal: Compare -> Visualization: Donut Chart (Chart.js) -> Justification: Visually represents the relative cost of labeling, making the "why" of weak supervision clear and impactful. Chart.js on Canvas used.
+        - Data Point: Weak Supervision Process -> Goal: Organize -> Visualization: HTML/CSS Flowchart -> Justification: Breaks down the two-stage pipeline into simple, understandable steps. NO SVG/Mermaid used.
+        - Data Point: Typology of LFs (Table 2) -> Goal: Compare -> Visualization: Radar Chart (Chart.js) -> Justification: Effectively compares the multi-dimensional trade-offs of different LF types (precision, coverage, effort), which is more insightful than a static table. Chart.js on Canvas used.
+        - Data Point: LLMs as LFs -> Goal: Compare -> Visualization: Styled HTML/CSS Cards -> Justification: Clearly contrasts the "old way" (code) with the "new way" (prompts) to highlight the paradigm shift. NO SVG/Mermaid used.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="text-[#073B4C]">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <!-- Section 1: Introduction -->
+        <section class="text-center mb-16">
+            <h1 class="text-5xl md:text-6xl font-black text-[#118AB2] uppercase tracking-wider text-shadow">Weak Supervision</h1>
+            <p class="mt-4 text-xl md:text-2xl font-semibold text-gray-700">Stop Labeling Data. Start Programming It.</p>
+            <p class="mt-2 text-gray-600 max-w-3xl mx-auto">Weak supervision is a modern approach to machine learning that overcomes the primary bottleneck in AI development—manual data labeling—by allowing experts to programmatically create massive training datasets.</p>
+            <div class="mt-8 bg-white p-8 rounded-2xl shadow-2xl inline-block border-4 border-[#FFD166]">
+                 <p class="text-2xl font-bold text-gray-600">The Problem with Manual Labeling</p>
+                 <p class="text-7xl md:text-8xl font-black text-[#FF6B6B] my-2">90%</p>
+                 <p class="text-2xl font-bold text-gray-600">of ML project time can be spent on data preparation and labeling.</p>
+            </div>
+        </section>
+        
+        <!-- Section 2: Paradigm Comparison -->
+        <section class="mb-20 bg-white p-6 md:p-8 rounded-2xl shadow-xl">
+            <h2 class="text-3xl font-bold text-center mb-2 text-[#118AB2]">A Spectrum of Supervision</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Weak supervision offers a powerful alternative to traditional methods by drastically reducing the need for expensive, hand-labeled "gold" data.</p>
+             <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="chart-container" style="max-width: 400px; height: 300px;">
+                    <canvas id="paradigmChart"></canvas>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-4 rounded-lg bg-[#FF6B6B] bg-opacity-20">
+                        <h3 class="font-bold text-[#FF6B6B]">Supervised Learning</h3>
+                        <p class="text-sm">Requires massive, perfect "gold" datasets. Extremely high cost.</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-[#FFD166] bg-opacity-30">
+                        <h3 class="font-bold text-[#FFD166]">Active/Semi-Supervised</h3>
+                        <p class="text-sm">Uses a small labeled set to learn from an unlabeled pool. Medium cost.</p>
+                    </div>
+                     <div class="p-4 rounded-lg bg-[#06D6A0] bg-opacity-20">
+                        <h3 class="font-bold text-[#06D6A0]">Weak Supervision</h3>
+                        <p class="text-sm">Uses noisy heuristics to programmatically label data. Very low cost.</p>
+                    </div>
+                </div>
+             </div>
+             <p class="text-center text-sm text-gray-500 mt-6">This chart visualizes the relative annotation cost from Table 1 of the source report. Weak Supervision dramatically lowers the barrier to creating large-scale training sets.</p>
+        </section>
+
+        <!-- Section 3: The Pipeline -->
+        <section class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-2 text-[#118AB2]">The Programmatic Pipeline</h2>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Modern weak supervision uses a powerful two-stage process to turn noisy rules into high-performance models.</p>
+            <div class="flex flex-col md:flex-row items-stretch justify-center gap-x-4 gap-y-8">
+                <div class="flex-1 text-center bg-white p-6 rounded-2xl shadow-lg border-t-8 border-[#06D6A0]">
+                    <div class="text-[#06D6A0] text-5xl font-black mb-2">1</div>
+                    <h3 class="font-bold text-xl">Develop Labeling Functions (LFs)</h3>
+                    <p class="text-sm text-gray-600 mt-2">Experts encode domain knowledge into code (heuristics, keywords, etc.) that programmatically assigns noisy labels to data.</p>
+                </div>
+                <div class="text-4xl font-thin text-[#118AB2] self-center transform md:rotate-0 rotate-90">→</div>
+                 <div class="flex-1 text-center bg-white p-6 rounded-2xl shadow-lg border-t-8 border-[#118AB2]">
+                    <div class="text-[#118AB2] text-5xl font-black mb-2">2</div>
+                    <h3 class="font-bold text-xl">Train Generative Label Model</h3>
+                    <p class="text-sm text-gray-600 mt-2">A statistical model learns the accuracies and correlations of the LFs to produce a single, denoised probabilistic label for each data point.</p>
+                </div>
+                 <div class="text-4xl font-thin text-[#073B4C] self-center transform md:rotate-0 rotate-90">→</div>
+                <div class="flex-1 text-center bg-white p-6 rounded-2xl shadow-lg border-t-8 border-[#073B4C]">
+                    <div class="text-[#073B4C] text-5xl font-black mb-2">3</div>
+                    <h3 class="font-bold text-xl">Train Discriminative End Model</h3>
+                    <p class="text-sm text-gray-600 mt-2">A powerful end model (e.g., a transformer) is trained on the probabilistic labels to learn rich features and generalize to new, unseen data.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Labeling Functions -->
+        <section class="mb-20 bg-white p-6 md:p-8 rounded-2xl shadow-xl">
+             <h2 class="text-3xl font-bold text-center mb-2 text-[#118AB2]">The LF Toolkit: Programming with Heuristics</h2>
+             <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Labeling Functions are the heart of weak supervision. The art of LF development is balancing precision, coverage, and effort.</p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="chart-container">
+                    <canvas id="lfChart"></canvas>
+                </div>
+                <div class="prose">
+                    <p>This radar chart, based on Table 2 of the source report, shows the trade-offs of different LF types:</p>
+                    <ul>
+                        <li><strong>Keyword/Regex:</strong> Simple to create, but often imprecise.</li>
+                        <li><strong>Heuristic Rules:</strong> More complex logic can yield better results.</li>
+                        <li><strong>Distant Supervision:</strong> High coverage but notoriously noisy.</li>
+                        <li><strong>LLM Prompts:</strong> A new class of highly flexible and powerful LFs.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 5: LLM Revolution -->
+        <section class="text-center mb-16">
+            <h2 class="text-4xl font-black text-[#118AB2] uppercase text-shadow">The LLM Revolution</h2>
+            <p class="text-center text-xl font-semibold text-gray-700 mt-2 mb-8">Large Language Models are transforming weak supervision, replacing code with natural language prompts.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-lg border-2 border-dashed border-gray-300">
+                    <h3 class="font-bold text-lg mb-4 text-gray-500">The Old Way: Code as LF</h3>
+                    <code class="block bg-gray-100 p-3 rounded text-sm text-left font-mono">if re.search(r"\bbuy now\b", text):
+    return "TRANSACTIONAL"
+else:
+    return ABSTAIN</code>
+                    <p class="text-xs text-gray-500 mt-3">Requires programming skills and can be brittle.</p>
+                </div>
+                 <div class="bg-white p-8 rounded-xl shadow-lg border-2 border-[#FFD166]">
+                    <h3 class="font-bold text-lg mb-4 text-[#073B4C]">The New Way: Prompt as LF</h3>
+                    <p class="block bg-yellow-50 p-3 rounded text-sm text-left font-serif">"Does the following query show transactional intent? Answer 'Yes' or 'No'. Query: [text]"</p>
+                    <p class="text-xs text-gray-500 mt-3">Accessible to any domain expert, highly flexible and nuanced.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Synergy -->
+        <section class="text-center mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2 text-[#118AB2]">A Data-Centric Toolkit</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Weak Supervision is a core component of modern data-centric AI, working in synergy with other techniques to build robust models.</p>
+            <div class="flex justify-center items-center space-x-2 md:space-x-4">
+                <div class="p-4 bg-white rounded-lg shadow-md flex-1">
+                    <p class="text-4xl">🧠</p>
+                    <p class="font-bold text-sm">Weak Supervision</p>
+                    <p class="text-xs text-gray-500">Generate Labels</p>
+                </div>
+                <div class="text-2xl font-bold text-[#118AB2]">+</div>
+                 <div class="p-4 bg-white rounded-lg shadow-md flex-1">
+                    <p class="text-4xl">🎯</p>
+                    <p class="font-bold text-sm">Active Learning</p>
+                    <p class="text-xs text-gray-500">Select Data</p>
+                </div>
+                 <div class="text-2xl font-bold text-[#118AB2]">+</div>
+                 <div class="p-4 bg-white rounded-lg shadow-md flex-1">
+                    <p class="text-4xl">✨</p>
+                    <p class="font-bold text-sm">Data Augmentation</p>
+                    <p class="text-xs text-gray-500">Create Data</p>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+    <script>
+        const wrapLabel = (label) => {
+            if (label.length <= 16) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + ' ' + word).trim().length > 16 && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            return lines;
+        };
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+              return label.join(' ');
+            } else {
+              return label;
+            }
+        };
+
+        // Chart 1: Paradigm Comparison
+        const paradigmCtx = document.getElementById('paradigmChart');
+        if (paradigmCtx) {
+            new Chart(paradigmCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Supervised', 'Active/Semi-Supervised', 'Weak Supervision'],
+                    datasets: [{
+                        label: 'Relative Annotation Cost',
+                        data: [100, 30, 5],
+                        backgroundColor: ['#FF6B6B', '#FFD166', '#06D6A0'],
+                        borderColor: '#f8f9fa',
+                        borderWidth: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: tooltipTitleCallback
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Chart 2: LF Comparison
+        const lfCtx = document.getElementById('lfChart');
+        if (lfCtx) {
+            new Chart(lfCtx, {
+                type: 'radar',
+                data: {
+                    labels: [wrapLabel('Precision'), wrapLabel('Coverage'), wrapLabel('Low Dev Effort')],
+                    datasets: [{
+                        label: 'Keyword/Regex',
+                        data: [8, 4, 9],
+                        fill: true,
+                        backgroundColor: 'rgba(255, 107, 107, 0.2)',
+                        borderColor: '#FF6B6B',
+                        pointBackgroundColor: '#FF6B6B',
+                    }, {
+                        label: 'Heuristic Rules',
+                        data: [7, 7, 3],
+                        fill: true,
+                        backgroundColor: 'rgba(255, 209, 102, 0.2)',
+                        borderColor: '#FFD166',
+                        pointBackgroundColor: '#FFD166',
+                    },{
+                        label: 'Distant Supervision',
+                        data: [4, 9, 7],
+                        fill: true,
+                        backgroundColor: 'rgba(6, 214, 160, 0.2)',
+                        borderColor: '#06D6A0',
+                        pointBackgroundColor: '#06D6A0',
+                    },{
+                        label: 'LLM Prompts',
+                        data: [9, 9, 6],
+                        fill: true,
+                        backgroundColor: 'rgba(17, 138, 178, 0.2)',
+                        borderColor: '#118AB2',
+                        pointBackgroundColor: '#118AB2',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                      line: {
+                        borderWidth: 3
+                      }
+                    },
+                    scales: {
+                        r: {
+                           angleLines: { color: 'rgba(7, 59, 76, 0.1)' },
+                           grid: { color: 'rgba(7, 59, 76, 0.1)' },
+                           suggestedMin: 0,
+                           suggestedMax: 10,
+                           ticks: { display: false },
+                           pointLabels: {
+                                font: {
+                                    size: 13,
+                                    weight: 'bold'
+                                },
+                                color: '#073B4C'
+                           }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                         tooltip: {
+                            callbacks: {
+                                title: tooltipTitleCallback
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

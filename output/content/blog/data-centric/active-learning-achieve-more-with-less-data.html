@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to Active Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A thematic, single-page scrolling application. This structure guides the user logically from foundational concepts ('What' & 'Why') to the core mechanics ('How') and specific implementations ('Which Strategy'). The flow is designed for educational purposes, starting broad and progressively delving into interactive details. Key interactions include: 1. An animated chart comparing traditional vs. active learning to immediately establish value. 2. A clickable, interactive diagram of the AL cycle to deconstruct the process. 3. A tabbed-interface with interactive visualizations for different query strategies, allowing users to actively explore and compare the core logic of AL. This structure avoids a dense dashboard layout, making a complex topic more approachable and digestible for learners. -->
+    <!-- Visualization & Content Choices: 1. Comparison Chart (Why AL?): Report Info -> Cost of labeling is high. Goal -> Compare. Viz -> Two simple bar charts (Traditional vs. AL). Interaction -> Animate bars on scroll-in to show contrast. Justification -> A simple, powerful visual to demonstrate the primary benefit. Library -> Chart.js. 2. AL Cycle Diagram: Report Info -> AL is a cyclical process. Goal -> Organize/Inform. Viz -> HTML/CSS flowchart. Interaction -> Click on each step to reveal detailed text. Justification -> Makes the process tangible and self-paced. Method -> JS click handlers. 3. Query Strategy Visualizations: Report Info -> Different query strategies (Uncertainty, QBC, etc.) exist. Goal -> Compare/Engage. Viz -> Interactive 2D scatter plots. Interaction -> Buttons to simulate 'querying' points based on the selected strategy, highlighting them on the chart. Justification -> The best way to understand the abstract logic is to see it in action. Library -> Chart.js. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #C5A07E;
+            border-bottom-color: #C5A07E;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #EAEAEA;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.3s;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #C5A07E;
+            color: #FFFFFF;
+        }
+        .btn-primary:hover {
+            background-color: #B5906E;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background-color: #F0EBE5;
+            color: #8D6E63;
+        }
+        .btn-secondary.active {
+             background-color: #C5A07E;
+             color: #FFFFFF;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .cycle-step {
+            cursor: pointer;
+            border: 2px solid #EAEAEA;
+            transition: all 0.3s;
+        }
+        .cycle-step.active, .cycle-step:hover {
+            border-color: #C5A07E;
+            background-color: #FDFBF8;
+        }
+        .cycle-arrow {
+            font-size: 2rem;
+            color: #D1D5DB;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Active Learning</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#why-al" class="nav-link">Why AL?</a>
+                <a href="#cycle" class="nav-link">The Cycle</a>
+                <a href="#strategies" class="nav-link">Strategies</a>
+                <a href="#scenarios" class="nav-link">Scenarios</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <section id="hero" class="text-center py-16">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Achieve More with Less Data</h2>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-600">
+                Active Learning is a smart machine learning technique that minimizes labeling effort by intelligently selecting the most informative data points for training. This guide provides an interactive exploration of its core concepts.
+            </p>
+        </section>
+
+        <section id="why-al" class="py-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">The Efficiency Advantage</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-gray-600">
+                    The primary motivation for Active Learning is to drastically reduce the cost and time associated with data labeling, which is often the biggest bottleneck in machine learning projects. This section visually compares the resources needed in traditional supervised learning versus an active learning approach to achieve similar model performance.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="card text-center">
+                    <h4 class="text-xl font-semibold mb-2 text-gray-700">Traditional Supervised Learning</h4>
+                    <p class="text-sm text-gray-500 mb-4">Requires a massive, fully-labeled dataset from the start.</p>
+                    <div class="chart-container h-64 md:h-80">
+                        <canvas id="traditionalChart"></canvas>
+                    </div>
+                </div>
+                <div class="card text-center">
+                    <h4 class="text-xl font-semibold mb-2 text-gray-700">Active Learning</h4>
+                    <p class="text-sm text-gray-500 mb-4">Starts small and strategically grows the labeled set.</p>
+                    <div class="chart-container h-64 md:h-80">
+                        <canvas id="activeLearningChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cycle" class="py-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">The Active Learning Cycle</h3>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                    Active Learning is not a one-off process but an iterative loop. The model, the data, and the human expert (oracle) work in tandem to progressively improve performance. Click on each step in the diagram below to understand its role in this intelligent cycle.
+                </p>
+            </div>
+            <div class="w-full max-w-5xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-center text-center">
+                    <div id="cycle-step-1" class="cycle-step p-4 rounded-lg h-full flex flex-col justify-center">
+                        <div class="text-3xl mb-2">1️⃣</div>
+                        <h4 class="font-semibold text-gray-700">Train Model</h4>
+                    </div>
+                    <div class="cycle-arrow hidden lg:block">→</div>
+                    <div id="cycle-step-2" class="cycle-step p-4 rounded-lg h-full flex flex-col justify-center active">
+                        <div class="text-3xl mb-2">2️⃣</div>
+                        <h4 class="font-semibold text-gray-700">Query Strategy</h4>
+                    </div>
+                     <div class="cycle-arrow hidden lg:block">→</div>
+                    <div id="cycle-step-3" class="cycle-step p-4 rounded-lg h-full flex flex-col justify-center">
+                       <div class="text-3xl mb-2">3️⃣</div>
+                        <h4 class="font-semibold text-gray-700">Oracle Labeling</h4>
+                    </div>
+                     <div class="cycle-arrow hidden lg:block">→</div>
+                    <div id="cycle-step-4" class="cycle-step p-4 rounded-lg h-full flex flex-col justify-center">
+                        <div class="text-3xl mb-2">4️⃣</div>
+                        <h4 class="font-semibold text-gray-700">Augment & Retrain</h4>
+                    </div>
+                </div>
+                <div id="cycle-explanation" class="mt-8 card">
+                    <p class="text-gray-600"></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="strategies" class="py-16">
+             <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">Exploring Query Strategies</h3>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-600">
+                    The power of Active Learning lies in its ability to intelligently select which data to label. This is handled by a "query strategy". In this section, you can explore some of the most common strategies and interact with simplified visualizations to understand how they decide which data points are the most informative.
+                </p>
+            </div>
+            <div class="flex justify-center space-x-2 md:space-x-4 mb-8">
+                <button data-strategy="uncertainty" class="strategy-btn btn btn-secondary active">Uncertainty Sampling</button>
+                <button data-strategy="qbc" class="strategy-btn btn btn-secondary">Query-By-Committee</button>
+                <button data-strategy="density" class="strategy-btn btn-secondary">Density-Based</button>
+            </div>
+            <div class="card">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h4 id="strategy-title" class="text-2xl font-bold text-gray-800 mb-2"></h4>
+                        <p id="strategy-description" class="text-gray-600 mb-6"></p>
+                        <div class="space-x-4">
+                            <button id="query-btn" class="btn btn-primary">Run Query</button>
+                            <button id="reset-btn" class="btn btn-secondary bg-gray-200 text-gray-700">Reset</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="chart-container h-80 md:h-96">
+                            <canvas id="strategyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="scenarios" class="py-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-800">Common Scenarios</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-gray-600">
+                    Active Learning can be applied in different settings, depending on how data is accessed and processed. Here are the three main scenarios.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-2">Pool-Based Sampling</h4>
+                    <p class="text-gray-600">This is the most common scenario. The algorithm has access to a large pool of unlabeled data and queries the most informative instances from this pool to be labeled by the oracle.</p>
+                </div>
+                <div class="card">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-2">Stream-Based Selective Sampling</h4>
+                    <p class="text-gray-600">Data points arrive one by one in a stream. For each instance, the algorithm must quickly decide whether to query its label or discard it, without the ability to revisit it later.</p>
+                </div>
+                <div class="card">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-2">Membership Query Synthesis</h4>
+                    <p class="text-gray-600">In this scenario, the learning algorithm can generate its own new data points from scratch and ask the oracle to label them. This is powerful but less common in practice.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-gray-100 border-t">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+            <p>An Interactive Guide to Active Learning.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (entry.target.id === 'why-al') {
+                            initComparisonCharts();
+                            observer.unobserve(entry.target);
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            const whyAlSection = document.getElementById('why-al');
+            if(whyAlSection) {
+              observer.observe(whyAlSection);
+            }
+
+            let traditionalChartInstance, activeLearningChartInstance;
+            function initComparisonCharts() {
+                const traditionalCtx = document.getElementById('traditionalChart')?.getContext('2d');
+                const activeLearningCtx = document.getElementById('activeLearningChart')?.getContext('2d');
+
+                if (!traditionalCtx || !activeLearningCtx) return;
+
+                const chartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: value => value + '%'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.dataset.label}: ${context.raw}%`
+                            }
+                        }
+                    }
+                };
+
+                if(traditionalChartInstance) traditionalChartInstance.destroy();
+                traditionalChartInstance = new Chart(traditionalCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Labeled Data Used', 'Final Accuracy'],
+                        datasets: [{
+                            label: 'Effort/Result',
+                            data: [100, 95],
+                            backgroundColor: ['#D1C4E9', '#7E57C2'],
+                            borderColor: ['#B39DDB', '#673AB7'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: chartOptions
+                });
+                
+                if(activeLearningChartInstance) activeLearningChartInstance.destroy();
+                activeLearningChartInstance = new Chart(activeLearningCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Labeled Data Used', 'Final Accuracy'],
+                        datasets: [{
+                            label: 'Effort/Result',
+                            data: [20, 94],
+                            backgroundColor: ['#FFCC80', '#FFA726'],
+                            borderColor: ['#FFB74D', '#FB8C00'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: chartOptions
+                });
+            }
+
+            const cycleSteps = document.querySelectorAll('.cycle-step');
+            const cycleExplanationEl = document.getElementById('cycle-explanation').querySelector('p');
+            const cycleExplanations = {
+                'cycle-step-1': 'The cycle begins by training an initial machine learning model on a small, pre-existing set of labeled data. This model is often weak but serves as a starting point.',
+                'cycle-step-2': 'The current model is applied to a large pool of unlabeled data. A query strategy is used to identify and select the single most informative instance that the model is least certain about.',
+                'cycle-step-3': 'The selected instance is presented to a human expert, known as an "oracle". The oracle provides the correct label for this instance.',
+                'cycle-step-4': 'The newly labeled instance is added to the training set. The model is then retrained from scratch or updated with this new information, improving its decision boundary.'
+            };
+
+            function updateCycleExplanation(stepId) {
+                cycleExplanationEl.textContent = cycleExplanations[stepId];
+                cycleSteps.forEach(s => {
+                    s.classList.remove('active');
+                    if(s.id === stepId) {
+                        s.classList.add('active');
+                    }
+                });
+            }
+
+            cycleSteps.forEach(step => {
+                step.addEventListener('click', () => updateCycleExplanation(step.id));
+            });
+            updateCycleExplanation('cycle-step-2');
+
+            const strategyData = {
+                uncertainty: {
+                    title: 'Uncertainty Sampling',
+                    description: 'This is the simplest and most common strategy. The model selects the data point it is least certain about. For a binary classifier, this is the point closest to its decision boundary (where P(y=1|x) is close to 0.5).',
+                    queryLogic: (points) => {
+                        let minDistance = Infinity;
+                        let bestIndex = -1;
+                        points.forEach((p, i) => {
+                            if (p.queried) return;
+                            const distance = Math.abs(p.y - 0.5);
+                            if (distance < minDistance) {
+                                minDistance = distance;
+                                bestIndex = i;
+                            }
+                        });
+                        return bestIndex;
+                    }
+                },
+                qbc: {
+                    title: 'Query-By-Committee',
+                    description: 'A "committee" of different models is trained. The data point on which the committee members disagree the most is selected for labeling. This captures areas of high variance in the model space.',
+                    queryLogic: (points) => {
+                        let maxDisagreement = -1;
+                        let bestIndex = -1;
+                        points.forEach((p, i) => {
+                            if (p.queried) return;
+                            const d1 = Math.abs(p.y - 0.55);
+                            const d2 = Math.abs(p.y - 0.45);
+                            const disagreement = Math.abs(d1 - d2) * Math.random(); 
+                            if (disagreement > maxDisagreement) {
+                                maxDisagreement = disagreement;
+                                bestIndex = i;
+                            }
+                        });
+                        return bestIndex;
+                    }
+                },
+                density: {
+                    title: 'Density-Based Sampling',
+                    description: 'This strategy combines model uncertainty with data density. It prioritizes points that are both uncertain and representative of the underlying data distribution, avoiding querying outliers.',
+                     queryLogic: (points) => {
+                        let bestScore = -Infinity;
+                        let bestIndex = -1;
+                        points.forEach((p, i) => {
+                            if (p.queried) return;
+                            const uncertainty = 1 - Math.abs(p.y - 0.5); 
+                            const density = p.density;
+                            const score = uncertainty * density;
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestIndex = i;
+                            }
+                        });
+                        return bestIndex;
+                    }
+                }
+            };
+            
+            let currentStrategy = 'uncertainty';
+            let strategyChart;
+            let scatterData;
+
+            const strategyTitleEl = document.getElementById('strategy-title');
+            const strategyDescriptionEl = document.getElementById('strategy-description');
+            const strategyBtns = document.querySelectorAll('.strategy-btn');
+            
+            function generateScatterData() {
+                scatterData = [];
+                for(let i=0; i<100; i++) {
+                    const x = Math.random() * 10;
+                    const y = Math.random();
+                    const density = Math.random();
+                    scatterData.push({x, y, queried: false, density});
+                }
+            }
+            
+            function initStrategyChart() {
+                const ctx = document.getElementById('strategyChart').getContext('2d');
+                const datasets = [
+                    {
+                        label: 'Unlabeled',
+                        data: scatterData.filter(p => !p.queried).map(p => ({x: p.x, y: p.y})),
+                        backgroundColor: 'rgba(200, 200, 200, 0.6)',
+                        borderColor: 'rgba(150, 150, 150, 1)',
+                        pointRadius: 5,
+                    },
+                    {
+                        label: 'Queried',
+                        data: scatterData.filter(p => p.queried).map(p => ({x: p.x, y: p.y})),
+                        backgroundColor: 'rgba(255, 167, 38, 1)',
+                        borderColor: 'rgba(251, 140, 0, 1)',
+                        pointRadius: 8,
+                        pointStyle: 'star'
+                    }
+                ];
+
+                if (strategyChart) {
+                    strategyChart.data.datasets = datasets;
+                    strategyChart.update();
+                } else {
+                    strategyChart = new Chart(ctx, {
+                        type: 'scatter',
+                        data: { datasets },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { display: false },
+                                y: {
+                                    min: 0,
+                                    max: 1,
+                                    title: { display: true, text: 'Model Uncertainty (0.5 is most uncertain)' }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: true },
+                                annotation: {
+                                    annotations: {
+                                        line1: {
+                                            type: 'line',
+                                            yMin: 0.5,
+                                            yMax: 0.5,
+                                            borderColor: 'rgb(255, 99, 132)',
+                                            borderWidth: 2,
+                                            borderDash: [6, 6],
+                                            label: {
+                                                content: 'Decision Boundary',
+                                                enabled: true,
+                                                position: 'start'
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            function updateStrategyView(strategy) {
+                currentStrategy = strategy;
+                strategyBtns.forEach(b => {
+                    b.classList.toggle('active', b.dataset.strategy === strategy);
+                });
+                const data = strategyData[strategy];
+                strategyTitleEl.textContent = data.title;
+                strategyDescriptionEl.textContent = data.description;
+                resetSimulation();
+            }
+
+            function resetSimulation() {
+                generateScatterData();
+                initStrategyChart();
+            }
+
+            document.getElementById('query-btn').addEventListener('click', () => {
+                const queryFn = strategyData[currentStrategy].queryLogic;
+                const indexToQuery = queryFn(scatterData);
+                if (indexToQuery !== -1) {
+                    scatterData[indexToQuery].queried = true;
+                    initStrategyChart();
+                }
+            });
+
+            document.getElementById('reset-btn').addEventListener('click', resetSimulation);
+            
+            strategyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    updateStrategyView(btn.dataset.strategy);
+                });
+            });
+
+            updateStrategyView('uncertainty');
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').slice(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

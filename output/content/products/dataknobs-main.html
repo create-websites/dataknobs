@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataknobs | Interactive Strategic Blueprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 45vh;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 50vh;
+                max-height: 500px;
+            }
+        }
+        .nav-btn.active {
+            background-color: #2563eb;
+            color: white;
+        }
+        .tab-btn.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        .kontrol-item.active {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans leading-relaxed">
+
+    <!-- Chosen Palette: Warm Neutral & Subtle Tech (bg-gray-50, text-gray-800, text-gray-600, bg-white, with a blue-600 accent) -->
+    <!-- Application Structure Plan: A tab-based, single-page application structure was chosen over a linear report. This allows users to non-linearly explore the content based on their role (e.g., product, marketing, executive). The main navigation divides the report into four logical, task-oriented themes: 1) Home (Executive Summary), 2) Platform Deep Dive (Interactive view of Kreate, Kontrols, Knobs), 3) Market & Strategy (ICPs, GTM, Competitive Analysis), and 4) Recommendations (Actionable plan). This structure breaks down the dense report into consumable, interactive chunks, with sub-navigation in each section for deeper exploration. The "Kontrols" section is specifically designed as an interactive grid to highlight its importance as the core differentiator, and the competitive matrix is visualized as a radar chart for easier comparison. This design prioritizes usability and user-driven exploration over the report's original document structure. -->
+    <!-- Visualization & Content Choices: 
+        - [Main Navigation]: Goal: Organize. Method: HTML/JS Tabs (show/hide main sections). Interaction: Click to swap entire content views. Justification: Core SPA functionality, better than a long scroll.
+        - [Home - Strategic Shifts]: Goal: Inform. Method: 3-card layout (HTML/Tailwind). Interaction: Static. Justification: Highlights key takeaways from the exec summary immediately.
+        - [Platform - Kontrols]: Goal: Organize/Engage. Method: 6-panel interactive grid (HTML/Tailwind) with a separate details-display area. Interaction: Click a grid panel (e.g., "Data-Centric") to populate the display area with its specific features from a JS object. Justification: Makes the 6-layer framework, the key differentiator, tangible and explorable.
+        - [Platform - Kreate]: Goal: Organize. Method: Sub-tabs (HTML/JS). Interaction: Click to swap content for Datasets, Websites, Bots. Justification: Manages the density of the Kreate module.
+        - [Strategy - Competitive Matrix]: Goal: Compare. Method: Radar Chart (Chart.js/Canvas). Interaction: Hover tooltips. Justification: Visually and dynamically compares Dataknobs vs. competitors on key dimensions (Governance, Integration, etc.), far more effective than the static report table.
+        - [Strategy - ICPs]: Goal: Inform. Method: 3-card layout (HTML/Tailwind). Interaction: Static. Justification: Clearly segments the ideal customers.
+        - [Recommendations - Roadmap]: Goal: Organize/Inform. Method: 3-column grid (HTML/Tailwind). Interaction: Static. Justification: Visually represents the phased timeline (Phase 1, 2, 3) more clearly than a table.
+        - All text content is drawn from the report and placed in its logical application section, with introductory paragraphs added to each section to provide context for the user.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="sticky top-0 z-50 w-full bg-white shadow-md">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4">
+                <h1 class="text-2xl font-bold text-blue-600 mb-2 sm:mb-0">Dataknobs: Strategic Blueprint</h1>
+                <div class="flex flex-wrap sm:flex-nowrap space-x-0 sm:space-x-1">
+                    <button class="nav-btn active w-1/2 sm:w-auto text-sm font-medium py-2 px-3 rounded-md transition-colors duration-150" data-target="#home-section">Home</button>
+                    <button class="nav-btn w-1/2 sm:w-auto text-sm font-medium py-2 px-3 rounded-md transition-colors duration-150" data-target="#platform-section">Platform Deep Dive</button>
+                    <button class="nav-btn w-1/2 sm:w-auto text-sm font-medium py-2 px-3 rounded-md transition-colors duration-150 mt-1 sm:mt-0" data-target="#strategy-section">Market & Strategy</button>
+                    <button class="nav-btn w-1/2 sm:w-auto text-sm font-medium py-2 px-3 rounded-md transition-colors duration-150 mt-1 sm:mt-0" data-target="#recommendations-section">Recommendations</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <section id="home-section" class="main-section">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-3xl font-bold text-gray-900 mb-3">The AI Data Product Factory: A Blueprint for Leadership</h2>
+                <p class="text-lg text-gray-600 mb-6">This interactive report analyzes the Dataknobs platform, positioning it as a complete "AI Data Product Factory." The platform's core strength lies in its integrated, governance-first approach, particularly the <span class="font-semibold text-blue-600">'Kontrols'</span> module, which addresses the most critical enterprise needs for trust, safety, and compliance. The following sections deconstruct the platform, analyze its market position, and provide a set of actionable strategic recommendations for sustainable growth.</p>
+                
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Core Strategic Imperatives</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="border border-gray-200 bg-gray-50 p-4 rounded-lg">
+                        <span class="text-3xl">1</span>
+                        <h4 class="text-xl font-semibold text-gray-800 my-2">Product Clarity & Packaging</h4>
+                        <p class="text-gray-600">Address ambiguity, particularly in the 'Knobs' module (rebranding it to "Experimentation Engine"), and create transparent, tiered pricing to support a "Land and Expand" motion.</p>
+                    </div>
+                    <div class="border border-gray-200 bg-gray-50 p-4 rounded-lg">
+                        <span class="text-3xl">2</span>
+                        <h4 class="text-xl font-semibold text-gray-800 my-2">Unified Go-to-Market Narrative</h4>
+                        <p class="text-gray-600">Formally adopt "The AI Data Product Factory" as the primary marketing message. Lead with a governance-first campaign targeting regulated industries like finance and manufacturing.</p>
+                    </div>
+                    <div class="border border-gray-200 bg-gray-50 p-4 rounded-lg">
+                        <span class="text-3xl">3</span>
+                        <h4 class="text-xl font-semibold text-gray-800 my-2">Strategic Sales Execution</h4>
+                        <p class="text-gray-600">Implement a formal "Land and Expand" sales playbook to systematically educate and upsell customers from individual modules (like KreateBots) to the full, integrated platform.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="platform-section" class="main-section hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-3">Platform Deep Dive: The Intelligent Trio</h2>
+            <p class="text-lg text-gray-600 mb-6">The Dataknobs platform is built on three interconnected pillars—Kreate, Kontrols, and Knobs—that form a "Virtuous Cycle of Creation." This section provides an interactive exploration of each component, which together enable enterprises to "Build, Govern, and Adopt" AI data products within a single, unified factory.</p>
+
+            <div class="flex flex-wrap border-b border-gray-300 mb-6">
+                <button class="platform-tab-btn active text-lg font-medium py-3 px-5 border-b-2 border-transparent" data-target="#kreate-content">Kreate (Build)</button>
+                <button class="platform-tab-btn text-lg font-medium py-3 px-5 border-b-2 border-transparent" data-target="#kontrols-content">Kontrols (Govern)</button>
+                <button class="platform-tab-btn text-lg font-medium py-3 px-5 border-b-2 border-transparent" data-target="#knobs-content">Knobs (Optimize)</button>
+            </div>
+
+            <div id="kreate-content" class="platform-tab-content">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Kreate: The Generative Engine</h3>
+                    <p class="text-gray-600 mb-6">The Kreate module is the generative core of the platform, a suite of tools designed to build the foundational assets for any data product, from high-quality datasets to AI-powered websites and conversational agents. Select a component below to learn more.</p>
+
+                    <div class="flex flex-wrap -mx-2 mb-6">
+                        <button class="kreate-tab-btn active bg-blue-100 text-blue-700 font-medium py-2 px-4 rounded-full m-2" data-target="#kreate-datasets">KreateDatasets</button>
+                        <button class="kreate-tab-btn bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-full m-2" data-target="#kreate-websites">KreateWebsites</button>
+                        <button class="kreate-tab-btn bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-full m-2" data-target="#kreate-bots">KreateBots</button>
+                    </div>
+
+                    <div id="kreate-datasets" class="kreate-tab-content">
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">KreateDatasets</h4>
+                        <p class="text-gray-600 mb-4">Positioned as the "cornerstone of Data-Centric AI," this is an advanced engineering environment for manufacturing high-quality, AI-ready data assets. It transforms raw or insufficient data into valuable inputs for models.</p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><strong>Data Signal and Summary Generation:</strong> Leverages AI to extract meaningful "data signals" and generate summaries from raw data.</li>
+                            <li><strong>Synthetic Data Generation:</strong> Creates new, artificial data to solve the "cold start problem" and enhance data privacy.</li>
+                            <li><strong>Advanced Curation:</strong> Employs Active Learning and Weak Supervision to build and refine datasets more efficiently.</li>
+                        </ul>
+                    </div>
+                    <div id="kreate-websites" class="kreate-tab-content hidden">
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">KreateWebsites</h4>
+                        <p class="text-gray-600 mb-4">An AI-powered engine that automates the creation of data-driven web assets using a "content-first" approach. It generates a complete website from raw content in Google Drive, PDFs, or GitHub.</p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><strong>AI-Powered SEO:</strong> A continuous AI agent optimizes the site for search engines and keeps content fresh.</li>
+                            <li><strong>GenAI-Specific CMS:</strong> Includes a CMS built to handle AI-generated content with full data lineage.</li>
+                            <li><strong>Multi-Platform Output:</strong> Generates sites in HTML, React/Node.js, ASPX, and PHP.</li>
+                        </ul>
+                    </div>
+                    <div id="kreate-bots" class="kreate-tab-content hidden">
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">KreateBots</h4>
+                        <p class="text-gray-600 mb-4">A comprehensive, low-code framework for building a full spectrum of conversational AI, from simple chatbots to complex AI agents. It's offered in a tiered structure to avoid vendor lock-in.</p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li><strong>Standard Chatbot:</strong> For small businesses; includes pre-built UI, admin dashboard, and prompt management.</li>
+                            <li><strong>Pro with RAG:</strong> For medium businesses; adds Retrieval-Augmented Generation (RAG) to ground bots in proprietary knowledge.</li>
+                            <li><strong>Enterprise:</strong> For large organizations; adds LLM fine-tuning, custom API generation, and model performance comparison.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="kontrols-content" class="platform-tab-content hidden">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-2">Kontrols: The Governance Backbone</h3>
+                    <p class="text-gray-600 mb-6">This is the platform's most significant strategic asset: a comprehensive suite of "guardrails for secure and responsible AI." It provides a multi-layered, holistic approach to AI governance that addresses the critical concerns of regulated enterprises. <span class="font-semibold">Click on a layer below to see its specific controls.</span></p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-1">
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-4">
+                                <div class="kontrol-item active cursor-pointer p-4 border-2 border-gray-200 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md" data-kontrol="data">
+                                    <span class="text-2xl">📊</span>
+                                    <h5 class="text-lg font-semibold mt-2">Data-Centric</h5>
+                                </div>
+                                <div class="kontrol-item cursor-pointer p-4 border-2 border-gray-200 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md" data-kontrol="model">
+                                    <span class="text-2xl">🤖</span>
+                                    <h5 class="text-lg font-semibold mt-2">Model-Centric</h5>
+                                </div>
+                                <div class="kontrol-item cursor-pointer p-4 border-2 border-gray-200 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md" data-kontrol="output">
+                                    <span class="text-2xl">📤</span>
+                                    <h5 class="text-lg font-semibold mt-2">Output-Centric</h5>
+                                </div>
+                                <div class="kontrol-item cursor-pointer p-4 border-2 border-gray-200 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md" data-kontrol="infra">
+                                    <span class="text-2xl">⚙️</span>
+                                    <h5 class="text-lg font-semibold mt-2">Infrastructure-Centric</h5>
+                                </div>
+                                <div class="kontrol-item cursor-pointer p-4 border-2 border-gray-200 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md" data-kontrol="gov">
+                                    <span class="text-2xl">🏛️</span>
+                                    <h5 class="text-lg font-semibold mt-2">Governance-Centric</h5>
+                                </div>
+                                <div class="kontrol-item cursor-pointer p-4 border-2 border-gray-200 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md" data-kontrol="biz">
+                                    <span class="text-2xl">📈</span>
+                                    <h5 class="text-lg font-semibold mt-2">Business & User-Centric</h5>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="kontrol-details" class="lg:col-span-2 bg-blue-50 p-6 rounded-lg border border-blue-200 min-h-[300px]">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="knobs-content" class="platform-tab-content hidden">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-2">Knobs: The Experimentation Layer</h3>
+                    <p class="text-gray-600 mb-6">The 'Knobs' module is designed to be the optimization and experimentation layer, enabling users to diagnose performance issues and iteratively improve data products. However, the "Knobs" concept suffers from a critical messaging problem, as the term is ambiguous (is it a UI slider or a config parameter?).</p>
+                    
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-6">
+                        <h4 class="text-xl font-semibold text-red-800">Strategic Weakness & Recommendation</h4>
+                        <p class="text-red-700">The ambiguity of "Knobs" creates customer confusion. It is imperative to resolve this by rebranding the module to something more descriptive, such as **"Experimentation Engine"** or **"Tuning Studio,"** and creating concrete documentation and demos.</p>
+                    </div>
+
+                    <h4 class="text-xl font-semibold text-gray-800 mb-2">Defined Capabilities</h4>
+                    <p class="text-gray-600 mb-4">As defined, this module provides configurable parameters across key areas:</p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li><strong>Data Transformation Knobs:</strong> Adjust data preprocessing steps like normalization, scaling, and dimensionality reduction.</li>
+                        <li><strong>Hyperparameter Knobs:</strong> Configure model training parameters like learning rate, batch size, and regularization strength.</li>
+                        <li><strong>GenAI & Agentic Knobs:</strong> Control output characteristics like `temperature` and `top-p` or configure AI agent behaviors.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="strategy-section" class="main-section hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-3">Market & Strategy</h2>
+            <p class="text-lg text-gray-600 mb-6">This section outlines the go-to-market strategy, starting with the Ideal Customer Profiles (ICPs) where Dataknobs provides maximum value. It then details industry-specific GTM blueprints and analyzes the competitive landscape, highlighting Dataknobs' unique, governance-first differentiation.</p>
+
+            <div class="flex flex-wrap border-b border-gray-300 mb-6">
+                <button class="strategy-tab-btn active text-lg font-medium py-3 px-5 border-b-2 border-transparent" data-target="#icp-content">Ideal Customers (ICPs)</button>
+                <button class="strategy-tab-btn text-lg font-medium py-3 px-5 border-b-2 border-transparent" data-target="#gtm-content">GTM Blueprints</button>
+                <button class="strategy-tab-btn text-lg font-medium py-3 px-5 border-b-2 border-transparent" data-target="#competitive-content">Competitive Matrix</button>
+            </div>
+
+            <div id="icp-content" class="strategy-tab-content">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Ideal Customer Profiles (ICPs)</h3>
+                    <p class="text-gray-600 mb-6">Analysis identifies three primary ICPs where the platform's value is most concentrated.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="border border-gray-200 p-5 rounded-lg bg-gray-50">
+                            <h4 class="text-xl font-semibold text-blue-700 mb-2">1. The Regulated Enterprise</h4>
+                            <p class="text-sm text-gray-500 mb-3">(Finance, Fintech, Healthcare)</p>
+                            <p class="text-gray-600 mb-3">Risk-averse organizations that prioritize data privacy, security, model transparency, and auditability above all else.</p>
+                            <p class="font-semibold text-gray-800">Primary Value Driver:</p>
+                            <p class="text-blue-600 font-medium">The 'Kontrols' module, which directly addresses their core trust, safety, and compliance needs.</p>
+                        </div>
+                        <div class="border border-gray-200 p-5 rounded-lg bg-gray-50">
+                            <h4 class="text-xl font-semibold text-blue-700 mb-2">2. The Scaled Infrastructure Operator</h4>
+                            <p class="text-sm text-gray-500 mb-3">(Cloud Providers, Manufacturing, Energy)</p>
+                            <p class="text-gray-600 mb-3">Focused on operational efficiency, uptime, and asset utilization. They manage massive volumes of telemetry and IoT data.</p>
+                            <p class="font-semibold text-gray-800">Primary Value Driver:</p>
+                            <p class="text-blue-600 font-medium">The 'Kreate' module, specifically the 'AI Twin' product for predictive maintenance and health scoring.</p>
+                        </div>
+                        <div class="border border-gray-200 p-5 rounded-lg bg-gray-50">
+                            <h4 class="text-xl font-semibold text-blue-700 mb-2">3. The Digital-First Growth Business</h4>
+                            <p class="text-sm text-gray-500 mb-3">(E-commerce, Tech Consulting)</p>
+                            <p class="text-gray-600 mb-3">Agile, data-driven companies focused on customer acquisition, conversion, and digital experience.</p>
+                            <p class="font-semibold text-gray-800">Primary Value Driver:</p>
+                            <p class="text-blue-600 font-medium">'KreateWebsites' for AI-powered SEO and 'KreateBots' for sales/support automation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gtm-content" class="strategy-tab-content hidden">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Industry-Specific Go-to-Market Blueprints</h3>
+                    <p class="text-gray-600 mb-6">These GTM blueprints package the platform's capabilities into solutions that speak directly to the challenges of each vertical.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="border border-gray-200 p-5 rounded-lg bg-gray-50">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-2">Financial Services & Fintech</h4>
+                            <p class="text-gray-600 mb-3"><span class="font-medium">Package:</span> "The Compliant AI Suite for Financial Services."</p>
+                            <p class="text-gray-600"><span class="font-medium">Lead With:</span> **Kontrols** module, bundled with KreateBots and KreateDatasets.</p>
+                            <p class="text-gray-600 mt-2"><span class="font-medium">Use Case:</span> AI Tax & Financial Research Assistant (parsing IRS docs), Compliant Call Center Monitoring.</p>
+                        </div>
+                        <div class="border border-gray-200 p-5 rounded-lg bg-gray-50">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-2">Manufacturing & Infrastructure</h4>
+                            <p class="text-gray-600 mb-3"><span class="font-medium">Package:</span> "Predictive Maintenance and Asset Health Intelligence."</p>
+                            <p class="text-gray-600"><span class="font-medium">Lead With:</span> **AI Twin** (from Kreate), supported by Kontrols.</p>
+                            <p class="text-gray-600 mt-2"><span class="font-medium">Use Case:</span> Real-Time Hardware Health Scoring, Remaining Useful Life (RUL) Prediction, Secure IoT Data Governance.</p>
+                        </div>
+                        <div class="border border-gray-200 p-5 rounded-lg bg-gray-50">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-2">E-commerce & Retail</h4>
+                            <p class="text-gray-600 mb-3"><span class="font-medium">Package:</span> "Dynamic E-commerce Analytics & Personalization Engine."</p>
+                            <p class="text-gray-600"><span class="font-medium">Lead With:</span> **KreateWebsites** and AI agents (from KreateBots).</p>
+                            <p class="text-gray-600 mt-2"><span class="font-medium">Use Case:</span> Automated Sales & Revenue Analysis, AI-Powered SEO, Personalized Shopping Assistants.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="competitive-content" class="strategy-tab-content hidden">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Competitive Positioning Matrix</h3>
+                    <p class="text-gray-600 mb-6">Dataknobs' primary differentiator against Tier 1 competitors is its deeply integrated, comprehensive governance framework. While others offer strong creation or MLOps tools, Dataknobs is architected for enterprise trust and safety. This chart visualizes the qualitative comparison, where 5 = High, 3 = Medium, and 1 = Low.</p>
+                    <div class="chart-container">
+                        <canvas id="competitiveRadarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="recommendations-section" class="main-section hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-3">Strategic Recommendations</h2>
+            <p class="text-lg text-gray-600 mb-6">Based on the analysis, this section provides a set of concrete, actionable recommendations to capitalize on strengths, address weaknesses, and create a clear path toward market leadership. These are grouped into product, marketing, and a phased implementation plan.</p>
+
+            <div class="flex flex-wrap border-b border-gray-300 mb-6">
+                <button class="rec-tab-btn active text-lg font-medium py-3 px-5 border-b-2 border-transparent" data-target="#product-rec-content">Product & Packaging</button>
+                <button class="rec-tab-btn text-lg font-medium py-3 px-5 border-b-2 border-transparent" data-target="#marketing-rec-content">Marketing & Sales</button>
+                <button class="rec-tab-btn text-lg font-medium py-3 px-5 border-b-2 border-transparent" data-target="#roadmap-content">Phased Roadmap</button>
+            </div>
+
+            <div id="product-rec-content" class="rec-tab-content">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Product & Packaging Recommendations</h3>
+                    <div class="space-y-6">
+                        <div class="border-b pb-4">
+                            <h4 class="text-xl font-semibold text-gray-800">1. Clarify and Rebrand the 'Knobs' Module</h4>
+                            <p class="text-gray-600 mt-1">Immediately rename 'Knobs' to a descriptive title like **"Experimentation Engine"** or **"Tuning Studio."** This eliminates ambiguity. This must be supported by creating concrete tutorials, API documentation, and video demos showing *how* a user tunes a model or system.</p>
+                        </div>
+                        <div class="border-b pb-4">
+                            <h4 class="text-xl font-semibold text-gray-800">2. Develop a Unified, Tiered Platform Pricing Strategy</h4>
+                            <p class="text-gray-600 mt-1">Use the Standard / Pro / Enterprise model from KreateBots for the *entire* platform. This creates a clear pricing structure and upgrade path. The **Enterprise Tier** should be packaged for the "Regulated Enterprise" ICP and include the full, comprehensive suite of **Kontrols** features.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800">3. Systematize and Quantify Customer Success Stories</h4>
+                            <p class="text-gray-600 mt-1">Move beyond qualitative descriptions and launch an initiative to develop a library of ROI-driven case studies. These must feature hard metrics (e.g., "Reduced unplanned downtime by 30%," "Decreased compliance reporting time by 50 hours") to provide compelling social proof for enterprise buyers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="marketing-rec-content" class="rec-tab-content hidden">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Marketing & Sales Enablement Recommendations</h3>
+                    <div class="space-y-6">
+                        <div class="border-b pb-4">
+                            <h4 class="text-xl font-semibold text-gray-800">4. Unify the Narrative Around "The AI Data Product Factory"</h4>
+                            <p class="text-gray-600 mt-1">Formally adopt this as the single, primary marketing message across all materials (website, sales decks, etc.). This provides a consistent and powerful story. The "Intelligent Trio" should be used as the supporting framework to explain *how* the factory works.</p>
+                        </div>
+                        <div class="border-b pb-4">
+                            <h4 class="text-xl font-semibold text-gray-800">5. Lead with Governance in Target Markets</h4>
+                            <p class="text-gray-600 mt-1">Launch targeted marketing campaigns at the "Regulated Enterprise" ICP (finance, healthcare) that lead with the value of the **Kontrols** module. Create high-value content (whitepapers, webinars) that establishes Dataknobs as a thought leader in AI governance and responsible AI.</p>
+</div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800">6. Implement a "Land and Expand" Sales Playbook</h4>
+                            <p class="text-gray-600 mt-1">Create a formal playbook to operationalize the upsell strategy. This must include discovery questions to find governance/risk pain points, value-based upsell scripts, and a simple ROI calculator to model the financial benefits of upgrading from a single module to the full platform.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="roadmap-content" class="rec-tab-content hidden">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Phased Implementation Roadmap</h3>
+                    <p class="text-gray-600 mb-6">This roadmap provides a prioritized sequence of initiatives to translate strategy into action, from immediate quick wins to longer-term projects for market leadership.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <div class="border-l-4 border-blue-600 bg-blue-50 p-5 rounded-r-lg">
+                            <h4 class="text-xl font-semibold text-blue-800 mb-3">Phase 1: Foundational Clarity (0-3 Months)</h4>
+                            <ul class="list-disc list-inside text-blue-700 space-y-2">
+                                <li>Rename 'Knobs' module in all public materials.</li>
+                                <li>Unify website & sales deck messaging around "AI Data Product Factory."</li>
+                                <li>Initiate outreach to top 3-5 customers to build quantitative case studies.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="border-l-4 border-blue-600 bg-blue-50 p-5 rounded-r-lg">
+                            <h4 class="text-xl font-semibold text-blue-800 mb-3">Phase 2: Strategic Execution (3-9 Months)</h4>
+                            <ul class="list-disc list-inside text-blue-700 space-y-2">
+                                <li>Launch new tiered platform pricing model.</li>
+                                <li>Develop and train sales team on the "Land and Expand" playbook.</li>
+                                <li>Launch first governance-focused campaign for Financial Services.</li>
+                                <li>Publish detailed tutorials for the rebranded "Experimentation Engine."</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="border-l-4 border-blue-600 bg-blue-50 p-5 rounded-r-lg">
+                            <h4 class="text-xl font-semibold text-blue-800 mb-3">Phase 3: Market Leadership (9+ Months)</h4>
+                            <ul class="list-disc list-inside text-blue-700 space-y-2">
+                                <li>Establish a Customer Advisory Board for regulated industries.</li>
+                                <li>Publish a benchmark "State of AI Governance" industry report.</li>
+                                <li>Expand GTM blueprints to new verticals (e.g., Healthcare, Public Sector).</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+
+    </main>
+
+    <footer class="text-center py-8 mt-12 border-t border-gray-200">
+        <p class="text-gray-500 text-sm">Dataknobs Interactive Strategic Blueprint | An AI-Generated Analysis</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const kontrolsData = {
+                data: {
+                    title: "Data-Centric Kontrols",
+                    desc: "Ensures the quality, integrity, and privacy of the data fueling the AI systems.",
+                    features: [
+                        "Data Lineage Tracking: Documents the data's journey for traceability.",
+                        "Pre-processing Pipelines: Automated standardization of data.",
+                        "Data Privacy & Security: Controls like data masking and anonymization (GDPR, CCPA)."
+                    ]
+                },
+                model: {
+                    title: "Model-Centric Kontrols",
+                    desc: "Provides rigorous oversight of the machine learning model lifecycle.",
+                    features: [
+                        "Bias Detection & Mitigation: Promotes fairness and ethical outcomes.",
+                        "Performance Monitoring: Tracks accuracy, precision, and other metrics.",
+                        "Model Versioning: Allows for rollbacks to previous stable models.",
+                        "Explainability Tools: Fosters trust using tools like LIME and SHAP."
+                    ]
+                },
+                output: {
+                    title: "Output-Centric Kontrols",
+                    desc: "Focuses on the results generated by AI models to ensure reliability and ethical integrity.",
+                    features: [
+                        "Feedback Loops: Captures end-user input for refinement.",
+                        "Ethics & Compliance Checks: Flags outputs that could violate regulatory or ethical guidelines.",
+                    ]
+                },
+                infra: {
+                    title: "Infrastructure-Centric Kontrols",
+                    desc: "Secures and optimizes the underlying hardware and software environment.",
+                    features: [
+                        "Scalability Management: Auto-scaling to meet demand.",
+                        "Cost Optimization: Monitors resource consumption.",
+                        "High Availability & Disaster Recovery: Ensures system uptime.",
+                        "Security Controls: Firewalls and end-to-end encryption."
+                    ]
+                },
+                gov: {
+                    title: "Governance-Centric Kontrols",
+                    desc: "Provides the overarching policy management framework for the entire system.",
+                    features: [
+                        "Audit Trails & Documentation: Detailed records for accountability.",
+                        "Role-Based Access Control (RBAC): Restricts access to sensitive data and tools.",
+                        "Regulatory Compliance Management: Ensures protocols evolve with changing laws."
+                    ]
+                },
+                biz: {
+                    title: "Business & User-Centric Kontrols",
+                    desc: "Bridges the gap between technical AI systems and tangible business value.",
+                    features: [
+                        "ROI Tracking: Measures the financial impact of AI initiatives.",
+                        "User-Centric Feedback: Ensures products meet user needs and enhance satisfaction."
+                    ]
+                }
+            };
+
+            const competitiveChartData = {
+                labels: [
+                    'AI Governance & Compliance',
+                    'End-to-End Integration',
+                    'Low-Code Accessibility',
+                    'Experimentation & Optimization',
+                    'Targeted Industry Solutions'
+                ],
+                datasets: [
+                    {
+                        label: 'Dataknobs',
+                        data: [5, 5, 5, 3, 3], 
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        borderColor: 'rgba(37, 99, 235, 1)',
+                        pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(37, 99, 235, 1)'
+                    },
+                    {
+                        label: 'Dataiku',
+                        data: [3, 5, 5, 3, 5], 
+                        backgroundColor: 'rgba(107, 114, 128, 0.2)',
+                        borderColor: 'rgba(107, 114, 128, 1)',
+                        pointBackgroundColor: 'rgba(107, 114, 128, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(107, 114, 128, 1)'
+                    },
+                    {
+                        label: 'Databricks',
+                        data: [3, 3, 3, 5, 5], 
+                        backgroundColor: 'rgba(234, 88, 12, 0.2)',
+                        borderColor: 'rgba(234, 88, 12, 1)',
+                        pointBackgroundColor: 'rgba(234, 88, 12, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(234, 88, 12, 1)'
+                    },
+                    {
+                        label: 'Google Cloud Vertex AI',
+                        data: [3, 3, 5, 5, 3],
+                        backgroundColor: 'rgba(5, 150, 105, 0.2)',
+                        borderColor: 'rgba(5, 150, 105, 1)',
+                        pointBackgroundColor: 'rgba(5, 150, 105, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(5, 150, 105, 1)'
+                    }
+                ]
+            };
+            
+            function initTabs(btnSelector, contentSelector, activeClass) {
+                const buttons = document.querySelectorAll(btnSelector);
+                const contents = document.querySelectorAll(contentSelector);
+                
+                buttons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        buttons.forEach(btn => btn.classList.remove(...activeClass.split(' ')));
+                        button.classList.add(...activeClass.split(' '));
+                        
+                        contents.forEach(content => content.classList.add('hidden'));
+                        const target = document.querySelector(button.dataset.target);
+                        if (target) {
+                            target.classList.remove('hidden');
+                        }
+                    });
+                });
+            }
+
+            initTabs('.nav-btn', '.main-section', 'active');
+            initTabs('.platform-tab-btn', '.platform-tab-content', 'active');
+            initTabs('.kreate-tab-btn', '.kreate-tab-content', 'active bg-blue-100 text-blue-700');
+            initTabs('.strategy-tab-btn', '.strategy-tab-content', 'active');
+            initTabs('.rec-tab-btn', '.rec-tab-content', 'active');
+
+            function initKontrolsGrid() {
+                const items = document.querySelectorAll('.kontrol-item');
+                const detailsDisplay = document.getElementById('kontrol-details');
+
+                function updateDetails(kontrolId) {
+                    const data = kontrolsData[kontrolId];
+                    if (!data) return;
+                    
+                    let featuresHtml = data.features.map(feature => 
+                        `<li class="text-gray-700">${feature}</li>`
+                    ).join('');
+                    
+                    detailsDisplay.innerHTML = `
+                        <h4 class="text-2xl font-semibold text-gray-900 mb-3">${data.title}</h4>
+                        <p class="text-gray-700 mb-4">${data.desc}</p>
+                        <h5 class="text-lg font-semibold text-gray-800 mb-2">Key Features:</h5>
+                        <ul class="list-disc list-inside space-y-1">
+                            ${featuresHtml}
+                        </ul>
+                    `;
+                }
+
+                items.forEach(item => {
+                    item.addEventListener('click', () => {
+                        items.forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                        updateDetails(item.dataset.kontrol);
+                    });
+                });
+
+                updateDetails('data');
+            }
+            
+            function createCompetitiveChart() {
+                const ctx = document.getElementById('competitiveRadarChart');
+                if (ctx) {
+                    new Chart(ctx.getContext('2d'), {
+                        type: 'radar',
+                        data: competitiveChartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.r !== null) {
+                                                const valueMap = {5: "High", 3: "Medium", 1: "Low"};
+                                                label += valueMap[context.parsed.r] || context.parsed.r;
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                r: {
+                                    angleLines: {
+                                        color: 'rgba(0, 0, 0, 0.1)'
+                                    },
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.1)'
+                                    },
+                                    pointLabels: {
+                                        font: {
+                                            size: 11,
+                                            weight: 'bold'
+                                        },
+                                        color: '#333'
+                                    },
+                                    ticks: {
+                                        backdropColor: 'rgba(255, 255, 255, 0.75)',
+                                        stepSize: 1,
+                                        callback: function(value) {
+                                            const valueMap = {5: "High", 4: "", 3: "Medium", 2: "", 1: "Low", 0: "N/A"};
+                                            return valueMap[value] || '';
+                                        }
+                                    },
+                                    suggestedMin: 0,
+                                    suggestedMax: 5
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            initKontrolsGrid();
+            
+            const strategyTabButton = document.querySelector('.nav-btn[data-target="#strategy-section"]');
+            let chartCreated = false;
+            if (strategyTabButton) {
+                new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.target.classList.contains('active') && !chartCreated) {
+                            const competitiveTab = document.querySelector('.strategy-tab-btn[data-target="#competitive-content"]');
+                            if (competitiveTab && competitiveTab.classList.contains('active')) {
+                                createCompetitiveChart();
+                                chartCreated = true;
+                            } else if (competitiveTab) {
+                                const tabObserver = new MutationObserver(() => {
+                                    if (competitiveTab.classList.contains('active') && !chartCreated) {
+                                        createCompetitiveChart();
+                                        chartCreated = true;
+                                        tabObserver.disconnect();
+                                    }
+                                });
+                                tabObserver.observe(competitiveTab, { attributes: true, attributeFilter: ['class'] });
+                            }
+                        }
+                    });
+                }).observe(strategyTabButton, { attributes: true, attributeFilter: ['class'] });
+
+                const competitiveTabButton = document.querySelector('.strategy-tab-btn[data-target="#competitive-content"]');
+                if (competitiveTabButton) {
+                    competitiveTabButton.addEventListener('click', () => {
+                        if (!chartCreated) {
+                            setTimeout(() => { 
+                                createCompetitiveChart();
+                                chartCreated = true;
+                            }, 0);
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

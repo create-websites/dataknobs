@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Risks in MCP: Lessons from MCPSafetyScanner and Attack Vectors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">Security Risks in MCP</h1>
+            <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Lessons from the MCP Safety Audit and Real-World Attack Vectors</p>
+        </header>
+
+        <main class="max-w-4xl mx-auto">
+            <!-- Introduction Section -->
+            <section class="mb-12">
+                <p class="text-lg leading-relaxed">
+                    The Model Context Protocol (MCP) defines how AI agents connect with tools and data, enabling advanced functionality. Yet, centralizing context introduces a major attack vector. If an MCP server is breached or malicious, agents can be misled, credentials stolen, and data leaked. Protecting this layer isn’t optional—it's crucial for safe and reliable agentic systems.
+                </p>
+            </section>
+
+            <!-- MCP Safety Audit Section -->
+            <section id="safety-audit" class="mb-16">
+                 <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Lessons from the "MCP Safety Audit" Paper</h2>
+                 <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <p class="text-lg leading-relaxed mb-6">A key paper frequently cited in arXiv discussions examined the security of MCP implementations. The research identified several major attack vectors that developers need to address:</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800">Code & Prompt Injection</h3>
+                            <p class="text-gray-700">A compromised MCP server may send crafted replies that influence an agent’s Large Language Model (LLM), potentially causing it to run harmful commands, leak private data from its context, or target external systems.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800">Credential & Data Theft</h3>
+                            <p class="text-gray-700">If an agent sends credentials (such as an API key) through an MCP server to a tool, a hacked tool could steal them. Similarly, any sensitive data passed to a tool may be intercepted and leaked by a malicious server.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Recommendations Section -->
+            <section id="recommendations" class="mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Recommendations for Secure MCP Implementation</h2>
+                 <div class="grid md:grid-cols-2 gap-8">
+                     <!-- Least Privilege -->
+                     <div class="bg-teal-50 border-t-4 border-teal-500 p-6 rounded-lg shadow">
+                        <h4 class="font-bold text-xl text-teal-900 mb-2">Least Privilege Principle</h4>
+                        <p class="text-teal-800">Agents must receive access solely to the exact tools and data necessary for their duties; do not assign broad or unrestricted permissions.</p>
+                     </div>
+                      <!-- Sandboxing -->
+                     <div class="bg-teal-50 border-t-4 border-teal-500 p-6 rounded-lg shadow">
+                        <h4 class="font-bold text-xl text-teal-900 mb-2">Sandboxing Tool Execution</h4>
+                        <p class="text-teal-800">Run tools—particularly those executing arbitrary code—in secure, containerized environments (like Docker or gVisor) to restrict their access to the host and network.</p>
+                     </div>
+                      <!-- Input Validation -->
+                     <div class="bg-teal-50 border-t-4 border-teal-500 p-6 rounded-lg shadow">
+                        <h4 class="font-bold text-xl text-teal-900 mb-2">Strict Input Validation</h4>
+                        <p class="text-teal-800">Always treat agent input as untrusted. The MCP server must carefully validate and sanitize every parameter before forwarding them to a tool to prevent injection vulnerabilities.</p>
+                     </div>
+                      <!-- Permission Gating -->
+                     <div class="bg-teal-50 border-t-4 border-teal-500 p-6 rounded-lg shadow">
+                        <h4 class="font-bold text-xl text-teal-900 mb-2">Permission Gating & User Consent</h4>
+                        <p class="text-teal-800">For sensitive tasks such as file deletion or money transfer, the MCP server must apply rigorous permission checks, preferably demanding direct user confirmation.</p>
+                     </div>
+                 </div>
+            </section>
+
+            <!-- Example Attack Section -->
+            <section id="example-attack" class="mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Example: A Malicious MCP Server in the Wild</h2>
+                <div class="bg-red-50 border-l-4 border-red-500 p-8 rounded-lg">
+                    <h3 class="text-2xl font-semibold text-red-900 mb-3">The Stealth Email BCC Attack</h3>
+                    <p class="text-red-800 text-lg leading-relaxed">
+                        An agent needs to email a confidential project update. It finds a third-party `sendEmail` utility on an MCP server and uses it with the recipient, subject, and message. However, the tool's code on this compromised server quietly inserts an attacker's address into the BCC field of each sent email. This creates an invisible, ongoing data breach that neither the agent nor the recipient can easily uncover.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Conclusion -->
+            <section class="text-center mt-16">
+                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Building a Foundation of Trust</h2>
+                 <p class="text-lg leading-relaxed max-w-3xl mx-auto">
+                    Here is a rewritten version of similar size:
+
+The safety of your whole agentic ecosystem depends on the strength of your MCP servers. Implementing layered defenses—such as sandboxing, least-privilege permissions, and rigorous validation—creates a robust base that lets you use AI agents securely and with confidence.
+                </p>
+            </section>
+        </main>
+
+        <footer class="text-center mt-16 border-t pt-8">
+            <p class="text-gray-500">&copy; 2025 AI Insights. All Rights Reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

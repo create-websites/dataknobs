@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataknobs | Interactive Feature Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutrals with Muted Teal Accent -->
+    <!-- Application Structure Plan: A tabbed SPA with a top navigation bar ("Value Prop", "Kreate", "Kontrols", "Knobs"). JS hides/shows content sections. This structure directly mirrors the product's three-pillar concept, making it intuitive to explore. The default "Value Prop" view provides initial context. The "Knobs" section includes a live demo. -->
+    <!-- Visualization & Content Choices: Report Info: "Knobs" feature concept. Goal: Demonstrate this core interactive feature. Viz/Presentation: A Chart.js Bar Chart ("Sales") inside a responsive container. Interaction: External HTML buttons (as "Knobs") representing filters (e.g., "Region") will trigger a JS function to update the chart's dataset and call chart.update(). Justification: This makes the abstract "Knob" concept tangible and interactive, proving its value. Library: Chart.js (Canvas). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; 
+        }
+        .nav-link {
+            @apply px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-cyan-700 hover:bg-neutral-100 cursor-pointer transition-all;
+        }
+        .nav-link.active {
+            @apply text-cyan-700 font-semibold border-b-2 border-cyan-700;
+        }
+        .content-section {
+            @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+        }
+        .feature-card {
+            @apply bg-white p-6 rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+        }
+        .knob-button {
+            @apply px-4 py-2 rounded-lg font-medium text-neutral-700 bg-white border border-neutral-300 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50 transition-all;
+        }
+        .knob-button.active {
+            @apply bg-cyan-600 text-white border-cyan-600 hover:bg-cyan-700;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+                max-height: 450px;
+            }
+        }
+    </style>
+</head>
+<body class="text-neutral-800">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl font-bold text-cyan-700">Dataknobs</span>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <button id="nav-value-prop" class="nav-link active" data-section="value-prop">Value Proposition</button>
+                        <button id="nav-kreate" class="nav-link" data-section="kreate">Kreate</button>
+                        <button id="nav-kontrols" class="nav-link" data-section="kontrols">Kontrols</button>
+                        <button id="nav-knobs" class="nav-link" data-section="knobs">Knobs</button>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <select id="mobile-nav" class="block w-full pl-3 pr-10 py-2 text-base border-neutral-300 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm rounded-md">
+                        <option value="value-prop">Value Proposition</option>
+                        <option value="kreate">Kreate</option>
+                        <option value="kontrols">Kontrols</option>
+                        <option value="knobs">Knobs</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="value-prop" class="content-section">
+            <h1 class="text-4xl font-bold text-neutral-900 mb-4">Turn Data into Actionable Insights</h1>
+            <p class="text-xl text-neutral-600 leading-relaxed mb-8">
+                Dataknobs is the all-in-one platform that empowers your entire team to create, govern, and interact with data. We bridge the gap between complex data creation (<strong>Kreate</strong>), enterprise-grade security (<strong>Kontrols</strong>), and intuitive user exploration (<strong>Knobs</strong>). Stop just looking at static reports—start having a conversation with your data.
+            </p>
+
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <span class="text-5xl">🎨</span>
+                    <h3 class="text-2xl font-semibold text-cyan-700 my-3">Kreate</h3>
+                    <p class="text-neutral-600">Build beautiful, data-rich dashboards and reports with a powerful, easy-to-use visual builder.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <span class="text-5xl">🛡️</span>
+                    <h3 class="text-2xl font-semibold text-cyan-700 my-3">Kontrols</h3>
+                    <p class="text-neutral-600">Govern your data with granular, role-based access, full audit logs, and version control.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <span class="text-5xl">🎛️</span>
+                    <h3 class="text-2xl font-semibold text-cyan-700 my-3">Knobs</h3>
+                    <p class="text-neutral-600">Empower non-technical users to explore data safely with simple, interactive filters and controls.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="kreate" class="content-section hidden">
+            <h1 class="text-3xl font-bold text-neutral-900 mb-3">Kreate: The Builder's Studio</h1>
+            <p class="text-lg text-neutral-600 leading-relaxed mb-8">
+                The "Kreate" module is your complete environment for connecting to data and building insightful visualizations. Move from raw data to a shareable dashboard in minutes, not weeks. This section outlines the core features that allow you to build and automate your data assets.
+            </p>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="feature-card">
+                    <h3 class="text-2xl font-semibold text-cyan-700 mb-3 flex items-center"><span class="text-3xl mr-3">🔗</span>Data Connector Studio</h3>
+                    <p class="text-neutral-600">Securely connect to dozens of data sources, from SQL databases and data warehouses to spreadsheets and third-party APIs. Our studio manages credentials and query optimization.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="text-2xl font-semibold text-cyan-700 mb-3 flex items-center"><span class="text-3xl mr-3">📊</span>Visual Dashboard Builder</h3>
+                    <p class="text-neutral-600">A true drag-and-drop experience. Choose from a library of charts, tables, and KPIs. Configure interactions, drill-downs, and layouts that are responsive on all devices.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="text-2xl font-semibold text-cyan-700 mb-3 flex items-center"><span class="text-3xl mr-3">🤖</span>Automated Reporting</h3>
+                    <p class="text-neutral-600">Why pull when you can push? Schedule reports to be sent to any stakeholder via email or Slack, with optional "Knob" presets applied.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="kontrols" class="content-section hidden">
+            <h1 class="text-3xl font-bold text-neutral-900 mb-3">Kontrols: Governance & Security</h1>
+            <p class="text-lg text-neutral-600 leading-relaxed mb-8">
+                Data is your most valuable asset; "Kontrols" ensures it stays secure, compliant, and accurate. This is the enterprise-grade governance layer that gives you peace of mind while empowering your organization. Here are the pillars of our "Kontrols" module.
+            </p>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="feature-card">
+                    <h3 class="text-2xl font-semibold text-cyan-700 mb-3 flex items-center"><span class="text-3xl mr-3">👤</span>Role-Based Access (RBAC)</h3>
+                    <p class="text-neutral-600">Define fine-grained permissions for every user and group. Control who can view, edit, or create content. Apply rules at the dashboard, data source, or even row level.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="text-2xl font-semibold text-cyan-700 mb-3 flex items-center"><span class="text-3xl mr-3">⏳</span>Data Auditing & Logging</h3>
+                    <p class="text-neutral-600">Maintain a complete, immutable log of all user activity. See who viewed what report, what "Knobs" they used, and any changes made. Essential for compliance and debugging.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="text-2xl font-semibold text-cyan-700 mb-3 flex items-center"><span class="text-3xl mr-3">🏛️</span>Content Version Control</h3>
+                    <p class="text-neutral-600">Never fear a bad edit again. Every change to a dashboard is saved. Revert to previous versions with a single click, or compare changes between versions.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="knobs" class="content-section hidden">
+            <h1 class="text-3xl font-bold text-neutral-900 mb-3">Knobs: Interactive Exploration</h1>
+            <p class="text-lg text-neutral-600 leading-relaxed mb-6">
+                "Knobs" are the magic of the Dataknobs platform. They are simple, intuitive controls (like sliders, buttons, and dropdowns) that you, the creator, attach to your dashboards. This allows non-technical users to safely explore and filter data without needing to know any code or query languages. This section provides an interactive demo of "Knobs" in action.
+            </p>
+            <p class="text-lg text-neutral-600 leading-relaxed mb-8">
+                Use the "Knobs" (buttons) below to filter the "Quarterly Sales Performance" chart by region. Notice how the chart updates instantly, providing immediate feedback. This is the core experience you can build for your users.
+            </p>
+
+            <div class="flex items-center justify-center space-x-3 mb-6">
+                <span class="text-lg font-medium text-neutral-700">Filter by Region:</span>
+                <button id="knob-all" class="knob-button active" data-region="all">All</button>
+                <button id="knob-north" class="knob-button" data-region="north">North</button>
+                <button id="knob-south" class="knob-button" data-region="south">South</button>
+            </div>
+
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-xl">
+                <div class="chart-container">
+                    <canvas id="knobs-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+            const mobileNav = document.getElementById('mobile-nav');
+
+            const salesData = {
+                all: [1200, 1900, 1500, 2100],
+                north: [800, 900, 700, 1000],
+                south: [400, 1000, 800, 1100]
+            };
+
+            let salesChart;
+
+            function showSection(sectionId) {
+                sections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.dataset.section === sectionId) {
+                        link.classList.add('active');
+                    }
+                });
+
+                const activeSection = document.getElementById(sectionId);
+                if (activeSection) {
+                    activeSection.classList.remove('hidden');
+                }
+                
+                if (mobileNav.value !== sectionId) {
+                    mobileNav.value = sectionId;
+                }
+
+                if (sectionId === 'knobs' && !salesChart) {
+                    renderKnobsChart();
+                }
+            }
+
+            function renderKnobsChart() {
+                const ctx = document.getElementById('knobs-chart').getContext('2d');
+                salesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                        datasets: [{
+                            label: 'Quarterly Sales',
+                            data: salesData.all,
+                            backgroundColor: 'rgba(22, 163, 165, 0.6)', 
+                            borderColor: 'rgba(22, 163, 165, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Sales (USD)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: true,
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    showSection(e.currentTarget.dataset.section);
+                });
+            });
+
+            mobileNav.addEventListener('change', (e) => {
+                showSection(e.target.value);
+            });
+
+            showSection('value-prop');
+
+            const knobButtons = document.querySelectorAll('.knob-button');
+            knobButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const region = e.currentTarget.dataset.region;
+                    
+                    if (salesChart) {
+                        salesChart.data.datasets[0].data = salesData[region];
+                        salesChart.update();
+                    }
+
+                    knobButtons.forEach(btn => btn.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

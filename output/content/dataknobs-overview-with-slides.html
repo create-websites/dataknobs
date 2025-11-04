@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataknobs | Interactive Proposal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Corporate Neutral & Blue -->
+    <!-- Application Structure Plan: A single-page, multi-section SPA with a fixed top navbar for easy scrolling/navigation (#home, #capabilities, #use-cases, #architecture, #products). This structure presents a clear narrative: 1. Who we are (Home), 2. What we offer (Capabilities), 3. What we've built (Use Cases), 4. How we build it (Architecture), 5. What you get (Products). This non-linear but guided flow is superior to a static doc for a customer proposal, allowing them to dive into the areas they care about most. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Capabilities (Kreate, Kontrols, Knobs). Goal: Inform/Organize. Viz/Method: Tabbed interface. Interaction: JS click events to toggle visibility of content panels. Justification: Intuitive segmentation of services. Library: Vanilla JS.
+        2. Report Info: Use Cases list. Goal: Organize/Compare. Viz/Method: Grid of content cards. Interaction: JS-powered filter buttons based on data-category attributes. Justification: Allows customers to self-select relevant examples. Library: Vanilla JS.
+        3. Report Info: Architecture Diagram. Goal: Inform/Organize. Viz/Method: A diagram built with nested HTML divs and Tailwind (flexbox, borders) to represent layers. Interaction: JS 'onmouseover' events on each component div populate a "Details" panel with more information. Justification: Makes a dense technical diagram interactive and digestible without SVG/Mermaid. Library: Vanilla JS.
+        4. Report Info: Example Data Products. Goal: Inform. Viz/Method: Simple 3-column grid of static cards. Interaction: None. Justification: Reinforces the 'Kreate' capability with concrete examples. Library: HTML/Tailwind.
+        5. NEW: Slideshow. Goal: Visually engage. Viz/Method: Flexbox-based carousel. Interaction: JS click events for prev/next buttons and dots. Justification: Adds a dynamic visual element as requested by the user. Library: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            border-bottom-color: #2563EB; /* blue-600 */
+            color: #1D4ED8; /* blue-800 */
+        }
+        .filter-button {
+            transition: all 0.3s ease;
+        }
+        .filter-button.active {
+            background-color: #2563EB; /* blue-600 */
+            color: white;
+        }
+        .arch-component {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .arch-component:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #2563EB; /* blue-600 */
+        }
+        .use-case-card {
+            transition: all 0.3s ease-in-out;
+        }
+        .slide-dot.active {
+            background-color: white;
+        }
+        .slide-dot {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans leading-relaxed">
+
+    <!-- Header / Navigation -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#home" class="text-3xl font-bold text-blue-700">Dataknobs</a>
+            <div class="hidden md:flex space-x-6">
+                <a href="#capabilities" class="text-gray-600 hover:text-blue-600 font-medium">Capabilities</a>
+                <a href="#use-cases" class="text-gray-600 hover:text-blue-600 font-medium">Use Cases</a>
+                <a href="#architecture" class="text-gray-600 hover:text-blue-600 font-medium">Architecture</a>
+                <a href="#products" class="text-gray-600 hover:text-blue-600 font-medium">Products</a>
+            </div>
+            <a href="#contact" class="hidden md:block bg-blue-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">Contact Us</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Home / Hero Section -->
+        <section id="home" class="min-h-screen flex items-center bg-white">
+            <div class="container mx-auto px-6 py-20 text-center">
+                <h1 class="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                    Transform Data into Autonomous Products with Generative and Agentic AI
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10">
+                    Build Smarter Data Products — with Generative and Agentic AI.
+                </p>
+                <a href="#capabilities" class="bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg">
+                    Explore Our Platform
+                </a>
+            </div>
+        </section>
+        
+        <!-- NEW Slideshow Section -->
+        <section id="slideshow" class="py-24 bg-gray-50 border-y border-gray-200">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-6">Platform Highlights</h2>
+                <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                    A visual tour of our core concepts, capabilities, and architecture.
+                </p>
+                
+                <div class="max-w-5xl mx-auto relative bg-gray-800 rounded-lg shadow-2xl overflow-hidden aspect-video">
+                    <!-- Slides Container -->
+                    <div id="slides-container" class="flex transition-transform duration-500 ease-in-out h-full">
+                        <!-- Slide 1 -->
+                        <div class="slide-item flex-shrink-0 w-full h-full flex items-center justify-center">
+                            <img src="https://storage.googleapis.com/5101_gdrive/site1.kreatewebsites.com/input/content/data-products/co-pilot-for-data-products/images/Slide1200/Slide1.png" alt="Dataknobs Slide 1" class="max-w-full max-h-full object-contain">
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="slide-item flex-shrink-0 w-full h-full flex items-center justify-center">
+                            <img src="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/customer-slides/dataknobs-capabilities-enterprise/images/Slide1200/Slide4.png" alt="Dataknobs Slide 2" class="max-w-full max-h-full object-contain">
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="slide-item flex-shrink-0 w-full h-full flex items-center justify-center">
+                            <img src="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/slides/dataknobs/images/Slide1200/dataknobs-1.png" alt="Dataknobs Slide 3" class="max-w-full max-h-full object-contain">
+                        </div>
+                    </div>
+
+                    <!-- Prev/Next Buttons -->
+                    <button id="prev-slide" class="absolute top-1/2 left-4 -translate-y-1/2 bg-black/30 text-white rounded-full p-3 hover:bg-black/50 transition-all focus:outline-none z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <button id="next-slide" class="absolute top-1/2 right-4 -translate-y-1/2 bg-black/30 text-white rounded-full p-3 hover:bg-black/50 transition-all focus:outline-none z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+
+                    <!-- Dots -->
+                    <div id="slide-dots" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3 z-10">
+                        <button class="slide-dot w-3 h-3 rounded-full transition-colors" data-slide="0"></button>
+                        <button class="slide-dot w-3 h-3 rounded-full transition-colors" data-slide="1"></button>
+                        <button class="slide-dot w-3 h-3 rounded-full transition-colors" data-slide="2"></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Capabilities Section -->
+        <section id="capabilities" class="py-24 bg-white"> <!-- Changed background for contrast -->
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-6">The Intelligent Trio</h2>
+                <p class="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-16">
+                    Dataknobs is built on a unified philosophy that integrates the entire data product lifecycle. This architecture, "The Intelligent Trio," provides a seamless flow from creation to governance and optimization, addressing the fragmentation common in AI development. Explore the three core pillars below.
+                </p>
+
+                <!-- Tab Buttons -->
+                <div class="flex justify-center border-b border-gray-300 mb-12">
+                    <button class="tab-button active text-lg font-semibold py-4 px-8 border-b-4 border-transparent text-gray-500" onclick="showTab('kreate')">
+                        1. Kreate
+                    </button>
+                    <button class="tab-button text-lg font-semibold py-4 px-8 border-b-4 border-transparent text-gray-500" onclick="showTab('kontrols')">
+                        2. Kontrols
+                    </button>
+                    <button class="tab-button text-lg font-semibold py-4 px-8 border-b-4 border-transparent text-gray-500" onclick="showTab('knobs')">
+                        3. Knobs
+                    </button>
+                </div>
+
+                <!-- Tab Content -->
+                <div id="tab-content" class="max-w-4xl mx-auto">
+                    <!-- Kreate Panel -->
+                    <div id="kreate-content" class="tab-panel">
+                        <h3 class="text-3xl font-semibold text-blue-700 mb-4">Kreate</h3>
+                        <p class="text-lg text-gray-700 mb-6">The generative engine to build foundational data assets, from datasets to AI agents. We rapidly build sophisticated, AI-first solutions that integrate seamlessly with your workflows.</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start p-4 bg-gray-50 rounded-lg shadow-sm">
+                                <span class="text-blue-600 text-2xl mr-4">→</span>
+                                <div>
+                                    <h4 class="font-semibold text-lg">Create AI Assistants</h4>
+                                    <p class="text-gray-600">Bespoke conversational agents for planning, research, and analysis.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start p-4 bg-gray-50 rounded-lg shadow-sm">
+                                <span class="text-blue-600 text-2xl mr-4">→</span>
+                                <div>
+                                    <h4 class="font-semibold text-lg">Create Web Apps & Applications</h4>
+                                    <p class="text-gray-600">Intelligent, data-driven applications built on modern web stacks.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start p-4 bg-gray-50 rounded-lg shadow-sm">
+                                <span class="text-blue-600 text-2xl mr-4">→</span>
+                                <div>
+                                    <h4 class="font-semibold text-lg">Create Data Products</h4>
+                                    <p class="text-gray-600">Turn raw data into valuable assets like health scores or momentum indicators.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Kontrols Panel -->
+                    <div id="kontrols-content" class="tab-panel hidden">
+                        <h3 class="text-3xl font-semibold text-blue-700 mb-4">Kontrols</h3>
+                        <p class="text-lg text-gray-700 mb-6">The governance backbone, embedding security, privacy, and compliance. This suite ensures your data and AI processes are secure, compliant, and reliable.</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start p-4 bg-gray-50 rounded-lg shadow-sm">
+                                <span class="text-blue-600 text-2xl mr-4">→</span>
+                                <div>
+                                    <h4 class="font-semibold text-lg">GateKeep</h4>
+                                    <p class="text-gray-600">Robust access control and authentication for all data and applications.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start p-4 bg-gray-50 rounded-lg shadow-sm">
+                                <span class="text-blue-600 text-2xl mr-4">→</span>
+                                <div>
+                                    <h4 class="font-semibold text-lg">Enforcer</h4>
+                                    <p class="text-gray-600">Policy enforcement to ensure data handling and AI behavior meet compliance standards.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start p-4 bg-gray-50 rounded-lg shadow-sm">
+                                <span class="text-blue-600 text-2xl mr-4">→</span>
+                                <div>
+                                    <h4 class="font-semibold text-lg">Shield</h4>
+                                    <p class="text-gray-600">Data protection, encryption, and anonymization to safeguard sensitive information.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Knobs Panel -->
+                    <div id="knobs-content" class="tab-panel hidden">
+                        <h3 class="text-3xl font-semibold text-blue-700 mb-4">Knobs</h3>
+                        <p class="text-lg text-gray-700 mb-6">The experimentation layer for system tuning and performance optimization. This suite provides the tools to experiment, measure, and fine-tune your applications for peak performance.</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start p-4 bg-gray-50 rounded-lg shadow-sm">
+                                <span class="text-blue-600 text-2xl mr-4">→</span>
+                                <div>
+                                    <h4 class="font-semibold text-lg">AB Experiment</h4>
+                                    <p class="text-gray-600">Advanced A/B testing framework to compare models, prompts, and UI changes.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start p-4 bg-gray-50 rounded-lg shadow-sm">
+                                <span class="text-blue-600 text-2xl mr-4">→</span>
+                                <div>
+                                    <h4 class="font-semibold text-lg">ResultBench</h4>
+                                    <p class="text-gray-600">A powerful workbench for benchmarking AI model performance and accuracy.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section id="use-cases" class="py-24 bg-gray-50"> <!-- Changed background -->
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-6">AI-Powered Use Cases</h2>
+                <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                    See our platform in action. We build solutions that solve complex, real-world problems across various domains. Filter by category to explore the use cases most relevant to your business.
+                </p>
+
+                <!-- Filter Buttons -->
+                <div id="filter-container" class="flex flex-wrap justify-center gap-3 mb-12">
+                    <button class="filter-button active bg-gray-200 text-gray-800 px-5 py-2 rounded-full font-medium" data-filter="all">All</button>
+                    <button class="filter-button bg-gray-200 text-gray-800 px-5 py-2 rounded-full font-medium" data-filter="compliance">Risk & Compliance</button>
+                    <button class="filter-button bg-gray-200 text-gray-800 px-5 py-2 rounded-full font-medium" data-filter="analytics">Analytics</button>
+                    <button class="filter-button bg-gray-200 text-gray-800 px-5 py-2 rounded-full font-medium" data-filter="assistant">AI Assistants</button>
+                    <button class="filter-button bg-gray-200 text-gray-800 px-5 py-2 rounded-full font-medium" data-filter="specialized">Specialized</button>
+                </div>
+
+                <!-- Use Case Grid -->
+                <div id="use-case-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="use-case-card bg-white rounded-xl shadow-lg overflow-hidden p-6" data-category="compliance">
+                        <h4 class="font-bold text-xl text-blue-800 mb-3">Complaint Management with AI</h4>
+                        <p class="text-gray-700">Automatically identify complaints, extract key topics, and flag emerging themes from customer interactions.</p>
+                    </div>
+                    <div class="use-case-card bg-white rounded-xl shadow-lg overflow-hidden p-6" data-category="compliance">
+                        <h4 class="font-bold text-xl text-blue-800 mb-3">Regulatory Risk Identification</h4>
+                        <p class="text-gray-700">Scan customer calls and communications to proactively identify and flag potential regulatory risks.</p>
+                    </div>
+                    <div class="use-case-card bg-white rounded-xl shadow-lg overflow-hidden p-6" data-category="compliance">
+                        <h4 class="font-bold text-xl text-blue-800 mb-3">Audit Sales & Service Calls</h4>
+                        <p class="text-gray-700">Perform automated, large-scale audits of sales, service, and collection calls for quality assurance and compliance.</p>
+                    </div>
+                    <div class="use-case-card bg-white rounded-xl shadow-lg overflow-hidden p-6" data-category="analytics">
+                        <h4 class="font-bold text-xl text-blue-800 mb-3">Ecommerce Analysis AI Agent</h4>
+                        <p class="text-gray-700">An AI agent that provides insights on sales trends, customer behavior, and inventory optimization.</p>
+                    </div>
+                    <div class="use-case-card bg-white rounded-xl shadow-lg overflow-hidden p-6" data-category="assistant">
+                        <h4 class="font-bold text-xl text-blue-800 mb-3">Financial Planner AI Assistant</h4>
+                        <p class="text-gray-700">An intelligent assistant to help users with financial planning, market research, and portfolio analysis.</p>
+                    </div>
+                    <div class="use-case-card bg-white rounded-xl shadow-lg overflow-hidden p-6" data-category="assistant">
+                        <h4 class="font-bold text-xl text-blue-800 mb-3">Tax Research AI Assistant</h4>
+                        <p class="text-gray-700">A specialized agent trained on tax code and regulations to provide fast, accurate research support.</p>
+                    </div>
+                    <div class="use-case-card bg-white rounded-xl shadow-lg overflow-hidden p-6" data-category="assistant">
+                        <h4 class="font-bold text-xl text-blue-800 mb-3">Stocks Earning Call AI Assistant</h4>
+                        <p class="text-gray-700">Summarize and analyze earning calls, extracting key metrics, sentiment, and management guidance.</p>
+                    </div>
+                    <div class="use-case-card bg-white rounded-xl shadow-lg overflow-hidden p-6" data-category="specialized">
+                        <h4 class="font-bold text-xl text-blue-800 mb-3">AI Twin for Data Centers</h4>
+                        <p class="text-gray-700">A sophisticated AI twin for modeling, simulating, and optimizing data center operations and energy usage.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Section -->
+        <section id="architecture" class="py-24 bg-white"> <!-- Changed background -->
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-6">Our Technology Architecture</h2>
+                <p class="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-16">
+                    Our robust, scalable architecture is built on best-in-class, cloud-native technologies. This layered, modular design allows for flexibility, security, and rapid integration.
+                    <br><strong class="text-blue-600">Hover over any component to learn more.</strong>
+                </p>
+
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <!-- Interactive Diagram -->
+                    <div class="flex-grow lg:w-2/3 space-y-4">
+                        <div class="arch-component bg-white p-4 rounded-lg shadow-sm border border-gray-200" onmouseover="showArchDetail('ui')" onmouseout="clearArchDetail()">
+                            <h4 class="font-bold text-lg text-blue-700 mb-2">UI Layer</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Next.js</span>
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">React</span>
+                            </div>
+                        </div>
+                        
+                        <div class="arch-component bg-white p-4 rounded-lg shadow-sm border border-gray-200" onmouseover="showArchDetail('orchestration')" onmouseout="clearArchDetail()">
+                            <h4 class="font-bold text-lg text-blue-700 mb-2">Orchestration</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Langchain</span>
+                            </div>
+                        </div>
+
+                        <div class="arch-component bg-white p-4 rounded-lg shadow-sm border border-gray-200" onmouseover="showArchDetail('ai')" onmouseout="clearArchDetail()">
+                            <h4 class="font-bold text-lg text-blue-700 mb-2">AI Process Layer</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">OpenAI</span>
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">Gemini</span>
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">Azure Open AI</span>
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">Custom Models</span>
+                            </div>
+                        </div>
+
+                        <div class="arch-component bg-white p-4 rounded-lg shadow-sm border border-gray-200" onmouseover="showArchDetail('data')" onmouseout="clearArchDetail()">
+                            <h4 class="font-bold text-lg text-blue-700 mb-2">Data and Knowledge</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Vector DB</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">PostgreSQL</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Storage Buckets</span>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Databases</span>
+                            </div>
+                        </div>
+                        
+                        <div class="arch-component bg-white p-4 rounded-lg shadow-sm border border-gray-200" onmouseover="showArchDetail('api')" onmouseout="clearArchDetail()">
+                            <h4 class="font-bold text-lg text-blue-700 mb-2">Integration & API</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">CloudRun / App Service</span>
+                                <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">External Feeds & APIs</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-3 gap-4">
+                             <div class="arch-component bg-white p-4 rounded-lg shadow-sm border border-gray-200" onmouseover="showArchDetail('security')" onmouseout="clearArchDetail()">
+                                <h4 class="font-bold text-lg text-blue-700 mb-2">Security</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">OAuth</span>
+                                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">JWT</span>
+                                </div>
+                            </div>
+                             <div class="arch-component bg-white p-4 rounded-lg shadow-sm border border-gray-200" onmouseover="showArchDetail('experimentation')" onmouseout="clearArchDetail()">
+                                <h4 class="font-bold text-lg text-blue-700 mb-2">Experimentation</h4>
+                                 <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">ABExperiment.com</span>
+                            </div>
+                             <div class="arch-component bg-white p-4 rounded-lg shadow-sm border border-gray-200" onmouseover="showArchDetail('infra')" onmouseout="clearArchDetail()">
+                                <h4 class="font-bold text-lg text-blue-700 mb-2">Infrastructure</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">GCP</span>
+                                    <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Azure</span>
+                                    <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">AWS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Details Panel -->
+                    <div class="flex-shrink-0 lg:w-1/3">
+                        <div id="arch-details-panel" class="bg-white p-6 rounded-lg shadow-lg sticky top-28 min-h-[300px] border border-gray-200">
+                            <h4 class="text-xl font-semibold text-gray-900 mb-4">Component Details</h4>
+                            <p id="arch-details-text" class="text-gray-700 transition-opacity duration-300">
+                                Hover over a component on the left to see more information here.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Example Data Products Section -->
+        <section id="products" class="py-24 bg-gray-50"> <!-- Changed background -->
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-6">Example Data Products</h2>
+                <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-16">
+                    We transform raw information into valuable, proprietary assets. These data products can be consumed via API or integrated directly into your applications to provide predictive insights and scores.
+                </p>
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <div class="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-200">
+                        <h4 class="font-bold text-2xl text-blue-800 mb-3">Earnings Momentum Score</h4>
+                        <p class="text-gray-700">A proprietary score that analyzes earnings data to predict future stock performance and momentum.</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-200">
+                        <h4 class="font-bold text-2xl text-blue-800 mb-3">Device Health Score</h4>
+                        <p class="text-gray-700">A predictive score for IoT or hardware devices, indicating the likelihood of failure and an optimal maintenance window.</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-200">
+                        <h4 class="font-bold text-2xl text-blue-800 mb-3">Datasets for Fine-Tuning</h4>
+                        <p class="text-gray-700">Curated and cleaned datasets, specifically structured for fine-tuning large language models (LLMs) on specific domains.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 bg-blue-700 text-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold mb-6">Let's Build Together</h2>
+                <p class="text-xl text-blue-100 max-w-2xl mx-auto mb-10">
+                    Ready to unlock the power of your data? Contact us to discuss your project and learn how Dataknobs can help you achieve your goals.
+                </p>
+                <a href="mailto:sales@dataknobs.com" class="bg-white text-blue-700 px-10 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg">
+                    Get in Touch
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-12">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Dataknobs. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // --- Architecture Details Panel Logic ---
+        const archDetails = {
+            ui: {
+                title: "UI Layer",
+                text: "Our front-ends are built with modern, high-performance frameworks like React and Next.js, ensuring a fast, responsive, and engaging user experience."
+            },
+            orchestration: {
+                title: "Orchestration Layer",
+                text: "We use powerful orchestration tools like Langchain to build complex AI workflows, manage prompts, chain models, and connect AI processes to data sources."
+            },
+            ai: {
+                title: "AI Process Layer",
+                text: "We are model-agnostic, leveraging the best-in-class models for the job, including OpenAI's GPT series, Google's Gemini, Azure Open AI services, or custom-trained models."
+            },
+            data: {
+                title: "Data and Knowledge Layer",
+                text: "The foundation of all AI. We use a combination of Vector Databases for similarity search, PostgreSQL for structured data, and cloud storage for unstructured files and knowledge bases."
+            },
+            api: {
+                title: "Integration & API Layer",
+                text: "Secure and scalable APIs are built on serverless platforms like Google CloudRun or Azure App Service, allowing seamless integration with your systems and external data feeds."
+            },
+            security: {
+                title: "Security",
+                text: "Security is paramount. We implement industry-standard protocols like OAuth 2.0 for authentication and JWTs (JSON Web Tokens) for secure, stateless authorization."
+            },
+            experimentation: {
+                title: "Experimentation",
+                text: "We leverage our own powerful platform, ABExperiment.com, to rigorously test and optimize all aspects of the application, from UI changes to AI model performance."
+            },
+            infra: {
+                title: "Infrastructure",
+                text: "Our solutions are cloud-native and can be deployed on your preferred provider, including Google Cloud (GCP), Microsoft Azure, or Amazon Web Services (AWS)."
+            }
+        };
+
+        const detailsPanel = document.getElementById('arch-details-panel');
+        const detailsText = document.getElementById('arch-details-text');
+        const defaultDetailText = detailsText.innerHTML;
+
+        function showArchDetail(key) {
+            if (archDetails[key]) {
+                detailsPanel.style.borderColor = '#2563EB';
+                detailsText.style.opacity = 0;
+                setTimeout(() => {
+                    detailsText.innerHTML = `<strong class="block text-blue-700 mb-2">${archDetails[key].title}</strong> ${archDetails[key].text}`;
+                    detailsText.style.opacity = 1;
+                }, 150);
+            }
+        }
+
+        function clearArchDetail() {
+            detailsPanel.style.borderColor = 'transparent';
+            detailsText.style.opacity = 0;
+            setTimeout(() => {
+                detailsText.innerHTML = defaultDetailText;
+                detailsText.style.opacity = 1;
+            }, 150);
+        }
+
+        // --- Tab Logic ---
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+
+        function showTab(tabId) {
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+                if (button.getAttribute('onclick') === `showTab('${tabId}')`) {
+                    button.classList.add('active');
+                }
+            });
+
+            tabPanels.forEach(panel => {
+                if (panel.id === `${tabId}-content`) {
+                    panel.classList.remove('hidden');
+                } else {
+                    panel.classList.add('hidden');
+                }
+            });
+        }
+        
+        // --- Filter Logic ---
+        const filterButtons = document.querySelectorAll('.filter-button');
+        const useCaseCards = document.querySelectorAll('.use-case-card');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const filter = button.getAttribute('data-filter');
+                
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                useCaseCards.forEach(card => {
+                    const category = card.getAttribute('data-category');
+                    if (filter === 'all' || filter === category) {
+                        card.classList.remove('hidden');
+                        card.style.opacity = 1;
+                        card.style.transform = 'scale(1)';
+                    } else {
+                        card.classList.add('hidden');
+                        card.style.opacity = 0;
+                        card.style.transform = 'scale(0.95)';
+                    }
+                });
+            });
+        });
+
+        // --- NEW Slideshow Logic ---
+        const slidesContainer = document.getElementById('slides-container');
+        const prevButton = document.getElementById('prev-slide');
+        const nextButton = document.getElementById('next-slide');
+        const slideDots = document.querySelectorAll('.slide-dot');
+        const slides = document.querySelectorAll('.slide-item');
+        const totalSlides = slides.length;
+        let currentSlide = 0;
+
+        function goToSlide(slideIndex) {
+            // Clamp index
+            if (slideIndex < 0) {
+                slideIndex = totalSlides - 1;
+            } else if (slideIndex >= totalSlides) {
+                slideIndex = 0;
+            }
+            
+            if (slidesContainer) {
+                 slidesContainer.style.transform = `translateX(-${slideIndex * 100}%)`;
+            }
+            currentSlide = slideIndex;
+            
+            // Update dots
+            slideDots.forEach((dot, index) => {
+                if (index === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        if (nextButton && prevButton) {
+            nextButton.addEventListener('click', () => {
+                goToSlide(currentSlide + 1);
+            });
+
+            prevButton.addEventListener('click', () => {
+                goToSlide(currentSlide - 1);
+            });
+        }
+
+        slideDots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                goToSlide(parseInt(dot.dataset.slide));
+            });
+        });
+
+        // Initialize slideshow
+        goToSlide(0);
+
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>The Agentic AI Challenge: An Interactive Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed as a single-page scrolling narrative to guide executives through the complex topic of Agentic AI. The structure is thematic rather than mirroring the paper's layout, starting with a high-level definition, then diving into specific challenges (Technical, Alignment, Societal), and concluding with a forward-looking roadmap. This flow is more intuitive for a web experience, allowing users to either follow the narrative or use the sticky navigation to jump to areas of interest. Key interactions include clickable diagrams and filterable charts to encourage exploration and make dense information digestible. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Defining Agentic AI -> Goal: Inform -> Viz: Interactive Cards (HTML/CSS) -> Interaction: Click to reveal details -> Justification: Breaks a dense definition into three core, memorable concepts.
+        - Report Info: Technical Hurdles -> Goal: Compare -> Viz: Radar Chart (Chart.js) -> Interaction: Hover tooltips for details -> Justification: Visually demonstrates the gap between current and required capabilities across multiple technical domains.
+        - Report Info: The Alignment Problem -> Goal: Organize -> Viz: Interactive Diagram (HTML/CSS) -> Interaction: Click on a component to display its explanation -> Justification: Shows the interconnectedness of alignment issues in a more engaging way than a simple list.
+        - Report Info: Labor Displacement -> Goal: Compare -> Viz: Bar Chart (Chart.js) -> Interaction: Buttons to switch between scenarios -> Justification: Clearly visualizes the potential impact across different sectors and allows for simple scenario comparison.
+        - Report Info: Proposed Roadmap -> Goal: Organize -> Viz: Interactive Timeline (HTML/CSS) -> Interaction: Click on a phase to see details -> Justification: Presents a multi-stage plan in a clear, sequential, and interactive format.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8; /* Warm off-white */
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .nav-link:hover {
+            color: #059669; /* Emerald 600 */
+        }
+        .active-nav {
+            color: #059669;
+            border-bottom-color: #059669;
+        }
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 1.125rem;
+            top: 1.25rem;
+            height: calc(100% - 1.25rem);
+            width: 2px;
+            background-color: #D1D5DB;
+            z-index: 0;
+        }
+         .timeline-item:last-child::before {
+            display: none;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50" id="header">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-emerald-700">Agentic AI Insights</h1>
+            <div class="hidden md:flex space-x-8">
+                <a class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1" href="#paradigm">The Paradigm</a>
+                <a class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1" href="#challenges">Challenges</a>
+                <a class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1" href="#alignment">Alignment</a>
+                <a class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1" href="#societal">Societal Impact</a>
+                <a class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1" href="#roadmap">Roadmap</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section class="text-center min-h-[60vh] flex flex-col justify-center items-center" id="paradigm">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">The Agentic AI Challenge</h2>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">A concise overview of the technical, ethical, and societal challenges in AI's evolution from generative models to autonomous systems.</p>
+            <p class="max-w-3xl mx-auto text-gray-700">This report delves into key insights on Agentic AI, examining systems that autonomously perceive, reason, and act to achieve objectives. Here, we define this emerging paradigm, highlighting the transition from reactive tools to proactive, goal-driven agents.</p>
+            
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+                <div class="card bg-white p-6 rounded-lg shadow-md border border-gray-200 text-left">
+                    <h3 class="text-xl font-semibold text-emerald-700 mb-3">Autonomy</h3>
+                    <p class="text-gray-600">The capacity to act and decide autonomously, sensing and interacting with its surroundings on its own.</p>
+                </div>
+                <div class="card bg-white p-6 rounded-lg shadow-md border border-gray-200 text-left">
+                    <h3 class="text-xl font-semibold text-emerald-700 mb-3">Proactivity</h3>
+                    <p class="text-gray-600">Going past simple reactions, these systems can proactively plan, take action, and accomplish tasks to advance objectives.</p>
+                </div>
+                <div class="card bg-white p-6 rounded-lg shadow-md border border-gray-200 text-left">
+                    <h3 class="text-xl font-semibold text-emerald-700 mb-3">Goal-Orientation</h3>
+                    <p class="text-gray-600">Designed to tackle intricate, long-term goals, demanding reasoning, strategy, and flexibility in evolving environments.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="my-16 border-t border-gray-200"></div>
+
+        <section class="py-12" id="challenges">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">Core Technical Hurdles</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto text-center mb-12">Building resilient Agentic AI demands tackling substantial technical challenges. This part highlights the disparity between existing AI abilities and the standards needed for safely deploying autonomous systems in practical scenarios. Explore the chart to delve into specific hurdles.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                <div class="chart-container h-96 md:h-[500px]">
+                    <canvas id="technicalHurdlesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <div class="my-16 border-t border-gray-200"></div>
+
+        <section class="py-12" id="alignment">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">The Alignment Problem</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto text-center mb-12">Ensuring Agentic AI aligns with human values and intentions stands as a critical challenge, often called the 'alignment problem.' The diagram below highlights its three key pillars. Tap each section to explore the unique challenges within.</p>
+            
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/3">
+                    <div class="space-y-4">
+                        <button class="alignment-btn w-full text-left p-4 rounded-lg border-2 border-emerald-500 bg-emerald-50 font-semibold text-emerald-800 shadow-sm" data-target="value-alignment">Value Alignment</button>
+                        <button class="alignment-btn w-full text-left p-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 font-semibold text-gray-700" data-target="corrigibility">Corrigibility</button>
+                        <button class="alignment-btn w-full text-left p-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 font-semibold text-gray-700" data-target="interpretability">Interpretability</button>
+                    </div>
+                </div>
+                <div class="md:w-2/3 bg-white p-8 rounded-lg shadow-lg border border-gray-200 min-h-[250px]">
+                    <div id="alignment-content">
+                        <div class="alignment-text block" id="value-alignment">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-3">Value Alignment</h3>
+                            <p class="text-gray-600">The task of embedding intricate, nuanced, and sometimes conflicting human values into AI systems. How can we align the AI's goals with ours, avoiding outcomes that are technically accurate but detrimental in practice?</p>
+                        </div>
+                        <div class="alignment-text hidden" id="corrigibility">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-3">Corrigibility</h3>
+                            <p class="text-gray-600">Designing AI to be corrigible ensures it accepts feedback, allows safe shutdowns or modifications, and avoids resisting human intervention. Without inherent cooperation, an advanced agent might perceive interference as a threat to its objectives, posing serious safety concerns.</p>
+                        </div>
+                        <div class="alignment-text hidden" id="interpretability">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-3">Interpretability</h3>
+                            <p class="text-gray-600">The challenge of AI opacity: As models grow in complexity, deciphering their inner workings becomes harder. Lacking interpretability, we can't completely trust their choices, troubleshoot errors, or ensure their reasoning aligns with human values.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="my-16 border-t border-gray-200"></div>
+
+        <section class="py-12" id="societal">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">Societal Impact &amp; Existential Risk</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto text-center mb-12">The rise of Agentic AI is set to reshape society, sparking labor market shifts and existential risk debates. Explore these challenges through data-driven insights and toggle between labor market scenarios using the buttons.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                <div class="flex justify-center mb-4 space-x-2">
+                    <button class="scenario-btn px-4 py-2 text-sm font-medium rounded-md bg-emerald-600 text-white shadow-sm" id="scenario-moderate">Moderate Displacement</button>
+                    <button class="scenario-btn px-4 py-2 text-sm font-medium rounded-md bg-white text-gray-700 border border-gray-300 hover:bg-gray-50" id="scenario-significant">Significant Displacement</button>
+                </div>
+                 <div class="chart-container h-96 md:h-[500px]">
+                    <canvas id="laborDisplacementChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <div class="my-16 border-t border-gray-200"></div>
+
+        <section class="py-12" id="roadmap">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">A Roadmap for Safe Development</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto text-center mb-12">Understanding the challenges of Agentic AI demands a well-rounded, strategic approach. Presented here is an interactive timeline detailing a suggested roadmap, blending technical advancements, policy structures, and community involvement. Select each phase to uncover its main goals.</p>
+            
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/3">
+                    <div class="space-y-4">
+                        <button class="phase-btn w-full text-left p-4 rounded-lg border-2 border-emerald-500 bg-emerald-50 font-semibold text-emerald-800 shadow-sm relative timeline-item" data-target="phase1">
+                           <span class="absolute -left-4 top-4 h-3 w-3 rounded-full bg-emerald-600 border-2 border-white z-10"></span>Phase 1: Foundational Research</button>
+                        <button class="phase-btn w-full text-left p-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 font-semibold text-gray-700 relative timeline-item" data-target="phase2">
+                           <span class="absolute -left-4 top-4 h-3 w-3 rounded-full bg-gray-400 border-2 border-white z-10"></span>Phase 2: Controlled Deployment</button>
+                        <button class="phase-btn w-full text-left p-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 font-semibold text-gray-700 relative timeline-item" data-target="phase3">
+                           <span class="absolute -left-4 top-4 h-3 w-3 rounded-full bg-gray-400 border-2 border-white z-10"></span>Phase 3: Global Governance</button>
+                    </div>
+                </div>
+                <div class="md:w-2/3 bg-white p-8 rounded-lg shadow-lg border border-gray-200 min-h-[250px]">
+                    <div id="roadmap-content">
+                        <div class="roadmap-text block" id="phase1">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-3">Phase 1: Foundational Research &amp; Safety Protocols</h3>
+                            <ul class="list-disc list-inside text-gray-600 space-y-2">
+                                <li>Intensify research into core alignment problems (interpretability, corrigibility).</li>
+                                <li>Develop robust sandboxing environments for testing agentic systems.</li>
+                                <li>Establish industry-wide standards for internal safety and red-teaming.</li>
+                                <li>Invest in formal verification methods to mathematically prove system properties.</li>
+                            </ul>
+                        </div>
+                         <div class="roadmap-text hidden" id="phase2">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-3">Phase 2: Controlled Deployment &amp; Auditing</h3>
+                            <ul class="list-disc list-inside text-gray-600 space-y-2">
+                                <li>Graduated deployment in non-critical, highly monitored applications.</li>
+                                <li>Mandate third-party auditing of high-capability agentic models.</li>
+                                <li>Create "circuit breakers" and human-in-the-loop systems for all deployments.</li>
+                                <li>Develop clear liability frameworks for actions taken by autonomous agents.</li>
+                            </ul>
+                        </div>
+                         <div class="roadmap-text hidden" id="phase3">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-3">Phase 3: Global Governance &amp; Public Discourse</h3>
+                            <ul class="list-disc list-inside text-gray-600 space-y-2">
+                                <li>Establish international treaties on the development of highly autonomous systems.</li>
+                                <li>Establish a worldwide agency to oversee catastrophic AI risks, similar to the IAEA for nuclear power.</li>
+                                <li>Encourage broad public learning and dialogue on advantages and dangers.</li>
+                                <li>Support studies on economic and social strategies for workforce adaptation.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const chartColors = {
+        current: 'rgba(5, 150, 105, 0.6)', // emerald-600
+        required: 'rgba(249, 115, 22, 0.6)', // orange-500
+        grid: 'rgba(209, 213, 219, 0.5)',
+        font: '#4A4A4A'
+    };
+    
+    // Technical Hurdles Chart
+    const hurdlesCtx = document.getElementById('technicalHurdlesChart').getContext('2d');
+    const hurdlesChart = new Chart(hurdlesCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Complex Reasoning', 'Long-Term Planning', 'Robustness & Adaptability', 'Scalable Oversight', 'Real-World Grounding'],
+            datasets: [{
+                label: 'Current Capability',
+                data: [5, 4, 6, 3, 5],
+                backgroundColor: chartColors.current,
+                borderColor: chartColors.current.replace('0.6', '1'),
+                borderWidth: 2,
+                pointBackgroundColor: chartColors.current.replace('0.6', '1'),
+            }, {
+                label: 'Required for Safe Deployment',
+                data: [9, 8, 9, 8, 9],
+                backgroundColor: chartColors.required,
+                borderColor: chartColors.required.replace('0.6', '1'),
+                borderWidth: 2,
+                pointBackgroundColor: chartColors.required.replace('0.6', '1'),
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    angleLines: { color: chartColors.grid },
+                    grid: { color: chartColors.grid },
+                    pointLabels: { 
+                        font: { size: 14, family: "'Inter', sans-serif" },
+                        color: chartColors.font 
+                    },
+                    ticks: {
+                        backdropColor: 'rgba(253, 251, 248, 0.75)', // Match body bg
+                        color: chartColors.font,
+                        stepSize: 2
+                    },
+                    min: 0,
+                    max: 10
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                         font: { size: 14, family: "'Inter', sans-serif" },
+                         color: chartColors.font
+                    }
+                },
+                tooltip: {
+                    bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                    titleFont: { size: 14, family: "'Inter', sans-serif" }
+                }
+            }
+        }
+    });
+
+    // Labor Displacement Chart
+    const laborData = {
+        moderate: [15, 25, 10, 30, 20, 12, 18],
+        significant: [35, 55, 25, 60, 45, 30, 40]
+    };
+    const laborLabels = ['Transportation', 'Customer Service', 'Data Entry', 'Software Dev', 'Manufacturing', 'Legal Analysis', 'Creative Industries'];
+    
+    const laborCtx = document.getElementById('laborDisplacementChart').getContext('2d');
+    const laborChart = new Chart(laborCtx, {
+        type: 'bar',
+        data: {
+            labels: laborLabels,
+            datasets: [{
+                label: 'Potential Job Displacement (%)',
+                data: laborData.moderate,
+                backgroundColor: chartColors.current,
+                borderColor: chartColors.current.replace('0.6', '1'),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: chartColors.grid },
+                    ticks: { color: chartColors.font }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { color: chartColors.font }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Potential Labor Displacement by Sector (Moderate Scenario)',
+                    font: { size: 16, family: "'Inter', sans-serif" },
+                    color: chartColors.font,
+                    padding: { bottom: 20 }
+                }
+            }
+        }
+    });
+
+    const scenarioBtns = document.querySelectorAll('.scenario-btn');
+    scenarioBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            scenarioBtns.forEach(b => {
+                b.classList.remove('bg-emerald-600', 'text-white');
+                b.classList.add('bg-white', 'text-gray-700', 'border', 'border-gray-300');
+            });
+            btn.classList.add('bg-emerald-600', 'text-white');
+            btn.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-300');
+
+            const scenario = btn.id.split('-')[1];
+            laborChart.data.datasets[0].data = laborData[scenario];
+            laborChart.options.plugins.title.text = `Potential Labor Displacement by Sector (${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Scenario)`;
+            laborChart.update();
+        });
+    });
+
+    // Alignment Section Interactivity
+    const alignmentBtns = document.querySelectorAll('.alignment-btn');
+    const alignmentTexts = document.querySelectorAll('.alignment-text');
+    alignmentBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            alignmentBtns.forEach(b => {
+                b.classList.remove('border-emerald-500', 'bg-emerald-50', 'text-emerald-800');
+                b.classList.add('border-gray-300', 'bg-white', 'text-gray-700');
+            });
+            btn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-800');
+            btn.classList.remove('border-gray-300', 'bg-white', 'text-gray-700');
+
+            alignmentTexts.forEach(text => text.classList.add('hidden'));
+            document.getElementById(btn.dataset.target).classList.remove('hidden');
+        });
+    });
+    
+    // Roadmap Section Interactivity
+    const phaseBtns = document.querySelectorAll('.phase-btn');
+    const roadmapTexts = document.querySelectorAll('.roadmap-text');
+    const timelineDots = document.querySelectorAll('.phase-btn span');
+    phaseBtns.forEach((btn, index) => {
+        btn.addEventListener('click', () => {
+            phaseBtns.forEach(b => {
+                b.classList.remove('border-emerald-500', 'bg-emerald-50', 'text-emerald-800');
+                b.classList.add('border-gray-300', 'bg-white', 'text-gray-700');
+            });
+            btn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-800');
+            btn.classList.remove('border-gray-300', 'bg-white', 'text-gray-700');
+            
+            timelineDots.forEach(dot => {
+                dot.classList.remove('bg-emerald-600');
+                dot.classList.add('bg-gray-400');
+            });
+            timelineDots[index].classList.add('bg-emerald-600');
+            timelineDots[index].classList.remove('bg-gray-400');
+
+            roadmapTexts.forEach(text => text.classList.add('hidden'));
+            document.getElementById(btn.dataset.target).classList.remove('hidden');
+        });
+    });
+
+    // Navigation scroll highlighting
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const headerHeight = document.getElementById('header').offsetHeight;
+
+    window.onscroll = () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - headerHeight - 20;
+            if (pageYOffset >= sectionTop) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active-nav');
+            if (link.href.includes(current)) {
+                link.classList.add('active-nav');
+            }
+        });
+    };
+    
+    // Smooth scrolling for nav links
+    navLinks.forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            const targetPosition = targetElement.offsetTop - headerHeight;
+            
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+        });
+    });
+});
+</script>
+
+
+</body></html>

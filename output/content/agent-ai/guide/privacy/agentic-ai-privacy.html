@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Report: The Privacy Dilemma of Agentic AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Tech Neutral -->
+    <!-- Application Structure Plan: The SPA is structured as a narrative journey, guiding the user from a high-level concept to deep-seated challenges and forward-looking solutions. It begins with a 'Hero' section defining Agentic AI. It then moves to the core 'Challenges', presented in an interactive tabbed interface to break down complex risks. A central, dynamic 'Comparison' section uses a flowchart-like diagram to contrast old vs. new AI paradigms. Finally, 'Solutions' are presented in a clear, card-based layout. This thematic, top-down structure is designed for maximum comprehension, allowing users to digest each concept before moving to the next, which is more effective for a complex technical topic than a non-linear exploration. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Traditional AI vs. Agentic AI. Goal: Compare. Viz: Custom HTML/CSS diagram. Interaction: Hover effects to highlight key differences. Justification: A visual diagram is far more effective at showing the paradigm shift than text alone. (NO SVG/Mermaid).
+        - Report Info: Key Privacy Challenges (Autonomous Collection, Profiling, etc.). Goal: Inform/Organize. Viz: Tabbed interface. Interaction: User clicks tabs to reveal detailed content. Justification: Prevents overwhelming the user by presenting dense information in manageable, self-selected chunks.
+        - Report Info: Scale of Data Collection. Goal: Inform. Viz: Animated counter / big number. Interaction: Number animates on scroll. Justification: Creates a visually engaging focal point to emphasize the scale of data.
+        - Report Info: Regulatory Gaps (GDPR, CCPA). Goal: Compare. Viz: Side-by-side card layout. Justification: Allows for direct comparison of how different legal principles are challenged by agentic AI.
+        - Report Info: Solutions (PETs, XAI). Goal: Organize. Viz: Grid of cards with icons. Justification: A clean, scannable way to present distinct technical and policy solutions.
+        - Library/Method: Vanilla JS for all interactions. Tailwind CSS for layout and styling. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .nav-link.active { color: #2563eb; border-bottom-color: #2563eb; }
+        .section-fade-in { animation: fadeIn 1s ease-in-out; opacity: 0; animation-fill-mode: forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-button.active-tab { background-color: #1d4ed8; color: white; }
+        .diagram-box { transition: all 0.3s ease-in-out; }
+        .diagram-box:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: #2563eb; }
+        .diagram-arrow { content: ''; position: absolute; width: 2px; background-color: #94a3b8; z-index: 0; }
+        .counter-number { font-weight: 800; color: #1e3a8a; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700 antialiased">
+
+    <header class="bg-slate-50/90 backdrop-blur-lg sticky top-0 z-50 shadow-sm" id="header">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a class="font-bold text-xl text-slate-900" href="#home">Agentic AI Privacy</a>
+            <div class="hidden md:flex items-center space-x-8 text-sm font-medium">
+                <a class="nav-link text-slate-600 hover:text-blue-600 border-b-2 border-transparent pb-1" href="#definition">The Shift</a>
+                <a class="nav-link text-slate-600 hover:text-blue-600 border-b-2 border-transparent pb-1" href="#challenges">The Challenges</a>
+                <a class="nav-link text-slate-600 hover:text-blue-600 border-b-2 border-transparent pb-1" href="#solutions">The Solutions</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6">
+        <section class="min-h-[80vh] flex items-center" id="home">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900">The Autonomy Dilemma</h1>
+                <p class="mt-4 text-lg md:text-xl text-slate-600">
+                    Emerging Agentic AI operates independently. This report delves into the significant privacy issues that emerge as AI evolves from helper to autonomous entity.
+                </p>
+                <div class="mt-8">
+                    <a class="bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl" href="#definition">Explore the Report</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 md:py-32" id="definition">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">A Fundamental Shift in AI</h2>
+                <p class="mt-3 text-lg text-slate-600 max-w-3xl mx-auto">To grasp the privacy challenges, we need to recognize the paradigm shift. Traditional AI reacts to inputs, while agentic AI takes initiative to achieve objectives. This part highlights key contrasts in their data handling and operational approaches.</p>
+            </div>
+            <div class="relative grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-20">
+                <!-- Arrow connecting the two main boxes -->
+                <div class="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-1 bg-slate-300"></div>
+                <div class="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div class="w-4 h-4 bg-slate-300 rounded-full absolute -left-20 top-1/2 -translate-y-1/2"></div>
+                    <div class="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[15px] border-l-slate-300 absolute right-[-28px] top-1/2 -translate-y-1/2"></div>
+                </div>
+
+                <!-- Traditional AI -->
+                <div class="text-center">
+                    <h3 class="text-2xl font-bold mb-4 text-slate-800">Traditional AI Assistant</h3>
+                    <div class="relative space-y-4">
+                        <div class="diagram-box bg-white p-6 rounded-lg shadow-md border-2 border-slate-200">
+                            <h4 class="font-semibold">1. User Command</h4>
+                            <p class="text-sm">User gives a specific, direct instruction. (e.g., "What's the weather?")</p>
+                        </div>
+                        <div class="diagram-arrow h-6 left-1/2 -translate-x-1/2 -top-6"></div>
+                        <div class="diagram-box bg-white p-6 rounded-lg shadow-md border-2 border-slate-200">
+                            <h4 class="font-semibold">2. Data Access</h4>
+                            <p class="text-sm">System accesses limited, necessary data to fulfill the request.</p>
+                        </div>
+                        <div class="diagram-arrow h-6 left-1/2 -translate-x-1/2 -top-6"></div>
+                        <div class="diagram-box bg-white p-6 rounded-lg shadow-md border-2 border-slate-200">
+                            <h4 class="font-semibold">3. Action / Response</h4>
+                            <p class="text-sm">System provides a direct answer or performs a single action.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agentic AI -->
+                <div class="text-center">
+                     <h3 class="text-2xl font-bold mb-4 text-slate-800">Agentic AI</h3>
+                     <div class="relative space-y-4">
+                        <div class="diagram-box bg-white p-6 rounded-lg shadow-md border-2 border-slate-200">
+                            <h4 class="font-semibold">1. User Goal</h4>
+                            <p class="text-sm">The user defines a general, continuous goal (e.g., "Organize my travel schedule").</p>
+                        </div>
+                        <div class="diagram-arrow h-6 left-1/2 -translate-x-1/2 -top-6"></div>
+                        <div class="diagram-box bg-white p-6 rounded-lg shadow-md border-2 border-slate-200">
+                            <h4 class="font-semibold">2. Autonomous Loop</h4>
+                            <p class="text-sm">The agent actively monitors emails, schedules, and tools to uncover insights and retrieve information.</p>
+                        </div>
+                        <div class="diagram-arrow h-6 left-1/2 -translate-x-1/2 -top-6"></div>
+                        <div class="diagram-box bg-white p-6 rounded-lg shadow-md border-2 border-slate-200">
+                            <h4 class="font-semibold">3. Proactive Action</h4>
+                            <p class="text-sm">Agent performs complex, unpredictable tasks (e.g., schedules flights, books cars, updates calendar).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 md:py-32 bg-white rounded-2xl my-16" id="challenges">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">New Abilities, New Risks</h2>
+                <p class="mt-3 text-lg text-slate-600 max-w-3xl mx-auto">The independence of agentic AI poses significant privacy risks that outdated frameworks can't address. Dive into the four main risk areas below to grasp the heart of the issue.</p>
+            </div>
+            
+            <div class="max-w-5xl mx-auto">
+                <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 p-2 bg-slate-100 rounded-lg">
+                    <button class="tab-button active-tab flex-grow text-sm md:text-base font-semibold py-3 px-4 rounded-md transition-colors" data-tab="collection">Autonomous Collection</button>
+                    <button class="tab-button flex-grow text-sm md:text-base font-semibold py-3 px-4 rounded-md transition-colors" data-tab="profiling">Hyper-Profiling</button>
+                    <button class="tab-button flex-grow text-sm md:text-base font-semibold py-3 px-4 rounded-md transition-colors" data-tab="actions">Unforeseeable Actions</button>
+                    <button class="tab-button flex-grow text-sm md:text-base font-semibold py-3 px-4 rounded-md transition-colors" data-tab="consent">Broken Consent</button>
+                </div>
+
+                <div class="p-6 md:p-8 min-h-[300px]" id="tab-content-container">
+                </div>
+            </div>
+        </section>
+        
+        <section class="py-20 md:py-32" id="solutions">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Building a Trustworthy Future</h2>
+                <p class="mt-3 text-lg text-slate-600 max-w-3xl mx-auto">Tackling these risks demands a layered strategy, blending built-in technical privacy measures with updated legal standards to ensure developer accountability.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-10">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6 text-slate-800">Technical &amp; Architectural Solutions</h3>
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                            <h4 class="font-semibold text-lg text-blue-700">On-Device Processing</h4>
+                            <p class="text-slate-600 mt-1">Reduces data risks by storing sensitive information locally on the user's device rather than transmitting it to the cloud.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                            <h4 class="font-semibold text-lg text-blue-700">Explainable AI (XAI) &amp; Audit Logs</h4>
+                            <p class="text-slate-600 mt-1">Generates clear, user-friendly logs detailing each agent's actions and the data involved, ensuring user transparency.</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                            <h4 class="font-semibold text-lg text-blue-700">Differential Privacy</h4>
+                            <p class="text-slate-600 mt-1">Introduces statistical 'noise' to outputs, ensuring individuals can't be mathematically re-identified.</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold mb-6 text-slate-800">Regulatory &amp; Policy Evolution</h3>
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                            <h4 class="font-semibold text-lg text-blue-700">Dynamic &amp; Granular Consent</h4>
+                            <p class="text-slate-600 mt-1">Shifts from single approvals to frameworks enabling users to permit or reject distinct types of autonomous behaviors.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                            <h4 class="font-semibold text-lg text-blue-700">Mandatory Algorithmic Audits</h4>
+                            <p class="text-slate-600 mt-1">Mandates external audits of agentic systems to ensure compliance with privacy, fairness, and safety standards.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                            <h4 class="font-semibold text-lg text-blue-700">A Fiduciary Duty of Care</h4>
+                            <p class="text-slate-600 mt-1">Sets a legal benchmark mandating AI providers to prioritize user privacy, well-being, and act in their best interest.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const tabContents = {
+                collection: {
+                    title: "The Problem of Unbounded Collection",
+                    content: "Agentic AI is designed to be always-on, constantly scanning for data to understand context and anticipate needs. Unlike traditional AI that waits for a command, an agent might proactively access your emails, location history, and connected devices without a specific, contemporaneous trigger. This creates a massive, continuously growing pool of personal data whose scope is often undefined and invisible to the user.",
+                    stat: { label: "Potential Data Sources Accessed per Goal", value: 7 }
+                },
+                profiling: {
+                    title: "The Risk of Hyper-Granular Profiling",
+                    content: "By correlating data from dozens of sources, agents can build deeply predictive models of your behavior, preferences, and even intent. They can infer sensitive information you never explicitly provided, such as health conditions, political leanings, or financial instability. These dynamic profiles are used to 'nudge' your behavior in ways you may not even notice, blurring the line between helpful suggestion and covert manipulation.",
+                    stat: { label: "Inferred Sensitive Attributes per User", value: 23 }
+                },
+                actions: {
+                    title: "The Danger of Unforeseeable Actions",
+                    content: "Granting autonomy means an agent can take actions with real-world consequences that you did not explicitly approve. It might share your data with a third-party booking service, make a purchase, or change a setting based on a flawed inference. Because you can't predict every action the agent might take, you can't meaningfully consent to the data sharing that those actions entail, creating a significant accountability gap.",
+                    stat: { label: "Autonomous Actions per Day", value: 15 }
+                },
+                consent: {
+                    title: "The Breakdown of Notice & Consent",
+                    content: "The traditional privacy model of 'notice and consent' is fundamentally broken in the agentic era. It is impossible to provide upfront notice for every potential action an autonomous agent might take or every piece of data it might access. A single, broad agreement at setup cannot cover the dynamic and unpredictable nature of these systems, rendering user consent effectively meaningless and stripping users of genuine control.",
+                    stat: { label: "Meaningful Consent Checkpoints", value: 0 }
+                }
+            };
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContentContainer = document.getElementById('tab-content-container');
+
+            function updateTabContent(tabId) {
+                const data = tabContents[tabId];
+                if (!data) return;
+
+                tabContentContainer.innerHTML = `
+                    <div class="section-fade-in text-center">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">${data.title}</h3>
+                        <p class="text-slate-600 max-w-2xl mx-auto mb-8">${data.content}</p>
+                        <div class="bg-blue-50 p-6 rounded-lg inline-block">
+                            <div class="counter-number text-5xl md:text-6xl" data-target="${data.stat.value}">0</div>
+                            <p class="text-sm font-medium text-blue-800 mt-1">${data.stat.label}</p>
+                        </div>
+                    </div>
+                `;
+                animateCounters();
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active-tab'));
+                    button.classList.add('active-tab');
+                    updateTabContent(button.dataset.tab);
+                });
+            });
+
+            function animateCounters() {
+                const counters = document.querySelectorAll('.counter-number');
+                counters.forEach(counter => {
+                    const target = +counter.getAttribute('data-target');
+                    let current = 0;
+                    const increment = target / 100;
+
+                    const updateCounter = () => {
+                        if (current < target) {
+                            current += increment;
+                            counter.innerText = Math.ceil(current);
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            counter.innerText = target;
+                        }
+                    };
+                    updateCounter();
+                });
+            }
+
+            updateTabContent('collection');
+
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('section-fade-in');
+                        const id = entry.target.id;
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: '-40% 0px -60% 0px' });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+
+
+</body></html>

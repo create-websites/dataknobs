@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>An In-Depth Analysis of Multi-Agent AI Systems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutrals with Slate Blue Accent -->
+    <!-- Application Structure Plan: The application is designed as a single-page scrolling experience with a sticky navigation header for easy access to different sections. This structure is more intuitive than a multi-page site for a research report, allowing for a linear, story-like progression of information while still enabling random access via the navigation. The core of the design is a tabbed interface for the main concepts (Guardian, Super, Orchestration) to prevent overwhelming the user with a long wall of text. This thematic grouping, combined with interactive diagrams and charts, is chosen to make complex, abstract concepts more digestible and engaging. The user flow is: Introduction -> Deep dive into individual concepts via tabs -> Synthesis of how they work together -> Conclusion. This facilitates both a comprehensive read-through and quick reference. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Guardian Agent Role -> Goal: Organize/Inform -> Viz/Presentation: Interactive HTML/CSS diagram showing the Guardian Agent's position in a system -> Interaction: Hovering over diagram elements reveals descriptive tooltips -> Justification: Clearly illustrates the protective and monitoring function in a way static text cannot. Library/Method: Vanilla JS + Tailwind CSS.
+        2. Report Info: Super Agent Capabilities vs. Standard Agent -> Goal: Compare -> Viz/Presentation: Bar Chart -> Interaction: Hovering over bars shows detailed comparisons in tooltips -> Justification: Provides a quick, visually intuitive comparison of capabilities, making the "super" distinction clear. Library/Method: Chart.js.
+        3. Report Info: Agent Orchestration Models (Centralized, Decentralized, Hierarchical) -> Goal: Compare/Organize -> Viz/Presentation: Interactive HTML/CSS diagram with clickable buttons -> Interaction: Clicking a model type updates a detailed description panel -> Justification: Allows for direct side-by-side comparison of complex architectures in a single, user-controlled view. Library/Method: Vanilla JS + Tailwind CSS.
+        4. Report Info: Interplay of all agent types -> Goal: Relationships/Organize -> Viz/Presentation: HTML/CSS Flowchart -> Interaction: Hover-activated highlights and tooltips -> Justification: Synthesizes all the individual concepts into a single, cohesive system view, demonstrating their functional relationships. Library/Method: Vanilla JS + Tailwind CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #333;
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+        .nav-link {
+            transition: color 0.3s ease, border-bottom-color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #4a5568;
+            border-bottom-color: #4a5568;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #435574;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .diagram-node {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .diagram-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .has-tooltip:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Multi-Agent AI Systems</h1>
+            <div class="hidden md:flex space-x-8">
+                <a class="nav-link text-gray-600 border-b-2 border-transparent pb-1" href="#introduction">Introduction</a>
+                <a class="nav-link text-gray-600 border-b-2 border-transparent pb-1" href="#core-concepts">Core Concepts</a>
+                <a class="nav-link text-gray-600 border-b-2 border-transparent pb-1" href="#synthesis">Synthesis</a>
+                <a class="nav-link text-gray-600 border-b-2 border-transparent pb-1" href="#conclusion">Conclusion</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <section class="mb-24 text-center" id="introduction">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">From Policies to Protectors: The New Era of AI Governance</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-700 leading-relaxed">
+                AI's landscape is transforming: from isolated models to intricate, multi-agent collaborations. This leap unlocks vast potential but also presents challenges like amplified errors and unforeseen behaviors. Traditional human control struggles to keep pace. This report examines core AI governance elements for managing this complexity: Guardian Agents, Super Agents, and the coordinating Orchestration frameworks.
+            </p>
+        </section>
+
+        <section class="mb-24" id="core-concepts">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Core Concepts in Multi-Agent Systems</h2>
+            
+            <div class="max-w-5xl mx-auto" id="tabs-container">
+                <div class="flex justify-center mb-8 bg-gray-200 rounded-lg p-2">
+                    <button class="tab-button w-full text-center py-3 px-4 rounded-md text-gray-700 font-medium active" data-tab="guardian">Guardian Agents</button>
+                    <button class="tab-button w-full text-center py-3 px-4 rounded-md text-gray-700 font-medium" data-tab="super">Super Agents</button>
+                    <button class="tab-button w-full text-center py-3 px-4 rounded-md text-gray-700 font-medium" data-tab="orchestration">Agent Orchestration</button>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-lg min-h-[500px]" id="tab-content">
+                    
+                    <div class="tab-panel" id="guardian-content">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Guardian Agents: The System's Immune Response</h3>
+                        <p class="text-gray-600 mb-8">Guardian Agents: AI overseers meticulously designed to monitor, guide, and control other AI agents. They provide automated oversight, ensuring safe, ethical, and rule-compliant operation within agentic systems. Critical for risk management in complex, multi-agent scenarios where human intervention is limited.</p>
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h4 class="text-xl font-semibold text-gray-700 mb-3">Key Roles &amp; Functions:</h4>
+                                <ul class="space-y-3 text-gray-600">
+                                    <li class="flex items-start"><span class="text-blue-500 font-bold mr-3 mt-1">●</span><strong>Quality Control:</strong> Ensures outputs meet expected accuracy and compliance standards.</li>
+                                    <li class="flex items-start"><span class="text-green-500 font-bold mr-3 mt-1">●</span><strong>Observation &amp; Auditing:</strong> Here are a few options, all similar in length and meaning:
+
+*   **Tracks AI actions, offering explanations and a clear audit trail.**
+*   **Observes AI operations, delivering insight and ensuring responsibility.**
+*   **Supervises AI performance, clarifying decisions and establishing trust.**
+*   **Audits AI behavior, providing context and promoting transparency.**
+*   **Monitors AI, explaining its actions and creating a record.**</li>
+                                    <li class="flex items-start"><span class="text-red-500 font-bold mr-3 mt-1">●</span><strong>Protection &amp; Intervention:</strong> Here are a few options, all similar in length and focusing on real-time intervention:
+
+*   **Real-time monitoring and control to neutralize or reroute harmful AI actions.**
+*   **Proactively identifies and immediately corrects malicious or errant AI behaviors.**
+*   **Monitors AI in real-time, intervening to stop or redirect unwanted actions.**
+*   **Detects and swiftly mitigates harmful AI behavior, preventing negative results.**</li>
+                                </ul>
+                            </div>
+                            <div class="relative p-8 bg-gray-50 rounded-lg">
+                                <div class="has-tooltip relative flex items-center justify-center diagram-node bg-red-100 border-2 border-red-400 rounded-full w-32 h-32 mx-auto">
+                                    <span class="font-semibold text-red-800">Guardian Agent</span>
+                                    <div class="tooltip absolute bottom-full mb-2 w-48 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Monitors all interactions and outputs for safety and compliance.</div>
+                                </div>
+                                <div class="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-px h-2/3 bg-gray-300"></div>
+                                <div class="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 w-px h-2/3 bg-gray-300"></div>
+                                <div class="absolute top-1/2 left-0 -translate-x-full -translate-y-20 flex flex-col items-center space-y-2">
+                                     <div class="has-tooltip diagram-node bg-blue-100 border border-blue-300 p-3 rounded-lg"><span class="text-blue-800">Task Agent 1</span><div class="tooltip absolute bottom-full mb-2 w-32 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Performs a specific task.</div></div>
+                                     <div class="h-10 w-px bg-gray-300"></div>
+                                     <div class="has-tooltip diagram-node bg-blue-100 border border-blue-300 p-3 rounded-lg"><span class="text-blue-800">Task Agent 2</span><div class="tooltip absolute top-full mt-2 w-32 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Collaborates on the task.</div></div>
+                                </div>
+                                <div class="absolute top-1/2 right-0 translate-x-full -translate-y-10 has-tooltip diagram-node bg-green-100 border border-green-300 p-3 rounded-lg"><span class="text-green-800">External API</span><div class="tooltip absolute top-full mt-2 w-32 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Provides external data or tools.</div></div>
+                                <p class="text-center text-xs text-gray-500 mt-8">Here are a few options, all similar in length:
+
+*   View Guardian Agent oversight via element hover.
+*   Hover to reveal the Guardian Agent's system role.
+*   See Guardian Agent's system control: hover.
+*   Explore system oversight: hover for Guardian Agent.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="super-content" style="display: none;">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Super Agents: The Digital Executive</h3>
+                        <p class="text-gray-600 mb-8">An advanced AI, dubbed a "Super Agent" (or master/orchestrator agent), autonomously governs complex, complete workflows. Unlike single-purpose AI, it breaks down big goals, delegates to specialized agents, coordinates their work, and combines the results. Effectively, it's a project manager for AI teams.</p>
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h4 class="text-xl font-semibold text-gray-700 mb-3">Core Capabilities:</h4>
+                                <ul class="space-y-3 text-gray-600">
+                                    <li class="flex items-start"><span class="text-purple-500 font-bold mr-3 mt-1">●</span><strong>Task Decomposition:</strong> Breaks down high-level goals into a sequence of actionable steps.</li>
+                                    <li class="flex items-start"><span class="text-indigo-500 font-bold mr-3 mt-1">●</span><strong>Agent Delegation:</strong> Delegates tasks to specialized agents (e.g., coder, researcher).</li>
+                                    <li class="flex items-start"><span class="text-pink-500 font-bold mr-3 mt-1">●</span><strong>Self-Correction &amp; Learning:</strong> Here are a few options, all similar in length and meaning:
+
+*   **Self-evaluates outputs/agent actions, adapting strategy via feedback.**
+*   **Analyzes results and agent behavior, improving tactics with input.**
+*   **Reviews its work and agent actions, adjusting its approach accordingly.**
+*   **Assesses its performance, incorporating feedback for strategic changes.**
+*   **Monitors outputs and agent actions, evolving strategy from review.**</li>
+                                    <li class="flex items-start"><span class="text-yellow-500 font-bold mr-3 mt-1">●</span><strong>Human-in-the-Loop:</strong> Here are a few options, aiming for a similar length and meaning:
+
+*   **Integrates human review for crucial decisions, maintaining oversight.**
+*   **Requires human intervention/approval for key choices, enhancing governance.**
+*   **Incorporates human oversight at pivotal junctures, enabling control.**
+*   **Pauses for human input on important decisions, ensuring control and alignment.**
+*   **Allows human intervention for crucial decisions, guaranteeing accuracy and control.**</li>
+                                </ul>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="superAgentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="orchestration-content" style="display: none;">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Agent Orchestration: Conducting the AI Symphony</h3>
+                        <p class="text-gray-600 mb-8">Agent orchestration, the engine of multi-agent systems, manages the interactions of various AI specialists. It's the blueprint, detailing communication, data exchange, and workflow. Though a Super Agent often handles it, the concept encompasses the architecture facilitating agent teamwork.</p>
+                        <div class="grid md:grid-cols-3 gap-6 text-center">
+                            <button class="orchestration-btn p-4 border-2 border-gray-300 rounded-lg bg-gray-100 font-semibold text-gray-800" id="btn-centralized">Centralized</button>
+                            <button class="orchestration-btn p-4 border-2 border-gray-300 rounded-lg font-semibold text-gray-600" id="btn-decentralized">Decentralized</button>
+                            <button class="orchestration-btn p-4 border-2 border-gray-300 rounded-lg font-semibold text-gray-600" id="btn-hierarchical">Hierarchical</button>
+                        </div>
+                        <div class="mt-8 p-6 bg-gray-50 rounded-lg min-h-[250px]">
+                            <h4 class="text-xl font-bold text-gray-800 mb-3" id="orchestration-title">Centralized Orchestration</h4>
+                            <p class="text-gray-600" id="orchestration-desc">In a "conductor" architecture, a lead agent (like a "Super Agent") orchestrates all other agents. It delegates duties, gathers outputs, and governs the complete process flow. While easy to set up and offering straightforward control, it risks a central bottleneck.</p>
+                            <div class="mt-4">
+                                <strong class="text-gray-700">Best for:</strong> <span class="text-gray-600" id="orchestration-usecase">Tightly controlled, linear workflows where predictability is key.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-24" id="synthesis">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Synthesis: A Complete Multi-Agent Workflow</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-700 leading-relaxed text-center mb-12">
+                Think of it this way: AI's strength lies in its interconnected layers. The Super Agent is the mind, specialized agents are the limbs, orchestration provides the nerves, and the Guardian Agent acts as protection. Examine the following diagram to understand how user requests are processed.
+            </p>
+            <div class="w-full bg-white p-8 rounded-xl shadow-lg">
+                 <div class="flex flex-col items-center space-y-4">
+                    <div class="has-tooltip diagram-node bg-yellow-100 border-2 border-yellow-400 p-4 rounded-lg w-64 text-center">
+                        <span class="font-bold">User Request</span>
+                        <p class="text-sm">"Analyze Q3 sales data &amp; create a presentation"</p>
+                        <div class="tooltip absolute bottom-full mb-2 w-48 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">The initial high-level goal from the user.</div>
+                    </div>
+                    <div class="h-8 w-1 bg-gray-300"></div>
+                    <div class="has-tooltip diagram-node bg-purple-100 border-2 border-purple-400 p-4 rounded-lg w-72 text-center relative">
+                        <span class="font-bold">Super Agent</span>
+                        <p class="text-sm">Decomposes request into sub-tasks</p>
+                         <div class="absolute -right-24 top-1/2 -translate-y-1/2 has-tooltip diagram-node bg-red-100 border-2 border-red-400 p-3 rounded-full flex items-center justify-center w-24 h-24">
+                            <span class="font-bold text-sm text-center">Guardian Agent</span>
+                            <div class="tooltip absolute right-full mr-2 w-48 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Monitors entire process for policy violations and safety.</div>
+                        </div>
+                         <div class="tooltip absolute bottom-full mb-2 w-48 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Plans the workflow and delegates tasks.</div>
+                    </div>
+                    <div class="h-8 w-1 bg-gray-300"></div>
+                    <div class="w-full flex justify-center space-x-8">
+                        <div class="flex flex-col items-center">
+                            <div class="h-8 w-1 bg-gray-300 transform -rotate-45 translate-x-12"></div>
+                            <div class="has-tooltip diagram-node bg-blue-100 border border-blue-300 p-3 rounded-lg w-48 text-center">
+                                <span class="font-bold">Data Agent</span>
+                                <p class="text-sm">Queries database for sales figures</p>
+                                <div class="tooltip absolute bottom-full mb-2 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Specialized in data retrieval.</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                             <div class="h-8 w-1 bg-gray-300"></div>
+                             <div class="has-tooltip diagram-node bg-green-100 border border-green-300 p-3 rounded-lg w-48 text-center">
+                                <span class="font-bold">Analysis Agent</span>
+                                <p class="text-sm">Identifies trends and key insights</p>
+                                 <div class="tooltip absolute bottom-full mb-2 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Specialized in statistical analysis.</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="h-8 w-1 bg-gray-300 transform rotate-45 -translate-x-12"></div>
+                             <div class="has-tooltip diagram-node bg-indigo-100 border border-indigo-300 p-3 rounded-lg w-48 text-center">
+                                <span class="font-bold">Content Agent</span>
+                                <p class="text-sm">Generates slides and commentary</p>
+                                 <div class="tooltip absolute bottom-full mb-2 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Specialized in content creation.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-8 w-1 bg-gray-300"></div>
+                     <div class="has-tooltip diagram-node bg-purple-100 border-2 border-purple-400 p-4 rounded-lg w-72 text-center">
+                        <span class="font-bold">Super Agent</span>
+                        <p class="text-sm">Synthesizes results into final presentation</p>
+                        <div class="tooltip absolute bottom-full mb-2 w-48 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Aggregates outputs from specialized agents.</div>
+                    </div>
+                     <div class="h-8 w-1 bg-gray-300"></div>
+                     <div class="has-tooltip diagram-node bg-yellow-100 border-2 border-yellow-400 p-4 rounded-lg w-64 text-center">
+                        <span class="font-bold">Final Output</span>
+                        <p class="text-sm">Completed Sales Presentation</p>
+                         <div class="tooltip absolute bottom-full mb-2 w-48 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">The final product delivered to the user.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="text-center" id="conclusion">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Conclusion: The Future is Collaborative and Governed</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-700 leading-relaxed">
+                Multi-agent systems signify a major AI advancement, shifting from single tools to cooperative digital agents. Super Agents (reasoning), Specialized Agents (execution), and Guardian Agents (safety) offer a strong architecture for responsible AI. Their growing integration into daily life demands understanding and applying these orchestration and governance principles to ensure autonomous AI's safe, reliable, and beneficial evolution.
+            </p>
+        </section>
+    </main>
+
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    const tab = button.dataset.tab;
+                    tabPanels.forEach(panel => {
+                        if (panel.id === `${tab}-content`) {
+                            panel.style.display = 'block';
+                        } else {
+                            panel.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            const superAgentChartCtx = document.getElementById('superAgentChart').getContext('2d');
+            const superAgentChart = new Chart(superAgentChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Task Complexity', 'Autonomy', 'Adaptability', 'Coordination'],
+                    datasets: [{
+                        label: 'Standard Agent',
+                        data: [4, 3, 5, 2],
+                        backgroundColor: 'rgba(165, 180, 252, 0.6)',
+                        borderColor: 'rgba(129, 140, 248, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Super Agent',
+                        data: [9, 8, 8, 9],
+                        backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            title: {
+                                display: true,
+                                text: 'Capability Score (1-10)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Capability Comparison: Standard vs. Super Agent'
+                        },
+                        tooltip: {
+                           callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y;
+                                        if (context.dataset.label === 'Super Agent') {
+                                           label += ' - Manages complex, multi-step tasks.'
+                                        } else {
+                                           label += ' - Handles specific, predefined tasks.'
+                                        }
+                                    }
+                                    return label;
+                                }
+                           }
+                        }
+                    }
+                }
+            });
+
+            const orchestrationBtns = document.querySelectorAll('.orchestration-btn');
+            const orchTitle = document.getElementById('orchestration-title');
+            const orchDesc = document.getElementById('orchestration-desc');
+            const orchUsecase = document.getElementById('orchestration-usecase');
+            const orchestrationData = {
+                centralized: {
+                    title: 'Centralized Orchestration',
+                    desc: 'In a "conductor" architecture, a lead agent (like a "Super Agent") orchestrates all other agents. It delegates duties, gathers outputs, and governs the complete process flow. While easy to set up and offering straightforward control, it risks a central bottleneck.',
+                    usecase: 'Tightly controlled, linear workflows where predictability is key.'
+                },
+                decentralized: {
+                    title: 'Decentralized Orchestration',
+                    desc: 'Agents communicate and coordinate directly with each other (peer-to-peer) without a central authority. This approach is more robust and scalable, as there is no single point of failure, but can lead to complex and unpredictable emergent behaviors.',
+                    usecase: 'Dynamic environments where adaptability and resilience are critical, like swarm robotics.'
+                },
+                hierarchical: {
+                    title: 'Hierarchical Orchestration',
+                    desc: 'This model combines centralized and decentralized approaches. High-level agents manage strategy and delegate broad goals to mid-level managers, who in turn assign specific tasks to worker agents. It offers a balance between control and scalability.',
+                    usecase: 'Large-scale systems requiring both strategic oversight and localized autonomy, like logistics.'
+                }
+            };
+
+            orchestrationBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    orchestrationBtns.forEach(b => {
+                        b.classList.remove('bg-gray-100', 'text-gray-800');
+                        b.classList.add('text-gray-600');
+                    });
+                    btn.classList.add('bg-gray-100', 'text-gray-800');
+                    btn.classList.remove('text-gray-600');
+                    
+                    const model = btn.id.split('-')[1];
+                    orchTitle.textContent = orchestrationData[model].title;
+                    orchDesc.textContent = orchestrationData[model].desc;
+                    orchUsecase.textContent = orchestrationData[model].usecase;
+                });
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 60) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+
+
+</body></html>

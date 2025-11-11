@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Agentic AI in Production Planning &amp; Inventory Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Slate Gray and Amber -->
+    <!-- Application Structure Plan: The SPA is designed as a thematic, top-down dashboard. This structure was chosen to guide the user from a high-level overview to more specific details, mirroring a natural learning process. It starts with 'What is Agentic AI?', then moves to its functional 'Core Capabilities', quantifies the 'Impact Analysis' with an interactive chart, visualizes the 'Implementation Pathway', and finally addresses the 'Challenges'. This flow is more intuitive than a static report, allowing users to build foundational knowledge before exploring data and practicalities. The key interactions—clicking tabs to reveal capabilities and filtering the chart to see different benefits—encourage active exploration rather than passive reading, making the complex topic more digestible. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Key benefits (Cost Reduction, Efficiency Gain, etc.). Goal: Compare/Inform. Viz: Interactive Bar Chart. Interaction: Buttons filter the chart's dataset to show different metrics. Justification: Allows users to directly compare the scale of various benefits, making the data more impactful than separate static charts. Library: Chart.js.
+        2. Report Info: Core applications (Demand Forecasting, Inventory Optimization, etc.). Goal: Organize/Inform. Viz: Tabbed content view. Interaction: Clicking a tab reveals descriptive text and a representative icon. Justification: Organizes dense information cleanly, preventing cognitive overload and letting users focus on one application at a time. Library: Vanilla JS.
+        3. Report Info: Step-by-step implementation process. Goal: Organize. Viz: Numbered horizontal process flow diagram. Interaction: Subtle hover effects on each step. Justification: Clearly visualizes a sequence, making the process easier to follow than a simple text list. Library/Method: HTML/CSS with Tailwind Flexbox.
+        4. Report Info: Challenges of adoption. Goal: Inform. Viz: Card-based grid layout. Interaction: None, focus is on readability. Justification: Cards break up text and provide a modern, scannable layout for presenting distinct points. Library/Method: HTML/CSS with Tailwind Grid.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #f59e0b;
+        }
+        .capability-tab.active {
+            background-color: #1e293b;
+            color: #ffffff;
+        }
+        .process-step {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .process-step:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="text-slate-700 smooth-scroll">
+
+    <header class="bg-slate-800 text-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-amber-400">Agentic AI Analysis</h1>
+            <div class="hidden md:flex space-x-8">
+                <a class="nav-link" href="#overview">Overview</a>
+                <a class="nav-link" href="#capabilities">Capabilities</a>
+                <a class="nav-link" href="#impact">Impact</a>
+                <a class="nav-link" href="#pathway">Pathway</a>
+                <a class="nav-link" href="#challenges">Challenges</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section class="mb-20 text-center" id="overview">
+            <h2 class="text-4xl font-bold text-slate-900 mb-4">Transforming Production and Inventory with Agentic AI</h2>
+            <p class="max-w-3xl mx-auto text-lg text-slate-600 mb-8">
+                This study examines how Agentic AI—autonomous systems designed to achieve specific goals—is transforming production planning and inventory control. Unlike conventional AI, these agents can independently decide, learn from results, and adapt to changes, fostering stronger and more agile supply chains. This dashboard offers an interactive snapshot of their features, effects, and adoption strategies.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-amber-400">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Autonomous Decision-Making</h3>
+                    <p>AI systems autonomously process data to adjust stock levels, plan production, and oversee suppliers with minimal human oversight.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-amber-400">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Continuous Learning</h3>
+                    <p>These systems refine their approaches using real-time data, consistently enhancing prediction precision and workflow effectiveness over time.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-amber-400">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Proactive Disruption Handling</h3>
+                    <p>Agents identify supply chain risks, such as delays, and swiftly reroute shipments or secure backup suppliers.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20" id="capabilities">
+            <h2 class="text-3xl font-bold text-slate-900 mb-2 text-center">Core Capabilities</h2>
+            <p class="max-w-3xl mx-auto text-center text-slate-600 mb-10">
+                Agentic AI tackles diverse, intricate tasks that underpin today's supply chain operations. Through automation and optimization, companies gain enhanced precision and adaptability. Tap on each feature below to see real-world AI applications in action.
+            </p>
+            <div class="flex flex-wrap justify-center gap-2 mb-8">
+                <button class="capability-tab px-4 py-2 bg-white text-slate-700 rounded-full shadow-sm font-medium border border-slate-200 hover:bg-slate-100 transition active" data-target="cap-1">Demand Forecasting</button>
+                <button class="capability-tab px-4 py-2 bg-white text-slate-700 rounded-full shadow-sm font-medium border border-slate-200 hover:bg-slate-100 transition" data-target="cap-2">Inventory Optimization</button>
+                <button class="capability-tab px-4 py-2 bg-white text-slate-700 rounded-full shadow-sm font-medium border border-slate-200 hover:bg-slate-100 transition" data-target="cap-3">Production Scheduling</button>
+                <button class="capability-tab px-4 py-2 bg-white text-slate-700 rounded-full shadow-sm font-medium border border-slate-200 hover:bg-slate-100 transition" data-target="cap-4">Supplier Management</button>
+            </div>
+            <div class="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+                <div class="capability-content" id="cap-1">
+                    <h3 class="text-2xl font-semibold text-slate-800 mb-3 flex items-center"><span class="text-3xl mr-3">📈</span>Intelligent Demand Forecasting</h3>
+                    <p class="text-slate-600">AI systems leverage historical sales data, market trends, seasonal patterns, and external factors such as weather or social media insights to deliver precise demand forecasts. By surpassing conventional statistical methods, they adapt in real-time, cutting errors by up to 50% while optimizing inventory to prevent stockouts and overstock issues.</p>
+                </div>
+                <div class="capability-content hidden" id="cap-2">
+                    <h3 class="text-2xl font-semibold text-slate-800 mb-3 flex items-center"><span class="text-3xl mr-3">📦</span>Dynamic Inventory Optimization</h3>
+                    <p class="text-slate-600">Agents independently oversee inventory levels throughout the network, determining ideal reorder points, safety stock, and order quantities using real-time demand and supplier lead times. This approach minimizes excess inventory, maintains strong service levels, and typically cuts holding costs by 20-30%.</p>
+                </div>
+                <div class="capability-content hidden" id="cap-3">
+                    <h3 class="text-2xl font-semibold text-slate-800 mb-3 flex items-center"><span class="text-3xl mr-3">⚙️</span>Autonomous Production Scheduling</h3>
+                    <p class="text-slate-600">AI systems optimize production schedules to boost efficiency and cut expenses. They account for equipment capacity, workforce availability, material limitations, and upkeep plans. In cases of disruptions, like equipment breakdowns, the system swiftly recalibrates the factory's schedule, minimizing delays and sustaining workflow continuity.</p>
+                </div>
+                <div class="capability-content hidden" id="cap-4">
+                    <h3 class="text-2xl font-semibold text-slate-800 mb-3 flex items-center"><span class="text-3xl mr-3">🚚</span>Proactive Supplier Management</h3>
+                    <p class="text-slate-600">Agents oversee supplier performance, manage lead times, and automate aspects of procurement. They can detect risks, like repeated late deliveries, and suggest or automatically switch to alternative suppliers, ensuring steady material flow. This fosters a stronger and more dependable supply network.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20" id="impact">
+            <h2 class="text-3xl font-bold text-slate-900 mb-2 text-center">Quantitative Impact Analysis</h2>
+            <p class="max-w-3xl mx-auto text-center text-slate-600 mb-10">
+                Agentic AI drives notable, quantifiable gains in critical metrics. The chart below illustrates the common impact ranges observed by companies leveraging these tools. Use the buttons to explore various KPIs and assess the real-world advantages.
+            </p>
+            <div class="flex flex-wrap justify-center gap-2 mb-8">
+                <button class="impact-btn px-4 py-2 bg-slate-800 text-white rounded-full shadow-sm font-medium" id="btn-costs">Cost Reductions</button>
+                <button class="impact-btn px-4 py-2 bg-white text-slate-700 rounded-full shadow-sm font-medium border border-slate-200" id="btn-efficiency">Efficiency Gains</button>
+                <button class="impact-btn px-4 py-2 bg-white text-slate-700 rounded-full shadow-sm font-medium border border-slate-200" id="btn-accuracy">Accuracy &amp; Service</button>
+            </div>
+            <div class="bg-white p-4 md:p-8 rounded-lg shadow-lg">
+                <div class="chart-container">
+                    <canvas id="impactChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20" id="pathway">
+            <h2 class="text-3xl font-bold text-slate-900 mb-2 text-center">Implementation Pathway</h2>
+            <p class="max-w-3xl mx-auto text-center text-slate-600 mb-10">
+                Embracing agentic AI is a calculated endeavor demanding thoughtful preparation and action. Though intricate, it unfolds in clear stages, from early data integration to ongoing evaluation and refinement. This approach outlines a streamlined guide for effective adoption.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-0">
+                <div class="process-step bg-white p-6 rounded-lg shadow-md w-full md:w-1/5 text-center">
+                    <div class="text-3xl font-bold text-amber-500 mb-2">1</div>
+                    <h3 class="font-semibold text-slate-800">Data Integration &amp; Preparation</h3>
+                    <p class="text-sm text-slate-500 mt-1">Consolidate and clean data from ERP, SCM, and IoT sources.</p>
+                </div>
+                <div class="text-2xl text-slate-400 mx-4 hidden md:block">→</div>
+                <div class="process-step bg-white p-6 rounded-lg shadow-md w-full md:w-1/5 text-center">
+                    <div class="text-3xl font-bold text-amber-500 mb-2">2</div>
+                    <h3 class="font-semibold text-slate-800">Model Development &amp; Training</h3>
+                    <p class="text-sm text-slate-500 mt-1">Train AI models using past data to identify and understand trends.</p>
+                </div>
+                <div class="text-2xl text-slate-400 mx-4 hidden md:block">→</div>
+                <div class="process-step bg-white p-6 rounded-lg shadow-md w-full md:w-1/5 text-center">
+                    <div class="text-3xl font-bold text-amber-500 mb-2">3</div>
+                    <h3 class="font-semibold text-slate-800">Simulation &amp; Validation</h3>
+                    <p class="text-sm text-slate-500 mt-1">Test agents in a simulated environment to validate their decisions.</p>
+                </div>
+                 <div class="text-2xl text-slate-400 mx-4 hidden md:block">→</div>
+                <div class="process-step bg-white p-6 rounded-lg shadow-md w-full md:w-1/5 text-center">
+                    <div class="text-3xl font-bold text-amber-500 mb-2">4</div>
+                    <h3 class="font-semibold text-slate-800">Phased Deployment</h3>
+                    <p class="text-sm text-slate-500 mt-1">Deploy agents gradually, beginning with lower-priority zones.</p>
+                </div>
+                 <div class="text-2xl text-slate-400 mx-4 hidden md:block">→</div>
+                <div class="process-step bg-white p-6 rounded-lg shadow-md w-full md:w-1/5 text-center">
+                    <div class="text-3xl font-bold text-amber-500 mb-2">5</div>
+                    <h3 class="font-semibold text-slate-800">Monitoring &amp; Optimization</h3>
+                    <p class="text-sm text-slate-500 mt-1">Continuously monitor performance and provide feedback to refine the agents.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="challenges">
+            <h2 class="text-3xl font-bold text-slate-900 mb-2 text-center">Challenges &amp; Considerations</h2>
+            <p class="max-w-3xl mx-auto text-center text-slate-600 mb-10">
+                Though impactful, adopting agentic AI comes with challenges. Businesses must tackle technical, financial, and cultural barriers to unlock its potential. Recognizing these factors is key to crafting an effective implementation plan.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Data Quality &amp; Integration</h3>
+                    <p>AI systems depend on vast amounts of reliable, unified data. Fragmented or uneven data poses significant challenges to model training and efficiency.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">High Initial Investment</h3>
+                    <p>AI software, skilled talent, and infrastructure can be pricey. Clear ROI analysis is key to justifying the spend.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Complexity &amp; Talent Gap</h3>
+                    <p>Building, implementing, and managing autonomous systems demands expert skills that are both highly sought after and scarce.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Building Trust in AI</h3>
+                    <p>Human operators might resist trusting autonomous choices. Clear communication and managing change are crucial for AI acceptance.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Security &amp; Governance</h3>
+                    <p>Autonomous agents interfacing with key systems introduce fresh security challenges. Strong governance structures are essential to oversee their behavior.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">Scalability &amp; Maintenance</h3>
+                    <p>Scaling the AI system alongside business growth and maintaining it effectively over time presents a major ongoing operational hurdle.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const smoothScrollLinks = document.querySelectorAll('a[href^="#"]');
+            smoothScrollLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            const capabilityTabs = document.querySelectorAll('.capability-tab');
+            const capabilityContents = document.querySelectorAll('.capability-content');
+            capabilityTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = document.getElementById(tab.dataset.target);
+
+                    capabilityTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    capabilityContents.forEach(content => content.classList.add('hidden'));
+                    target.classList.remove('hidden');
+                });
+            });
+
+            const impactData = {
+                costs: {
+                    title: 'Typical Cost Reductions (%)',
+                    labels: ['Inventory Holding', 'Logistics Costs', 'Administrative Costs', 'Procurement Spend'],
+                    data: [25, 15, 30, 10],
+                },
+                efficiency: {
+                    title: 'Typical Efficiency Gains (%)',
+                    labels: ['Production Throughput', 'Warehouse Capacity', 'Labor Productivity', 'Order Fulfilment Speed'],
+                    data: [20, 10, 40, 15],
+                },
+                accuracy: {
+                    title: 'Accuracy & Service Level Improvements (%)',
+                    labels: ['Forecast Accuracy', 'Service Levels (Fill Rate)', 'Reduction in Stockouts', 'Reduction in Defects'],
+                    data: [40, 20, 65, 25],
+                }
+            };
+
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            let impactChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: impactData.costs.labels,
+                    datasets: [{
+                        label: 'Improvement Percentage',
+                        data: impactData.costs.data,
+                        backgroundColor: 'rgba(245, 158, 11, 0.6)',
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Improvement (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: impactData.costs.title,
+                            font: {
+                                size: 18
+                            }
+                        },
+                        tooltip: {
+                           callbacks: {
+                               label: function(context) {
+                                   return context.dataset.label + ': ' + context.raw + '%';
+                               }
+                           }
+                        }
+                    }
+                }
+            });
+
+            function updateChart(dataType) {
+                const newData = impactData[dataType];
+                impactChart.data.labels = newData.labels;
+                impactChart.data.datasets[0].data = newData.data;
+                impactChart.options.plugins.title.text = newData.title;
+                impactChart.update();
+            }
+
+            const impactBtns = document.querySelectorAll('.impact-btn');
+            impactBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    impactBtns.forEach(b => {
+                        b.classList.remove('bg-slate-800', 'text-white');
+                        b.classList.add('bg-white', 'text-slate-700', 'border', 'border-slate-200');
+                    });
+                    e.target.classList.add('bg-slate-800', 'text-white');
+                    e.target.classList.remove('bg-white', 'text-slate-700', 'border', 'border-slate-200');
+                    
+                    if(e.target.id === 'btn-costs') updateChart('costs');
+                    if(e.target.id === 'btn-efficiency') updateChart('efficiency');
+                    if(e.target.id === 'btn-accuracy') updateChart('accuracy');
+                });
+            });
+        });
+    </script>
+
+
+</body></html>

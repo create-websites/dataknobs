@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Next-Generation Demand Sensing with LLMs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutrals (Slate, Muted Blue/Indigo) -->
+    <!-- Application Structure Plan: The application is designed as a single-page, narrative-driven vertical scroll. It starts with the problem (limitations of traditional forecasting), introduces the LLM-based solution with a process diagram, provides a hands-on interactive demo to make the concept tangible, quantifies the benefits with clear charts, and finally discusses implementation. This structure was chosen to guide the user logically from "what" and "why" to "how" and "what's the impact," making a complex technological concept accessible and understandable for a business and technical audience. The interactive demo is the centerpiece, allowing users to actively explore the model's behavior. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: The problem of forecast inaccuracy. -> Goal: Inform -> Viz: HTML/CSS diagram showing a simple forecast line vs. spiky actual sales. -> Interaction: None. -> Justification: A simple visual to establish the core problem quickly. -> Method: Tailwind CSS.
+        - Report Info: The proposed LLM process. -> Goal: Organize -> Viz: A 4-step flowchart. -> Interaction: None. -> Justification: Clearly explains the methodology in a digestible format. -> Method: HTML/Tailwind.
+        - Report Info: Demonstrating the LLM model's effectiveness. -> Goal: Compare/Relationships -> Viz: Line chart comparing 3 forecasts and dynamic 'Signal' cards. -> Interaction: Dropdown to select a product, which updates the chart and cards. -> Justification: This is the most critical interaction. It makes the abstract concept of an 'LLM signal' concrete by linking it directly to a visible improvement in forecast accuracy for a specific product. -> Library/Method: Chart.js, Vanilla JS.
+        - Report Info: Quantifying business impact. -> Goal: Compare/Inform -> Viz: Bar chart for accuracy comparison, Donut charts for metric improvements. -> Interaction: Hover tooltips on charts. -> Justification: Standard, easily understood business charts to summarize the value proposition. -> Library/Method: Chart.js.
+        - Report Info: Implementation details. -> Goal: Inform -> Viz: Styled list. -> Interaction: None. -> Justification: Simple text is sufficient for these concluding points. -> Method: HTML/Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .section-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+
+        <header class="text-center py-16 sm:py-24 section-fade-in">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 tracking-tight">
+                Next-Generation Demand Sensing
+            </h1>
+            <p class="mt-4 max-w-3xl mx-auto text-lg sm:text-xl text-slate-600">
+                Here are a few options, all similar in length and capturing the core meaning:
+
+*   **Using LLMs to generate innovative signals, reshaping food forecasting.**
+*   **Harnessing Large Language Models to forge new signals, boosting food prediction.**
+*   **Novel food forecasting: Powered by LLMs and innovative signal creation.**
+*   **Transforming food forecasting: LLMs and new signals drive innovation.**
+            </p>
+            <a class="mt-8 inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300" href="#interactive-demo">
+                See it in Action
+            </a>
+        </header>
+
+        <main>
+            <section class="py-16 sm:py-20 section-fade-in" id="challenge">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold text-slate-900">The Challenge with Traditional Forecasting</h2>
+                    <p class="mt-4 text-lg text-slate-600">Here's a rewritten line with a similar length, focusing on the core issue:
+
+Traditional demand models struggle in today's market. Built on past sales and set factors (promotions, etc.), they fail to capture the rapid shifts from social trends, viral content, and evolving consumer preferences, resulting in prediction errors.</p>
+                </div>
+                <div class="mt-12 max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xl">1</div>
+                            <div class="ml-4">
+                                <h3 class="text-xl font-semibold">Reactive, Not Predictive</h3>
+                                <p class="text-slate-600">Here are a few rewritten options, aiming for a similar length and meaning:
+
+*   Models lag behind sales, responding post-event and often failing to predict demand changes from unseen trends.
+*   Sales models are reactive, processing data after the fact and missing shifts caused by emerging, unquantified factors.
+*   Current models trail sales, reacting to past performance while struggling to forecast demand fluctuations from novel trends.
+*   Existing models are inherently backward-looking, reacting to sales data and faltering when facing unforeseen market forces.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xl">2</div>
+                            <div class="ml-4">
+                                <h3 class="text-xl font-semibold">Misses Social &amp; Cultural Trends</h3>
+                                <p class="text-slate-600">Here are a few options, all similar in length and capturing the core idea:
+
+*   Unexpected trends, like TikTok recipes or health crazes, can cause unpredictable demand spikes.
+*   Demand surges, fueled by trends like viral TikTok recipes or wellness fads, outpace historical forecasts.
+*   Predicting demand is tricky; TikTok recipes and health trends can suddenly create large, unforeseen needs.</p>
+                            </div>
+                        </div>
+                         <div class="flex items-start">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xl">3</div>
+                            <div class="ml-4">
+                                <h3 class="text-xl font-semibold">Data Latency</h3>
+                                <p class="text-slate-600">Weekly/monthly sales data lags, hindering quick responses to daily or hourly changes in consumer demand.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-lg">
+                       <div class="chart-container" style="height: 300px;">
+                            <canvas id="challengeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="py-16 sm:py-20 bg-white rounded-2xl shadow-sm section-fade-in" id="solution">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold text-slate-900">The LLM-Powered Solution</h2>
+                    <p class="mt-4 text-lg text-slate-600">Introducing a new framework leveraging LLMs to interpret the real-time digital landscape. It analyzes unstructured text from diverse sources to pinpoint emerging trends, quantifying them into actionable signals. These signals boost the accuracy and responsiveness of forecasting models.</p>
+                </div>
+                <div class="mt-12 max-w-6xl mx-auto grid md:grid-cols-4 gap-4 text-center">
+                    <div class="flex items-center md:block">
+                        <div class="p-6 bg-slate-100 rounded-lg flex-grow">
+                            <div class="text-3xl text-indigo-600">📡</div>
+                            <h3 class="mt-2 text-lg font-semibold">1. Data Ingestion</h3>
+                            <p class="text-sm text-slate-600">Here are a few options, all similar in length:
+
+*   Gather live, unstructured data from social feeds, news sites, and food blogs.
+*   Acquire real-time, raw data from sources such as social media and news outlets.
+*   Fetch live, unstructured data from the web: social media, news, and food content.
+*   Extract live, unstructured data from social platforms, news, and food websites.</p>
+                        </div>
+                        <div class="hidden md:block text-slate-300 text-4xl mx-auto my-4">↓</div>
+                        <div class="block md:hidden text-slate-300 text-4xl mx-4">→</div>
+                    </div>
+                    <div class="flex items-center md:block">
+                        <div class="p-6 bg-slate-100 rounded-lg flex-grow">
+                            <div class="text-3xl text-indigo-600">🧠</div>
+                            <h3 class="mt-2 text-lg font-semibold">2. LLM Analysis</h3>
+                            <p class="text-sm text-slate-600">Here are a few options, all similar in length and conveying a similar meaning:
+
+*   LLMs analyze text data to find food product trends, sentiment, and new topics.
+*   Analyzing food product text, LLMs uncover trends, sentiment, and evolving themes.
+*   Using text, LLMs extract trends, sentiment, and fresh insights about food products.
+*   LLMs mine text data, revealing trends, sentiment, and the evolution of food topics.</p>
+                        </div>
+                        <div class="hidden md:block text-slate-300 text-4xl mx-auto my-4">↓</div>
+                        <div class="block md:hidden text-slate-300 text-4xl mx-4">→</div>
+                    </div>
+                    <div class="flex items-center md:block">
+                         <div class="p-6 bg-slate-100 rounded-lg flex-grow">
+                            <div class="text-3xl text-indigo-600">📈</div>
+                            <h3 class="mt-2 text-lg font-semibold">3. Signal Creation</h3>
+                            <p class="text-sm text-slate-600">*   Analyze numerical signal data (e.g., 'Viral Recipe Index', 'Health Trend Score').</p>
+                        </div>
+                        <div class="hidden md:block text-slate-300 text-4xl mx-auto my-4">↓</div>
+                        <div class="block md:hidden text-slate-300 text-4xl mx-4">→</div>
+                    </div>
+                    <div>
+                        <div class="p-6 bg-slate-100 rounded-lg h-full">
+                            <div class="text-3xl text-indigo-600">🎯</div>
+                            <h3 class="mt-2 text-lg font-semibold">4. Model Integration</h3>
+                            <p class="text-sm text-slate-600">Here are a few options, all similar in length:
+
+*   **Incorporate fresh data to refine demand predictions.**
+*   **Update the model with new data for better forecasts.**
+*   **Improve forecasts by feeding the model new inputs.**
+*   **Refine predictions: feed updated signals to the model.**</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-16 sm:py-20 section-fade-in" id="interactive-demo">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold text-slate-900">Uncovering New Signals: An Interactive Demo</h2>
+                     <p class="mt-4 text-lg text-slate-600">Here are a few options, all similar in size and conveying the same information:
+
+**Option 1 (Concise):**
+
+&gt; Explore the impact of LLM-generated signals in this dashboard. Choose a food item to compare the LLM-driven sales forecast (blue) against the traditional method. Below, discover the real-time signals, like social trends, that powered the improved LLM prediction.
+
+**Option 2 (Slightly More Descriptive):**
+
+&gt; This dashboard highlights the power of LLM-generated insights. Pick a food product from the list to compare the LLM-enhanced sales forecast (blue) with the standard forecast. Below the chart, uncover the real-time signals, such as social media data, that contributed to the LLM's accuracy.
+
+**Option 3 (Emphasis on Interaction):**
+
+&gt; Interact with this dashboard to see LLM signals in action. Select a food item to compare the LLM forecast (blue), which utilizes dynamic signals, against a traditional forecast. Under the chart, explore the specific real-time signals, like social media buzz, that informed the LLM's prediction.
+
+All of these options maintain the core message, using a similar word count. Choose the one that best suits your desired tone and emphasis.</p>
+                </div>
+
+                <div class="mt-8 max-w-lg mx-auto">
+                    <label class="block text-sm font-medium text-slate-700" for="product-selector">Select a Product to Analyze</label>
+                    <select class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm" id="product-selector">
+                        <option selected="" value="oat_milk">Oat Milk</option>
+                        <option value="avocados">Avocados</option>
+                        <option value="quinoa">Quinoa</option>
+                        <option value="feta_cheese">Feta Cheese</option>
+                    </select>
+                </div>
+
+                <div class="mt-12 bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-xl font-semibold text-center mb-4" id="chart-title">Weekly Sales Forecast: Oat Milk</h3>
+                    <div class="chart-container">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="mt-12">
+                     <h3 class="text-2xl font-bold text-center text-slate-900">Key LLM-Generated Signals Driving the Forecast</h3>
+                     <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="signals-container">
+                     </div>
+                </div>
+            </section>
+            
+            <section class="py-16 sm:py-20 bg-white rounded-2xl shadow-sm section-fade-in" id="impact">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold text-slate-900">The Quantifiable Impact</h2>
+                    <p class="mt-4 text-lg text-slate-600">By leveraging LLM insights, companies can drive substantial, quantifiable gains throughout their supply chains. The following charts illustrate these improvements across crucial metrics. They compare forecast accuracy of different models, showcasing waste reduction and fewer stockouts, and proving the technology's strong ROI.</p>
+                </div>
+                <div class="mt-12 max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+                     <div class="bg-slate-50 p-4 rounded-xl">
+                        <h3 class="text-xl font-semibold text-center mb-4 text-slate-800">Forecast Accuracy (Lower is Better)</h3>
+                        <div class="chart-container" style="height: 350px;">
+                            <canvas id="accuracyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="space-y-8">
+                        <div>
+                           <h3 class="text-xl font-semibold text-center mb-4 text-slate-800">Reduction in Spoilage &amp; Waste</h3>
+                           <div class="chart-container" style="height: 200px; max-width: 200px;">
+                                <canvas id="spoilageChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                           <h3 class="text-xl font-semibold text-center mb-4 text-slate-800">Increase in On-Shelf Availability</h3>
+                            <div class="chart-container" style="height: 200px; max-width: 200px;">
+                                <canvas id="availabilityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="py-16 sm:py-20 section-fade-in" id="implementation">
+                <div class="max-w-4xl mx-auto">
+                     <h2 class="text-3xl font-bold text-slate-900 text-center">Implementation &amp; Considerations</h2>
+                      <p class="mt-4 text-lg text-slate-600 text-center">Implementing an LLM-driven demand sensing system is strategic, demanding meticulous planning. This concluding part details vital elements and implementation hurdles, encompassing data acquisition, technical infrastructure development, and team skill cultivation. </p>
+                    <div class="mt-10 grid md:grid-cols-2 gap-8 text-lg">
+                        <div class="bg-white p-8 rounded-lg shadow-sm">
+                            <h3 class="text-2xl font-semibold mb-4 text-slate-900">What You Need</h3>
+                            <ul class="space-y-3 list-disc list-inside text-slate-700">
+                                <li>Access to diverse, real-time data streams.</li>
+                                <li>Cloud computing infrastructure for data processing.</li>
+                                <li>LLM APIs (e.g., Gemini, OpenAI) or self-hosted models.</li>
+                                <li>Data science and ML engineering talent.</li>
+                                <li>Integration with existing forecasting and ERP systems.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-8 rounded-lg shadow-sm">
+                            <h3 class="text-2xl font-semibold mb-4 text-slate-900">Potential Challenges</h3>
+                            <ul class="space-y-3 list-disc list-inside text-slate-700">
+                                <li>Ensuring data quality and filtering out noise.</li>
+                                <li>Managing the computational cost of LLM inference.</li>
+                                <li>Model explainability and building trust with planners.</li>
+                                <li>Keeping up with the rapid evolution of LLM technology.</li>
+                                <li>Data privacy and ethical considerations.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const mockData = {
+                challenge: {
+                    labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'],
+                    actual: [100, 105, 110, 108, 150, 165, 120, 115, 118, 120, 122, 125],
+                    forecast: [102, 106, 109, 110, 112, 113, 115, 116, 117, 118, 120, 121],
+                },
+                products: {
+                    'oat_milk': {
+                        name: 'Oat Milk',
+                        labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'],
+                        actual: [500, 520, 580, 750, 780, 600, 580, 590, 610, 600, 620, 630],
+                        traditional: [510, 515, 520, 525, 530, 535, 540, 545, 550, 555, 560, 565],
+                        llm: [505, 525, 570, 740, 770, 620, 590, 595, 605, 605, 615, 625],
+                        signals: [
+                            { title: '🌱 Veganuary Trend', detail: 'Increased social media mentions of "plant-based" and "veganuary" correlated with sales spike.', strength: 9.2 },
+                            { title: '☕ Barista Endorsements', detail: 'Popular coffee shop chains promoting oat milk lattes led to higher consumer interest.', strength: 8.5 },
+                            { title: '⬇️ Almond Milk Criticism', detail: 'Negative news articles about almond production\'s water usage shifted demand.', strength: 7.0 }
+                        ]
+                    },
+                    'avocados': {
+                        name: 'Avocados',
+                        labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'],
+                        actual: [1000, 1050, 1080, 1100, 1400, 1200, 1150, 1180, 1200, 1220, 1250, 1280],
+                        traditional: [1020, 1040, 1060, 1080, 1100, 1120, 1140, 1160, 1180, 1200, 1220, 1240],
+                        llm: [1010, 1060, 1090, 1120, 1380, 1250, 1160, 1170, 1190, 1210, 1240, 1270],
+                        signals: [
+                            { title: '🥑 Super Bowl Spike', detail: 'Chatter about guacamole recipes and game-day parties predicted a massive sales lift in Week 5.', strength: 9.8 },
+                            { title: '☀️ "Healthy Fats" News Cycle', detail: 'Major health publications featured benefits of monounsaturated fats, boosting interest.', strength: 8.0 },
+                            { title: ' toast on Instagram', detail: 'Sustained visual trend on social media maintains a high baseline demand.', strength: 7.5 }
+                        ]
+                    },
+                    'quinoa': {
+                        name: 'Quinoa',
+                        labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'],
+                        actual: [300, 310, 320, 450, 460, 440, 330, 340, 335, 345, 350, 355],
+                        traditional: [305, 310, 315, 320, 325, 330, 335, 340, 345, 350, 355, 360],
+                        llm: [302, 315, 325, 445, 465, 450, 340, 345, 340, 345, 350, 355],
+                        signals: [
+                            { title: '🥗 "New Year Resolution" Signal', detail: 'LLM detected surge in "healthy eating" and "meal prep" keywords in January.', strength: 9.5 },
+                            { title: '🌾 Gluten-Free Community Buzz', detail: 'High traffic on gluten-free blogs and forums mentioning quinoa as a staple.', strength: 7.8 },
+                            { title: ' celebrity Diet Plan', detail: 'A-list celebrity mentioned a quinoa-based diet in a magazine interview.', strength: 8.2 }
+                        ]
+                    },
+                    'feta_cheese': {
+                        name: 'Feta Cheese',
+                        labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'],
+                        actual: [400, 410, 800, 850, 700, 500, 450, 460, 455, 465, 470, 475],
+                        traditional: [405, 410, 415, 420, 425, 430, 435, 440, 445, 450, 455, 460],
+                        llm: [408, 415, 780, 860, 720, 530, 460, 465, 460, 465, 470, 475],
+                        signals: [
+                            { title: '🍝 Viral TikTok Recipe', detail: 'The "Baked Feta Pasta" trend caused an unprecedented, sharp increase in demand.', strength: 10.0 },
+                            { title: '☀️ Summer Salad Season', detail: 'Seasonal increase in searches for "Greek salad" and "watermelon feta salad".', strength: 7.5 },
+                            { title: ' Mediterranean Diet Popularity', detail: 'Sustained media focus on the health benefits of the Mediterranean diet.', strength: 8.0 }
+                        ]
+                    }
+                }
+            };
+            
+            const chartJsConfig = {
+                defaults: {
+                    font: {
+                        family: 'Inter',
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#475569',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#64748b' },
+                            grid: { color: '#e2e8f0' }
+                        },
+                        x: {
+                            ticks: { color: '#64748b' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            };
+
+            Chart.defaults.font.family = 'Inter';
+            Chart.defaults.color = '#334155';
+            
+            let forecastChart, accuracyChart, spoilageChart, availabilityChart, challengeChart;
+            
+            const renderChallengeChart = () => {
+                const ctx = document.getElementById('challengeChart').getContext('2d');
+                challengeChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: mockData.challenge.labels,
+                        datasets: [{
+                            label: 'Actual Sales',
+                            data: mockData.challenge.actual,
+                            borderColor: '#4f46e5',
+                            backgroundColor: '#4f46e520',
+                            fill: false,
+                            tension: 0.1,
+                            borderWidth: 3
+                        }, {
+                            label: 'Traditional Forecast',
+                            data: mockData.challenge.forecast,
+                            borderColor: '#64748b',
+                            backgroundColor: '#64748b20',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.1,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: { display: true, text: 'Actual Sales vs. Traditional Forecast' },
+                            legend: { position: 'bottom' }
+                        },
+                         scales: { y: { beginAtZero: true, title: { display: true, text: 'Units Sold' }}}
+                    }
+                });
+            };
+
+            const renderForecastChart = (productKey) => {
+                const product = mockData.products[productKey];
+                const ctx = document.getElementById('forecastChart').getContext('2d');
+                if (forecastChart) {
+                    forecastChart.destroy();
+                }
+                forecastChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: product.labels,
+                        datasets: [
+                            {
+                                label: 'Actual Sales',
+                                data: product.actual,
+                                borderColor: '#059669',
+                                borderWidth: 4,
+                                fill: false,
+                                tension: 0.4,
+                                pointRadius: 2,
+                                pointBackgroundColor: '#059669'
+                            },
+                            {
+                                label: 'LLM-Enhanced Forecast',
+                                data: product.llm,
+                                borderColor: '#4f46e5',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Traditional Forecast',
+                                data: product.traditional,
+                                borderColor: '#9ca3af',
+                                borderDash: [5, 5],
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: { y: { beginAtZero: false, title: { display: true, text: 'Units Sold' }}}
+                    }
+                });
+            };
+
+            const renderImpactCharts = () => {
+                const accuracyCtx = document.getElementById('accuracyChart').getContext('2d');
+                accuracyChart = new Chart(accuracyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Traditional Model', 'Traditional + Events', 'LLM-Enhanced Model'],
+                        datasets: [{
+                            label: 'Mean Absolute Percentage Error (MAPE)',
+                            data: [18.2, 14.5, 6.8],
+                            backgroundColor: ['#9ca3af', '#60a5fa', '#4f46e5'],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, title: { display: true, text: 'Error %' }}}
+                    }
+                });
+                
+                const createDoughnutChart = (id, data, color, label) => {
+                    const ctx = document.getElementById(id).getContext('2d');
+                    return new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: [label, ''],
+                            datasets: [{ data: [data, 100 - data], backgroundColor: [color, '#e5e7eb'], borderWidth: 0 }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '75%',
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { enabled: false }
+                            }
+                        }
+                    });
+                };
+                
+                spoilageChart = createDoughnutChart('spoilageChart', 22, '#ef4444', 'Reduction');
+                availabilityChart = createDoughnutChart('availabilityChart', 15, '#22c55e', 'Increase');
+
+                const addDoughnutText = (chartId, text) => {
+                    const chartElement = document.getElementById(chartId).parentElement;
+                    const textElement = document.createElement('div');
+                    textElement.style.position = 'absolute';
+                    textElement.style.top = '50%';
+                    textElement.style.left = '50%';
+                    textElement.style.transform = 'translate(-50%, -50%)';
+                    textElement.style.textAlign = 'center';
+                    textElement.innerHTML = `<span class="text-3xl font-bold text-slate-800">${text}%</span>`;
+                    chartElement.style.position = 'relative';
+                    chartElement.appendChild(textElement);
+                };
+                addDoughnutText('spoilageChart', '22');
+                addDoughnutText('availabilityChart', '15');
+            };
+
+            const updateDashboard = (productKey) => {
+                const product = mockData.products[productKey];
+                document.getElementById('chart-title').innerText = `Weekly Sales Forecast: ${product.name}`;
+                renderForecastChart(productKey);
+
+                const signalsContainer = document.getElementById('signals-container');
+                signalsContainer.innerHTML = '';
+
+                product.signals.forEach(signal => {
+                    const signalEl = document.createElement('div');
+                    signalEl.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300';
+                    signalEl.innerHTML = `
+                        <h4 class="text-lg font-semibold text-indigo-700">${signal.title}</h4>
+                        <p class="mt-2 text-slate-600">${signal.detail}</p>
+                        <div class="mt-4">
+                            <span class="text-sm font-medium text-slate-500">Signal Strength</span>
+                            <div class="w-full bg-slate-200 rounded-full h-2.5 mt-1">
+                                <div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${signal.strength * 10}%"></div>
+                            </div>
+                        </div>
+                    `;
+                    signalsContainer.appendChild(signalEl);
+                });
+            };
+
+            document.getElementById('product-selector').addEventListener('change', (e) => {
+                updateDashboard(e.target.value);
+            });
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.section-fade-in').forEach(section => {
+                observer.observe(section);
+            });
+            
+            renderChallengeChart();
+            renderImpactCharts();
+            updateDashboard('oat_milk');
+        });
+    </script>
+
+
+</body></html>

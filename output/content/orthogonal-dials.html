@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Report: Orthogonal Dials in AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutrals (Stone, Amber, Sky) -->
+    <!-- Application Structure Plan: The SPA is designed around a non-linear, thematic structure, allowing users to select one of the three core paradigms (Engineer, Researcher, Philosopher) from a primary navigation hub. This immediately breaks the linear flow of the source report, promoting user-driven exploration. Each paradigm is presented as a self-contained section with tailored interactive elements: an interactive flowchart for the Engineer's "dials," a comparative chart and detailed views for the Researcher's technical tools, and a visually-supported narrative for the Philosopher's thesis. This structure was chosen to make the dense, multi-faceted topic accessible by allowing users to engage with the content that is most relevant to their interests first, rather than forcing them through foundational concepts they may already know. The goal is to facilitate understanding through targeted interaction and logical, user-centric chunking of information. -->
+    <!-- Visualization & Content Choices: 1. Main Paradigms (Report Table 1): Goal=Navigate/Inform -> Method=Interactive cards -> Interaction=Click to reveal section -> Justification=Core non-linear navigation. 2. Engineer's Dials (Report Table 2): Goal=Organize/Compare -> Method=Interactive HTML/CSS flowchart -> Interaction=Click on problem to highlight solutions -> Justification=Makes the diagnostic process tangible. 3. Researcher's Techniques (Report Table 3): Goal=Compare -> Method=Chart.js bar chart for cost + HTML table for details -> Interaction=Hover/Click for info -> Justification=Visualizes quantitative trade-offs effectively. 4. Philosopher's Thesis: Goal=Inform -> Method=HTML/CSS diagram of orthogonal axes -> Interaction=Static -> Justification=Simple visual metaphor for a complex idea. 5. Advanced Applications: Goal=Organize -> Method=Accordion component -> Interaction=Click to expand -> Justification=Manages complexity and prevents information overload. All visualizations use Canvas or HTML/CSS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .active-nav { background-color: #0c4a6e; color: white; }
+        .inactive-nav { background-color: #e0f2fe; color: #075985; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .interactive-diagram-item.highlight { background-color: #fef9c3; border-color: #facc15; }
+        .chart-container { position: relative; width: 100%; max-width: 768px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-sky-900 mb-2">Orthogonal Dials in AI</h1>
+            <p class="text-lg text-stone-600 max-w-3xl mx-auto">Here are a few options, all similar in length and capturing the essence of the original:
+
+*   **A deep dive into orthogonality's ML paradigms: Control, strategy, and safety, unified.**
+*   **Explore orthogonality's impact: A unified ML framework for control, strategy, and safety.**
+*   **Unifying ML through orthogonality: Exploring control, strategy, and safety paradigms.**
+*   **Interactive look at ML: Orthogonality's three paradigms of control, strategy, and safety.**</p>
+        </header>
+
+        <nav class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12" id="main-nav">
+            <button class="nav-button p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-left" data-target="engineer">
+                <h2 class="text-xl font-bold mb-2">The Engineer's Dial</h2>
+                <p class="text-sm">Here are a few options, all similar in length and capturing the core meaning:
+
+*   **A practical approach to swiftly creating and troubleshooting intricate ML systems.**
+*   **Building and debugging complex ML systems: a pragmatic and efficient methodology.**
+*   **Efficiently constructing and debugging intricate ML systems: a practical strategy.**
+*   **Pragmatic tactics for rapid construction and effective debugging of complex ML.**</p>
+            </button>
+            <button class="nav-button p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-left" data-target="researcher">
+                <h2 class="text-xl font-bold mb-2">The Researcher's Toolkit</h2>
+                <p class="text-sm">Here are a few options, all of similar length and capturing the core meaning:
+
+*   **A method for building dependable, clear, and resilient models.**
+*   **Enabling the design of reliable, understandable, and strong models.**
+*   **Technique for developing solid, transparent, and enduring model structures.**
+*   **Facilitating the construction of stable, explainable, and durable model designs.**</p>
+            </button>
+            <button class="nav-button p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-left" data-target="philosopher">
+                <h2 class="text-xl font-bold mb-2">The Philosopher's Thesis</h2>
+                <p class="text-sm">Here are a few options, all similar in length:
+
+*   AI safety thesis: Intelligence vs. goal alignment.
+*   Thesis: AI safety and the intelligence-goal gap.
+*   Exploring AI safety: Goals and intelligence independence.
+*   AI safety research: Separating intelligence from goals.
+*   Focus: AI safety and intelligence/goal disconnect.</p>
+            </button>
+        </nav>
+
+        <main id="main-content">
+            <div class="text-center py-16 px-6 bg-white rounded-lg shadow-lg" id="welcome-message">
+                <h2 class="text-2xl font-bold text-sky-800 mb-2">Welcome</h2>
+                <p class="text-stone-600">Choose one of the three paradigms to start exploring.</p>
+            </div>
+
+            <!-- Engineer's Dial Section -->
+            <section class="content-section bg-white rounded-lg shadow-lg p-6 md:p-8" id="engineer">
+                <h2 class="text-3xl font-bold text-sky-900 mb-4">The Engineer's Dial: A Strategy for ML Projects</h2>
+                <p class="text-stone-700 mb-6">Drawing inspiration from Andrew Ng's approach, this guide views modularity as a key project management strategy. The principle centers on independent controls, akin to 'dials,' designed for focused problem-solving within the ML lifecycle. This promotes structured development, reducing debugging complexity. This document serves as a web resource, offering a guide to the 'assumption chain' for identifying and resolving performance bottlenecks in supervised learning.</p>
+                
+                <div class="border-l-4 border-sky-200 pl-4 mb-8">
+                     <p class="text-stone-600 italic">Here are a few options, all similar in length and capturing the essence of the original:
+
+*   ML engineering aims to make the development cycle less "helicopter" and more "radio dial."
+*   In ML, the ideal workflow resembles radio tuning, not the complex piloting of a helicopter.
+*   The aim in ML is to shift from helicopter-like complexity to radio-like simplicity in development.
+*   ML engineers seek a development process that's akin to tuning a radio, rather than flying a helicopter.</p>
+                </div>
+                
+                <h3 class="text-2xl font-semibold mb-6 text-center text-stone-700">Interactive Diagnostic Flowchart</h3>
+                <div class="space-y-4">
+                    <div class="interactive-diagram-item border-2 border-stone-200 rounded-lg p-4 cursor-pointer hover:bg-stone-100 transition-colors" id="diagram-item-1">
+                        <h4 class="font-bold text-lg text-sky-800">1. Fit Training Set Well</h4>
+                        <p class="text-sm text-stone-600">Issue: Significant preventable bias. Training accuracy is low.</p>
+                    </div>
+                    <div class="hidden ml-8 p-4 bg-amber-50 rounded-lg border-l-4 border-amber-400" id="solution-1">
+                        <h5 class="font-semibold text-amber-900">Orthogonal "Knobs":</h5>
+                        <ul class="list-disc list-inside text-stone-700 mt-2">
+                            <li>Use a bigger neural network.</li>
+                            <li>Switch to a better optimization algorithm (e.g., Adam).</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-center"><span class="text-sky-500 font-bold text-2xl">↓</span></div>
+
+                    <div class="interactive-diagram-item border-2 border-stone-200 rounded-lg p-4 cursor-pointer hover:bg-stone-100 transition-colors" id="diagram-item-2">
+                        <h4 class="font-bold text-lg text-sky-800">2. Fit Dev Set Well</h4>
+                        <p class="text-sm text-stone-600">Here are a few rewritten options, similar in length and conveying the same meaning:
+
+*   **Issue: Significant variance. Dev set performance lags training.**
+*   **Challenge: High variance. Training set overfits, dev set underperforms.**
+*   **Problem: Overfitting detected. Dev set results severely degrade.**
+*   **Variance problem: Poor generalization. Big gap between training/dev.**
+*   **Variance issue: Model overfits training data; dev set suffers.**</p>
+                    </div>
+                     <div class="hidden ml-8 p-4 bg-amber-50 rounded-lg border-l-4 border-amber-400" id="solution-2">
+                        <h5 class="font-semibold text-amber-900">Orthogonal "Knobs":</h5>
+                        <ul class="list-disc list-inside text-stone-700 mt-2">
+                            <li>Apply regularization (e.g., L2, dropout).</li>
+                            <li>Acquire a larger training set.</li>
+                        </ul>
+                    </div>
+
+                     <div class="flex justify-center"><span class="text-sky-500 font-bold text-2xl">↓</span></div>
+
+                    <div class="interactive-diagram-item border-2 border-stone-200 rounded-lg p-4 cursor-pointer hover:bg-stone-100 transition-colors" id="diagram-item-3">
+                        <h4 class="font-bold text-lg text-sky-800">3. Fit Test Set Well</h4>
+                        <p class="text-sm text-stone-600">Here are a few rewrites of the line, keeping a similar length and conveying the same issue:
+
+*   **Issue:** Dev set overfitting leads to poor test performance.
+*   **Challenge:** Model overfits dev data, hurts test results.
+*   **Concern:** Overfitting the development set causes test set failure.
+*   **The Problem:** Overfit dev data; weak test set score.</p>
+                    </div>
+                     <div class="hidden ml-8 p-4 bg-amber-50 rounded-lg border-l-4 border-amber-400" id="solution-3">
+                        <h5 class="font-semibold text-amber-900">Orthogonal "Knobs":</h5>
+                        <ul class="list-disc list-inside text-stone-700 mt-2">
+                            <li>Acquire a larger development set.</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-center"><span class="text-sky-500 font-bold text-2xl">↓</span></div>
+
+                    <div class="interactive-diagram-item border-2 border-stone-200 rounded-lg p-4 cursor-pointer hover:bg-stone-100 transition-colors" id="diagram-item-4">
+                        <h4 class="font-bold text-lg text-sky-800">4. Perform Well in Real World</h4>
+                        <p class="text-sm text-stone-600">Issue: Poor model performance due to data mismatch or metric issues in real-world application.</p>
+                    </div>
+                     <div class="hidden ml-8 p-4 bg-amber-50 rounded-lg border-l-4 border-amber-400" id="solution-4">
+                        <h5 class="font-semibold text-amber-900">Orthogonal "Knobs":</h5>
+                        <ul class="list-disc list-inside text-stone-700 mt-2">
+                            <li>Change the dev/test set to better reflect reality.</li>
+                            <li>Change the cost function or evaluation metric.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Researcher's Toolkit Section -->
+            <section class="content-section bg-white rounded-lg shadow-lg p-6 md:p-8" id="researcher">
+                <h2 class="text-3xl font-bold text-sky-900 mb-4">The Researcher's Toolkit: A Mathematical Instrument</h2>
+                <p class="text-stone-700 mb-6">Orthogonality, rooted in linear algebra, is a technical means to ensure mathematical independence in models. This aids in stability (e.g., gradient management), interpretability, and fairness through feature decorrelation. This section examines the practical choices involved in applying various orthogonalization techniques.</p>
+                
+                <h3 class="text-2xl font-semibold mb-6 text-stone-700">Comparison of Orthogonalization Techniques in Deep Learning</h3>
+                <p class="text-stone-600 mb-6">Orthogonalizing neural network weights aids stability, though approaches vary in their cost. This chart illustrates the computational expenses of several common orthogonalization methods; higher values represent greater expense.</p>
+                <div class="chart-container mb-8">
+                    <canvas id="researcherChart"></canvas>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-sky-50">
+                            <tr>
+                                <th class="p-3 font-semibold text-sm text-sky-800 border-b">Technique</th>
+                                <th class="p-3 font-semibold text-sm text-sky-800 border-b">Mechanism</th>
+                                <th class="p-3 font-semibold text-sm text-sky-800 border-b">Guarantees</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-stone-50">
+                                <td class="p-3 border-b border-stone-200 font-medium">Orthogonal Initialization</td>
+                                <td class="p-3 border-b border-stone-200 text-stone-600">Set initial weights to be orthogonal.</td>
+                                <td class="p-3 border-b border-stone-200 text-stone-600">Only at the start of training.</td>
+                            </tr>
+                            <tr class="hover:bg-stone-50">
+                                <td class="p-3 border-b border-stone-200 font-medium">Soft Regularization</td>
+                                <td class="p-3 border-b border-stone-200 text-stone-600">Incorporate an orthogonality penalty into the loss function.</td>
+                                <td class="p-3 border-b border-stone-200 text-stone-600">Approximate orthogonality.</td>
+                            </tr>
+                            <tr class="hover:bg-stone-50">
+                                <td class="p-3 border-b border-stone-200 font-medium">Hard Constraint (SVD)</td>
+                                <td class="p-3 border-b border-stone-200 text-stone-600">Re-project weights onto orthogonal manifold with SVD after each update.</td>
+                                <td class="p-3 border-b border-stone-200 text-stone-600">Strict orthogonality.</td>
+                            </tr>
+                            <tr class="hover:bg-stone-50">
+                                <td class="p-3 border-b border-stone-200 font-medium">Newton's Iteration (ONI)</td>
+                                <td class="p-3 border-b border-stone-200 text-stone-600">Employ iteration to converge singular values effectively toward unity.</td>
+                                <td class="p-3 border-b border-stone-200 text-stone-600">Controllable orthogonality.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+
+            <!-- Philosopher's Thesis Section -->
+            <section class="content-section bg-white rounded-lg shadow-lg p-6 md:p-8" id="philosopher">
+                <h2 class="text-3xl font-bold text-sky-900 mb-4">The Philosopher's Thesis: Intelligence vs. Goals</h2>
+                <p class="text-stone-700 mb-6">Nick Bostrom and Eliezer Yudkowsky's Orthogonality Thesis, central to AI safety, delves into intelligent agents.  It's not math-focused, but rather about agent nature. The thesis argues agent intelligence and goals are separate ("orthogonal"). A smart agent doesn't inherently pursue human-friendly aims. This crucial concept will now be investigated.</p>
+                
+                <div class="bg-sky-50 border-l-4 border-sky-500 rounded-r-lg p-6 my-8">
+                    <h3 class="text-xl font-semibold text-sky-900 mb-4">Visualizing the Thesis</h3>
+                    <div class="relative w-full h-64">
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-stone-300"></div>
+                        <div class="absolute bottom-0 left-0 w-1 h-full bg-stone-300"></div>
+                        
+                        <div class="absolute bottom-0 left-0 w-full h-1">
+                            <div class="absolute top-1/2 left-full -translate-y-1/2 ml-2 text-stone-600 font-semibold">Intelligence →</div>
+                        </div>
+                        <div class="absolute bottom-full left-0 w-1 h-full mb-2">
+                             <div class="absolute top-0 left-1/2 -translate-x-1/2 -mt-6 text-stone-600 font-semibold">↑ Goals</div>
+                        </div>
+
+                        <div class="absolute bottom-[25%] left-[75%]">
+                           <div class="w-4 h-4 bg-red-500 rounded-full"></div>
+                           <p class="text-xs text-red-600 -ml-8 mt-1">Superintelligent Paperclip Maximizer</p>
+                        </div>
+
+                         <div class="absolute bottom-[80%] left-[20%]">
+                           <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+                           <p class="text-xs text-green-600 -ml-4 mt-1">Human-Aligned AI</p>
+                        </div>
+
+                        <div class="absolute bottom-[50%] left-[45%]">
+                           <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
+                           <p class="text-xs text-blue-600 -ml-4 mt-1">Apathetic Chess AI</p>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-sm text-stone-600">This plot depicts an agent's presence in 2D space, where intelligence doesn't guarantee desirable goals. A highly intelligent entity might pursue an odd objective, like relentless paperclip production.</p>
+                </div>
+
+                <div class="prose max-w-none text-stone-700">
+                    <h4>The Core Claim</h4>
+                    <p>Intelligence and goals are distinct: any intelligence level can pursue any end. Superior intellect doesn't inherently breed morality. This undermines the notion that superintelligence would naturally adopt human values.</p>
+                    
+                    <h4>Implications for AI Safety</h4>
+                    <p>The thesis leads to a critical conclusion: <strong class="text-sky-800">benevolence must be explicitly designed into an AI system.</strong> Without careful design, it won't just happen. The "paperclip maximizer" scenario shows why: an AI fixated on making paperclips could, through cleverness, repurpose everything—even us—for that purpose, not from ill intent, but because it's optimizing its objective. This exposes the core difficulty of AI alignment: making sure AI goals perfectly reflect human values.</p>
+                </div>
+            </section>
+            
+            <!-- Advanced Applications Section -->
+            <section class="bg-white rounded-lg shadow-lg p-6 md:p-8 mt-12" id="applications">
+                 <h2 class="text-3xl font-bold text-sky-900 mb-4 text-center">Advanced Applications &amp; Frontiers</h2>
+                 <p class="text-stone-700 mb-8 max-w-3xl mx-auto text-center">Here's a rewritten version of similar length:
+
+Orthogonality's principles go beyond theory, powering AI solutions. This ranges from generative model control to ensuring causal inference's statistical strength. This section will briefly explore critical research areas.</p>
+                 
+                 <div class="space-y-4 max-w-4xl mx-auto">
+                    <details class="group bg-stone-50 p-4 rounded-lg cursor-pointer">
+                        <summary class="font-semibold text-lg text-sky-800 flex justify-between items-center">
+                            Generative Models: Orthogonal Finetuning (OFT)
+                            <span class="text-sky-600 transition-transform group-open:rotate-90">→</span>
+                        </summary>
+                        <div class="mt-4 text-stone-600">
+                            <p>During the fine-tuning of large models (e.g., Stable Diffusion), a potential issue is "catastrophic forgetting" - the loss of prior learned knowledge. <strong>Orthogonal Finetuning (OFT)</strong> Rather than altering weights directly, OFT learns an orthogonal (rotational) transformation. This method preserves angles and distances, allowing the model to adapt while retaining its fundamental geometric knowledge, resulting in improved performance and data efficiency.</p>
+                        </div>
+                    </details>
+                    <details class="group bg-stone-50 p-4 rounded-lg cursor-pointer">
+                        <summary class="font-semibold text-lg text-sky-800 flex justify-between items-center">
+                            Causal Inference: Double Machine Learning (DML)
+                             <span class="text-sky-600 transition-transform group-open:rotate-90">→</span>
+                        </summary>
+                         <div class="mt-4 text-stone-600">
+                            <p>To isolate a treatment's genuine impact, we need to neutralize the effects of confounders. <strong>Double/Debiased Machine Learning (DML)</strong> This method achieves causal inference via orthogonalization. It employs models to predict outcome and treatment, both using confounders. Analyzing residuals (confounder-unrelated parts) ensures the treatment effect is statistically orthogonal to confounding. This allows for reliable, unbiased causal estimates, even with complex, opaque models.</p>
+                        </div>
+                    </details>
+                    <details class="group bg-stone-50 p-4 rounded-lg cursor-pointer">
+                        <summary class="font-semibold text-lg text-sky-800 flex justify-between items-center">
+                            Large Language Models: Inference-Time Steering
+                             <span class="text-sky-600 transition-transform group-open:rotate-90">→</span>
+                        </summary>
+                         <div class="mt-4 text-stone-600">
+                            <p>Managing LLM characteristics (e.g., accuracy, style) is difficult. Recent approaches employ independent controls during generation. <strong>Self-Control framework</strong>Leveraging latent space gradients, such as those targeting "truthfulness," allows for dynamic control over an LLM's outputs. This method subtly adjusts model activations—and, optionally, other control vectors—to steer behavior in real-time, effectively creating internal, adjustable behavioral controls without retraining.</p>
+                        </div>
+                    </details>
+                 </div>
+            </section>
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const welcomeMessage = document.getElementById('welcome-message');
+
+            function setActiveSection(targetId) {
+                welcomeMessage.style.display = 'none';
+                
+                navButtons.forEach(button => {
+                    if (button.dataset.target === targetId) {
+                        button.classList.add('active-nav');
+                        button.classList.remove('inactive-nav');
+                    } else {
+                        button.classList.add('inactive-nav');
+                        button.classList.remove('active-nav');
+                    }
+                });
+
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+            }
+
+            navButtons.forEach(button => {
+                button.classList.add('inactive-nav');
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    setActiveSection(targetId);
+                });
+            });
+
+            // Engineer's Diagram Interactivity
+            const diagramItems = document.querySelectorAll('.interactive-diagram-item');
+            diagramItems.forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    const solutionId = `solution-${index + 1}`;
+                    const solutionEl = document.getElementById(solutionId);
+                    
+                    // Toggle highlight and visibility
+                    item.classList.toggle('highlight');
+                    solutionEl.classList.toggle('hidden');
+
+                    // Close others
+                    diagramItems.forEach((otherItem, otherIndex) => {
+                        if (index !== otherIndex) {
+                            otherItem.classList.remove('highlight');
+                            document.getElementById(`solution-${otherIndex + 1}`).classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            // Researcher's Chart
+            const ctx = document.getElementById('researcherChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Orthogonal Init.', 'Soft Regularization', 'Newton\'s Iteration (ONI)', 'Hard Constraint (SVD)'],
+                        datasets: [{
+                            label: 'Relative Computational Cost',
+                            data: [10, 40, 60, 95],
+                            backgroundColor: [
+                                'rgba(56, 189, 248, 0.6)',
+                                'rgba(251, 191, 36, 0.6)',
+                                'rgba(249, 115, 22, 0.6)',
+                                'rgba(239, 68, 68, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(56, 189, 248, 1)',
+                                'rgba(251, 191, 36, 1)',
+                                'rgba(249, 115, 22, 1)',
+                                'rgba(239, 68, 68, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Computational Cost of Orthogonalization Techniques',
+                                font: { size: 16 },
+                                color: '#44403c'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.x !== null) {
+                                            const val = context.parsed.x;
+                                            if (val < 20) label += 'Low';
+                                            else if (val < 50) label += 'Medium';
+                                            else if (val < 80) label += 'Medium-High';
+                                            else label += 'High';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        if (value === 0) return 'Low';
+                                        if (value === 50) return 'Medium';
+                                        if (value === 100) return 'High';
+                                        return null;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

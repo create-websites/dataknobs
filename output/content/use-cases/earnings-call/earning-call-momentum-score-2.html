@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>LLM Momentum Score: Earnings Calls &amp; Financial Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Slate & Sky -->
+    <!-- Application Structure Plan: The application maintains its sequential guide structure but adds a crucial new section for the "Momentum Score." The flow is now: Intro -> Process -> Data (now combining structured & unstructured) -> Curation (updated to show the synthesis) -> Momentum Score (the new core concept) -> Method -> Evaluation -> Challenges. This structure logically builds up to the main output (the score), showing how the raw data is sourced, processed, and then used to generate the final analytical product. This provides a clearer, more goal-oriented narrative for the user. -->
+    <!-- Visualization & Content Choices: 
+        - Process Diagram: Goal(Organize) -> Viz(HTML/CSS Flowchart) -> Interaction(Hover) -> Justification(Provides a high-level map of the process) -> Method(Tailwind CSS).
+        - Data Source Cards: Goal(Inform) -> Viz(Styled cards with a new table for structured data) -> Interaction(Static) -> Justification(Clearly separates and showcases the two types of input data: qualitative text and quantitative metrics) -> Method(Tailwind CSS).
+        - Curation Example: Goal(Demonstrate) -> Viz(Code blocks) -> Interaction(Button toggle) -> Justification(Critically, this now shows the model being instructed to process BOTH text and structured numbers to produce a "beat/miss" analysis and a sentiment score, which are inputs for the momentum score) -> Method(Vanilla JS).
+        - Momentum Score Calculator: Goal(Explain/Engage) -> Viz(Interactive sliders and score display) -> Interaction(User can adjust inputs to see how the score changes) -> Justification(This interactive element makes the abstract concept of the score tangible and helps users understand the weighting of its components) -> Method(Vanilla JS).
+        - Tuning/Metrics Charts: Goal(Compare/Inform) -> Viz(Bar/Donut Charts) -> Justification(These remain essential for explaining the underlying ML method and success criteria) -> Library(Chart.js).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #334155; /* slate-700 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #0284c7; /* sky-600 */
+        }
+        .nav-link.active {
+            color: #0369a1; /* sky-700 */
+            border-bottom-color: #0369a1;
+        }
+        .momentum-score-display {
+            background: linear-gradient(90deg, #ef4444, #f97316, #eab308, #84cc16, #22c55e);
+            color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+        .momentum-score-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: #f8fafc;
+            mix-blend-mode: screen;
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-slate-800 text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl lg:text-2xl font-bold tracking-tight">LLM Earning Momentum Score</h1>
+            <nav class="hidden md:flex space-x-4 lg:space-x-6 text-sm font-medium">
+                <a class="nav-link border-b-2 border-transparent pb-1" href="#process">Process</a>
+                <a class="nav-link border-b-2 border-transparent pb-1" href="#data">Data</a>
+                <a class="nav-link border-b-2 border-transparent pb-1" href="#curation">Curation</a>
+                <a class="nav-link border-b-2 border-transparent pb-1" href="#score">Score</a>
+                <a class="nav-link border-b-2 border-transparent pb-1" href="#evaluation">Evaluation</a>
+                <a class="nav-link border-b-2 border-transparent pb-1" href="#challenges">Challenges</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section class="text-center mb-16" id="intro">
+            <h2 class="text-4xl font-bold text-slate-900 mb-4">Quantifying Earnings Momentum with AI</h2>
+            <p class="max-w-3xl mx-auto text-lg text-slate-600">
+                This guide explains how to fine-tune an LLM to synthesize unstructured earnings calls and structured financial data into a single "Earning Call Momentum Score." This score provides an actionable signal for predicting post-earning stock performance.
+            </p>
+        </section>
+
+        <section class="mb-20" id="process">
+            <h3 class="text-3xl font-bold text-center text-slate-900 mb-2">The Momentum Score Lifecycle</h3>
+             <p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+                From raw documents and data to a predictive score, the process requires careful data integration and specialized training. Hover over each stage to understand its role.
+            </p>
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                <div class="process-step group" data-info="Collect transcripts, reports, and the last 3 quarters of EPS/Revenue data.">
+                    <span class="text-2xl">💾</span>
+                    <span class="font-semibold">Data Sourcing</span>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step group" data-info="Structure the combined data to teach the model how to calculate beat/miss percentages and sentiment.">
+                    <span class="text-2xl">✨</span>
+                    <span class="font-semibold">Data Curation</span>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step group" data-info="Train the model to generate a structured output including sentiment and beat/miss analysis.">
+                    <span class="text-2xl">⚙️</span>
+                    <span class="font-semibold">Fine-Tuning</span>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step group" data-info="Calculate the final Momentum Score based on the LLM's structured output.">
+                    <span class="text-2xl">💯</span>
+                    <span class="font-semibold">Score Generation</span>
+                </div>
+                <div class="hidden absolute bg-slate-800 text-white text-sm rounded-lg px-3 py-2 mt-2 shadow-lg transition-opacity duration-300" id="process-info-box"></div>
+            </div>
+        </section>
+
+        <section class="mb-20" id="data">
+            <h3 class="text-3xl font-bold text-center text-slate-900 mb-2">Combining Unstructured &amp; Structured Data</h3>
+            <p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+                A robust model needs to understand both the narrative (what management says) and the numbers (what the company reports). We combine qualitative text with quantitative historical data.
+            </p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-slate-200">
+                    <h4 class="font-bold text-lg text-sky-700 mb-2">Unstructured Data</h4>
+                    <p class="text-slate-600">
+                        <span class="font-semibold">Earnings Call Transcripts &amp; Analyst Reports:</span> The primary source for management's tone, sentiment, guidance, and responses to analyst questions. This provides the qualitative context.
+                    </p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg border border-slate-200">
+                    <h4 class="font-bold text-lg text-sky-700 mb-2">Structured Data</h4>
+                    <p class="text-slate-600 mb-4">
+                       <span class="font-semibold">Last 3 Quarters of Financials:</span> Historical performance data provides the quantitative baseline for the current quarter's results.
+                    </p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-500">
+                            <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                <tr><th class="px-4 py-2" scope="col">Quarter</th><th class="px-4 py-2" scope="col">Actual EPS</th><th class="px-4 py-2" scope="col">Est. EPS</th><th class="px-4 py-2" scope="col">Actual Rev</th><th class="px-4 py-2" scope="col">Est. Rev</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b"><td class="px-4 py-2">Q3 '25</td><td class="px-4 py-2">$1.55</td><td class="px-4 py-2">$1.50</td><td class="px-4 py-2">$25.2B</td><td class="px-4 py-2">$25.0B</td></tr>
+                                <tr class="bg-white border-b"><td class="px-4 py-2">Q2 '25</td><td class="px-4 py-2">$1.48</td><td class="px-4 py-2">$1.49</td><td class="px-4 py-2">$24.5B</td><td class="px-4 py-2">$24.3B</td></tr>
+                                <tr class="bg-white"><td class="px-4 py-2">Q1 '25</td><td class="px-4 py-2">$1.42</td><td class="px-4 py-2">$1.40</td><td class="px-4 py-2">$23.8B</td><td class="px-4 py-2">$23.9B</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20" id="curation">
+             <h3 class="text-3xl font-bold text-center text-slate-900 mb-2">Teaching the Model to Synthesize</h3>
+             <p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+                Data curation is where we create training examples that teach the LLM to connect the words to the numbers. The model learns to perform calculations and classifications based on the combined data.
+            </p>
+            <div class="bg-white p-8 rounded-lg shadow-lg border border-slate-200 max-w-4xl mx-auto">
+                <h4 class="font-bold text-lg text-center text-sky-700 mb-4">Instruction Formatting Example</h4>
+                <p class="text-center text-slate-600 mb-6">The model is instructed to analyze the current quarter's numbers in the context of the earnings call text and produce a structured analysis.</p>
+                <div class="text-center mb-6">
+                    <button class="bg-sky-600 text-white font-semibold px-6 py-2 rounded-md hover:bg-sky-700 transition-colors" id="format-toggle-btn">Show Formatted Example</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="code-views">
+                    <div id="raw-view">
+                        <h5 class="font-semibold mb-2 text-slate-800">Raw Data (Inputs)</h5>
+                        <pre class="bg-slate-100 p-4 rounded-md text-sm overflow-x-auto"><code><span class="font-bold">Q4 EPS:</span> { Actual: $1.65, Est: $1.60 }
+<span class="font-bold">Q4 Rev:</span> { Actual: $26.1B, Est: $26.0B }
+<span class="font-bold">Call Snippet:</span> "Despite macro headwinds, we delivered another record quarter... Our AI cloud services are seeing exponential demand, and we are confidently raising next year's guidance."</code></pre>
+                    </div>
+                    <div class="hidden" id="formatted-view">
+                        <h5 class="font-semibold mb-2 text-slate-800">Formatted for LLM</h5>
+                        <pre class="bg-green-50 p-4 rounded-md text-sm text-green-900 overflow-x-auto"><code>{
+  "instruction": "Analyze the structured data and earnings call text. Determine the status (Beat, Miss, Meet) and percentage surprise for EPS and Revenue. Classify the call sentiment.",
+  "input": "Current EPS: {Act: 1.65, Est: 1.60}, Current Rev: {Act: 26.1B, Est: 26.0B}, Transcript: '...confidently raising next year's guidance.'",
+  "output": "{ 'eps_status': 'Beat', 'eps_surprise_pct': 3.13, 'rev_status': 'Beat', 'rev_surprise_pct': 0.38, 'sentiment': 'Very Positive' }"
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20" id="score">
+            <h3 class="text-3xl font-bold text-center text-slate-900 mb-2">The Earning Call Momentum Score</h3>
+            <p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+                The Momentum Score is a composite metric calculated from the LLM's output. It combines the magnitude of financial beats with the qualitative sentiment from the call to produce a single number from 0 (very bearish) to 100 (very bullish). Adjust the sliders below to see how each component affects the score.
+            </p>
+            <div class="bg-white p-8 rounded-lg shadow-lg border border-slate-200 max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="font-semibold" for="eps-slider">EPS Surprise % (Weight: 40%)</label>
+                            <input class="w-full" id="eps-slider" max="10" min="-10" step="0.1" type="range" value="3.13"/>
+                            <div class="text-right text-sm text-slate-500"><span id="eps-value">3.13</span>%</div>
+                        </div>
+                         <div>
+                            <label class="font-semibold" for="rev-slider">Revenue Surprise % (Weight: 30%)</label>
+                            <input class="w-full" id="rev-slider" max="5" min="-5" step="0.1" type="range" value="0.38"/>
+                            <div class="text-right text-sm text-slate-500"><span id="rev-value">0.38</span>%</div>
+                        </div>
+                         <div>
+                            <label class="font-semibold" for="sentiment-slider">Sentiment Score (Weight: 30%)</label>
+                            <input class="w-full" id="sentiment-slider" max="1" min="-1" step="0.1" type="range" value="0.9"/>
+                            <div class="text-right text-sm text-slate-500"><span id="sentiment-value">Very Positive</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="momentum-score-display">
+                            <span id="momentum-score">83</span>
+                            <div class="momentum-score-bar bg-white/30" id="momentum-score-bar-bg" style="width: 100%;"></div>
+                            <div class="momentum-score-bar" id="momentum-score-bar" style="width: 17%;"></div>
+                        </div>
+                         <p class="text-center text-xs text-slate-500 mt-2">Score = (EPS_Component + Rev_Component + Sentiment_Component)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20" id="evaluation">
+            <h3 class="text-3xl font-bold text-center text-slate-900 mb-2">Defining Success: From Score to Profit</h3>
+            <p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+               The ultimate test is whether the Momentum Score has predictive power. Evaluation focuses on the correlation between high scores and positive future stock returns.
+            </p>
+             <div class="bg-white p-8 rounded-lg shadow-lg border border-slate-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="chart-container h-64 md:h-auto">
+                        <canvas id="metricsChart"></canvas>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-sky-700 mb-4">Key Metric Types</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-3 mt-1">✓</span>
+                                <div>
+                                    <h5 class="font-semibold">Score-to-Return Correlation</h5>
+                                    <p class="text-slate-600 text-sm">The most critical metric. Does a portfolio of high-scoring stocks outperform a portfolio of low-scoring stocks? (e.g., Information Coefficient).</p>
+                                </div>
+                            </li>
+                             <li class="flex items-start">
+                                <span class="text-yellow-500 mr-3 mt-1">✓</span>
+                                <div>
+                                    <h5 class="font-semibold">Financial Backtesting</h5>
+                                    <p class="text-slate-600 text-sm">Simulates a trading strategy based on the score (e.g., "buy above 75, sell below 25") to calculate Sharpe Ratio and Alpha.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-3 mt-1">✓</span>
+                                <div>
+                                    <h5 class="font-semibold">LLM Output Accuracy</h5>
+                                    <p class="text-slate-600 text-sm">Assesses if the LLM correctly calculates surprise percentages and classifies sentiment against a human-labeled test set (F1-score, RMSE).</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16" id="challenges">
+            <h3 class="text-3xl font-bold text-center text-slate-900 mb-2">Navigating the Pitfalls</h3>
+            <p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+                Creating a reliable momentum score from complex data introduces new challenges beyond standard LLM fine-tuning.
+            </p>
+            <div class="max-w-3xl mx-auto space-y-4">
+                 <div class="bg-white p-4 rounded-lg shadow border border-slate-200">
+                    <h4 class="font-semibold text-slate-800">Score Calibration &amp; Weighting</h4>
+                    <p class="text-sm text-slate-600">Determining the optimal weights for EPS surprise, revenue surprise, and sentiment is a major challenge, often requiring extensive historical testing and optimization.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow border border-slate-200">
+                    <h4 class="font-semibold text-slate-800">Handling "Whisper Numbers"</h4>
+                    <p class="text-sm text-slate-600">The market often reacts to unofficial "whisper" estimates, not just the official consensus. A stock can drop despite a beat if it doesn't beat by enough. The model must learn this context.</p>
+                </div>
+                 <div class="bg-white p-4 rounded-lg shadow border border-slate-200">
+                    <h4 class="font-semibold text-slate-800">Look-Ahead Bias</h4>
+                    <p class="text-sm text-slate-600">Ensuring that the model's training data for a specific earnings report ONLY contains information that was publicly available *before* the report was released.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const sections = document.querySelectorAll('main section');
+            const navLinks = document.querySelectorAll('header nav a');
+
+            function updateActiveLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            window.addEventListener('scroll', updateActiveLink);
+            updateActiveLink();
+
+            const formatBtn = document.getElementById('format-toggle-btn');
+            const rawView = document.getElementById('raw-view');
+            const formattedView = document.getElementById('formatted-view');
+            let isFormatted = false;
+
+            formatBtn.addEventListener('click', () => {
+                isFormatted = !isFormatted;
+                if(isFormatted) {
+                    rawView.classList.add('hidden');
+                    formattedView.classList.remove('hidden');
+                    formatBtn.textContent = 'Show Raw Inputs';
+                } else {
+                    rawView.classList.remove('hidden');
+                    formattedView.classList.add('hidden');
+                    formatBtn.textContent = 'Show Formatted Example';
+                }
+            });
+
+            const processSteps = document.querySelectorAll('.process-step');
+            const infoBox = document.getElementById('process-info-box');
+
+            processSteps.forEach(step => {
+                step.addEventListener('mouseenter', (e) => {
+                    infoBox.textContent = step.dataset.info;
+                    infoBox.classList.remove('hidden');
+                    const rect = step.getBoundingClientRect();
+                    infoBox.style.left = `${rect.left + window.scrollX}px`;
+                    infoBox.style.top = `${rect.bottom + window.scrollY + 10}px`;
+                });
+                step.addEventListener('mouseleave', () => {
+                    infoBox.classList.add('hidden');
+                });
+            });
+
+            // Momentum Score Calculator
+            const epsSlider = document.getElementById('eps-slider');
+            const revSlider = document.getElementById('rev-slider');
+            const sentimentSlider = document.getElementById('sentiment-slider');
+            const epsValue = document.getElementById('eps-value');
+            const revValue = document.getElementById('rev-value');
+            const sentimentValue = document.getElementById('sentiment-value');
+            const momentumScoreDisplay = document.getElementById('momentum-score');
+            const momentumScoreBar = document.getElementById('momentum-score-bar');
+
+            const sentimentMap = {
+                '-1.0': 'Very Negative', '-0.9': 'Very Negative', '-0.8': 'Negative', '-0.7': 'Negative', '-0.6': 'Negative',
+                '-0.5': 'Slightly Negative', '-0.4': 'Slightly Negative', '-0.3': 'Slightly Negative', '-0.2': 'Neutral', '-0.1': 'Neutral',
+                '0.0': 'Neutral', '0.1': 'Neutral', '0.2': 'Neutral', '0.3': 'Slightly Positive', '0.4': 'Slightly Positive', '0.5': 'Slightly Positive',
+                '0.6': 'Positive', '0.7': 'Positive', '0.8': 'Positive', '0.9': 'Very Positive', '1.0': 'Very Positive'
+            };
+            
+            function calculateMomentumScore() {
+                const eps = parseFloat(epsSlider.value);
+                const rev = parseFloat(revSlider.value);
+                const sentiment = parseFloat(sentimentSlider.value);
+
+                // Normalize inputs to a 0-100 scale. Max surprise is capped for stability.
+                const maxEpsSurprise = 10;
+                const maxRevSurprise = 5;
+
+                const epsComponent = (Math.max(Math.min(eps, maxEpsSurprise), -maxEpsSurprise) / maxEpsSurprise * 50 + 50) * 0.40;
+                const revComponent = (Math.max(Math.min(rev, maxRevSurprise), -maxRevSurprise) / maxRevSurprise * 50 + 50) * 0.30;
+                const sentimentComponent = ((sentiment + 1) / 2 * 100) * 0.30;
+                
+                const score = Math.round(epsComponent + revComponent + sentimentComponent);
+                
+                momentumScoreDisplay.textContent = score;
+                epsValue.textContent = eps.toFixed(2);
+                revValue.textContent = rev.toFixed(2);
+                sentimentValue.textContent = sentimentMap[sentiment.toFixed(1)];
+                momentumScoreBar.style.width = `${100 - score}%`;
+            }
+
+            epsSlider.addEventListener('input', calculateMomentumScore);
+            revSlider.addEventListener('input', calculateMomentumScore);
+            sentimentSlider.addEventListener('input', calculateMomentumScore);
+            
+            calculateMomentumScore(); // Initial calculation
+
+            const metricsCtx = document.getElementById('metricsChart').getContext('2d');
+            new Chart(metricsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Score-to-Return Correlation', 'Financial Backtesting', 'LLM Output Accuracy'],
+                    datasets: [{
+                        label: 'Importance',
+                        data: [50, 35, 15],
+                        backgroundColor: [
+                            'rgba(34, 197, 94, 0.7)',
+                            'rgba(234, 179, 8, 0.7)',
+                            'rgba(59, 130, 246, 0.7)'
+                        ],
+                        borderColor: [
+                             'rgba(34, 197, 94, 1)',
+                            'rgba(234, 179, 8, 1)',
+                            'rgba(59, 130, 246, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Relative Importance of Metric Types',
+                            font: { size: 16 },
+                            color: '#334155'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        
+            const sharedStyles = `
+                .process-step {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: 0.5rem;
+                    border: 1px solid #e2e8f0;
+                    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    min-width: 150px;
+                }
+                .process-step:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+                    border-color: #38bdf8;
+                }
+                .process-arrow {
+                    font-size: 2rem;
+                    color: #94a3b8;
+                    margin: 0 1rem;
+                }
+                @media (max-width: 767px) {
+                    .process-arrow {
+                        transform: rotate(90deg);
+                        margin: 0.5rem 0;
+                    }
+                }
+            `;
+            const styleSheet = document.createElement("style");
+            styleSheet.innerText = sharedStyles;
+            document.head.appendChild(styleSheet);
+        });
+    </script>
+
+
+
+</body></html>

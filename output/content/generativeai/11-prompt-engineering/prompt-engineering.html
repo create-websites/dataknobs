@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Report: Advanced Prompt Engineering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutrals (Slate, Stone, Sky) -->
+    <!-- Application Structure Plan: A tab-based single-page application (SPA) design was chosen to manage the report's density. This structure breaks the content into thematic, digestible sections (Fundamentals, Reasoning, Agents, etc.), preventing user overwhelm. The user flow is non-linear, guided by a persistent top navigation bar. Key interactions include a dynamic master-detail view for comparing reasoning frameworks, interactive diagrams for agent architecture, and accordions for progressive information disclosure. This design prioritizes exploration and comparative understanding over a linear reading of the original report. -->
+    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation -> Interaction -> Justification -> Library/Method. 
+        - Comparative Analysis (Table 1) -> Goal: Compare Frameworks -> Viz: Interactive 3-column layout with diagrams and a central detail pane. A bar chart visualizes relative cost. -> Interaction: Clickable framework selectors update the detail pane and highlight the chart. -> Justification: Transforms a static table into an engaging, exploratory tool for direct comparison. -> Library: Chart.js for the cost chart; custom JS for interactivity.
+        - Agent Architecture -> Goal: Explain Components -> Viz: Interactive diagram using styled divs (HTML/Tailwind). -> Interaction: Clicking a component reveals its description. -> Justification: Visually represents the agent's structure, making it easier to grasp than text alone.
+        - Other Tables (Memory, APO, Frameworks) -> Goal: Inform/Organize -> Viz: Styled HTML tables. -> Interaction: None. -> Justification: Tables are the clearest way to present this structured data; interactivity would add unnecessary complexity.
+        - Textual Content -> Goal: Inform -> Viz: Cards and expandable accordions. -> Interaction: Clicking to expand. -> Justification: Progressive disclosure manages content density and allows users to focus on specific topics.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-button.active { border-color: #0ea5e9; color: #0ea5e9; font-weight: 600; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .framework-card { transition: all 0.3s ease-in-out; }
+        .framework-card.selected { border-color: #0ea5e9; box-shadow: 0 4px 14px 0 rgba(14, 165, 233, 0.2); transform: translateY(-5px); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 320px; max-height: 400px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto px-4 py-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-2">From Instruction to Orchestration</h1>
+            <p class="text-lg text-slate-600">An Interactive Exploration of Advanced Prompt Engineering</p>
+        </header>
+
+        <nav class="sticky top-0 z-10 bg-slate-50/80 backdrop-blur-md mb-8 py-2 border-b border-slate-200">
+            <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm md:text-base">
+                <button class="tab-button active" data-tab="intro">Introduction</button>
+                <button class="tab-button" data-tab="fundamentals">Fundamentals</button>
+                <button class="tab-button" data-tab="reasoning">Reasoning Frameworks</button>
+                <button class="tab-button" data-tab="agents">Agentic Architecture</button>
+                <button class="tab-button" data-tab="reliability">Reliability &amp; Automation</button>
+                <button class="tab-button" data-tab="ecosystem">Developer Ecosystem</button>
+            </div>
+        </nav>
+
+        <main>
+            <section class="content-section active" id="intro">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4">Welcome</h2>
+                    <p class="text-slate-600 mb-4">This interactive tool summarizes "From Instruction to Orchestration," offering an explorable, practical guide to advanced prompt engineering for LLMs and agentic systems, moving beyond the static report.</p>
+                    <p class="text-slate-600">Explore this application using the tabs! You'll uncover core prompt design principles, examine reasoning frameworks, build your understanding of autonomous agents, and discover essential tools. Grasp the "what," "why," and interconnections of these AI techniques.</p>
+                </div>
+            </section>
+
+            <section class="content-section" id="fundamentals">
+                 <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2">The Anatomy of an Advanced Prompt</h2>
+                    <p class="text-slate-600 mb-8 max-w-3xl mx-auto text-center">A sophisticated prompt isn't just a query; it's a carefully crafted blueprint. Designed to steer an LLM, it features defined roles, deep context, and exact instructions. These elements minimize uncertainty and boost the output's dependability. Let's delve into its key parts.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="accordion-container bg-slate-100/50 p-6 rounded-lg">
+                            <h3 class="accordion-header text-lg font-semibold text-slate-800 cursor-pointer flex justify-between items-center">Role Definition (Persona) <span class="accordion-icon">+</span></h3>
+                            <div class="accordion-content">
+                                <p class="text-slate-600 mt-2 text-sm">By giving the model a defined role (e.g., "Act as a seasoned data analyst"), we shape its approach, leading to a consistent tone, persona, and expertise level. This foundational approach significantly elevates response quality.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-container bg-slate-100/50 p-6 rounded-lg">
+                            <h3 class="accordion-header text-lg font-semibold text-slate-800 cursor-pointer flex justify-between items-center">Context Setting <span class="accordion-icon">+</span></h3>
+                            <div class="accordion-content">
+                                <p class="text-slate-600 mt-2 text-sm">Here are a few options, aiming for a similar length and meaning:
+
+*   **Supplying context—facts, data, and background—enriches the model's answers, preventing over-reliance on its general training.**
+*   **Detailed context, including facts and background, anchors the response, avoiding reliance on broad training knowledge alone.**
+*   **By offering rich context (facts, figures, etc.), responses are grounded, reducing dependence on the model's core training data.**
+*   **Providing context with facts and background enhances answers, keeping responses concrete and avoiding reliance solely on training.**</p>
+                            </div>
+                        </div>
+                        <div class="accordion-container bg-slate-100/50 p-6 rounded-lg">
+                            <h3 class="accordion-header text-lg font-semibold text-slate-800 cursor-pointer flex justify-between items-center">Task Specification <span class="accordion-icon">+</span></h3>
+                            <div class="accordion-content">
+                                <p class="text-slate-600 mt-2 text-sm">Clarity is key for instructions; they should be direct and easy to understand. Action verbs such as 'Assess,' 'Contrast,' or 'Compile' offer precision, minimizing potential confusion.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-container bg-slate-100/50 p-6 rounded-lg">
+                            <h3 class="accordion-header text-lg font-semibold text-slate-800 cursor-pointer flex justify-between items-center">Output Formatting <span class="accordion-icon">+</span></h3>
+                            <div class="accordion-content">
+                                <p class="text-slate-600 mt-2 text-sm">For consistent, program-friendly results, clearly specify the output format.  Templates or examples (like JSON schema or Markdown tables) are vital for automation.</p>
+                            </div>
+                        </div>
+                         <div class="accordion-container bg-slate-100/50 p-6 rounded-lg">
+                            <h3 class="accordion-header text-lg font-semibold text-slate-800 cursor-pointer flex justify-between items-center">Constraints &amp; Guardrails <span class="accordion-icon">+</span></h3>
+                            <div class="accordion-content">
+                                <p class="text-slate-600 mt-2 text-sm">To improve output, adjust quality using parameters. This involves setting length, clarifying keywords, and applying restrictions. Employ positive instructions for best results.</p>
+                            </div>
+                        </div>
+                         <div class="accordion-container bg-slate-100/50 p-6 rounded-lg">
+                            <h3 class="accordion-header text-lg font-semibold text-slate-800 cursor-pointer flex justify-between items-center">The Engineering Mindset <span class="accordion-icon">+</span></h3>
+                            <div class="accordion-content">
+                                <p class="text-slate-600 mt-2 text-sm">Here are a few options, aiming for a similar length and conveying the same core idea:
+
+*   Advanced prompting employs software engineering practices: versioning prompts, conducting experiments, and integrating them into workflows, turning probabilistic tech into a reliable system part.
+
+*   Prompt engineering adopts software engineering principles: Version control for prompts, systematic testing, and workflow integration solidify probabilistic AI for dependable use.
+
+*   By applying software engineering to prompts, advanced prompting versions like code, runs experiments, and incorporates prompts into workflows, making AI a reliable component.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="reasoning">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2">Core Reasoning Frameworks</h2>
+                    <p class="text-slate-600 max-w-3xl mx-auto">LLM reasoning relies on frameworks that orchestrate its "thoughts," enhancing problem-solving beyond simple data recall. Explore a chosen framework's design, benefits, and applications, using this interactive tool derived from Table 1.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-6 mb-8">
+                    <div class="framework-card selected border-2 border-slate-200 bg-white p-6 rounded-xl cursor-pointer" id="framework-cot">
+                        <h3 class="text-xl font-semibold mb-3 text-slate-900">Chain-of-Thought (CoT)</h3>
+                        <p class="text-sm text-slate-500 mb-4">Linear, step-by-step deduction.</p>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 bg-sky-500 rounded-full"></div>
+                            <div class="w-8 h-px bg-slate-400"></div>
+                            <div class="w-6 h-6 bg-sky-500 rounded-full"></div>
+                            <div class="w-8 h-px bg-slate-400"></div>
+                            <div class="w-6 h-6 bg-sky-500 rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="framework-card border-2 border-slate-200 bg-white p-6 rounded-xl cursor-pointer" id="framework-tot">
+                        <h3 class="text-xl font-semibold mb-3 text-slate-900">Tree-of-Thought (ToT)</h3>
+                        <p class="text-sm text-slate-500 mb-4">Exploratory, multi-path reasoning.</p>
+                         <div class="flex justify-center items-end h-12">
+                            <div class="w-6 h-6 bg-sky-500 rounded-full relative bottom-6">
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 w-px h-3 bg-slate-400"></div>
+                                <div class="absolute top-full left-1/2 -translate-x-full w-4 h-px bg-slate-400 -rotate-45 origin-right"></div>
+                                <div class="absolute top-full left-1/2 w-4 h-px bg-slate-400 rotate-45 origin-left"></div>
+                            </div>
+                             <div class="w-6 h-6 bg-sky-500 rounded-full mx-6"></div>
+                             <div class="w-6 h-6 bg-sky-500 rounded-full"></div>
+                             <div class="w-6 h-6 bg-sky-500 rounded-full mx-6"></div>
+                        </div>
+                    </div>
+                    <div class="framework-card border-2 border-slate-200 bg-white p-6 rounded-xl cursor-pointer" id="framework-react">
+                        <h3 class="text-xl font-semibold mb-3 text-slate-900">ReAct</h3>
+                        <p class="text-sm text-slate-500 mb-4">Cyclical reasoning and action.</p>
+                        <div class="flex items-center justify-start space-x-2">
+                            <div class="text-sm font-medium text-sky-600">Thought</div>
+                            <div class="w-5 h-5 border-t-2 border-r-2 border-sky-500 rounded-full animate-spin"></div>
+                            <div class="text-sm font-medium text-sky-600">Action</div>
+                             <div class="w-5 h-5 border-t-2 border-r-2 border-sky-500 rounded-full animate-spin"></div>
+                            <div class="text-sm font-medium text-sky-600">Observation</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8 bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <div id="framework-details">
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-slate-900 mb-4 text-center">Relative Computational Cost</h3>
+                        <div class="chart-container">
+                            <canvas id="costChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="agents">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2 text-center">Building Autonomous Agents</h2>
+                    <p class="text-slate-600 mb-8 max-w-3xl mx-auto text-center">AI agents go beyond LLMs. They perceive, think, and act to reach objectives. Prompting shapes the agent's "cognitive loop." Key agency components are detailed below; click to explore.</p>
+                    
+                    <div class="w-full max-w-4xl mx-auto">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="agent-component-card p-6 bg-slate-100/50 rounded-lg cursor-pointer border-2 border-transparent hover:border-sky-500 transition-colors" id="agent-component-planning">
+                                <h3 class="font-semibold text-lg">Goal Decomposition &amp; Planning</h3>
+                                <p class="text-sm text-slate-500">Breaking down high-level goals into smaller, executable steps.</p>
+                            </div>
+                            <div class="agent-component-card p-6 bg-slate-100/50 rounded-lg cursor-pointer border-2 border-transparent hover:border-sky-500 transition-colors" id="agent-component-tools">
+                                <h3 class="font-semibold text-lg">Tool Integration &amp; Use</h3>
+                                <p class="text-sm text-slate-500">*   **Bridging digital information with physical reality through external connections.**</p>
+                            </div>
+                             <div class="agent-component-card p-6 bg-slate-100/50 rounded-lg cursor-pointer border-2 border-transparent hover:border-sky-500 transition-colors" id="agent-component-memory">
+                                <h3 class="font-semibold text-lg">Memory &amp; Learning</h3>
+                                <p class="text-sm text-slate-500">Here are a few options, all similar in length and meaning:
+
+*   **Learning and evolving by remembering previous exchanges.**
+*   **Adapting and refining through stored conversation history.**
+*   **Improving performance by utilizing past interaction data.**
+*   **Dynamically adapting based on prior conversational context.**</p>
+                            </div>
+                            <div class="agent-component-card p-6 bg-slate-100/50 rounded-lg cursor-pointer border-2 border-transparent hover:border-sky-500 transition-colors" id="agent-component-paradigm">
+                                <h3 class="font-semibold text-lg">The Agentic Paradigm</h3>
+                                <p class="text-sm text-slate-500">The shift from reactive content generation to proactive decision-making.</p>
+                            </div>
+                        </div>
+                         <div class="mt-6 p-6 bg-sky-50 rounded-lg min-h-[120px]" id="agent-details">
+                            <p class="text-slate-700">Select a component to see its description.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="reliability">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2 text-center">Enhancing Reliability &amp; Automation</h2>
+                    <p class="text-slate-600 mb-8 max-w-3xl mx-auto text-center">Sophisticated methods strive to reduce the inherent randomness of Large Language Models. This includes efforts to ensure more stable outputs, and to streamline complex prompt creation.</p>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-900 mb-4">Techniques for Output Consistency</h3>
+                            <div class="space-y-4">
+                               <div class="accordion-container border-b border-slate-200 pb-2">
+                                    <h4 class="accordion-header font-semibold cursor-pointer flex justify-between items-center">Self-Consistency <span class="accordion-icon">+</span></h4>
+                                    <div class="accordion-content"><p class="text-sm text-slate-600 mt-1">This approach explores various reasoning routes, then combines their results via a majority vote, boosting accuracy by mitigating the effect of individual errors.</p></div>
+                                </div>
+                                <div class="accordion-container border-b border-slate-200 pb-2">
+                                    <h4 class="accordion-header font-semibold cursor-pointer flex justify-between items-center">Confidence-Informed Self-Consistency (CISC) <span class="accordion-icon">+</span></h4>
+                                    <div class="accordion-content"><p class="text-sm text-slate-600 mt-1">This builds on Self-Consistency, adding per-path "confidence scores."  The final answer results from a weighted vote, giving more weight to confident paths, thus saving computation.</p></div>
+                                </div>
+                                 <div class="accordion-container border-b border-slate-200 pb-2">
+                                    <h4 class="accordion-header font-semibold cursor-pointer flex justify-between items-center">Self-Correction Blind Spot <span class="accordion-icon">+</span></h4>
+                                    <div class="accordion-content"><p class="text-sm text-slate-600 mt-1">A model paradox: errors persist internally yet vanish when re-presented externally. Mitigation involves adding a trigger word, e.g., 'Wait', to unlock hidden self-correction.</p></div>
+                                </div>
+                                <div class="accordion-container border-b border-slate-200 pb-2">
+                                    <h4 class="accordion-header font-semibold cursor-pointer flex justify-between items-center">Chain of Verification (CoVe) <span class="accordion-icon">+</span></h4>
+                                    <div class="accordion-content"><p class="text-sm text-slate-600 mt-1">Here are a few options, all of similar length, that rewrite the line:
+
+*   **A defined, three-stage approach: 1) Initial draft. 2) Validation questions. 3) Refined, verified answer.**
+*   **Methodical process, involving: 1) Response creation. 2) Quality checks. 3) Output correction and finalization.**
+*   **Structured workflow: 1) Create a first draft. 2) Verify using questions. 3) Produce a final, validated output.**
+*   **Three key steps are used: 1) Response drafting. 2) Verification procedure. 3) Final, adjusted result.**</p></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-900 mb-4">Automatic Prompt Optimization (APO)</h3>
+                            <p class="text-slate-600 mb-4 text-sm">Prompt engineering's manual nature hinders progress. APO streamlines prompt creation by automating the search for effective phrasing, structures, and examples. The table below, derived from the report, details core APO techniques.</p>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left text-slate-500">
+                                    <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                        <tr><th class="px-4 py-2" scope="col">Approach</th><th class="px-4 py-2" scope="col">Mechanism</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="bg-white border-b"><td class="px-4 py-2 font-medium">LLM-based</td><td class="px-4 py-2">Here are a few options, all roughly the same size as the original, rephrasing the sentence:
+
+*   Employs a robust LLM to craft and iteratively improve prompts for a target model.
+*   Leverages a strong LLM to create and repeatedly optimize prompts for a given model.
+*   Employs a capable LLM for prompt generation and iterative refinement for a target model.
+*   Utilizes a high-powered LLM to build and progressively enhance prompts for another model.</td></tr>
+                                        <tr class="bg-white border-b"><td class="px-4 py-2 font-medium">Evolutionary</td><td class="px-4 py-2">Uses genetic algorithms (mutation, crossover) to improve a prompt population.</td></tr>
+                                        <tr class="bg-white border-b"><td class="px-4 py-2 font-medium">Structured AutoML</td><td class="px-4 py-2">Formalizing frame prompt design as a search problem utilizing content and patterns.</td></tr>
+                                        <tr class="bg-white"><td class="px-4 py-2 font-medium">Gradient-based</td><td class="px-4 py-2">*   Refines "soft prompts" within the continuous embedding space, not plaintext.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="ecosystem">
+                 <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2 text-center">The Developer Ecosystem</h2>
+                    <p class="text-slate-600 mb-8 max-w-3xl mx-auto text-center">Sophisticated prompting methods are utilized across various frameworks. LangChain, LlamaIndex, and AutoGen stand out, offering different approaches to agent-based system construction, as observed in the source report.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-500">
+                            <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                                <tr>
+                                    <th class="px-6 py-3" scope="col">Framework</th>
+                                    <th class="px-6 py-3" scope="col">Core Philosophy</th>
+                                    <th class="px-6 py-3" scope="col">Primary Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b">
+                                    <th class="px-6 py-4 font-bold text-slate-900 whitespace-nowrap" scope="row">LangChain / LangGraph</th>
+                                    <td class="px-6 py-4">Stateful Orchestration</td>
+                                    <td class="px-6 py-4">Building general-purpose LLM apps and complex, cyclical agent workflows.</td>
+                                </tr>
+                                <tr class="bg-white border-b">
+                                    <th class="px-6 py-4 font-bold text-slate-900 whitespace-nowrap" scope="row">LlamaIndex</th>
+                                    <td class="px-6 py-4">Data-Driven Agency</td>
+                                    <td class="px-6 py-4">Here are a few options, all similar in length and focusing on the core concept:
+
+*   Developing data-driven agents for private or external data (RAG).
+*   Creating data-centric, reasoning agents for private/external data (RAG).
+*   Constructing intelligent agents powered by private/external data (RAG).
+*   Designing agents that use data for reasoning, including RAG principles.</td>
+                                </tr>
+                                <tr class="bg-white">
+                                    <th class="px-6 py-4 font-bold text-slate-900 whitespace-nowrap" scope="row">Microsoft AutoGen</th>
+                                    <td class="px-6 py-4">Social Agency</td>
+                                    <td class="px-6 py-4">Orchestrating conversations between multiple specialized agents.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                 </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.tab-button');
+            const sections = document.querySelectorAll('.content-section');
+            const accordions = document.querySelectorAll('.accordion-container');
+            const frameworkCards = document.querySelectorAll('.framework-card');
+            const agentComponentCards = document.querySelectorAll('.agent-component-card');
+            
+            const frameworkData = {
+                cot: {
+                    title: "Chain-of-Thought (CoT)",
+                    description: "CoT prompts the LLM to 'think out loud,' decomposing a complex problem into a linear sequence of intermediate reasoning steps. This allows the model to allocate more computation to difficult problems and provides an interpretable window into its reasoning process.",
+                    advantages: ["Improves reasoning on complex tasks.", "Provides high interpretability.", "Can be elicited with simple prompts (e.g., 'Let's think step by step')."],
+                    limitations: ["Brittle; a single error propagates down the chain.", "Cannot backtrack or explore alternatives.", "Limited to the model's internal knowledge."]
+                },
+                tot: {
+                    title: "Tree-of-Thought (ToT)",
+                    description: "ToT generalizes CoT by exploring multiple reasoning paths at once in a tree structure. It allows the model to deliberately evaluate different intermediate thoughts, self-correct, and use lookahead or backtracking to find the best solution path.",
+                    advantages: ["Superior on complex tasks requiring planning or search.", "Enables self-evaluation and exploration of alternatives.", "Mimics human trial-and-error problem-solving."],
+                    limitations: ["High computational cost due to multiple branches.", "Requires a complex search algorithm (BFS/DFS).", "Effectiveness depends on the quality of the state evaluator."]
+                },
+                react: {
+                    title: "ReAct (Reason + Act)",
+                    description: "ReAct creates a powerful synergy between reasoning and acting. The model generates interleaved thoughts and actions, allowing it to interact with external tools (e.g., a search engine) to gather information, which then grounds its subsequent reasoning.",
+                    advantages: ["Reduces hallucination by grounding in external facts.", "Enables interaction with APIs and dynamic data sources.", "Highly interpretable through thought-action-observation traces."],
+                    limitations: ["Performance depends heavily on the quality of tool outputs.", "Can be derailed by noisy or non-informative tool results.", "Requires careful tool definition and prompting."]
+                }
+            };
+
+            const agentData = {
+                planning: {
+                    title: "Goal Decomposition & Planning",
+                    description: "Planning is the foundation of agent autonomy. Through prompting techniques like Hierarchical Decomposition or Plan vs. Act mode, an agent can break a high-level goal into a coherent, step-by-step strategy. This ensures it can handle multi-step instructions and anticipate dependencies before execution, drastically improving success rates."
+                },
+                tools: {
+                    title: "Tool Integration & Use",
+                    description: "Tools transform an LLM from a knowledge base into an interactive agent. By prompting the agent with structured definitions of available tools (APIs, databases, code interpreters), it learns to decide which tool to call, with what arguments, to make progress on its task. This overcomes the LLM's inherent limitations by giving it access to real-time data and precise computation."
+                },
+                memory: {
+                    title: "Memory & Learning",
+                    description: "LLMs are stateless, so memory must be engineered. Short-term memory is often a conversational buffer. Long-term memory uses vector stores to retrieve relevant context from past interactions. Advanced techniques like Memory-of-Thought (MoT) even allow an agent to store and reuse successful reasoning patterns, enabling it to learn and improve over time."
+                },
+                paradigm: {
+                    title: "The Agentic Paradigm",
+                    description: "Agentic AI marks a shift from reactive content generation to proactive decision-making. These systems, defined by their prompts, are architected to perceive their environment, create plans, execute actions, and learn from outcomes. This paradigm enables AI to move beyond simple Q&A and tackle complex, autonomous tasks."
+                }
+            }
+
+            function updateFrameworkDetails(frameworkKey) {
+                const data = frameworkData[frameworkKey];
+                const detailsContainer = document.getElementById('framework-details');
+
+                let advantagesList = data.advantages.map(adv => `<li class="text-sm">${adv}</li>`).join('');
+                let limitationsList = data.limitations.map(lim => `<li class="text-sm">${lim}</li>`).join('');
+
+                detailsContainer.innerHTML = `
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">${data.title}</h3>
+                    <p class="text-slate-600 mb-4">${data.description}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-semibold text-slate-800 mb-2">Key Advantages</h4>
+                            <ul class="list-disc list-inside text-slate-600 space-y-1">${advantagesList}</ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-slate-800 mb-2">Key Limitations</h4>
+                            <ul class="list-disc list-inside text-slate-600 space-y-1">${limitationsList}</ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function updateAgentDetails(componentKey) {
+                const data = agentData[componentKey];
+                const detailsContainer = document.getElementById('agent-details');
+                detailsContainer.innerHTML = `
+                    <h4 class="font-semibold text-lg text-slate-800 mb-2">${data.title}</h4>
+                    <p class="text-slate-700">${data.description}</p>
+                `;
+                 agentComponentCards.forEach(card => card.classList.remove('bg-sky-100'));
+                 document.getElementById(`agent-component-${componentKey}`).classList.add('bg-sky-100');
+            }
+
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    sections.forEach(s => s.classList.remove('active'));
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+
+            accordions.forEach(acc => {
+                const header = acc.querySelector('.accordion-header');
+                const content = acc.querySelector('.accordion-content');
+                const icon = acc.querySelector('.accordion-icon');
+                header.addEventListener('click', () => {
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.textContent = '+';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.textContent = '-';
+                    }
+                });
+            });
+
+            let costChart;
+            function createCostChart() {
+                const ctx = document.getElementById('costChart').getContext('2d');
+                costChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['CoT', 'ToT', 'ReAct'],
+                        datasets: [{
+                            label: 'Relative Cost',
+                            data: [10, 85, 35],
+                            backgroundColor: [
+                                'rgba(14, 165, 233, 0.2)',
+                                'rgba(244, 63, 94, 0.2)',
+                                'rgba(22, 163, 74, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(14, 165, 233, 1)',
+                                'rgba(244, 63, 94, 1)',
+                                'rgba(22, 163, 74, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, display: false },
+                            x: { grid: { display: false } }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) { label += ': '; }
+                                        if (context.parsed.y !== null) {
+                                            if(context.label === 'CoT') label += 'Low';
+                                            if(context.label === 'ToT') label += 'High';
+                                            if(context.label === 'ReAct') label += 'Medium';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            frameworkCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    frameworkCards.forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    const frameworkKey = card.id.split('-')[1];
+                    updateFrameworkDetails(frameworkKey);
+                });
+            });
+            
+            agentComponentCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const componentKey = card.id.split('-')[2];
+                    updateAgentDetails(componentKey);
+                });
+            });
+
+            updateFrameworkDetails('cot');
+            createCostChart();
+            updateAgentDetails('planning');
+
+        });
+    </script>
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Web Guide to Text Chunking for RAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutral with Cool Accents -->
+    <!-- Application Structure Plan: The application is structured as a single-page dashboard. The core idea is to move from a high-level overview to specific details, facilitating comparison. The user starts with a filterable card-based gallery of all chunking strategies, allowing for quick assessment. Clicking a card reveals an in-depth view. A dedicated "Comparative Analysis" section with an interactive radar chart allows for direct, multi-faceted comparison of selected strategies. This is followed by sections on "Challenges & Mitigations" and a "Practitioner's Framework" to provide actionable guidance. This structure was chosen because the primary user task is comparison and decision-making, which is better served by a dynamic dashboard than a linear report format. -->
+    <!-- Visualization & Content Choices: Data from the report's comparative table is visualized using an interactive radar chart (Chart.js) to show the trade-offs between strategies (Goal: Compare). Simple mechanisms are visualized with HTML/CSS diagrams (Goal: Inform). The main strategies are presented as cards with key metrics visualized using bar ratings for quick scanning (Goal: Compare). Interactive toggles and checklists are used for the "Challenges" and "Framework" sections to make them engaging and practical (Goal: Organize/Inform). All visualizations are rendered on Canvas or with structured HTML/CSS, adhering to the NO SVG/Mermaid constraint. The choices support the dashboard structure by making complex data easily digestible and comparable. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #44403c;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #0891b2;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .strategy-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .strategy-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 500px;
+            }
+        }
+        .rating-bar-bg {
+            background-color: #e7e5e4;
+        }
+        .rating-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-stone-800 mb-2">Architectures of Segmentation</h1>
+            <p class="text-lg md:text-xl text-stone-600 max-w-3xl mx-auto">An Web Guide to Text Chunking for Retrieval-Augmented Generation (RAG)</p>
+        </header>
+
+        <nav class="flex justify-center flex-wrap gap-2 mb-12">
+            <button class="nav-button active font-semibold py-2 px-4 rounded-full bg-white shadow-sm border border-stone-200" data-target="strategies">Strategies</button>
+            <button class="nav-button font-semibold py-2 px-4 rounded-full bg-white shadow-sm border border-stone-200" data-target="comparison">Comparative Analysis</button>
+            <button class="nav-button font-semibold py-2 px-4 rounded-full bg-white shadow-sm border border-stone-200" data-target="challenges">Challenges &amp; Mitigations</button>
+            <button class="nav-button font-semibold py-2 px-4 rounded-full bg-white shadow-sm border border-stone-200" data-target="framework">Practitioner's Framework</button>
+        </nav>
+
+        <main>
+            <section class="content-section active" id="strategies">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-stone-800">Chunking Strategies</h2>
+                    <p class="mt-2 text-stone-600 max-w-2xl mx-auto">Here are a few rewrites, all around the same length:
+
+*   **RAG's architecture hinges on chunking. Discover various techniques, from basic rules to advanced, model-based strategies. Dive deeper by clicking a card.**
+
+*   **Chunking is key to RAG. Learn about diverse approaches: simple rules, to complex, AI-powered methods. Click a card to explore details.**
+
+*   **Chunking is a core RAG element. We'll cover various methods: rule-based to model-driven. Click any card to see a breakdown.**
+
+*   **In RAG, chunking's fundamental. Examine various techniques: rule-based options to advanced models. Click to learn more.**</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="strategy-gallery">
+                </div>
+                <div class="mt-12 hidden" id="strategy-detail-view">
+                </div>
+            </section>
+
+            <section class="content-section" id="comparison">
+                 <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-stone-800">Comparative Analysis</h2>
+                    <p class="mt-2 text-stone-600 max-w-2xl mx-auto">Choosing a chunking method requires balancing priorities. Explore different strategies using the controls below and see how they impact context, cost, and ease of use. This tool helps you compare them directly.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6" id="comparison-checkboxes">
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="comparison-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="challenges">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-stone-800">Challenges &amp; Mitigations</h2>
+                    <p class="mt-2 text-stone-600 max-w-2xl mx-auto">Chunking's success in RAG transcends mere splitting. It tackles key issues. This section focuses on two pivotal challenges, illustrating how clever chunking and retrieval strategies can help.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-xl font-bold text-stone-800 mb-3">Problem: "Lost in the Middle"</h3>
+                        <p class="text-stone-600 mb-4">LLMs often falter in retrieving information from the context's interior, favoring the start and finish. This "U-shaped" recall pattern can hinder Retrieval-Augmented Generation, potentially overlooking crucial retrieved details.</p>
+                        <h4 class="font-semibold text-stone-700 mb-2">Mitigation Strategies:</h4>
+                        <ul class="space-y-2">
+                            <li class="flex items-start gap-3">
+                                <span class="text-cyan-600 mt-1">✓</span>
+                                <div><strong class="text-stone-700">Optimize Chunk Size:</strong> Break it down: Smaller pieces often outperform larger ones; fetch many small chunks instead.</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-cyan-600 mt-1">✓</span>
+                                <div><strong class="text-stone-700">Re-ranking:</strong> Following retrieval, strategically re-rank chunks, placing the highest relevance ones at the prompt's start and finish to enhance focus.</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-xl font-bold text-stone-800 mb-3">Problem: Context Fragmentation</h3>
+                        <p class="text-stone-600 mb-4">Breaking down thoughts and using pronouns ("it," "they") without context creates semantic gaps in chunks, hindering embedding accuracy and retrieval performance.</p>
+                        <h4 class="font-semibold text-stone-700 mb-2">Mitigation Strategies:</h4>
+                        <ul class="space-y-2">
+                            <li class="flex items-start gap-3">
+                                <span class="text-cyan-600 mt-1">✓</span>
+                                <div><strong class="text-stone-700">Structure-Preserving Chunking:</strong> Consider employing techniques such as recursion or document-aware chunking to preserve logical structure.</div>
+                            </li>
+                             <li class="flex items-start gap-3">
+                                <span class="text-cyan-600 mt-1">✓</span>
+                                <div><strong class="text-stone-700">Contextual Headers:</strong> Here are a few options for rewriting the line, all roughly the same size and conveying a similar meaning:
+
+*   **Prefix text chunks with titles for clearer context when embedding.**
+*   **Add document/section titles to the start of chunks for embedding clarity.**
+*   **Improve embedding context: Add section/document titles to chunk beginnings.**
+*   **Embed with context: Title chunks with section or document identifiers.**
+*   **Before embedding, add titles to chunks to provide explicit context.**</div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-cyan-600 mt-1">✓</span>
+                                <div><strong class="text-stone-700">Late Chunking:</strong> Here are a few options, keeping the size roughly similar:
+
+*   This architecture addresses the problem by embedding the complete document initially, maintaining global context within each chunk.
+
+*   By embedding the whole document upfront, this architecture inherently resolves the issue, ensuring global context in all segments.
+
+*   This approach tackles the problem by first embedding the entire document, thus preserving global context in each resulting chunk.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="framework">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-stone-800">Practitioner's Framework</h2>
+                    <p class="mt-2 text-stone-600 max-w-2xl mx-auto">To select the best approach, a structured method is crucial.  Answer the following questions for a tailored recommendation, drawing on the report's framework.</p>
+                </div>
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg max-w-4xl mx-auto">
+                    <div id="framework-questions"></div>
+                    <div class="mt-8 p-6 bg-cyan-50 border-l-4 border-cyan-500 rounded-r-lg hidden" id="framework-recommendation">
+                        <h4 class="font-bold text-lg text-cyan-800">Recommendation</h4>
+                        <p class="text-cyan-700 mt-2"></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const strategiesData = [
+                {
+                    id: 'fixed-size',
+                    name: 'Fixed-Size',
+                    category: 'Syntactic',
+                    tagline: 'Simple, fast, but context-agnostic.',
+                    contextPreservation: 1,
+                    cost: 1,
+                    complexity: 1,
+                    granularity: 5,
+                    description: 'The most straightforward method. It divides text into chunks of a fixed character or token count. An overlap between chunks is often used to mitigate context fragmentation.',
+                    strengths: ['Extremely simple and fast to implement.', 'Predictable, uniform chunk sizes.', 'Low computational cost.'],
+                    weaknesses: ['Ignores all semantic and structural boundaries.', 'High risk of splitting sentences and creating incoherent chunks.', 'Often loses critical context.'],
+                    useCases: 'Best for unstructured plain text, logs, or as a quick, simple baseline for comparison.'
+                },
+                {
+                    id: 'recursive',
+                    name: 'Recursive',
+                    category: 'Syntactic',
+                    tagline: 'A balanced, structure-aware default.',
+                    contextPreservation: 3,
+                    cost: 2,
+                    complexity: 2,
+                    granularity: 4,
+                    description: 'A hierarchical approach that splits text using a prioritized list of separators (e.g., paragraphs, then lines, then words). It tries to keep semantically related pieces of text together.',
+                    strengths: ['Good balance of speed and structure preservation.', 'Preserves local context better than fixed-size.', 'The recommended default for general text.'],
+                    weaknesses: ['Still fundamentally syntactic, not semantic.', 'Effectiveness depends heavily on document formatting.'],
+                    useCases: 'Ideal for general-purpose NLP on semi-structured text like articles, reports, and markdown files.'
+                },
+                {
+                    id: 'document-based',
+                    name: 'Document-Based',
+                    category: 'Structural',
+                    tagline: 'Leverages the document\'s own structure.',
+                    contextPreservation: 4,
+                    cost: 2,
+                    complexity: 3,
+                    granularity: 2,
+                    description: 'Splits text based on explicit structural elements like Markdown/HTML headers or code functions. This aligns chunks with the author\'s logical organization.',
+                    strengths: ['Excellent context preservation.', 'Can add structural metadata (e.g., headers) to chunks.', 'Creates highly coherent, thematic chunks.'],
+                    weaknesses: ['Only applicable to well-structured documents.', 'Chunk sizes can be highly variable.'],
+                    useCases: 'Perfect for source code, HTML/Markdown documents, and any well-formatted reports with a clear hierarchy.'
+                },
+                {
+                    id: 'semantic',
+                    name: 'Semantic',
+                    category: 'Meaning-Aware',
+                    tagline: 'Splits by meaning, not syntax.',
+                    contextPreservation: 5,
+                    cost: 4,
+                    complexity: 4,
+                    granularity: 2,
+                    description: 'Uses embedding models to split text at points of low semantic similarity between sentences. The goal is to create chunks that are each focused on a single, coherent topic.',
+                    strengths: ['Creates semantically pure chunks.', 'Theoretically improves retrieval precision by focusing embeddings.', 'Can adapt to any text, regardless of formatting.'],
+                    weaknesses: ['Computationally expensive.', 'Empirical evidence shows inconsistent performance gains.', 'Complex to implement and tune.'],
+                    useCases: 'For highly thematic documents where semantic purity is critical and computational cost is not a major constraint.'
+                },
+                {
+                    id: 'llm-based',
+                    name: 'LLM-Based',
+                    category: 'Model-Driven',
+                    tagline: 'Uses an LLM\'s reasoning to chunk.',
+                    contextPreservation: 5,
+                    cost: 5,
+                    complexity: 5,
+                    granularity: 3,
+                    description: 'Leverages a powerful LLM to reason about the text and determine the optimal split points based on concepts or propositions. It asks the model to break the text into "ideas".',
+                    strengths: ['Can capture nuanced, complex conceptual boundaries.', 'Leverages deep contextual understanding.', 'Potentially the highest quality chunks.'],
+                    weaknesses: ['Extremely high cost and latency.', 'Can be a "black box" process.', 'Very complex to implement robustly.'],
+                    useCases: 'Cutting-edge applications where maximum quality is required regardless of cost. Useful for complex, dense documents.'
+                },
+                 {
+                    id: 'agentic',
+                    name: 'Agentic',
+                    category: 'Model-Driven',
+                    tagline: 'Task-driven, goal-oriented chunking.',
+                    contextPreservation: 4,
+                    cost: 5,
+                    complexity: 5,
+                    granularity: 3,
+                    description: 'Employs an AI agent to segment a document into "actionable" chunks tailored to a specific downstream task. It mimics how a human expert would deconstruct a document for a purpose.',
+                    strengths: ['Creates highly optimized, task-relevant chunks.', 'Ideal for complex, multi-step agentic workflows.'],
+                    weaknesses: ['Highly experimental and complex.', 'Risks over-specialization and loss of global context.', 'Extremely high computational cost.'],
+                    useCases: 'Advanced agentic systems where information needs to be segmented by function or goal, not just content.'
+                },
+                {
+                    id: 'late-chunking',
+                    name: 'Late Chunking',
+                    category: 'Advanced Architecture',
+                    tagline: 'Embeds first, chunks later for global context.',
+                    contextPreservation: 5,
+                    cost: 3,
+                    complexity: 4,
+                    granularity: 5,
+                    description: 'Inverts the traditional workflow. It embeds the entire document first using a long-context model, then splits and pools these embeddings into chunks. Each chunk embedding is infused with global context.',
+                    strengths: ['Systemically solves the problem of implicit references.', 'Preserves global context in every chunk.', 'Can be more efficient than chunking then embedding many small pieces.'],
+                    weaknesses: ['Dependent on the availability and quality of long-context embedding models.', 'Higher implementation complexity.'],
+                    useCases: 'Long documents with extensive cross-references and distributed context, like legal texts or technical manuals.'
+                }
+            ];
+
+            const gallery = document.getElementById('strategy-gallery');
+            const detailView = document.getElementById('strategy-detail-view');
+            
+            function createRating(label, value) {
+                const percentage = (value / 5) * 100;
+                return `
+                    <div class="w-full">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-medium text-stone-600">${label}</span>
+                            <span class="text-sm font-medium text-stone-500">${value}/5</span>
+                        </div>
+                        <div class="w-full rating-bar-bg rounded-full h-2.5">
+                            <div class="bg-cyan-600 h-2.5 rounded-full rating-bar-fill" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderGallery() {
+                gallery.innerHTML = '';
+                strategiesData.forEach(strategy => {
+                    const card = document.createElement('div');
+                    card.className = 'strategy-card bg-white p-6 rounded-2xl shadow-md cursor-pointer border border-stone-200';
+                    card.dataset.id = strategy.id;
+                    card.innerHTML = `
+                        <h3 class="text-xl font-bold text-stone-800">${strategy.name}</h3>
+                        <p class="text-stone-500 mb-4">${strategy.tagline}</p>
+                        <div class="space-y-3">
+                            ${createRating('Context Preservation', strategy.contextPreservation)}
+                            ${createRating('Computational Cost', strategy.cost)}
+                            ${createRating('Implementation Complexity', strategy.complexity)}
+                        </div>
+                    `;
+                    card.addEventListener('click', () => showDetail(strategy.id));
+                    gallery.appendChild(card);
+                });
+            }
+
+            function showDetail(id) {
+                const strategy = strategiesData.find(s => s.id === id);
+                if (!strategy) return;
+
+                detailView.innerHTML = `
+                    <div class="bg-white p-8 rounded-2xl shadow-lg relative">
+                        <button id="close-detail" class="absolute top-4 right-4 text-stone-500 hover:text-stone-800 text-2xl">&times;</button>
+                        <h2 class="text-3xl font-bold text-stone-800 mb-2">${strategy.name}</h2>
+                        <span class="inline-block bg-cyan-100 text-cyan-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full mb-4">${strategy.category}</span>
+                        <p class="text-lg text-stone-600 mb-6">${strategy.description}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-xl font-semibold text-stone-700 mb-3">Key Strengths</h4>
+                                <ul class="space-y-2">
+                                    ${strategy.strengths.map(s => `<li class="flex items-start gap-3"><span class="text-green-500 mt-1">&#10003;</span><span class="text-stone-600">${s}</span></li>`).join('')}
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-semibold text-stone-700 mb-3">Key Weaknesses</h4>
+                                <ul class="space-y-2">
+                                    ${strategy.weaknesses.map(w => `<li class="flex items-start gap-3"><span class="text-red-500 mt-1">&#10007;</span><span class="text-stone-600">${w}</span></li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-8 pt-6 border-t border-stone-200">
+                             <h4 class="text-xl font-semibold text-stone-700 mb-3">Ideal Use Cases</h4>
+                             <p class="text-stone-600">${strategy.useCases}</p>
+                        </div>
+                    </div>
+                `;
+                gallery.classList.add('hidden');
+                detailView.classList.remove('hidden');
+
+                document.getElementById('close-detail').addEventListener('click', () => {
+                    detailView.classList.add('hidden');
+                    gallery.classList.remove('hidden');
+                });
+                window.scrollTo({ top: detailView.offsetTop - 20, behavior: 'smooth' });
+            }
+            
+            renderGallery();
+
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('.content-section');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    sections.forEach(section => {
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            
+            let comparisonChart;
+            const checkboxContainer = document.getElementById('comparison-checkboxes');
+            
+            function renderComparisonCheckboxes() {
+                strategiesData.forEach(strategy => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center';
+                    div.innerHTML = `
+                        <input id="compare-${strategy.id}" type="checkbox" value="${strategy.id}" class="w-4 h-4 text-cyan-600 bg-stone-100 border-stone-300 rounded focus:ring-cyan-500">
+                        <label for="compare-${strategy.id}" class="ml-2 text-sm font-medium text-stone-700">${strategy.name}</label>
+                    `;
+                    checkboxContainer.appendChild(div);
+                });
+                
+                checkboxContainer.addEventListener('change', updateComparisonChart);
+            }
+            
+            function updateComparisonChart() {
+                const selectedIds = Array.from(checkboxContainer.querySelectorAll('input:checked')).map(cb => cb.value);
+                const selectedStrategies = strategiesData.filter(s => selectedIds.includes(s.id));
+                
+                const chartData = {
+                    labels: ['Context Preservation', 'Cost Effectiveness', 'Implementation Simplicity', 'Granularity Control'],
+                    datasets: selectedStrategies.map((strategy, index) => {
+                        const colors = ['rgba(8, 145, 178, 0.8)', 'rgba(217, 119, 6, 0.8)', 'rgba(107, 114, 128, 0.8)', 'rgba(4, 120, 87, 0.8)', 'rgba(124, 58, 237, 0.8)'];
+                        const borderColors = ['#0891b2', '#d97706', '#6b7280', '#047857', '#7c3aed'];
+                        return {
+                            label: strategy.name,
+                            data: [
+                                strategy.contextPreservation,
+                                6 - strategy.cost, 
+                                6 - strategy.complexity,
+                                strategy.granularity
+                            ],
+                            backgroundColor: colors[index % colors.length].replace('0.8', '0.2'),
+                            borderColor: borderColors[index % borderColors.length],
+                            pointBackgroundColor: borderColors[index % borderColors.length],
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: borderColors[index % borderColors.length]
+                        };
+                    })
+                };
+
+                if (comparisonChart) {
+                    comparisonChart.data = chartData;
+                    comparisonChart.update();
+                } else {
+                    const ctx = document.getElementById('comparison-chart').getContext('2d');
+                    comparisonChart = new Chart(ctx, {
+                        type: 'radar',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                r: {
+                                    angleLines: {
+                                        color: '#d6d3d1'
+                                    },
+                                    grid: {
+                                        color: '#e7e5e4'
+                                    },
+                                    pointLabels: {
+                                        font: {
+                                            size: 14,
+                                        },
+                                        color: '#44403c'
+                                    },
+                                    ticks: {
+                                        backdropColor: 'rgba(0,0,0,0)',
+                                        color: '#78716c',
+                                        stepSize: 1,
+                                        beginAtZero: true,
+                                        max: 5
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.r !== null) {
+                                                label += context.parsed.r;
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            renderComparisonCheckboxes();
+            updateComparisonChart();
+
+            const frameworkQuestionsContainer = document.getElementById('framework-questions');
+            const frameworkRecommendation = document.getElementById('framework-recommendation');
+            const frameworkQuestions = [
+                {
+                    id: 'structure',
+                    question: '1. What is the nature of your source data?',
+                    options: [
+                        { text: 'Highly Structured (Code, HTML)', value: 'structured' },
+                        { text: 'Semi-Structured (Markdown, Reports)', value: 'semi-structured' },
+                        { text: 'Unstructured (Plain text, transcripts)', value: 'unstructured' }
+                    ]
+                },
+                {
+                    id: 'goal',
+                    question: '2. What is the primary goal of your RAG system?',
+                    options: [
+                        { text: 'Specific, fact-based Q&A', value: 'qa' },
+                        { text: 'Broad summarization & exploration', value: 'summary' }
+                    ]
+                },
+                {
+                    id: 'resources',
+                    question: '3. What are your resource constraints?',
+                    options: [
+                        { text: 'Cost and speed are top priority', value: 'low-cost' },
+                        { text: 'Quality is priority, cost is secondary', value: 'high-quality' }
+                    ]
+                }
+            ];
+
+            let userAnswers = {};
+
+            function renderFrameworkQuestions() {
+                frameworkQuestions.forEach(q => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'mb-6';
+                    let optionsHTML = q.options.map(opt => `
+                        <div>
+                            <input type="radio" id="${q.id}-${opt.value}" name="${q.id}" value="${opt.value}" class="mr-2">
+                            <label for="${q.id}-${opt.value}">${opt.text}</label>
+                        </div>
+                    `).join('');
+                    qDiv.innerHTML = `
+                        <p class="font-semibold text-lg text-stone-700 mb-2">${q.question}</p>
+                        <div class="space-y-1">${optionsHTML}</div>
+                    `;
+                    frameworkQuestionsContainer.appendChild(qDiv);
+                });
+
+                frameworkQuestionsContainer.addEventListener('change', (event) => {
+                    if (event.target.type === 'radio') {
+                        userAnswers[event.target.name] = event.target.value;
+                        updateFrameworkRecommendation();
+                    }
+                });
+            }
+
+            function updateFrameworkRecommendation() {
+                if (Object.keys(userAnswers).length !== frameworkQuestions.length) {
+                    return;
+                }
+
+                let recommendationText = 'Based on your answers, you should start by exploring: ';
+                let recommendations = [];
+
+                if (userAnswers.structure === 'structured') {
+                    recommendations.push('<strong>Document-Based Chunking</strong>');
+                } else if (userAnswers.structure === 'semi-structured') {
+                    recommendations.push('<strong>Recursive Chunking</strong> or <strong>Document-Based Chunking</strong>');
+                } else {
+                    recommendations.push('<strong>Recursive Chunking</strong>');
+                    if(userAnswers.resources === 'high-quality') {
+                         recommendations.push('<strong>Semantic</strong> or <strong>Late Chunking</strong> if context fragmentation is a major issue');
+                    }
+                }
+
+                if (userAnswers.goal === 'qa') {
+                    recommendations.push('with a focus on <strong>smaller, more granular chunks</strong>');
+                } else {
+                    recommendations.push('with a focus on <strong>larger, more thematic chunks</strong>');
+                }
+
+                if (userAnswers.resources === 'low-cost' && !recommendations.some(r => r.includes('Recursive') || r.includes('Document-Based'))) {
+                     recommendations.push('and prioritize efficient methods like <strong>Recursive Chunking</strong>');
+                }
+                
+                let uniqueRecs = [...new Set(recommendations)];
+                recommendationText += uniqueRecs.join(', ') + ".";
+                recommendationText += "<br><br><strong>Next Step:</strong> Always establish a baseline (e.g., with Recursive Chunking) and use an evaluation framework like RAGAs to quantitatively measure if a more complex strategy provides a meaningful improvement for your specific data and queries."
+
+                frameworkRecommendation.querySelector('p').innerHTML = recommendationText;
+                frameworkRecommendation.classList.remove('hidden');
+            }
+
+            renderFrameworkQuestions();
+        });
+    </script>
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Guide to Privacy-Preserving Supply Chains</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: A thematic, single-page application with a fixed navigation bar for smooth scrolling between sections. The structure flows from foundational concepts to practical applications: 1) A clear definition, 2) An interactive diagram of the core design, 3) A comparative analysis of enabling technologies, 4) A visualization of key benefits, and 5) An interactive exploration of real-world use cases. This top-down, non-linear structure was chosen to allow both novice and expert users to explore content at their own pace, making a complex topic digestible and engaging by encouraging active participation rather than passive reading. -->
+    <!-- Visualization & Content Choices: 
+        - Definition: Goal: Inform -> Method: Clear textual blocks -> Interaction: None. Justification: Establish a baseline understanding.
+        - Design: Goal: Organize/Relate -> Method: Interactive HTML/CSS diagram -> Interaction: Click on stages to display details. Justification: Deconstructs a complex process visually and interactively.
+        - Technologies: Goal: Compare -> Method: Bar chart (Chart.js) -> Interaction: Hover tooltips. Justification: Provides a quick, data-driven comparison of abstract technologies.
+        - Benefits: Goal: Compare/Inform -> Method: Radar chart (Chart.js) -> Interaction: Click segments to show detailed text. Justification: Effectively visualizes the multi-faceted value proposition.
+        - Use Cases: Goal: Organize/Inform -> Method: Filter buttons updating text and a simple bar chart -> Interaction: Click buttons to switch industry contexts. Justification: Makes the concept tangible by connecting it to specific, real-world applications. 
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #333a45;
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+        .nav-link.active {
+            color: #c08401;
+            border-bottom-color: #c08401;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .diagram-node {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            cursor: pointer;
+        }
+        .diagram-node:hover, .diagram-node.active {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background-color: #f59e0b;
+            color: white;
+        }
+        .use-case-btn.active {
+            background-color: #1e3a8a;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-gray-800">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl font-bold text-blue-900">Privacy in Supply Chains</h1>
+                <div class="hidden md:flex md:space-x-8">
+                    <a class="nav-link text-gray-600 hover:text-amber-600 border-b-2 border-transparent pb-1" href="#definition">Definition</a>
+                    <a class="nav-link text-gray-600 hover:text-amber-600 border-b-2 border-transparent pb-1" href="#design">Design</a>
+                    <a class="nav-link text-gray-600 hover:text-amber-600 border-b-2 border-transparent pb-1" href="#tech">Technologies</a>
+                    <a class="nav-link text-gray-600 hover:text-amber-600 border-b-2 border-transparent pb-1" href="#benefits">Benefits</a>
+                    <a class="nav-link text-gray-600 hover:text-amber-600 border-b-2 border-transparent pb-1" href="#use-cases">Use Cases</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <section class="min-h-screen/2 py-16 text-center" id="definition">
+            <h2 class="text-4xl font-bold text-blue-900 mb-4">What is a Privacy-Preserving Supply Chain?</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-8">
+                This section introduces the fundamental concept of integrating advanced privacy technologies into supply chain management. The goal is to understand how businesses can share necessary operational data for efficiency and transparency without exposing sensitive commercial information, thus building a more secure and trustworthy ecosystem.
+            </p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200 max-w-4xl mx-auto">
+                <p class="text-xl text-left text-gray-700 leading-relaxed">
+                    A <strong class="text-amber-600">Privacy-Preserving Supply Chain</strong> is a system where stakeholders (suppliers, manufacturers, distributors, retailers) can collaborate and share information securely without revealing sensitive data to each other or to unauthorized parties. It uses cryptographic techniques like zero-knowledge proofs and secure multi-party computation to verify transactions and track goods, ensuring data integrity and confidentiality. This allows for end-to-end transparency and auditability while protecting trade secrets, pricing strategies, and customer information.
+                </p>
+            </div>
+        </section>
+
+        <section class="py-16" id="design">
+            <h2 class="text-3xl font-bold text-center text-blue-900 mb-4">Core Design &amp; Data Flow</h2>
+            <p class="max-w-3xl mx-auto text-center text-lg text-gray-600 mb-12">
+                Here we explore the architectural design of a privacy-preserving supply chain. The interactive diagram below illustrates the key stages and the flow of encrypted or verified information between them. Click on each stage to understand its specific role and the privacy-enhancing technologies (PETs) applied to protect its data while contributing to the overall visibility of the chain.
+            </p>
+            <div class="grid md:grid-cols-3 gap-8 items-start">
+                <div class="md:col-span-2">
+                    <div class="flex items-center justify-around flex-wrap gap-4">
+                        <div class="diagram-node w-32 h-32 flex items-center justify-center text-center bg-white rounded-lg shadow-md p-2 border border-gray-200" id="node-supplier">Supplier<br/>(Raw Materials)</div>
+                        <div class="text-3xl font-mono text-amber-500">→</div>
+                        <div class="diagram-node w-32 h-32 flex items-center justify-center text-center bg-white rounded-lg shadow-md p-2 border border-gray-200" id="node-manufacturer">Manufacturer<br/>(Production)</div>
+                        <div class="text-3xl font-mono text-amber-500">→</div>
+                        <div class="diagram-node w-32 h-32 flex items-center justify-center text-center bg-white rounded-lg shadow-md p-2 border border-gray-200" id="node-distributor">Distributor<br/>(Logistics)</div>
+                        <div class="text-3xl font-mono text-amber-500 md:hidden">↓</div>
+                        <div class="hidden md:block text-3xl font-mono text-amber-500">→</div>
+                        <div class="diagram-node w-32 h-32 flex items-center justify-center text-center bg-white rounded-lg shadow-md p-2 border border-gray-200" id="node-retailer">Retailer<br/>(Sales)</div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 min-h-[200px]" id="diagram-info">
+                    <h3 class="font-bold text-lg text-blue-900 mb-2" id="info-title">Click a stage to learn more.</h3>
+                    <p class="text-gray-600" id="info-description">Each node in the supply chain generates and consumes data. In a privacy-preserving model, this data is shared as encrypted proofs rather than in plaintext, ensuring security at every step.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16" id="tech">
+            <h2 class="text-3xl font-bold text-center text-blue-900 mb-4">Enabling Technologies</h2>
+            <p class="max-w-3xl mx-auto text-center text-lg text-gray-600 mb-12">
+                The functionality of a privacy-preserving supply chain rests on several key technologies. This section provides an overview and comparison of these foundational tools. The chart visualizes how different approaches balance attributes like privacy strength and performance overhead, helping to illustrate the trade-offs involved in designing such a system.
+            </p>
+            <div class="chart-container">
+                <canvas id="techChart"></canvas>
+            </div>
+        </section>
+
+        <section class="py-16" id="benefits">
+            <h2 class="text-3xl font-bold text-center text-blue-900 mb-4">Key Benefits</h2>
+             <p class="max-w-3xl mx-auto text-center text-lg text-gray-600 mb-12">
+                Adopting a privacy-preserving model offers significant advantages beyond just security. This section visualizes the multi-faceted benefits, from enhancing trust among partners to streamlining compliance. Interact with the chart to see how each benefit contributes to a more resilient, efficient, and collaborative supply chain ecosystem.
+            </p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="chart-container h-96">
+                    <canvas id="benefitsChart"></canvas>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 min-h-[200px]" id="benefit-info">
+                     <h3 class="font-bold text-lg text-blue-900 mb-2" id="benefit-title">Enhanced Security</h3>
+                    <p class="text-gray-600" id="benefit-description">By encrypting data and minimizing exposure of sensitive information, the entire supply chain becomes more resilient to cyber-attacks, data breaches, and corporate espionage. It protects the core intellectual property of all participants.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16" id="use-cases">
+            <h2 class="text-3xl font-bold text-center text-blue-900 mb-4">Industry Use Cases</h2>
+            <p class="max-w-3xl mx-auto text-center text-lg text-gray-600 mb-12">
+                The principles of privacy-preserving supply chains are not just theoretical; they have powerful real-world applications across various industries. Select an industry below to explore a specific use case, including the challenges it solves, the technologies applied, and the tangible business value it creates.
+            </p>
+            <div class="flex justify-center flex-wrap gap-4 mb-8">
+                <button class="use-case-btn px-6 py-2 bg-white rounded-full shadow-sm border border-gray-200 hover:bg-blue-100 transition-colors" data-case="pharma">Pharmaceuticals</button>
+                <button class="use-case-btn px-6 py-2 bg-white rounded-full shadow-sm border border-gray-200 hover:bg-blue-100 transition-colors" data-case="luxury">Luxury Goods</button>
+                <button class="use-case-btn px-6 py-2 bg-white rounded-full shadow-sm border border-gray-200 hover:bg-blue-100 transition-colors" data-case="food">Food &amp; Agriculture</button>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200 grid md:grid-cols-2 gap-8 items-center" id="use-case-content">
+                <div>
+                    <h3 class="text-2xl font-bold text-blue-900 mb-3" id="use-case-title"></h3>
+                    <p class="text-gray-600 mb-4" id="use-case-challenge"></p>
+                    <p class="text-gray-600" id="use-case-solution"></p>
+                </div>
+                <div class="chart-container h-64 md:h-80">
+                    <canvas id="useCaseChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+
+            sections.forEach(section => observer.observe(section));
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelector(link.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            const diagramNodes = {
+                'node-supplier': {
+                    title: 'Stage 1: Supplier',
+                    description: 'Suppliers provide raw materials. They generate proofs of authenticity and origin without revealing their sourcing costs or specific material compositions to other parties. This prevents competitors from gaining an unfair advantage.'
+                },
+                'node-manufacturer': {
+                    title: 'Stage 2: Manufacturer',
+                    description: 'Manufacturers use materials to create products. They can prove they used authentic components and followed quality standards without exposing proprietary manufacturing processes or production volumes.'
+                },
+                'node-distributor': {
+                    title: 'Stage 3: Distributor',
+                    description: 'Distributors handle logistics. They can verify custody and prove that transport conditions (e.g., temperature for cold chains) were met, without revealing their full logistics network, routes, or client lists.'
+                },
+                'node-retailer': {
+                    title: 'Stage 4: Retailer',
+                    description: 'Retailers sell to consumers. They can prove the product\'s journey and authenticity to customers without disclosing their wholesale pricing, inventory levels, or sales data back up the chain.'
+                }
+            };
+            
+            const infoTitle = document.getElementById('info-title');
+            const infoDescription = document.getElementById('info-description');
+
+            Object.keys(diagramNodes).forEach(id => {
+                const node = document.getElementById(id);
+                node.addEventListener('click', () => {
+                    document.querySelectorAll('.diagram-node').forEach(n => n.classList.remove('active'));
+                    node.classList.add('active');
+                    infoTitle.textContent = diagramNodes[id].title;
+                    infoDescription.textContent = diagramNodes[id].description;
+                });
+            });
+
+            const techCtx = document.getElementById('techChart').getContext('2d');
+            const techChart = new Chart(techCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Blockchain', 'Zero-Knowledge Proofs', 'Secure Multi-Party Comp.', 'Homomorphic Encryption'],
+                    datasets: [{
+                        label: 'Privacy Strength',
+                        data: [7, 9, 8, 10],
+                        backgroundColor: 'rgba(30, 58, 138, 0.7)',
+                        borderColor: 'rgba(30, 58, 138, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Performance Overhead',
+                        data: [6, 7, 9, 10],
+                        backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 10,
+                            title: { display: true, text: 'Rating (1=Low, 10=High)' }
+                        }
+                    },
+                    plugins: {
+                        title: { display: true, text: 'Technology Attribute Comparison' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += context.parsed.x;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const benefitsData = {
+                labels: ['Enhanced Security', 'Regulatory Compliance', 'Increased Trust', 'Improved Efficiency', 'Counterfeit Prevention', 'Data Monetization'],
+                datasets: [{
+                    label: 'Impact Level',
+                    data: [9, 8, 9, 7, 10, 6],
+                    backgroundColor: 'rgba(30, 58, 138, 0.2)',
+                    borderColor: 'rgba(30, 58, 138, 1)',
+                    pointBackgroundColor: 'rgba(30, 58, 138, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(30, 58, 138, 1)'
+                }]
+            };
+
+            const benefitDescriptions = {
+                0: { title: 'Enhanced Security', description: 'By encrypting data and minimizing exposure of sensitive information, the entire supply chain becomes more resilient to cyber-attacks, data breaches, and corporate espionage.' },
+                1: { title: 'Regulatory Compliance', description: 'Simplifies adherence to data privacy regulations like GDPR by building compliance into the system architecture, providing auditable proof without revealing raw data.' },
+                2: { title: 'Increased Trust', description: 'Enables partners to verify claims and data without direct access, fostering a higher level of trust and encouraging more open collaboration and data sharing.' },
+                3: { title: 'Improved Efficiency', description: 'Automates verification processes and reduces the need for manual audits and reconciliations, speeding up transactions and reducing administrative overhead.' },
+                4: { title: 'Counterfeit Prevention', description: 'Provides an immutable and verifiable record of a product\'s journey from origin to consumer, making it extremely difficult to introduce counterfeit goods into the supply chain.'},
+                5: { title: 'Data Monetization', description: 'Allows companies to securely pool and analyze anonymized data, generating valuable market insights without compromising the privacy of individual participants.' }
+            };
+
+            const benefitsCtx = document.getElementById('benefitsChart').getContext('2d');
+            const benefitsChart = new Chart(benefitsCtx, {
+                type: 'radar',
+                data: benefitsData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                stepSize: 2
+                            }
+                        }
+                    },
+                    onClick: (evt, elements) => {
+                        if (elements.length > 0) {
+                            const activeIndex = elements[0].index;
+                            document.getElementById('benefit-title').textContent = benefitDescriptions[activeIndex].title;
+                            document.getElementById('benefit-description').textContent = benefitDescriptions[activeIndex].description;
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Click a point to see details' }
+                    }
+                }
+            });
+
+            const useCases = {
+                pharma: {
+                    title: 'Pharmaceuticals: Combating Counterfeit Drugs',
+                    challenge: 'The pharmaceutical industry faces a massive problem with counterfeit drugs that endanger lives and cause huge financial losses. Proving the provenance of each batch of medicine is critical.',
+                    solution: 'Using a blockchain ledger, each transaction (from manufacturer to pharmacy) is recorded immutably. Zero-knowledge proofs are used to verify drug pedigrees without revealing sensitive business data like pricing or shipment volumes between partners.',
+                    chartData: { labels: ['Counterfeit Prevention', 'Regulatory Compliance', 'Patient Safety'], data: [10, 9, 9] }
+                },
+                luxury: {
+                    title: 'Luxury Goods: Verifying Authenticity',
+                    challenge: 'High-end goods like watches, handbags, and art are often targets of sophisticated counterfeiting, which erodes brand value and deceives consumers.',
+                    solution: 'Each item is given a unique digital identity on a secure ledger at the point of creation. Customers can scan a tag to privately verify the item\'s entire history, from workshop to boutique, confirming its authenticity without exposing the brand\'s sensitive internal logistics data.',
+                    chartData: { labels: ['Brand Protection', 'Authenticity', 'Consumer Trust'], data: [10, 9, 8] }
+                },
+                food: {
+                    title: 'Food & Agriculture: Ensuring Food Safety',
+                    challenge: 'In a food contamination outbreak, tracing the source quickly is vital for public health. However, businesses are reluctant to share farm-to-table data openly due to its commercial sensitivity.',
+                    solution: 'Federated learning and secure computation allow participants to contribute data to a shared analytical model for tracing contaminants without revealing their individual farm yields, suppliers, or customer lists. This enables rapid, targeted recalls while protecting business privacy.',
+                    chartData: { labels: ['Traceability', 'Food Safety', 'Efficiency'], data: [10, 9, 7] }
+                }
+            };
+            
+            let useCaseChart;
+            const useCaseChartCtx = document.getElementById('useCaseChart').getContext('2d');
+
+            function updateUseCase(caseKey) {
+                const useCaseData = useCases[caseKey];
+                document.getElementById('use-case-title').textContent = useCaseData.title;
+                document.getElementById('use-case-challenge').textContent = useCaseData.challenge;
+                document.getElementById('use-case-solution').textContent = useCaseData.solution;
+
+                if (useCaseChart) {
+                    useCaseChart.destroy();
+                }
+
+                useCaseChart = new Chart(useCaseChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: useCaseData.chartData.labels,
+                        datasets: [{
+                            label: 'Impact Score',
+                            data: useCaseData.chartData.data,
+                            backgroundColor: 'rgba(29, 78, 216, 0.7)',
+                            borderColor: 'rgba(29, 78, 216, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: `Primary Benefits for ${caseKey.charAt(0).toUpperCase() + caseKey.slice(1)}` }
+                        }
+                    }
+                });
+
+                document.querySelectorAll('.use-case-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.case === caseKey);
+                });
+            }
+
+            document.querySelectorAll('.use-case-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    updateUseCase(e.target.dataset.case);
+                });
+            });
+
+            updateUseCase('pharma');
+        });
+    </script>
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

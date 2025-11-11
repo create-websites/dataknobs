@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Enterprise Guide to Foundation Model Fine-Tuning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A task-oriented SPA with four main sections: Overview, an interactive Prompting vs. Fine-Tuning comparison, a deep dive into Fine-Tuning criteria/use cases, and a final section on process. This structure was chosen to guide the user from the strategic decision of 'if/how to customize' to the tactical details of fine-tuning, with the core interactive comparison at the center for maximum engagement and clarity. -->
+    <!-- Visualization & Content Choices: Main comparison uses interactive buttons to dynamically update text and a Chart.js Radar Chart (Goal: Compare, Interaction: Click-to-update, Justification: Visually contrasts multi-faceted concepts). Criteria and Use Cases are presented in static info cards (Goal: Inform/Organize, Justification: Clear, scannable presentation of distinct concepts). Process is shown as a styled list (Goal: Organize, Justification: Simple and clear for a linear process). No SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #333;
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #0d9488;
+        }
+        .active-nav {
+            color: #0d9488;
+            font-weight: 600;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #F0EAE3;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .decision-btn {
+            transition: all 0.3s ease;
+        }
+        .active-decision {
+            background-color: #0d9488 !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px 0 rgba(13, 148, 136, 0.39);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+         @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-200">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl font-bold text-gray-800">Enterprise AI Strategy</h1>
+                <div class="hidden sm:flex sm:space-x-8">
+                    <a class="nav-link text-gray-600" href="#overview">Overview</a>
+                    <a class="nav-link text-gray-600" href="#decision">The Big Decision</a>
+                    <a class="nav-link text-gray-600" href="#deepdive">Fine-Tuning Deep Dive</a>
+                    <a class="nav-link text-gray-600" href="#process">Process</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section class="py-12 md:py-16 text-center" id="overview">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Adapting Foundation Models for Your Enterprise</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600">
+                Foundation models offer powerful general capabilities, but unlocking their true value for specific business needs requires customization. This guide explores the key strategies—Prompt Engineering and Fine-Tuning—to help you decide which path is right for your unique challenges and goals.
+            </p>
+        </section>
+
+        <section class="py-12 md:py-16 bg-white rounded-2xl shadow-sm border border-gray-200 my-12" id="decision">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">The Big Decision: Prompting vs. Fine-Tuning</h2>
+                    <p class="text-lg text-gray-600">
+                        This is the most critical strategic choice in your AI customization journey. While both aim to improve model output, they operate at fundamentally different levels of complexity, cost, and performance. Use the interactive comparison below to understand their trade-offs.
+                    </p>
+                </div>
+
+                <div class="flex justify-center gap-4 mb-10">
+                    <button class="decision-btn active-decision text-lg font-semibold py-3 px-8 rounded-full bg-gray-200 text-gray-700" id="promptBtn">Prompt Engineering</button>
+                    <button class="decision-btn text-lg font-semibold py-3 px-8 rounded-full bg-gray-200 text-gray-700" id="fineTuneBtn">Fine-Tuning</button>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4" id="decisionTitle">Prompt Engineering</h3>
+                        <div class="space-y-4 text-gray-600" id="decisionDescription">
+                             <p>This is the art and science of crafting highly effective inputs (prompts) to guide the foundation model's output without changing the model itself. It's a low-cost, rapid way to adapt the model for various tasks.</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Techniques:</strong> Zero-shot, few-shot, and chain-of-thought prompting.</li>
+                                <li><strong>Best For:</strong> General tasks, rapid prototyping, and scenarios where data is limited or model access is restricted.</li>
+                                <li><strong>Limitation:</strong> Performance ceiling is limited by the base model's inherent knowledge and capabilities.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-12 md:py-16" id="deepdive">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Fine-Tuning Deep Dive</h2>
+                <p class="max-w-3xl mx-auto text-lg text-gray-600">
+                    Fine-tuning is the process of further training a pre-trained foundation model on a smaller, domain-specific dataset. This teaches the model new knowledge, styles, or capabilities relevant to your business. Below are the key criteria for when to consider it and common enterprise use cases where it excels.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Key Decision Criteria to Fine-Tune</h3>
+                    <div class="space-y-6">
+                        <div class="card">
+                            <h4 class="font-semibold text-teal-700 text-lg mb-2">High Task-Specific Accuracy is Critical</h4>
+                            <p class="text-gray-600">When general prompting isn't precise enough and you need consistently high performance for a narrow, repetitive task.</p>
+                        </div>
+                        <div class="card">
+                            <h4 class="font-semibold text-teal-700 text-lg mb-2">Requires Domain-Specific Knowledge</h4>
+                            <p class="text-gray-600">The model must understand and use specialized jargon, internal company knowledge, or niche terminology not present in its general training data.</p>
+                        </div>
+                         <div class="card">
+                            <h4 class="font-semibold text-teal-700 text-lg mb-2">Need for a Unique Style or Tone</h4>
+                            <p class="text-gray-600">To ensure the model's output consistently matches your brand's voice, whether it's for marketing copy, formal reports, or customer service interactions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Common Enterprise Use Cases</h3>
+                    <div class="space-y-6">
+                        <div class="card">
+                            <h4 class="font-semibold text-teal-700 text-lg mb-2">Advanced Customer Support Bots</h4>
+                            <p class="text-gray-600">Training a model on past support tickets and internal knowledge bases to provide accurate, context-aware answers to customer queries.</p>
+                        </div>
+                        <div class="card">
+                            <h4 class="font-semibold text-teal-700 text-lg mb-2">Specialized Code Generation</h4>
+                            <p class="text-gray-600">Fine-tuning on a proprietary codebase to help developers write code that follows internal standards, uses specific frameworks, and is highly optimized.</p>
+                        </div>
+                        <div class="card">
+                            <h4 class="font-semibold text-teal-700 text-lg mb-2">Domain-Specific Content Creation</h4>
+                            <p class="text-gray-600">Generating highly technical documentation, legal contract summaries, or marketing content that adheres to strict industry regulations and terminology.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-12 md:py-16" id="process">
+            <div class="max-w-4xl mx-auto">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">The Fine-Tuning Process &amp; Key Considerations</h2>
+                    <p class="text-lg text-gray-600">
+                        Embarking on a fine-tuning project requires a structured approach and awareness of key factors beyond the technical implementation. This process ensures your investment yields a reliable, secure, and valuable AI asset.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-10">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-6">A High-Level Process Overview</h3>
+                        <ol class="relative border-l border-gray-300">
+                            <li class="mb-10 ml-6">
+                                <span class="absolute flex items-center justify-center w-6 h-6 bg-teal-100 rounded-full -left-3 ring-8 ring-white">1</span>
+                                <h4 class="font-semibold text-lg text-gray-800">Define Objective &amp; Collect Data</h4>
+                                <p class="text-gray-600">Clearly define the specific task the model will perform. Gather and curate a high-quality, labeled dataset (thousands of examples are often needed).</p>
+                            </li>
+                            <li class="mb-10 ml-6">
+                                <span class="absolute flex items-center justify-center w-6 h-6 bg-teal-100 rounded-full -left-3 ring-8 ring-white">2</span>
+                                <h4 class="font-semibold text-lg text-gray-800">Prepare &amp; Clean Data</h4>
+                                <p class="text-gray-600">Format the data into a prompt-completion structure. Remove inconsistencies, errors, and biases to ensure effective training.</p>
+                            </li>
+                            <li class="mb-10 ml-6">
+                                <span class="absolute flex items-center justify-center w-6 h-6 bg-teal-100 rounded-full -left-3 ring-8 ring-white">3</span>
+                                <h4 class="font-semibold text-lg text-gray-800">Train &amp; Evaluate</h4>
+                                <p class="text-gray-600">Run the fine-tuning job on the prepared dataset. Evaluate the model's performance on a separate test set to measure improvement and prevent overfitting.</p>
+                            </li>
+                             <li class="ml-6">
+                                <span class="absolute flex items-center justify-center w-6 h-6 bg-teal-100 rounded-full -left-3 ring-8 ring-white">4</span>
+                                <h4 class="font-semibold text-lg text-gray-800">Deploy &amp; Monitor</h4>
+                                <p class="text-gray-600">Integrate the fine-tuned model into your application via an API. Continuously monitor its performance, cost, and for any "model drift".</p>
+                            </li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-6">Other Critical Considerations</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <span class="text-teal-500 font-bold mr-3 mt-1">✓</span>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Data Privacy and Security</h4>
+                                    <p class="text-gray-600">Ensure that training data is properly anonymized and that the fine-tuning process complies with all data governance policies.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-teal-500 font-bold mr-3 mt-1">✓</span>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Cost Management</h4>
+                                    <p class="text-gray-600">Fine-tuning involves costs for data processing, training compute time, and hosting the custom model. These must be budgeted and tracked.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-teal-500 font-bold mr-3 mt-1">✓</span>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Model Maintenance</h4>
+                                    <p class="text-gray-600">A fine-tuned model is not static. It may need to be periodically re-tuned with new data to maintain its accuracy as the world changes (model drift).</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const promptBtn = document.getElementById('promptBtn');
+            const fineTuneBtn = document.getElementById('fineTuneBtn');
+            const decisionTitle = document.getElementById('decisionTitle');
+            const decisionDescription = document.getElementById('decisionDescription');
+
+            const comparisonData = {
+                promptEng: {
+                    title: 'Prompt Engineering',
+                    description: `
+                        <p>This is the art and science of crafting highly effective inputs (prompts) to guide the foundation model's output without changing the model itself. It's a low-cost, rapid way to adapt the model for various tasks.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-4">
+                            <li><strong>Techniques:</strong> Zero-shot, few-shot, and chain-of-thought prompting.</li>
+                            <li><strong>Best For:</strong> General tasks, rapid prototyping, and scenarios where data is limited or model access is restricted.</li>
+                            <li><strong>Limitation:</strong> Performance ceiling is limited by the base model's inherent knowledge and capabilities.</li>
+                        </ul>
+                    `,
+                    chartData: [2, 1, 1, 3, 5]
+                },
+                fineTune: {
+                    title: 'Fine-Tuning',
+                    description: `
+                        <p>This involves updating the weights of the foundation model by training it further on a smaller, task-specific dataset. It fundamentally teaches the model new skills, knowledge, or a specific style.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-4">
+                            <li><strong>Process:</strong> Requires a curated dataset of hundreds or thousands of high-quality examples.</li>
+                            <li><strong>Best For:</strong> Achieving state-of-the-art performance on a narrow task, embedding deep domain knowledge, or adopting a unique brand voice.</li>
+                            <li><strong>Limitation:</strong> Higher cost, requires technical expertise, and needs careful data preparation.</li>
+                        </ul>
+                    `,
+                    chartData: [5, 5, 5, 2, 1]
+                }
+            };
+
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            let comparisonChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Task Performance', 'Cost & Effort', 'Data Requirement', 'Speed to Deploy', 'Ease of Use'],
+                    datasets: [{
+                        label: 'Relative Score',
+                        data: comparisonData.promptEng.chartData,
+                        backgroundColor: 'rgba(13, 148, 136, 0.2)',
+                        borderColor: 'rgba(13, 148, 136, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(13, 148, 136, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(13, 148, 136, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: '#e5e7eb'
+                            },
+                            grid: {
+                                color: '#e5e7eb'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    family: 'Inter'
+                                },
+                                color: '#4b5563'
+                            },
+                            ticks: {
+                                backdropColor: '#FDFBF8',
+                                color: '#6b7280',
+                                stepSize: 1,
+                                font: {
+                                     family: 'Inter'
+                                }
+                            },
+                            min: 0,
+                            max: 5
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.r !== null) {
+                                        label += context.parsed.r + '/5';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            function updateDecisionView(type) {
+                const data = comparisonData[type];
+                decisionTitle.textContent = data.title;
+                decisionDescription.innerHTML = data.description;
+                comparisonChart.data.datasets[0].data = data.chartData;
+                comparisonChart.update();
+
+                if (type === 'promptEng') {
+                    promptBtn.classList.add('active-decision');
+                    fineTuneBtn.classList.remove('active-decision');
+                } else {
+                    fineTuneBtn.classList.add('active-decision');
+                    promptBtn.classList.remove('active-decision');
+                }
+            }
+            
+            promptBtn.addEventListener('click', () => updateDecisionView('promptEng'));
+            fineTuneBtn.addEventListener('click', () => updateDecisionView('fineTune'));
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active-nav');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active-nav');
+                    }
+                });
+            });
+
+        });
+    </script>
+
+
+</body></html>

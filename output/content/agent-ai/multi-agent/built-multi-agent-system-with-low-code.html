@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Building LLM-Powered Multi-Agent AI Systems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Slate & Sky -->
+    <!-- Application Structure Plan: The application is designed as an interactive, single-page guide. It uses a sticky side navigation for quick access to different thematic sections, allowing for both linear, guided learning and non-linear, self-directed exploration. The structure starts with foundational concepts, moves to an interactive framework diagram, then shows a practical application with a marketing use-case dashboard, and concludes with a filterable list of tools. This task-oriented flow was chosen over a rigid report structure to make the complex topic of multi-agent systems more intuitive and engaging. Users can explore definitions, see the process in action, analyze a sample outcome, and then find the tools to build it themselves, all in one cohesive experience. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Core Definitions (LLM, Agent, Workflow). Goal: Inform. Viz/Method: Styled HTML/CSS cards. Interaction: Subtle hover effects. Justification: Provides clear, scannable definitions as a foundation. Method: Tailwind CSS.
+        - Report Info: Framework for building a system. Goal: Organize/Explain Process. Viz/Method: Interactive HTML/CSS Flowchart. Interaction: Clicking a step in the flowchart updates a detail panel with more information. Justification: Turns a static process into an explorable, self-paced learning tool, enhancing user engagement and understanding. Method: Vanilla JS DOM manipulation.
+        - Report Info: Agent involvement in a workflow. Goal: Compare/Show Change. Viz/Method: Bar Chart. Interaction: A dropdown filters the chart data to show agent allocation across different project phases. Justification: Visually demonstrates the dynamic nature of agentic workflows in a tangible way. Method: Chart.js.
+        - Report Info: Marketing campaign analysis. Goal: Synthesize/Analyze. Viz/Method: Dashboard with a line chart (performance over time) and a donut chart (agent task breakdown). Interaction: Standard Chart.js tooltips on hover. Justification: Provides a concrete example of the system's output, making the benefits clear. The charts are constrained in responsive containers to maintain layout integrity. Method: Chart.js.
+        - Report Info: Available low-code/no-code tools. Goal: Organize/Inform. Viz/Method: Filterable grid of HTML cards. Interaction: Buttons filter the tools by category. Justification: Offers a practical, actionable resource for the user. Method: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+        .nav-link.active {
+            color: #0ea5e9;
+            border-left-color: #0ea5e9;
+            background-color: #f0f9ff;
+        }
+        .nav-link:hover {
+            color: #0ea5e9;
+            background-color: #f0f9ff;
+            border-left-color: #0ea5e9;
+        }
+        .flow-step {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #e2e8f0;
+        }
+        .flow-step.active {
+            border-color: #0ea5e9;
+            background-color: #f0f9ff;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .flow-step:not(.active):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="relative min-h-screen md:flex">
+        <aside class="hidden md:block w-64 bg-white/80 backdrop-blur-sm border-r border-slate-200 p-6 fixed h-full">
+            <h2 class="text-xl font-bold text-slate-900 mb-6">Navigation</h2>
+            <nav class="space-y-2" id="desktop-nav">
+                <a class="nav-link block font-medium py-2 px-4 rounded-r-md" href="#introduction">Introduction</a>
+                <a class="nav-link block font-medium py-2 px-4 rounded-r-md" href="#concepts">Core Concepts</a>
+                <a class="nav-link block font-medium py-2 px-4 rounded-r-md" href="#framework">The Framework</a>
+                <a class="nav-link block font-medium py-2 px-4 rounded-r-md" href="#workflow">Building a Workflow</a>
+                <a class="nav-link block font-medium py-2 px-4 rounded-r-md" href="#use-case">Use Case: Marketing</a>
+                <a class="nav-link block font-medium py-2 px-4 rounded-r-md" href="#tools">Platform Tools</a>
+                <a class="nav-link block font-medium py-2 px-4 rounded-r-md" href="#conclusion">Conclusion</a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 md:ml-64 p-4 sm:p-6 lg:p-10">
+            <section class="mb-16 scroll-mt-20" id="introduction">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200/80">
+                        <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-4 tracking-tight">Build Multi-Agent AI Systems with Low-Code</h1>
+                        <p class="text-lg text-slate-600">This guide details the design and deployment of robust, project-focused multi-agent AI systems, leveraging contemporary low/no-code platforms. Covering key principles, a structured framework, and a marketing example, it clarifies agentic workflows to automate intricate tasks and deliver rich analytical insights, even without significant coding.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16 scroll-mt-20" id="concepts">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">Core Concepts</h2>
+                    <p class="text-slate-600 mb-8">Here's a rewritten version of similar length:
+
+**Mastering the fundamentals is key. These elements—forming a low-code, multi-agent AI system's core—demand examination. Discover how these concepts combine to enable potent automation.**</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200/80">
+                            <h3 class="font-bold text-xl mb-2 text-sky-600">Large Language Model (LLM)</h3>
+                            <p class="text-slate-600">The operational "brain": LLMs such as GPT and Gemini offer the reasoning, language skills, and content creation power driving intelligent agent actions.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200/80">
+                            <h3 class="font-bold text-xl mb-2 text-sky-600">AI Agent</h3>
+                            <p class="text-slate-600">An LLM-driven "agent" with a defined role, equipped with tools like web search or data analysis, and tasked with a project-specific objective.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200/80">
+                            <h3 class="font-bold text-xl mb-2 text-sky-600">Agentic Workflow</h3>
+                            <p class="text-slate-600">Here are a few options, all similar in length and capturing the essence of the original:
+
+*   **The "assembly line": a process map. It outlines agent collaboration, information flow, and sequential or parallel tasks to achieve a multi-stage goal.**
+
+*   **This "assembly line" – a process map – details agent interactions, information exchange, and the sequential/parallel steps needed for a complex objective.**
+
+*   **Think of it as the "assembly line" itself: a process map showing agent teamwork, information exchange, and the order (or simultaneous nature) of steps for a multi-faceted goal.**</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200/80">
+                            <h3 class="font-bold text-xl mb-2 text-sky-600">Low-Code/No-Code Platform</h3>
+                            <p class="text-slate-600">Here are a few options, all of similar length, rephrasing the original:
+
+*   **These "factory builders" let you build and manage agents.** They offer drag-and-drop tools for agent connection, workflow creation, and execution control.
+
+*   **Visual dev environments, or "factory builders," streamline agent management.** You design agents, link them in workflows, and oversee their operation via easy-to-use interfaces.
+
+*   **Similar to "factory builders," these platforms offer visual agent design.** Define agents, create workflows, and monitor their operation, all through intuitive interfaces.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mb-16 scroll-mt-20" id="framework">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">The Agentic Framework</h2>
+                    <p class="text-slate-600 mb-8">Creating a multi-agent system involves a defined, cyclical process. This interactive guide details each phase, from conception to deployment. Explore each stage to understand its objectives and tasks. This strategy ensures a well-built, successful system, matching your project goals.</p>
+                    <div class="lg:flex lg:space-x-8">
+                        <div class="lg:w-1/3 space-y-4 mb-8 lg:mb-0">
+                            <div class="flow-step p-4 rounded-lg active" id="step-1">
+                                <h4 class="font-bold text-lg">1. Define Goal &amp; Scope</h4>
+                                <p class="text-sm text-slate-500">Clearly articulate the overall objective.</p>
+                            </div>
+                             <div class="w-full flex justify-center"><span class="text-2xl text-slate-300">↓</span></div>
+                            <div class="flow-step p-4 rounded-lg" id="step-2">
+                                <h4 class="font-bold text-lg">2. Select Agent Roles</h4>
+                                <p class="text-sm text-slate-500">Identify the specialized skills needed.</p>
+                            </div>
+                             <div class="w-full flex justify-center"><span class="text-2xl text-slate-300">↓</span></div>
+                            <div class="flow-step p-4 rounded-lg" id="step-3">
+                                <h4 class="font-bold text-lg">3. Design the Workflow</h4>
+                                <p class="text-sm text-slate-500">Map the collaboration and data flow.</p>
+                            </div>
+                             <div class="w-full flex justify-center"><span class="text-2xl text-slate-300">↓</span></div>
+                            <div class="flow-step p-4 rounded-lg" id="step-4">
+                                <h4 class="font-bold text-lg">4. Execute &amp; Monitor</h4>
+                                <p class="text-sm text-slate-500">Run the system and analyze performance.</p>
+                            </div>
+                        </div>
+                        <div class="lg:w-2/3">
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 min-h-[300px]" id="framework-details">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mb-16 scroll-mt-20" id="workflow">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">Building a Dynamic Workflow</h2>
+                    <p class="text-slate-600 mb-8">Agentic workflows dynamically evolve; agent roles and influence shift over project phases. The illustration below models resource allocation changes within a marketing campaign analysis. Explore the stages – planning, execution, and analysis – using the dropdown to observe these shifts.</p>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-slate-800">Agent Involvement by Project Phase</h3>
+                            <select class="rounded-md border-slate-300 shadow-sm focus:border-sky-500 focus:ring-sky-500" id="phase-selector">
+                                <option value="planning">1. Planning Phase</option>
+                                <option value="execution">2. Execution Phase</option>
+                                <option value="analysis">3. Analysis Phase</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="workflowChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16 scroll-mt-20" id="use-case">
+                <div class="max-w-4xl mx-auto">
+                     <h2 class="text-3xl font-bold text-slate-900 mb-2">Use Case: Marketing Campaign Analysis</h2>
+                    <p class="text-slate-600 mb-8">Below is a demo dashboard showcasing a multi-agent system's work on a digital marketing campaign. This system employs agents to research trends, craft ads, track results, and compile reports, delivering clear, practical insights for human marketers.</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                             <h3 class="text-xl font-bold text-slate-800 mb-4">Campaign Performance Over Time</h3>
+                             <div class="chart-container h-64 md:h-80">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                             <h3 class="text-xl font-bold text-slate-800 mb-4">Agent Contribution to Campaign</h3>
+                             <div class="chart-container h-64 md:h-80">
+                                <canvas id="contributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mb-16 scroll-mt-20" id="tools">
+                 <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">Low-Code Platform Tools</h2>
+                    <p class="text-slate-600 mb-8">Agent system development tools are rapidly expanding. These platforms offer visual interfaces for designing, testing, and launching multi-agent workflows. Explore key tools below, categorized by their main functionalities.</p>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button class="tool-filter-btn active" data-filter="all">All</button>
+                        <button class="tool-filter-btn" data-filter="automation">Workflow Automation</button>
+                        <button class="tool-filter-btn" data-filter="agent">Agent Platforms</button>
+                        <button class="tool-filter-btn" data-filter="integration">Integration</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="tool-grid">
+                        <div class="tool-card" data-category="agent">
+                            <h4 class="font-bold">CrewAI</h4>
+                            <p>A framework for orchestrating role-playing, autonomous AI agents.</p>
+                        </div>
+                        <div class="tool-card" data-category="automation">
+                            <h4 class="font-bold">Make.com</h4>
+                            <p>A visual workflow automation platform that connects apps and services.</p>
+                        </div>
+                        <div class="tool-card" data-category="agent">
+                            <h4 class="font-bold">AgentGPT</h4>
+                            <p>Assemble, configure, and deploy autonomous AI agents in your browser.</p>
+                        </div>
+                         <div class="tool-card" data-category="integration">
+                            <h4 class="font-bold">Zapier</h4>
+                            <p>Connects thousands of apps to automate repetitive tasks with "Zaps".</p>
+                        </div>
+                        <div class="tool-card" data-category="automation">
+                            <h4 class="font-bold">n8n</h4>
+                            <p>A source-available workflow automation tool with extensive integrations.</p>
+                        </div>
+                         <div class="tool-card" data-category="agent">
+                            <h4 class="font-bold">AutoGen Studio</h4>
+                            <p>A Microsoft research project for building multi-agent applications.</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+
+            <section class="scroll-mt-20" id="conclusion">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-gradient-to-r from-sky-500 to-indigo-600 p-8 rounded-2xl text-white">
+                        <h2 class="text-3xl font-bold mb-4">The Future is Agentic</h2>
+                        <p class="text-sky-100 mb-6">Leveraging LLMs and accessible low-code tools, multi-agent AI breaks free from research and transforms automation. This paradigm shift empowers teams to solve complex projects quickly and intelligently. To begin, choose a simple task, select a platform, and build your initial agent workflow.</p>
+                        <button class="bg-white text-sky-600 font-bold py-3 px-6 rounded-lg shadow-md hover:bg-slate-100 transition-colors">Start Your First Project</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const frameworkDetails = {
+        'step-1': {
+            title: '1. Define Goal & Scope',
+            content: 'This is the most critical phase. You must clearly articulate the high-level objective of your project. What problem are you trying to solve? What is the ideal outcome? For a marketing campaign, the goal might be "Analyze the performance of our Q3 social media campaign and identify the top 3 drivers of user engagement." A well-defined goal prevents scope creep and ensures all agents work towards a common purpose.'
+        },
+        'step-2': {
+            title: '2. Select Agent Roles',
+            content: 'Based on your goal, break down the project into smaller tasks and assign an agent role to each. For our marketing example, you might need a "Data Gathering Agent" to pull metrics from APIs, a "Content Analysis Agent" to review posts and comments, and a "Reporting Agent" to synthesize the findings into a summary. Each agent should have a clear, distinct responsibility.'
+        },
+        'step-3': {
+            title: '3. Design the Workflow',
+            content: 'Map out how the agents will interact. This is the "agentic" part. Does the Data Agent hand off its findings to the Analysis Agent? Do they work in parallel? Define the triggers, data handoffs, and communication protocols. In low-code tools, this is often done by visually connecting agent nodes on a canvas to create a directed graph of tasks.'
+        },
+        'step-4': {
+            title: '4. Execute & Monitor',
+            content: 'Run the workflow and watch the agents collaborate. The key at this stage is to monitor their performance, outputs, and any errors that occur. Low-code platforms provide logs and dashboards for this purpose. Be prepared to iterate on your workflow, refine agent instructions, or adjust tools based on the initial results to improve accuracy and efficiency.'
+        }
+    };
+
+    const workflowChartData = {
+        planning: {
+            labels: ['Market Research Agent', 'Strategy Agent', 'Data Planning Agent', 'Content Idea Agent'],
+            data: [40, 35, 15, 10]
+        },
+        execution: {
+            labels: ['Content Generation Agent', 'Ad Campaign Agent', 'Social Media Agent', 'Monitoring Agent'],
+            data: [45, 30, 15, 10]
+        },
+        analysis: {
+            labels: ['Data Analysis Agent', 'Performance Reporting Agent', 'Insight Generation Agent', 'Visualization Agent'],
+            data: [50, 25, 20, 5]
+        }
+    };
+
+    let workflowChart;
+
+    function initWorkflowChart() {
+        const ctx = document.getElementById('workflowChart').getContext('2d');
+        workflowChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: workflowChartData.planning.labels,
+                datasets: [{
+                    label: 'Agent Involvement %',
+                    data: workflowChartData.planning.data,
+                    backgroundColor: 'rgba(56, 189, 248, 0.6)',
+                    borderColor: 'rgba(14, 165, 233, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.raw}% involvement`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 55,
+                        grid: {
+                            color: '#e2e8f0'
+                        }
+                    },
+                    y: {
+                         grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateWorkflowChart(phase) {
+        if (!workflowChart) return;
+        const { labels, data } = workflowChartData[phase];
+        workflowChart.data.labels = labels;
+        workflowChart.data.datasets[0].data = data;
+        workflowChart.update();
+    }
+
+    document.getElementById('phase-selector').addEventListener('change', (e) => {
+        updateWorkflowChart(e.target.value);
+    });
+    
+    function initPerformanceChart() {
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                datasets: [{
+                    label: 'Engagement Rate',
+                    data: [1.2, 1.5, 1.8, 2.5, 3.1, 4.0],
+                    borderColor: '#0ea5e9',
+                    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Conversion Rate',
+                    data: [0.3, 0.4, 0.5, 0.8, 1.1, 1.5],
+                    borderColor: '#4f46e5',
+                     backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                     y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                         callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function initContributionChart() {
+        const ctx = document.getElementById('contributionChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Market Research', 'Ad Copy Generation', 'Performance Reporting', 'Trend Analysis'],
+                datasets: [{
+                    label: 'Agent Contribution',
+                    data: [30, 40, 20, 10],
+                    backgroundColor: ['#38bdf8', '#6366f1', '#a78bfa', '#c084fc'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                 plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                         callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}% of tasks`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    const frameworkSteps = document.querySelectorAll('.flow-step');
+    const detailsContainer = document.getElementById('framework-details');
+
+    function updateFrameworkDetails(stepId) {
+        const detail = frameworkDetails[stepId];
+        detailsContainer.innerHTML = `
+            <h3 class="text-2xl font-bold text-slate-800 mb-4">${detail.title}</h3>
+            <p class="text-slate-600 leading-relaxed">${detail.content}</p>
+        `;
+        frameworkSteps.forEach(step => {
+            step.classList.toggle('active', step.id === stepId);
+        });
+    }
+
+    frameworkSteps.forEach(step => {
+        step.addEventListener('click', () => {
+            updateFrameworkDetails(step.id);
+        });
+    });
+
+    const filterButtons = document.querySelectorAll('.tool-filter-btn');
+    const toolCards = document.querySelectorAll('.tool-card');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const filter = button.getAttribute('data-filter');
+            
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            toolCards.forEach(card => {
+                const category = card.getAttribute('data-category');
+                if (filter === 'all' || filter === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    const styleToolCards = () => {
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.classList.add('bg-white', 'p-4', 'rounded-xl', 'border', 'border-slate-200/80', 'transition-shadow', 'hover:shadow-md');
+            card.querySelector('h4').classList.add('text-lg', 'text-slate-800', 'mb-1');
+            card.querySelector('p').classList.add('text-sm', 'text-slate-500');
+        });
+    };
+    
+    const styleFilterButtons = () => {
+        document.querySelectorAll('.tool-filter-btn').forEach(button => {
+            button.classList.add('px-4', 'py-1.5', 'text-sm', 'font-medium', 'rounded-full', 'transition-colors', 'border');
+            if(button.classList.contains('active')) {
+                button.classList.add('bg-sky-500', 'text-white', 'border-sky-500');
+            } else {
+                 button.classList.add('bg-white', 'text-slate-600', 'border-slate-300', 'hover:bg-slate-100');
+            }
+        });
+         document.querySelectorAll('.tool-filter-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tool-filter-btn').forEach(b => {
+                    b.classList.remove('bg-sky-500', 'text-white', 'border-sky-500');
+                    b.classList.add('bg-white', 'text-slate-600', 'border-slate-300', 'hover:bg-slate-100');
+                });
+                button.classList.remove('bg-white', 'text-slate-600', 'border-slate-300', 'hover:bg-slate-100');
+                button.classList.add('bg-sky-500', 'text-white', 'border-sky-500');
+            });
+        });
+    };
+    
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section');
+
+    const onScroll = () => {
+        let currentSection = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (window.scrollY >= sectionTop - 100) {
+                currentSection = section.getAttribute('id');
+            }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${currentSection}`) {
+                link.classList.add('active');
+            }
+        });
+    };
+
+    window.addEventListener('scroll', onScroll);
+
+    initWorkflowChart();
+    initPerformanceChart();
+    initContributionChart();
+    updateFrameworkDetails('step-1');
+    styleToolCards();
+    styleFilterButtons();
+    onScroll();
+
+});
+</script>
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

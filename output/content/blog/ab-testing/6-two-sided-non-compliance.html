@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Understanding Two-Sided Noncompliance in Experiments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&amp;family=Source+Sans+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Harmony (Stone, Slate, and Muted Blue) -->
+    <!-- Application Structure Plan: The application is designed as an interactive learning module that guides the user from theory to application. The structure is thematic: 1) Introduction to the problem of two-sided noncompliance. 2) An interactive visualization of the Principal Strata to make this core concept tangible. 3) A breakdown of the key causal questions (Estimands like ITT vs. CACE). 4) A clear, tabbed explanation of the critical IV Assumptions. 5) The centerpiece: an interactive calculator using the Vietnam Draft Lottery example to demonstrate the Wald estimator in action. 6) A summary of practical design considerations. This structure prioritizes conceptual understanding and active learning over the linear format of the source text. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Principal Strata. Goal: Organize/Inform. Viz: Interactive cards with a toggle. Interaction: The user can toggle between the "Treatment" and "Control" assignment view to see which strata are observed in each group and what their treatment status is. Justification: This dynamically illustrates how the latent strata compose the observed experimental groups, a core and often confusing concept. Method: HTML/CSS/JS.
+        - Report Info: Vietnam Draft Lottery data. Goal: Compare/Explain Process. Viz: Dynamic stats and two Bar Charts. Interaction: The app uses the raw data to visually and numerically calculate the ITT on mortality and the ITT on service (the "first stage"). These charts directly feed into the final CACE calculation. Justification: This makes the abstract Wald Estimator (the ratio of two effects) concrete and visual. Library: Chart.js (Canvas).
+        - Report Info: IV Assumptions. Goal: Inform/Organize. Viz: Tabbed interface. Interaction: Users click through tabs for each assumption. Justification: This breaks down the dense theoretical requirements into digestible, self-contained pieces to avoid overwhelming the user. Method: HTML/CSS/JS.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Source Sans Pro', sans-serif; background-color: #f8f7f5; color: #475569; }
+        h1, h2, h3 { font-family: 'Lora', serif; color: #1e293b; }
+        .nav-link { transition: color 0.2s; }
+        .nav-link:hover, .nav-link.active { color: #3b82f6; }
+        .card { background-color: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05); padding: 1.5rem; border: 1px solid #e5e7eb; }
+        .tab { cursor: pointer; padding: 0.75rem 1rem; border-bottom: 2px solid transparent; }
+        .tab.active { color: #3b82f6; border-color: #3b82f6; font-weight: 600;}
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        .strata-card { transition: all 0.3s ease-in-out; border-left-width: 4px; }
+        .strata-card.inactive { opacity: 0.4; transform: scale(0.98); }
+        .tooltip { position: relative; display: inline-block; cursor: help; }
+        .tooltip .tooltiptext { visibility: hidden; width: 250px; background-color: #334155; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -125px; opacity: 0; transition: opacity 0.3s; font-size: 0.875rem; font-weight: 400; }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body class="antialiased leading-relaxed">
+
+    <header class="bg-white/90 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-slate-800 font-serif">Two-Sided Noncompliance</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4" id="nav-menu">
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#problem">The Problem</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#assumptions">Assumptions</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#estimator">Estimator</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#design">Design</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="py-16 sm:py-20 lg:py-24" id="problem">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight">The Encouragement Problem</h1>
+                    <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-600">Field studies often face a reality: we can't always *make* people take the treatment. Instead, we randomize an *incentive*. Because of this, we get **two-sided noncompliance**, where some encouraged individuals skip the treatment, and some *un*encouraged individuals still receive it, creating challenges when analyzing impact.</p>
+                </div>
+
+                <div class="mt-16">
+                    <h2 class="text-3xl font-bold text-center">Understanding the Population</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-center text-slate-600">Here's a rewrite of the line, keeping a similar size and meaning:
+
+To address this, we categorize individuals into four concealed **Behavioral Classes**. Each person's class, like age, is a stable trait reflecting their responses to any given task.</p>
+                    
+                    <div class="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-sm">
+                        <div class="flex justify-center items-center space-x-4 mb-6">
+                            <span class="font-semibold text-slate-700">View Observed Behavior If:</span>
+                            <div class="flex rounded-md bg-slate-100 p-1">
+                                <button class="px-4 py-1 text-sm font-semibold rounded-md transition-colors" id="view-control">Assigned Control</button>
+                                <button class="px-4 py-1 text-sm font-semibold rounded-md transition-colors bg-white text-blue-600 shadow-sm" id="view-treatment">Assigned Treatment</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="strata-card card border-l-blue-500" id="strata-c">
+                                <h3 class="font-bold text-lg text-blue-800">Compliers</h3>
+                                <p class="text-sm text-slate-500">Take treatment if &amp; only if encouraged.</p>
+                                <p class="mt-2 text-sm font-bold">Observed Action: <span class="action-text">Gets Treated</span></p>
+                            </div>
+                            <div class="strata-card card border-l-green-500" id="strata-at">
+                                <h3 class="font-bold text-lg text-green-800">Always-Takers</h3>
+                                <p class="text-sm text-slate-500">Get treatment regardless of encouragement.</p>
+                                <p class="mt-2 text-sm font-bold">Observed Action: <span class="action-text">Gets Treated</span></p>
+                            </div>
+                            <div class="strata-card card border-l-red-500" id="strata-nt">
+                                <h3 class="font-bold text-lg text-red-800">Never-Takers</h3>
+                                <p class="text-sm text-slate-500">Never get treatment, regardless.</p>
+                                <p class="mt-2 text-sm font-bold">Observed Action: <span class="action-text">Not Treated</span></p>
+                            </div>
+                            <div class="strata-card card border-l-slate-400" id="strata-d">
+                                <h3 class="font-bold text-lg text-slate-600">Defiers</h3>
+                                <p class="text-sm text-slate-500">Do the opposite of their assignment.</p>
+                                <p class="mt-2 text-sm font-bold">Observed Action: <span class="action-text">Not Treated</span></p>
+                            </div>
+                        </div>
+                         <p class="text-center mt-6 text-sm text-slate-500">Key analytical issue: within the treatment group, both Compliers and Always-Takers receive the intervention, indistinguishable via data.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 sm:py-20 lg:py-24 bg-white" id="assumptions">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                 <div class="text-center">
+                    <h2 class="text-3xl font-bold">The Pillars of Identification</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">To gauge the causal effect on Compliers (CACE), we need to employ assumptions that connect the random encouragement to the observed outcome.</p>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto">
+                    <div class="border-b border-slate-200">
+                        <nav aria-label="Tabs" class="-mb-px flex space-x-2 sm:space-x-6 justify-center">
+                            <div class="tab active" id="tab-relevance">Relevance</div>
+                            <div class="tab" id="tab-exclusion">Exclusion</div>
+                            <div class="tab" id="tab-monotonicity">Monotonicity</div>
+                        </nav>
+                    </div>
+                    <div class="mt-8">
+                        <div class="tab-content active" id="content-relevance">
+                            <h3 class="text-xl font-bold text-center">Relevance (The "First Stage")</h3>
+                            <p class="mt-2 text-center text-slate-600">The encouragement's effectiveness is key. It must influence treatment uptake. Without behavioral change from encouragement, data provides no insights. This can be verified using the collected information.</p>
+                        </div>
+                        <div class="tab-content" id="content-exclusion">
+                            <h3 class="text-xl font-bold text-center">The Exclusion Restriction</h3>
+                            <p class="mt-2 text-center text-slate-600">Here's a concise rewrite, maintaining a similar length and conveying the same core idea:
+
+The key assumption: the encouragement's sole impact is increased treatment uptake. For those always or never taking the treatment, encouragement's impact is nil. This untestable claim hinges on the experiment's structure.</p>
+                        </div>
+                        <div class="tab-content" id="content-monotonicity">
+                            <h3 class="text-xl font-bold text-center">Monotonicity (No Defiers)</h3>
+                            <p class="mt-2 text-center text-slate-600">To ensure the encouragement only promotes treatment, we must rule out "Defiers" — those seeking treatment *only* without encouragement. This is a robust behavioral assumption in two-sided designs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 sm:py-20 lg:py-24" id="estimator">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold">Estimating the Effect: The Draft Lottery</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">Consider the Vietnam draft lottery: a random number spurred military service. We'll analyze how this "encouragement" influenced mortality rates among those drafted.</p>
+                </div>
+                
+                <div class="mt-12 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+                    <div class="space-y-6">
+                        <div class="card">
+                             <h3 class="text-xl font-bold">The CACE Formula (Wald Estimator)</h3>
+                             <p class="mt-2 text-slate-600">CACE, a straightforward ratio, is calculated as: the ITT for the outcome (ITT_Y) divided by the ITT for treatment take-up (ITT_D).</p>
+                             <div class="mt-3 p-4 bg-slate-50 rounded-lg text-center">
+                                <p class="text-lg font-semibold font-mono text-slate-700">
+                                CACE = 
+                                <span class="tooltip">
+                                    <span class="text-red-600">Effect on Outcome</span>
+                                    <span class="tooltiptext">Here are a few options, all similar in length:
+
+*   **Mortality's ITT impact: Did draft eligibility alter death rates?**
+*   **ITT effect on death: Did draft eligibility shift mortality rates?**
+*   **Draft eligibility and death: ITT impact on mortality rate change?**
+*   **ITT mortality analysis: How did the draft affect death rates?**</span>
+                                </span> 
+                                <span class="mx-2">/</span>
+                                <span class="tooltip">
+                                    <span class="text-blue-600">Effect on Participation</span>
+                                    <span class="tooltiptext">Here are a few options, all of similar length, focusing on the core meaning:
+
+*   **ITT's impact: Enlistment boost from eligibility?** (Focuses on the increase)
+*   **ITT &amp; Service: Measuring eligibility's enlistment rate.** (Emphasizes the measurement)
+*   **How ITT rules affected service: Enrollment compliance?** (More concise)
+*   **ITT's role: Eligibility's enlistment influence?** (Direct and clear)</span>
+                                </span>
+                                </p>
+                             </div>
+                        </div>
+
+                        <div class="card">
+                             <h3 class="text-xl font-bold">Calculated Effects</h3>
+                             <div class="mt-4 space-y-3">
+                                <div class="flex justify-between items-baseline">
+                                    <span class="font-semibold text-slate-600">Effect on Mortality (ITT_Y):</span>
+                                    <span class="font-bold text-xl text-red-600" id="itt_y_result"></span>
+                                </div>
+                                <div class="flex justify-between items-baseline">
+                                    <span class="font-semibold text-slate-600">Effect on Service (ITT_D):</span>
+                                    <span class="font-bold text-xl text-blue-600" id="itt_d_result"></span>
+                                </div>
+                                <hr class="my-2 border-slate-200"/>
+                                <div class="flex justify-between items-baseline">
+                                    <span class="text-xl font-bold text-slate-800">CACE (Effect for Compliers):</span>
+                                    <span class="font-extrabold text-3xl text-slate-800" id="cace_result"></span>
+                                </div>
+                                <p class="text-sm text-center pt-2 text-slate-500" id="cace_interpretation"></p>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-8">
+                        <div class="card">
+                            <h4 class="text-lg font-bold text-center">Effect of Eligibility on Mortality</h4>
+                            <div class="chart-container mt-2">
+                                <canvas id="ittOutcomeChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-lg font-bold text-center">Effect of Eligibility on Military Service</h4>
+                            <div class="chart-container mt-2">
+                                <canvas id="ittParticipationChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 sm:py-20 lg:py-24 bg-white" id="design">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold">Designing Better Experiments</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">Though instrumental variables (IV) offer analytical strength, well-designed experiments, minimizing assumptions and maximizing compliance, are the optimal approach.</p>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="card">
+                        <h3 class="text-xl font-bold">Maximize Compliance</h3>
+                        <ul class="mt-3 list-disc list-inside space-y-2 text-slate-600">
+                            <li><strong>Simplify the intervention:</strong> Reduce administrative burdens and "hassle factors".</li>
+                            <li><strong>Leverage behavioral science:</strong> Use reminders, clear messaging, and social norms.</li>
+                            <li><strong>Pilot test:</strong> Identify barriers to compliance before a full-scale launch.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-xl font-bold">Strengthen Assumptions</h3>
+                        <ul class="mt-3 list-disc list-inside space-y-2 text-slate-600">
+                            <li><strong>Design a good instrument:</strong> A good prompt must be both impactful and broadly applicable to meet the exclusion restriction.</li>
+                            <li><strong>Use placebo encouragements:</strong> To gauge the encouragement's impact, the control group receives a neutral message.</li>
+                            <li><strong>Profile the Compliers:</strong> Analyze baseline data to identify compliers.  The CACE reflects their effect, and may not generalize.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const strataCards = {
+            c: document.getElementById('strata-c'),
+            at: document.getElementById('strata-at'),
+            nt: document.getElementById('strata-nt'),
+            d: document.getElementById('strata-d'),
+        };
+
+        const viewControlBtn = document.getElementById('view-control');
+        const viewTreatmentBtn = document.getElementById('view-treatment');
+
+        const strataActions = {
+            control: {
+                c: { active: false, text: 'Not Treated' },
+                at: { active: true, text: 'Gets Treated' },
+                nt: { active: false, text: 'Not Treated' },
+                d: { active: true, text: 'Gets Treated' },
+            },
+            treatment: {
+                c: { active: true, text: 'Gets Treated' },
+                at: { active: true, text: 'Gets Treated' },
+                nt: { active: false, text: 'Not Treated' },
+                d: { active: false, text: 'Not Treated' },
+            }
+        };
+
+        function updateStrataView(view) {
+            Object.keys(strataCards).forEach(key => {
+                const card = strataCards[key];
+                const action = strataActions[view][key];
+                card.classList.toggle('inactive', !action.active);
+                card.querySelector('.action-text').textContent = action.text;
+            });
+
+            if (view === 'control') {
+                viewControlBtn.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+                viewTreatmentBtn.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+            } else {
+                viewTreatmentBtn.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+                viewControlBtn.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+            }
+        }
+
+        viewControlBtn.addEventListener('click', () => updateStrataView('control'));
+        viewTreatmentBtn.addEventListener('click', () => updateStrataView('treatment'));
+        
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.id.replace('tab-', 'content-');
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                tabContents.forEach(content => content.classList.toggle('active', content.id === targetId));
+            });
+        });
+        
+        const draftData = {
+            eligible_mortality: 0.040,
+            ineligible_mortality: 0.034,
+            eligible_service: 0.30,
+            ineligible_service: 0.15,
+        };
+
+        const itt_y = draftData.eligible_mortality - draftData.ineligible_mortality;
+        const itt_d = draftData.eligible_service - draftData.ineligible_service;
+        const cace = itt_y / itt_d;
+
+        document.getElementById('itt_y_result').textContent = `${(itt_y * 100).toFixed(1)} pp`;
+        document.getElementById('itt_d_result').textContent = `${(itt_d * 100).toFixed(0)} pp`;
+        document.getElementById('cace_result').textContent = `${(cace * 100).toFixed(1)} pp`;
+        document.getElementById('cace_interpretation').textContent = `For the 15% of men who were Compliers (served because they were drafted), military service increased the probability of later-life mortality by 4.0 percentage points.`;
+        
+        const createChart = (canvasId, labels, data, colors) => {
+            const formatPercent = (value) => (value * 100).toFixed(1) + '%';
+            return new Chart(document.getElementById(canvasId).getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('a(0.6', '1')),
+                        borderWidth: 1,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => formatPercent(ctx.raw) } } },
+                    scales: {
+                        y: {
+                            ticks: { callback: (value) => formatPercent(value) },
+                            grid: { drawBorder: false }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        };
+
+        createChart('ittOutcomeChart', ['Ineligible', 'Eligible'], [draftData.ineligible_mortality, draftData.eligible_mortality], ['rgba(239, 68, 68, 0.6)', 'rgba(239, 68, 68, 0.9)']);
+        createChart('ittParticipationChart', ['Ineligible', 'Eligible'], [draftData.ineligible_service, draftData.eligible_service], ['rgba(59, 130, 246, 0.6)', 'rgba(59, 130, 246, 0.9)']);
+
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                    });
+                }
+            });
+        }, { rootMargin: "-50% 0px -50% 0px" });
+
+        sections.forEach(section => observer.observe(section));
+    });
+    </script>
+
+
+</body></html>

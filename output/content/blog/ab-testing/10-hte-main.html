@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Report: Heterogeneous Treatment Effects</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A thematic, single-page narrative that guides the user from the foundational concept (ATE vs. CATE), to its real-world importance (MTO case study), then through the methodological toolkit (Confirmatory vs. Exploratory), and finally covers the critical pitfalls and best practices (p-hacking, PAPs). This top-down structure is chosen to build understanding logically, starting with the "what" and "why" before moving to the "how," making a complex academic topic accessible to a broader research audience. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: ATE vs. CATE -> Goal: Compare -> Viz: HTML/CSS Diagram -> Interaction: None -> Justification: A simple visual metaphor is more intuitive than a chart for this abstract, core concept. -> Method: HTML/Tailwind.
+        - Report Info: MTO Experiment Results -> Goal: Compare -> Viz: Bar Chart -> Interaction: Hover for tooltips -> Justification: The bar chart provides the most direct and impactful visualization of the starkly different outcomes, serving as the report's central evidence for HTE's importance. -> Library: Chart.js.
+        - Report Info: Methodologies -> Goal: Organize/Compare -> Viz: Interactive Toggle Tabs -> Interaction: Click to toggle content -> Justification: An interactive toggle is more engaging and space-efficient than a static table for comparing the two main methodological schools of thought. -> Method: JS + HTML/Tailwind.
+        - Report Info: Multiple Comparisons Problem -> Goal: Inform -> Viz: Donut Chart -> Interaction: Hover for tooltips -> Justification: A donut chart effectively visualizes a single, striking proportion—the high probability of a false discovery—making the abstract risk of p-hacking concrete. -> Library: Chart.js.
+        - Report Info: PAP Checklist -> Goal: Organize -> Viz: Styled List -> Interaction: None -> Justification: A clean, structured list is the clearest way to present actionable best practices. -> Method: HTML/Tailwind with Unicode.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+            color: #292524; /* stone-800 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+            border: 1px solid #e7e5e4; /* stone-200 */
+        }
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button.active {
+            color: #a16207; /* yellow-700 */
+            border-bottom-color: #a16207;
+            font-weight: 600;
+        }
+        .tab-button:not(.active):hover {
+            color: #57534e; /* stone-600 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 py-12 max-w-7xl">
+
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-stone-900">Beyond the Average</h1>
+            <p class="mt-4 text-lg md:text-xl text-stone-600 max-w-3xl mx-auto">Understanding Heterogeneous Treatment Effects in Experimental Research</p>
+        </header>
+
+        <section class="mb-16" id="core-concept">
+            <h2 class="text-3xl font-bold text-center text-stone-800 mb-4">From One Answer to Many</h2>
+            <p class="text-lg text-stone-600 max-w-4xl mx-auto mb-8 text-center">
+                Instead of a simple "Does it work?" (the ATE), experiments often explore the average impact. This can obscure crucial details. Analyzing Heterogeneous Treatment Effects (HTE) provides a richer view, probing: "For whom and why does it work?" This segment illustrates the move from one average result to several, conditional effects.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+                <div class="card flex flex-col justify-center">
+                    <h3 class="text-2xl font-bold text-stone-700 mb-3 text-center">Average Treatment Effect (ATE)</h3>
+                    <p class="text-stone-600 mb-6 text-center">A solitary average, reflecting population-wide impact.  Potent yet potentially deceptive.</p>
+                    <div class="bg-stone-200 h-24 rounded-md flex items-center justify-center border border-stone-300">
+                        <span class="text-2xl font-bold text-stone-700">+5% Average Effect</span>
+                    </div>
+                </div>
+                <div class="card flex flex-col justify-center">
+                     <h3 class="text-2xl font-bold text-stone-700 mb-3 text-center">Conditional ATE (CATE)</h3>
+                     <p class="text-stone-600 mb-6 text-center">Analyzes subgroup effects, identifying those who gain the most or potentially experience negative outcomes.</p>
+                     <div class="flex justify-between items-end space-x-2 h-24">
+                        <div class="bg-green-600 w-1/3 h-full rounded-md flex items-center justify-center flex-col text-white p-1 text-center shadow">
+                            <span class="font-semibold text-sm">Group A</span>
+                            <span class="font-bold text-lg">+15%</span>
+                        </div>
+                         <div class="bg-yellow-600 w-1/3 h-1/2 rounded-md flex items-center justify-center flex-col text-white p-1 text-center shadow">
+                            <span class="font-semibold text-sm">Group B</span>
+                            <span class="font-bold text-lg">+2%</span>
+                        </div>
+                         <div class="bg-red-600 w-1/3 h-1/3 rounded-md flex items-center justify-center flex-col text-white p-1 text-center shadow">
+                            <span class="font-semibold text-sm">Group C</span>
+                            <span class="font-bold text-lg">-3%</span>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16" id="mto-case-study">
+             <h2 class="text-3xl font-bold text-center text-stone-800 mb-4">Case Study: The Moving to Opportunity Experiment</h2>
+             <p class="text-lg text-stone-600 max-w-4xl mx-auto mb-8 text-center">The MTO study highlights HTE's significance. This program provided housing vouchers to low-income families. While early results showed no overall impact on adult earnings, a subsequent Heterogeneous Treatment Effects (HTE) analysis, detailed below, uncovered crucial differences based on the age of children at the time of relocation.</p>
+            <div class="card">
+                <h3 class="text-xl font-bold text-center text-stone-700 mb-4">Long-Term Income Gains: A Tale of Two Childhoods</h3>
+                <div class="chart-container">
+                    <canvas id="mtoChart"></canvas>
+                </div>
+                <p class="text-center text-stone-600 mt-6">The data reveals a stark contrast: childhood movers (under 13) experienced a significant 31% income boost, whereas teenage movers saw a slight detriment. This overlooked result, missed by prior analyses, fundamentally reshaped policy conclusions and highlighted the program's unexpected benefits.</p>
+            </div>
+        </section>
+
+        <section class="mb-16" id="methods">
+            <h2 class="text-3xl font-bold text-center text-stone-800 mb-4">The HTE Methodological Toolkit</h2>
+            <p class="text-lg text-stone-600 max-w-4xl mx-auto mb-8 text-center">Here are a few rewritten options, aiming for a similar length and clarity:
+
+**Option 1 (Concise):**
+
+&gt; HTE discovery methods have shifted.  Historically, it was theory-driven. Now, machine learning unveils hidden patterns. Compare these two influential techniques below.
+
+**Option 2 (Slightly more detail):**
+
+&gt; How we find HTE has changed.  Early approaches confirmed pre-set ideas.  Today, machine learning explores data for novel insights.  See how these methods differ below.
+
+**Option 3 (Emphasis on power):**
+
+&gt;  HTE's discovery process has transformed. The past relied on set theories; the present uses machine learning.  Compare these potent strategies below.</p>
+            <div class="card">
+                <div class="border-b border-stone-200 mb-6">
+                    <nav aria-label="Tabs" class="-mb-px flex space-x-6">
+                        <button class="tab-button active py-3 px-1 text-base font-medium" id="tab-confirmatory">Confirmatory Analysis</button>
+                        <button class="tab-button py-3 px-1 text-base font-medium" id="tab-exploratory">Exploratory Discovery</button>
+                    </nav>
+                </div>
+                <div id="content-confirmatory">
+                    <h3 class="text-xl font-semibold text-stone-800 mb-2">Goal: Test a Theory</h3>
+                    <p class="text-stone-600 mb-4">This method begins with a defined hypothesis about a subgroup's unique impact. It's the preferred method for theory testing, often employing interaction terms in regression. To be valid, this hypothesis must be established *before* data analysis.</p>
+                    <div class="bg-stone-100 p-4 rounded-lg text-sm font-mono text-stone-700 border border-stone-200">Y = β₀ + β₁T + β₂S + β₃(T x S) + ε</div>
+                    <p class="mt-4 text-stone-600">Here, a significant <strong>β₃</strong> coefficient provides evidence of HTE for subgroup S.</p>
+                </div>
+                <div class="hidden" id="content-exploratory">
+                    <h3 class="text-xl font-semibold text-stone-800 mb-2">Goal: Discover New Patterns</h3>
+                    <p class="text-stone-600 mb-4">Leveraging ML algorithms (e.g., Causal Forests), this method discovers key subgroups directly from the data. It avoids strong assumptions and explores intricate relationships, preventing overfitting via techniques such as sample splitting for robust estimation.</p>
+                    <ul class="list-disc list-inside text-stone-600 space-y-1">
+                        <li><strong>Causal Forests:</strong> Here are a few rewrites of the sentence, keeping a similar size and conveying a similar meaning:
+
+*   Construct causal trees to identify data partitions with varying effects.
+*   Develop numerous causal trees to pinpoint data segments with diverse impacts.
+*   Generate causal trees to discover data splits that highlight effect differences.
+*   Use causal trees to build partitions that maximize effect variation.</li>
+                        <li><strong>Meta-Learners:</strong> Employ readily available ML algorithms to forecast treatment/control outcomes, enabling individual effect estimation.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16" id="perils">
+            <h2 class="text-3xl font-bold text-center text-stone-800 mb-4">Perils and Best Practices</h2>
+            <p class="text-lg text-stone-600 max-w-4xl mx-auto mb-8 text-center">Strong analytical ability demands careful execution. Exploratory analyses, in particular, need rigorous methods to prevent errors, false findings, and damage to research integrity.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="card">
+                    <h3 class="text-xl font-bold text-stone-700 mb-4 flex items-center"><span class="text-3xl mr-3">⚠️</span>The Peril of "P-Hacking"</h3>
+                    <p class="text-stone-600 mb-4">Repeated subgroup testing vastly inflates the odds of a spurious, "significant" finding. This, known as p-hacking, severely undermines scientific reliability.</p>
+                    <div class="chart-container h-64 max-h-64">
+                         <canvas id="falseDiscoveryChart"></canvas>
+                    </div>
+                    <p class="text-center text-stone-600 mt-4">With 10 tests at 5% significance, the chance of a false positive is roughly 40%.</p>
+                </div>
+                <div class="card">
+                     <h3 class="text-xl font-bold text-stone-700 mb-4 flex items-center"><span class="text-3xl mr-3">✅</span>Best Practice: Pre-Analysis Plans</h3>
+                     <p class="text-stone-600 mb-4">A robust Pre-Analysis Plan (PAP) is key to thwarting p-hacking. This publicly registered document, drafted prior to analysis, distinguishes planned, confirmatory tests from later, exploratory discoveries.</p>
+                    <ul class="space-y-3 text-stone-700">
+                        <li class="flex items-start"><span class="text-yellow-700 font-bold mr-2 mt-1">✓</span><strong>Hypotheses:</strong> Clearly state which subgroups are being tested and why.</li>
+                        <li class="flex items-start"><span class="text-yellow-700 font-bold mr-2 mt-1">✓</span><strong>Model:</strong> Specify the exact statistical model and control variables.</li>
+                        <li class="flex items-start"><span class="text-yellow-700 font-bold mr-2 mt-1">✓</span><strong>Multiple Testing:</strong> Define the correction procedure (e.g., FDR) to be used.</li>
+                        <li class="flex items-start"><span class="text-yellow-700 font-bold mr-2 mt-1">✓</span><strong>Power:</strong> Report power calculations for detecting a meaningful effect difference.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const mtoChartCtx = document.getElementById('mtoChart').getContext('2d');
+    new Chart(mtoChartCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Moved Before Age 13', 'Moved After Age 13', 'Control Group (Baseline)'],
+            datasets: [{
+                label: 'Effect on Adult Annual Income',
+                data: [31, -4, 0],
+                backgroundColor: [
+                    '#16a34a', // green-600
+                    '#dc2626', // red-600
+                    '#a8a29e'  // stone-400
+                ],
+                borderColor: [
+                    '#15803d', // green-700
+                    '#b91c1c', // red-700
+                    '#78716c'  // stone-500
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Percentage Change in Income (%) vs. Control',
+                        font: { size: 14, weight: '500' },
+                        color: '#44403c' // stone-700
+                    },
+                    ticks: { color: '#57534e' }
+                },
+                y: { ticks: { color: '#57534e', font: {size: 14} } }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                       label: (context) => `Effect: ${context.raw}%`
+                    }
+                }
+            }
+        }
+    });
+
+    const falseDiscoveryChartCtx = document.getElementById('falseDiscoveryChart').getContext('2d');
+    new Chart(falseDiscoveryChartCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Chance of a False Discovery', 'No False Discovery'],
+            datasets: [{
+                data: [40, 60],
+                backgroundColor: ['#f87171', '#d1d5db'], // red-400, gray-300
+                borderColor: ['#dc2626', '#9ca3af'], // red-600, gray-400
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#57534e' } },
+                tooltip: {
+                     callbacks: {
+                       label: (context) => `${context.label}: ${context.raw}%`
+                    }
+                }
+            }
+        }
+    });
+
+    const tabConfirmatory = document.getElementById('tab-confirmatory');
+    const tabExploratory = document.getElementById('tab-exploratory');
+    const contentConfirmatory = document.getElementById('content-confirmatory');
+    const contentExploratory = document.getElementById('content-exploratory');
+
+    tabConfirmatory.addEventListener('click', () => {
+        tabConfirmatory.classList.add('active');
+        tabExploratory.classList.remove('active');
+        contentConfirmatory.classList.remove('hidden');
+        contentExploratory.classList.add('hidden');
+    });
+
+    tabExploratory.addEventListener('click', () => {
+        tabExploratory.classList.add('active');
+        tabConfirmatory.classList.remove('active');
+        contentExploratory.classList.remove('hidden');
+        contentConfirmatory.classList.add('hidden');
+    });
+});
+</script>
+
+
+
+</body></html>

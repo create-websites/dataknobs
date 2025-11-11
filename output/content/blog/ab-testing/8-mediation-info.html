@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Infographic: Unpacking the Black Box of Causal Mediation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Energetic & Playful -->
+    <!-- Application Structure Plan: The DataStory follows a problem-solution narrative. It starts with the core challenge: understanding *why* an experiment works (The Black Box). It then visually defines the problem with an HTML/CSS diagram of the causal chain (T->M->Y) and the critical, untestable assumption that complicates it. The core of the DataStory is a "Hierarchy of Designs" section, presenting four key experimental designs as solutions, from weakest to strongest. A "Case Study Spotlight" on the GOTV experiment makes the concept of a "mechanism experiment" tangible through an interactive bar chart. It concludes with the key takeaway: design for mediation, don't just test for it. This structure guides the user from problem to solution. -->
+    <!-- Visualization & Content Choices: 
+        - Data Point: Causal Chain & Sequential Ignorability. Goal: Organize/Inform. Viz: An HTML/CSS diagram. Justification: A simple visual flow is the best way to introduce the T->M->Y model and allows for a hover effect to explain the key untestable assumption on the M->Y link. Method: HTML/CSS.
+        - Data Point: Hierarchy of Experimental Designs. Goal: Compare/Organize. Viz: A series of styled cards. Justification: Cards allow for chunking complex information (description, pros, cons) into digestible pieces, making it easy to compare the different design trade-offs. Method: HTML/CSS.
+        - Data Point: GOTV Social Pressure Experiment Results. Goal: Compare/Inform. Viz: An interactive Bar Chart. Justification: A bar chart is ideal for comparing the turnout rates across the different mailer conditions. Making it interactive, where users can toggle the treatments, powerfully demonstrates the dose-response relationship of social pressure, the core idea of a mechanism experiment. Library: Chart.js/Canvas.
+        - Data Point: Key Takeaway. Goal: Inform. Viz: Styled text with a unicode arrow. Justification: A simple, bold statement is most effective for a concluding thought.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .hero-title { color: #118AB2; }
+        .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -2px rgb(0 0 0 / 0.05); }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        .diagram { display: flex; align-items: center; justify-content: center; gap: 1rem; font-family: 'Inter', sans-serif; font-weight: bold; }
+        .diagram-node { background-color: #e2e8f0; padding: 0.75rem 1.25rem; border-radius: 0.5rem; }
+        .diagram-arrow { font-size: 2rem; color: #94a3b8; }
+        .problem-arrow-container { position: relative; cursor: help; }
+        .problem-arrow-container .tooltip { visibility: hidden; width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 100%; left: 50%; margin-left: -125px; margin-bottom: 5px; opacity: 0; transition: opacity 0.3s; font-size: 0.8rem; line-height: 1.4; }
+        .problem-arrow-container:hover .tooltip { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <div class="container mx-auto px-4 py-12 md:py-20">
+
+        <section class="text-center max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-6xl font-extrabold hero-title leading-tight">UNPACKING THE BLACK BOX</h1>
+            <p class="mt-6 text-lg md:text-xl">Experiments show *if* something functions. Understanding **how and why** to improve theories and policies is the core of causal mediation.</p>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">The Central Problem: The Broken Link</h2>
+            <p class="text-center mt-4 max-w-3xl mx-auto">Our focus is on understanding the influence of a Treatment (T) on an Outcome (Y), mediated by a variable (M), and specifically, challenges in the latter part of this relationship.</p>
+            <div class="mt-12 diagram">
+                <div class="diagram-node" style="background-color: #FFD166;">Treatment (T)</div>
+                <div class="diagram-arrow" style="color: #06D6A0;">→</div>
+                <div class="diagram-node" style="background-color: #FFD166;">Mediator (M)</div>
+                <div class="problem-arrow-container">
+                    <div class="diagram-arrow text-red-400">→</div>
+                    <span class="tooltip">Observational links aren't random; causality requires eliminating confounding factors. The **Sequential Ignorability Assumption** needed for this is often untestable and unlikely.</span>
+                </div>
+                <div class="diagram-node" style="background-color: #FFD166;">Outcome (Y)</div>
+            </div>
+            <p class="text-center mt-6 max-w-2xl mx-auto text-sm text-slate-500">Randomizing T to M sees M-Y as a correlation only, a significant issue for causality. (See red arrow.)</p>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">A Hierarchy of Experimental Designs</h2>
+            <p class="text-center mt-4 max-w-3xl mx-auto">Instead of stats after the fact, superior designs are key to testing. Robust experimental planning builds stronger causal arguments.</p>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card p-6">
+                    <h3 class="font-bold text-xl text-slate-800">1. Measurement-of-Mediation</h3>
+                    <p class="mt-2 text-sm">Here are a few rewritten options, maintaining a similar size and conveying the core meaning:
+
+*   **Randomize T; measure M and Y. A common, simple but flawed approach.**
+*   **Start with randomized T; observe M and Y. It's typical, yet limited.**
+*   **T is randomized; M and Y are measured. A basic, less-effective design.**
+*   **Randomize T, assess M and Y. The standard, often weakest, method.**</p>
+                    <p class="mt-4"><span class="font-bold text-red-500">LIMITATION:</span> **Option 1 (Concise):**
+
+*   Dependent on untestable ignorability. Significant bias risk.
+
+**Option 2 (Slightly more descriptive):**
+
+*   Vulnerable to untestable sequential ignorability. Bias is a concern.
+
+**Option 3 (Emphasis on the problem):**
+
+*   Unsound ignorability assumption. High potential for bias.</p>
+                </div>
+                <div class="card p-6">
+                    <h3 class="font-bold text-xl text-slate-800">2. Implicit Mediation (Mechanism Experiment)</h3>
+                    <p class="mt-2 text-sm">Develop a treatment, either inhibiting or replicating mechanism (M), and assess its impact on outcome (Y).</p>
+                    <p class="mt-4"><span class="font-bold text-green-500">STRENGTH:</span> Here are a few options, all similar in length and capturing the key ideas:
+
+*   **Excellent for disproving theories quickly. Powerful causal inference.**
+*   **Allows quick theory elimination; Offers strong causal insight.**
+*   **Effective at theory refutation without measurement; Causal weight.**
+*   **Quickly rules out explanations. Provides strong causal power.**</p>
+                </div>
+                 <div class="card p-6">
+                    <h3 class="font-bold text-xl text-slate-800">3. Experimental-Causal-Chain</h3>
+                    <p class="mt-2 text-sm">Here are a few options, aiming for a similar length and clarity:
+
+*   Perform two distinct experiments: the first verifying T→M, the second validating M→Y.
+*   Run two experiments: the first to demonstrate the relationship T→M, the second to show M→Y.
+*   Two experiments are required: one to establish the causal link of T→M, and another for M→Y.
+*   Execute two studies: Experiment 1 proves T→M; Experiment 2 proves M→Y.</p>
+                    <p class="mt-4"><span class="font-bold text-red-500">LIMITATION:</span> Vulnerable to the "product fallacy" if populations differ across experiments.</p>
+                </div>
+                 <div class="card p-6">
+                    <h3 class="font-bold text-xl text-slate-800">4. Parallel Encouragement Design (PED)</h3>
+                    <p class="mt-2 text-sm">Here are a few options, keeping the size roughly similar:
+
+*   **Boost mediator uptake randomly, leveraging this as an instrumental variable.**
+*   **Employ an encouragement strategy, using it randomly as an IV to promote uptake.**
+*   **Randomize encouragement to boost mediator use; treat encouragement as an IV.**
+*   **To increase mediator use, use random encouragement as an instrumental variable.**</p>
+                    <p class="mt-4"><span class="font-bold text-green-500">STRENGTH:</span> State-of-the-art. Identifies mediation with weaker, more plausible assumptions.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">Case Study: Social Pressure &amp; Voter Turnout</h2>
+            <p class="text-center mt-4 max-w-3xl mx-auto">A classic "mechanism experiment" explored social pressure's role in Get-Out-The-Vote mailings. Rather than directly measuring pressure, the study used varied treatment designs to manipulate its intensity. See the outcomes by clicking the buttons.</p>
+            <div class="mt-12 max-w-4xl mx-auto card p-8">
+                <div class="text-center mb-6 flex flex-wrap justify-center gap-2">
+                    <button class="chart-btn font-semibold py-2 px-4 rounded-lg transition-colors" data-color="#94a3b8" data-label="Control" data-value="0.297" style="background-color: #e2e8f0; color: #475569;">Control</button>
+                    <button class="chart-btn font-semibold py-2 px-4 rounded-lg transition-colors" data-color="#38bdf8" data-label="Civic Duty" data-value="0.315" style="background-color: #e0f2fe; color: #0c4a6e;">Civic Duty</button>
+                    <button class="chart-btn font-semibold py-2 px-4 rounded-lg transition-colors" data-color="#FFD166" data-label="Hawthorne" data-value="0.322" style="background-color: #fef9c3; color: #a16207;">Hawthorne</button>
+                    <button class="chart-btn font-semibold py-2 px-4 rounded-lg transition-colors" data-color="#FF6B6B" data-label="Self" data-value="0.345" style="background-color: #ffe4e6; color: #9f1239;">Self</button>
+                    <button class="chart-btn font-semibold py-2 px-4 rounded-lg transition-colors" data-color="#EF476F" data-label="Neighbors" data-value="0.378" style="background-color: #fee2e2; color: #991b1b;">Neighbors</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="gotvChart"></canvas>
+                </div>
+                <p class="text-center mt-4 text-sm text-slate-500">The "Neighbors" mailing, disclosing voting data to peers, caused a large impact, suggesting social pressure was the primary driver.</p>
+            </div>
+        </section>
+
+        <section class="mt-20 md:mt-28 text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl font-bold hero-title">The Golden Rule of Mediation</h2>
+            <p class="mt-6 text-2xl font-semibold text-slate-800">Don't just test for mediation... <span style="color: #06D6A0;">DESIGN for it.</span></p>
+            <p class="mt-4 text-lg">A strong experimental setup offers clearer causal proof than intricate stats on a flawed design; future mediation hinges on careful planning.</p>
+        </section>
+
+    </div>
+
+    <script>
+        const chartTooltipCallback = function(tooltipItems) {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) { return label.join(' '); }
+            return label;
+        };
+
+        const gotvChartCtx = document.getElementById('gotvChart').getContext('2d');
+        const initialData = {
+            label: 'Control',
+            value: 0.297,
+            color: '#94a3b8'
+        };
+
+        const gotvChart = new Chart(gotvChartCtx, {
+            type: 'bar',
+            data: {
+                labels: [initialData.label],
+                datasets: [{
+                    label: 'Voter Turnout Rate',
+                    data: [initialData.value],
+                    backgroundColor: [initialData.color],
+                    barThickness: 60,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 0.28,
+                        max: 0.40,
+                        ticks: {
+                            callback: value => (value * 100).toFixed(1) + '%'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: chartTooltipCallback,
+                            label: context => `Turnout: ${(context.parsed.y * 100).toFixed(1)}%`
+                        }
+                    }
+                }
+            }
+        });
+
+        const chartBtns = document.querySelectorAll('.chart-btn');
+        chartBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const label = btn.dataset.label;
+                const value = parseFloat(btn.dataset.value);
+                const color = btn.dataset.color;
+
+                gotvChart.data.labels = [label];
+                gotvChart.data.datasets[0].data = [value];
+                gotvChart.data.datasets[0].backgroundColor = [color];
+                gotvChart.update();
+            });
+        });
+
+    </script>
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

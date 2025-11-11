@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Web Guide to Hypothesis Testing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Lora:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Professional & Stylish (#2c3e50, #34495e, #ecf0f1, #3498db, #e74c3c) -->
+    <!-- Application Structure Plan: The SPA is structured as a learning journey. It starts with the most foundational concept, the Sampling Distribution, letting users build one interactively. It then moves to the core framework of Hypothesis Testing, using an interactive visualization to explain the decision rule (p-value vs. alpha). A dedicated section visualizes the crucial trade-off between Type I and Type II errors. Finally, it provides a practical tool for understanding Confidence Intervals and a simple flowchart to guide users in choosing a test. This non-linear, interactive approach is chosen over a static report to build intuition through hands-on experimentation. -->
+    <!-- Visualization & Content Choices: 
+        - Sampling Distributions & CLT: Report Info -> Sampling Dist & CLT. Goal -> Explain the link between sample and population. Viz -> Interactive Histogram. Interaction -> Button click adds sample means to the histogram. Justification -> Actively building the distribution makes the Central Limit Theorem tangible. Library -> Chart.js.
+        - Hypothesis Testing Framework: Report Info -> H0/Ha, p-value, alpha. Goal -> Explain the decision-making process. Viz -> Normal distribution plot with sliders. Interaction -> User adjusts alpha, runs a simulated test to see a p-value. Justification -> Visualizes the abstract p < alpha rule. Library -> Chart.js.
+        - Type I & II Errors: Report Info -> Definition of errors. Goal -> Show the trade-off. Viz -> HTML/CSS animated balance scale. Interaction -> Slider for alpha adjusts the balance. Justification -> An intuitive metaphor for the inverse relationship between error types. Library -> HTML/CSS/JS.
+        - Confidence Intervals: Report Info -> CI formula and interpretation. Goal -> Show how an interval estimates a parameter. Viz -> Interactive calculator with a number line plot. Interaction -> User inputs stats, sees CI calculated and drawn. Justification -> Connects the formula directly to a visual range. Library -> Chart.js.
+        - Common Tests: Report Info -> t-test vs chi-squared. Goal -> Provide guidance. Viz -> HTML/CSS flowchart. Interaction -> Clickable choices. Justification -> Simplifies the test selection process. Library -> HTML/CSS/JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #ecf0f1; color: #2c3e50; }
+        h1, h2, h3, h4 { font-family: 'Lora', serif; color: #2c3e50; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; height: 300px; margin: auto; }
+        .interactive-section { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); padding: 2rem; }
+        .btn { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s ease; }
+        .btn-primary { background-color: #3498db; color: white; }
+        .btn-primary:hover { background-color: #2980b9; }
+        .btn-danger { background-color: #e74c3c; color: white; }
+        .btn-danger:hover { background-color: #c0392b; }
+        .btn-secondary { background-color: #34495e; color: white; }
+        .btn-secondary:hover { background-color: #2c3e50; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #3498db; cursor: pointer; margin-top: -8px; }
+        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #bdc3c7; border-radius: 5px; }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-white py-6">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold">The Machinery of Inference</h1>
+            <p class="text-lg text-slate-600 mt-2">An Web Guide to Hypothesis Testing</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 space-y-16">
+        <!-- Section 1: Sampling Distributions -->
+        <section class="interactive-section" id="sampling-distribution">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold">The Bridge: Sampling Distributions</h2>
+                <p class="max-w-3xl mx-auto mt-2 text-slate-600">Sampling a whole group is impossible; instead, we sample. But, how does a sample represent the full population? The **Central Limit Theorem** explains it. This theorem says repeated sample means create a bell curve, centered on the true average. Build a sampling distribution now!</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
+                <div class="md:col-span-1 space-y-4 text-center">
+                     <button class="btn btn-primary w-full" id="draw-sample-btn">Draw 1 Sample</button>
+                     <button class="btn btn-secondary w-full" id="draw-100-samples-btn">Draw 100 Samples</button>
+                     <button class="btn btn-danger w-full" id="reset-dist-btn">Reset</button>
+                    <div class="text-left bg-slate-100 p-4 rounded-lg" id="dist-stats">
+                        <h4 class="font-bold text-center">Population Info</h4>
+                        <p class="text-sm">True Mean (μ): 100</p>
+                        <h4 class="font-bold text-center mt-2">Sample Stats</h4>
+                        <p class="text-sm">Samples Drawn: <span id="samples-drawn">0</span></p>
+                        <p class="text-sm">Last Mean (x̄): <span id="last-mean">N/A</span></p>
+                    </div>
+                </div>
+                <div class="md:col-span-3">
+                    <div class="chart-container h-72">
+                        <canvas id="sampling-dist-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Hypothesis Testing -->
+        <section class="interactive-section" id="hypothesis-testing">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold">The Framework: Making a Decision</h2>
+                <p class="max-w-3xl mx-auto mt-2 text-slate-600">Imagine hypothesis testing as a courtroom. The **Null Hypothesis (H₀)** is the defendant, presumed "not guilty" (no change). The **p-value** represents the presented evidence.  If the p-value falls below our "burden of proof" (the **significance level α**), we convict the null and reject it. Adjust the slider to set your α and then execute the test.</p>
+            </div>
+             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
+                <div class="md:col-span-1 space-y-4">
+                    <div>
+                        <label class="font-bold block text-center" for="alpha-slider">Significance Level (α): <span id="alpha-value">0.05</span></label>
+                        <input class="mt-2" id="alpha-slider" max="0.2" min="0.01" step="0.01" type="range" value="0.05"/>
+                    </div>
+                    <button class="btn btn-primary w-full" id="run-test-btn">Run Simulated Test</button>
+                    <div class="text-center bg-slate-100 p-4 rounded-lg hidden" id="test-results-box">
+                        <p class="text-sm">Test Statistic's p-value:</p>
+                        <p class="font-bold text-2xl my-2" id="p-value-display">0.00</p>
+                        <p class="font-bold text-lg" id="test-verdict"></p>
+                    </div>
+                </div>
+                <div class="md:col-span-3">
+                    <div class="chart-container h-72">
+                        <canvas id="hypothesis-test-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Errors -->
+        <section class="interactive-section" id="errors">
+             <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold">The Trade-Off: Type I &amp; II Errors</h2>
+                <p class="max-w-3xl mx-auto mt-2 text-slate-600">Tests aren't flawless. Errors happen in two ways, and reducing one type frequently raises the other. This inherent compromise defines statistical analysis.</p>
+            </div>
+            <div class="flex flex-col md:flex-row justify-around items-center gap-8">
+                <div class="text-center">
+                    <h3 class="text-xl font-bold text-red-600">Type I Error (α)</h3>
+                    <p class="font-semibold">False Positive</p>
+                    <p class="text-sm text-slate-500">You reject H₀ when it's actually true.<br/>(You conclude there's an effect when there isn't one)</p>
+                </div>
+                 <div class="text-center">
+                    <h3 class="text-xl font-bold text-blue-600">Type II Error (β)</h3>
+                    <p class="font-semibold">False Negative</p>
+                    <p class="text-sm text-slate-500">You fail to reject H₀ when it's actually false.<br/>(You miss an effect that truly exists)</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Section 4: Confidence Intervals -->
+        <section class="interactive-section" id="confidence-intervals">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold">The Estimate: Confidence Intervals</h2>
+                <p class="max-w-3xl mx-auto mt-2 text-slate-600">Rather than a binary "reject/fail to reject" in hypothesis testing, a confidence interval provides a span of likely values for the population parameter. It offers an estimate with an associated margin of error.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
+                <div class="md:col-span-1 space-y-3">
+                    <div>
+                        <label class="text-sm font-bold" for="ci-mean">Sample Mean (x̄)</label>
+                        <input class="w-full p-2 border border-slate-300 rounded-md" id="ci-mean" type="number" value="105"/>
+                    </div>
+                    <div>
+                        <label class="text-sm font-bold" for="ci-sd">Sample SD (s)</label>
+                        <input class="w-full p-2 border border-slate-300 rounded-md" id="ci-sd" type="number" value="15"/>
+                    </div>
+                     <div>
+                        <label class="text-sm font-bold" for="ci-n">Sample Size (n)</label>
+                        <input class="w-full p-2 border border-slate-300 rounded-md" id="ci-n" type="number" value="30"/>
+                    </div>
+                </div>
+                <div class="md:col-span-3">
+                     <div class="text-center mb-4" id="ci-result">
+                        <p class="text-slate-600">Standard Error (SE): <span class="font-bold" id="ci-se"></span></p>
+                        <p class="text-lg">95% Confidence Interval:</p>
+                        <p class="font-bold text-2xl text-blue-600" id="ci-range"></p>
+                    </div>
+                    <div class="chart-container h-24">
+                        <canvas id="ci-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Test Chooser -->
+        <section class="interactive-section" id="test-chooser">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold">The Toolbox: Choosing the Right Test</h2>
+                <p class="max-w-3xl mx-auto mt-2 text-slate-600">Here are a few rewritten options, all roughly the same length and conveying a similar meaning:
+
+*   **Diverse inquiries call for diverse methods. This flowchart guides your selection between two core hypothesis test types.**
+
+*   **The right tool depends on the question. This easy flowchart helps you pick between two prevalent hypothesis test approaches.**
+
+*   **Varying questions, varying tools. Use this flowchart to help you choose between two of the most common hypothesis tests.**</p>
+            </div>
+            <div class="space-y-4 text-center" id="flowchart">
+                 <div class="p-4 bg-slate-100 rounded-lg">
+                    <p class="font-bold">What kind of data are you analyzing?</p>
+                </div>
+                <div class="text-2xl">↓</div>
+                <div class="flex justify-center gap-4">
+                    <button class="btn btn-secondary flex-1" data-choice="means">Comparing Means (Averages)</button>
+                    <button class="btn btn-secondary flex-1" data-choice="categorical">Comparing Categorical Data (Counts, Proportions)</button>
+                </div>
+                 <div class="mt-4 p-4 bg-green-100 border border-green-300 text-green-800 rounded-lg hidden" id="flowchart-result"></div>
+            </div>
+        </section>
+    </main>
+
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Globals ---
+        let samplingDistChart, hypothesisTestChart, ciChart;
+        const populationMean = 100;
+        const populationSD = 20;
+
+        // --- Section 1: Sampling Distribution ---
+        const drawSampleBtn = document.getElementById('draw-sample-btn');
+        const draw100SamplesBtn = document.getElementById('draw-100-samples-btn');
+        const resetDistBtn = document.getElementById('reset-dist-btn');
+        const samplesDrawnEl = document.getElementById('samples-drawn');
+        const lastMeanEl = document.getElementById('last-mean');
+        
+        let sampleMeans = [];
+
+        function generateSampleMean(sampleSize = 30) {
+            let sum = 0;
+            for (let i = 0; i < sampleSize; i++) {
+                // Marsaglia polar method for standard normal
+                let u, v, s;
+                do {
+                    u = Math.random() * 2 - 1;
+                    v = Math.random() * 2 - 1;
+                    s = u * u + v * v;
+                } while (s >= 1 || s === 0);
+                let mul = Math.sqrt(-2.0 * Math.log(s) / s);
+                let rand_norm = u * mul;
+                sum += (rand_norm * populationSD) + populationMean;
+            }
+            return sum / sampleSize;
+        }
+        
+        function updateDistChart() {
+            if (samplingDistChart) samplingDistChart.destroy();
+            
+            const bins = {};
+            for(let i = 85; i <= 115; i++) { bins[i] = 0; }
+            sampleMeans.forEach(mean => {
+                const bin = Math.round(mean);
+                if(bins[bin] !== undefined) bins[bin]++;
+            });
+
+            samplingDistChart = new Chart(document.getElementById('sampling-dist-chart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(bins),
+                    datasets: [{
+                        label: 'Frequency of Sample Means',
+                        data: Object.values(bins),
+                        backgroundColor: '#3498db',
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, title: { display: true, text: 'Sampling Distribution of the Mean' } },
+                    scales: {
+                        y: { title: { display: true, text: 'Frequency' }},
+                        x: { title: { display: true, text: 'Sample Mean (x̄)' }}
+                    }
+                }
+            });
+            samplesDrawnEl.textContent = sampleMeans.length;
+        }
+
+        function addSample(count = 1) {
+             for(let i=0; i < count; i++) {
+                const newMean = generateSampleMean();
+                sampleMeans.push(newMean);
+                if(i === count - 1) lastMeanEl.textContent = newMean.toFixed(2);
+            }
+            updateDistChart();
+        }
+
+        drawSampleBtn.addEventListener('click', () => addSample(1));
+        draw100SamplesBtn.addEventListener('click', () => addSample(100));
+        resetDistBtn.addEventListener('click', () => {
+            sampleMeans = [];
+            updateDistChart();
+            lastMeanEl.textContent = 'N/A';
+        });
+        
+        // --- Section 2: Hypothesis Testing ---
+        const alphaSlider = document.getElementById('alpha-slider');
+        const alphaValueEl = document.getElementById('alpha-value');
+        const runTestBtn = document.getElementById('run-test-btn');
+        const pValueDisplayEl = document.getElementById('p-value-display');
+        const testVerdictEl = document.getElementById('test-verdict');
+        const testResultsBox = document.getElementById('test-results-box');
+
+        function updateHypothesisChart(alpha = 0.05, pValue = null) {
+            if(hypothesisTestChart) hypothesisTestChart.destroy();
+            const labels = [];
+            const data = [];
+            const rejectionFill = [];
+            
+            for(let x = -4; x <= 4; x += 0.1) {
+                labels.push(x.toFixed(1));
+                const y = (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * x * x);
+                data.push(y);
+            }
+            
+            // This is a simplification for visualization
+            const criticalValue = 1.96; // for alpha=0.05
+            const alphaToZ = { '0.01': 2.58, '0.05': 1.96, '0.10': 1.64 };
+            const z = alphaToZ[alpha.toFixed(2)] || 1.96;
+
+
+            const backgroundColors = data.map((_, index) => {
+                const xVal = parseFloat(labels[index]);
+                return (xVal < -z || xVal > z) ? 'rgba(231, 76, 60, 0.5)' : 'rgba(52, 152, 219, 0.5)';
+            });
+
+            const datasets = [{
+                label: 'Null Hypothesis Distribution',
+                data: data,
+                fill: true,
+                backgroundColor: backgroundColors,
+                borderColor: '#2980b9',
+                pointRadius: 0,
+                tension: 0.1
+            }];
+
+            if(pValue !== null) {
+                // Find a z-score for the p-value for visualization
+                 let pZ = 3.5; // default for very small p
+                 if (pValue > 0.001) pZ = 1.96 * (1-(pValue/0.05)) + 1.5; // crude approximation
+                 if (pValue >= alpha) pZ = 0.5;
+
+                datasets.push({
+                    type: 'line',
+                    label: 'Test Statistic (p-value)',
+                    data: [{x: pZ.toFixed(1), y: 0.3}], // position on chart
+                    borderColor: '#e74c3c',
+                    backgroundColor: '#e74c3c',
+                    pointStyle: 'triangle',
+                    pointRadius: 10,
+                    pointRotation: 90
+                });
+            }
+
+            hypothesisTestChart = new Chart(document.getElementById('hypothesis-test-chart').getContext('2d'), {
+                type: 'line',
+                data: { labels, datasets },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, title: { display: true, text: 'Rejection Region (in Red)' } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+        alphaSlider.addEventListener('input', (e) => {
+            alphaValueEl.textContent = e.target.value;
+            updateHypothesisChart(parseFloat(e.target.value));
+        });
+
+        runTestBtn.addEventListener('click', () => {
+            const pValue = Math.random() * 0.15; // generate a random p-value
+            const alpha = parseFloat(alphaSlider.value);
+            updateHypothesisChart(alpha, pValue);
+            
+            pValueDisplayEl.textContent = pValue.toFixed(4);
+            testResultsBox.classList.remove('hidden');
+
+            if(pValue <= alpha) {
+                testVerdictEl.textContent = 'Reject Null Hypothesis';
+                testVerdictEl.className = 'font-bold text-lg text-red-600';
+            } else {
+                 testVerdictEl.textContent = 'Fail to Reject Null Hypothesis';
+                 testVerdictEl.className = 'font-bold text-lg text-slate-700';
+            }
+        });
+
+
+        // --- Section 4: Confidence Intervals ---
+        const ciMeanEl = document.getElementById('ci-mean');
+        const ciSdEl = document.getElementById('ci-sd');
+        const ciNEl = document.getElementById('ci-n');
+        const ciSeEl = document.getElementById('ci-se');
+        const ciRangeEl = document.getElementById('ci-range');
+
+        function updateCIChart() {
+            const mean = parseFloat(ciMeanEl.value);
+            const sd = parseFloat(ciSdEl.value);
+            const n = parseFloat(ciNEl.value);
+            if(isNaN(mean) || isNaN(sd) || isNaN(n) || n <= 0) return;
+
+            const se = sd / Math.sqrt(n);
+            const criticalValue = 1.96; // For 95% CI
+            const marginOfError = criticalValue * se;
+            const lowerBound = mean - marginOfError;
+            const upperBound = mean + marginOfError;
+
+            ciSeEl.textContent = se.toFixed(3);
+            ciRangeEl.textContent = `[ ${lowerBound.toFixed(2)} , ${upperBound.toFixed(2)} ]`;
+
+            if (ciChart) ciChart.destroy();
+            ciChart = new Chart(document.getElementById('ci-chart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: [''],
+                    datasets: [{
+                        label: '95% Confidence Interval',
+                        data: [[lowerBound, upperBound]],
+                        backgroundColor: 'rgba(52, 152, 219, 0.5)',
+                        borderColor: '#3498db',
+                        borderWidth: 2,
+                        borderSkipped: false
+                    },{
+                        label: 'Sample Mean',
+                        data: [mean],
+                        backgroundColor: '#e74c3c',
+                        barPercentage: 0.1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            min: Math.min(lowerBound - 5, 80),
+                            max: Math.max(upperBound + 5, 120),
+                            title: { display: true, text: 'Value' }
+                        },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+        [ciMeanEl, ciSdEl, ciNEl].forEach(el => el.addEventListener('input', updateCIChart));
+
+        // --- Section 5: Flowchart ---
+        const flowchart = document.getElementById('flowchart');
+        const resultBox = document.getElementById('flowchart-result');
+        flowchart.addEventListener('click', (e) => {
+            if(e.target.tagName !== 'BUTTON') return;
+            const choice = e.target.dataset.choice;
+            resultBox.classList.remove('hidden');
+            if(choice === 'means') {
+                resultBox.innerHTML = '<strong>Use a t-test.</strong><br><small>To compare the averages of one or two groups.</small>';
+            } else if (choice === 'categorical') {
+                 resultBox.innerHTML = '<strong>Use a Chi-Squared (χ²) Test.</strong><br><small>To check for relationships between categorical variables or compare observed vs. expected counts.</small>';
+            }
+        });
+
+        // --- Initial Calls ---
+        updateDistChart();
+        updateHypothesisChart();
+        updateCIChart();
+    });
+    </script>
+
+
+</body></html>

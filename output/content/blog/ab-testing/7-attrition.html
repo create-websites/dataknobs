@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Understanding Attrition in Field Experiments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Harmony (Slate, Sky, Stone) -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive diagnostic and solutions toolkit for researchers. It follows a logical flow: 1) Defining the problem of attrition. 2) An interactive "Bias Diagnosis" section where users can see how differential attrition rates break randomization. 3) The core of the app: an "Interactive Bounding Calculator." This allows users to manipulate attrition rates and outcome values to see in real-time how Manski and Lee bounds are calculated and how they differ based on the monotonicity assumption. This makes the abstract concepts concrete. 4) A "Solutions" section with clear, tabbed explanations of analytical corrections (IPW, Heckman, MI). 5) A "Prevention" section with a practical checklist for proactive design. This structure prioritizes hands-on learning over the linear format of the source text. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Testing for bias. Goal: Compare/Inform. Viz: Two Bar Charts showing baseline covariate balance. Interaction: A button toggles between a "No Attrition Bias" scenario and a "Differential Attrition Bias" scenario, dynamically updating the charts to show how balance is broken. Justification: Visually demonstrates the core threat of attrition to internal validity. Library: Chart.js/Canvas.
+        - Report Info: Bounding. Goal: Explain Process/Compare. Viz: Interactive sliders and a distribution chart. Interaction: Users can adjust attrition rates and see how the Manski and Lee bounds change dynamically. The chart visualizes the "trimming" for Lee bounds. Justification: This is the most effective way to teach the abstract logic of bounding and the trade-off between assumptions and precision. Library: Chart.js/Canvas.
+        - Report Info: Analytical Corrections & Prevention. Goal: Organize/Inform. Viz: Styled HTML cards and a checklist. Justification: Provides a clear, digestible summary of complex models and actionable design advice. Method: HTML/CSS.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; color: #495057; }
+        h1, h2, h3, h4 { font-family: 'Merriweather', serif; color: #212529; }
+        .nav-link { transition: color 0.2s; }
+        .nav-link:hover, .nav-link.active { color: #0c63e4; }
+        .card { background-color: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05); padding: 1.5rem; border: 1px solid #dee2e6; }
+        .tab { cursor: pointer; padding: 0.75rem 1rem; border-bottom: 2px solid transparent; }
+        .tab.active { color: #0c63e4; border-color: #0c63e4; font-weight: 600;}
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 280px; max-height: 350px; }
+        .tooltip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted #212529; }
+        .tooltip .tooltiptext { visibility: hidden; width: 250px; background-color: #343a40; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -125px; opacity: 0; transition: opacity 0.3s; font-size: 0.875rem; font-weight: 400; }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        .checklist li { padding-left: 1.5rem; position: relative; }
+        .checklist li::before { content: '✓'; color: #198754; position: absolute; left: 0; }
+    </style>
+</head>
+<body class="antialiased leading-relaxed">
+
+    <header class="bg-white/95 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-slate-800 font-serif">Attrition in Experiments</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4" id="nav-menu">
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#problem">The Problem</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#bounds">Bounding</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#solutions">Solutions</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#prevention">Prevention</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="py-16 sm:py-20 lg:py-24" id="problem">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight">The Achilles' Heel of Field Experiments</h1>
+                    <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-600">Participant dropout, the gradual loss of subjects, frequently jeopardizes the integrity of randomized trials. This attrition weakens the core randomization principle – equal group similarity – and potentially reintroduces the bias the trial aimed to avoid.</p>
+                </div>
+
+                <div class="mt-16">
+                    <h2 class="text-3xl font-bold text-center">Diagnosing Attrition Bias</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-center text-slate-600">The key issue is **unequal dropout**, as groups lose participants at varying rates or in dissimilar ways. This undermines the initial balance of randomized groups. See below to understand how differential attrition skews final group characteristics.</p>
+                    
+                    <div class="max-w-5xl mx-auto mt-8 p-6 card">
+                        <div class="text-center mb-6">
+                            <button class="bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 transition-colors" id="toggleBiasBtn">Switch to "Attrition Bias" Scenario</button>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-4" id="scenarioTitle">Scenario: No Attrition Bias (Balanced Attrition)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-lg font-semibold text-center">Attrition Rates</h4>
+                                <div class="chart-container h-48">
+                                    <canvas id="attritionRateChart"></canvas>
+                                </div>
+                            </div>
+                            <div>
+                                 <h4 class="text-lg font-semibold text-center">Baseline Covariate Balance</h4>
+                                <div class="chart-container h-48">
+                                    <canvas id="balanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                         <p class="text-center mt-6 text-sm text-slate-500" id="scenarioDescription">Absent attrition bias, equal attrition rates and balanced initial subject traits maintain the validity of comparisons.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 sm:py-20 lg:py-24 bg-white" id="bounds">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                 <div class="text-center">
+                    <h2 class="text-3xl font-bold">Placing Bounds on the Treatment Effect</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">Faced with high attrition, the Average Treatment Effect (ATE) becomes uncertain. Bounding techniques address this by quantifying the uncertainty: they define a plausible ATE range derived from various missing data assumptions.</p>
+                </div>
+                <div class="mt-12 max-w-6xl mx-auto card">
+                    <h3 class="text-2xl font-bold text-center mb-6">Interactive Bounding Calculator</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                        <div>
+                            <p class="text-slate-600 mb-6">Adjust attrition rates with the sliders to observe their impact on ATE bounds. Outcomes are simulated: 60 for treatment, 40 for control, range 0-100.</p>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="font-semibold" for="controlAttrition">Control Group Attrition: <span id="controlAttritionVal">10%</span></label>
+                                    <input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" id="controlAttrition" max="50" min="0" type="range" value="10"/>
+                                </div>
+                                <div>
+                                    <label class="font-semibold" for="treatmentAttrition">Treatment Group Attrition: <span id="treatmentAttritionVal">20%</span></label>
+                                    <input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" id="treatmentAttrition" max="50" min="0" type="range" value="20"/>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 space-y-4">
+                                <div>
+                                    <h4 class="text-lg font-bold">Manski "Worst-Case" Bounds</h4>
+                                    <p class="text-sm text-slate-500">Assumption-free. Imputes extreme values for attritors.</p>
+                                    <div class="mt-2 p-3 bg-slate-100 rounded-lg text-center text-xl font-mono font-bold" id="manskiBounds"></div>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold">Lee "Trimming" Bounds</h4>
+                                    <p class="text-sm text-slate-500">Assumes treatment only increases response (monotonicity).</p>
+                                    <div class="mt-2 p-3 bg-sky-100 rounded-lg text-center text-xl font-mono font-bold" id="leeBounds"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                           <h4 class="text-lg font-bold text-center">Visualizing Lee Bounds</h4>
+                           <p class="text-sm text-center text-slate-500 mb-2">To establish bounds, we adjust the higher-response group's outcomes, "trimming" them for comparability.</p>
+                            <div class="chart-container w-full h-64">
+                                <canvas id="leeBoundsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="py-16 sm:py-20 lg:py-24" id="solutions">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold">Analytical Strategies for Correction</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">By making bolder assumptions, statistical models allow us to produce a single, attrition-corrected estimate of the treatment effect.</p>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto">
+                    <div class="border-b border-slate-200">
+                        <nav aria-label="Tabs" class="-mb-px flex space-x-2 sm:space-x-6 justify-center">
+                            <div class="tab active" id="tab-ipw">IPW</div>
+                            <div class="tab" id="tab-heckman">Heckman Models</div>
+                            <div class="tab" id="tab-mi">Multiple Imputation</div>
+                        </nav>
+                    </div>
+                    <div class="mt-8">
+                        <div class="tab-content active card" id="content-ipw">
+                            <h3 class="text-xl font-bold text-center">Inverse Probability Weighting (IPW)</h3>
+                            <p class="mt-3 text-slate-600">IPW adjusts for dropout by re-weighting observed individuals. This process emphasizes those similar to dropouts, effectively simulating the full sample statistically.</p>
+                            <p class="mt-3 font-semibold text-center">Key Assumption: <span class="tooltip">Missing at Random (MAR)<span class="tooltiptext">Attrition's causes relate to known factors, but not to unseen results, after accounting for those factors.</span></span></p>
+                        </div>
+                         <div class="tab-content card" id="content-heckman">
+                            <h3 class="text-xl font-bold text-center">Heckman Selection Models</h3>
+                            <p class="mt-3 text-slate-600">The Heckman model tackles selection bias head-on, modeling the very process of attrition. It's used when missing data are believed to stem from hidden influences.</p>
+                            <p class="mt-3 font-semibold text-center">Key Assumption: <span class="tooltip">Exclusion Restriction<span class="tooltiptext">For this analysis, you need an 'instrument,' a predictor of attrition that solely influences the outcome through attrition itself. This is a demanding and often difficult requirement.</span></span></p>
+                        </div>
+                         <div class="tab-content card" id="content-mi">
+                            <h3 class="text-xl font-bold text-center">Multiple Imputation (MI)</h3>
+                            <p class="mt-3 text-slate-600">Rather than discarding or adjusting the data's weights, MI generates multiple complete datasets by "filling in" the missing values. Each is analyzed, and the results are combined to yield a final, more accurate estimate reflecting missing data uncertainty.</p>
+                            <p class="mt-3 font-semibold text-center">Key Assumption: <span class="tooltip">Missing at Random (MAR)<span class="tooltiptext">Similar to IPW, Multiple Imputation (MI) also relies on the assumption of sufficient observed data for accurate imputation.</span></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 sm:py-20 lg:py-24 bg-white" id="prevention">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold">Prevention is Better Than Cure</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">Preventing attrition is key, even though analytical fixes help. Strong design and careful fieldwork are essential for researchers.</p>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto card">
+                    <h3 class="text-xl font-bold mb-6">A Researcher's Prevention Checklist</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-left">
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Tracking &amp; Engagement</h4>
+                            <ul class="space-y-2 text-slate-600 checklist">
+                                <li>Gather detailed baseline tracking data (multiple contacts, emails, and secondary details).</li>
+                                <li>Maintain regular, positive contact (newsletters, holiday cards).</li>
+                                <li>Minimize participant burden with concise, well-piloted surveys.</li>
+                            </ul>
+                        </div>
+                        <div>
+                             <h4 class="font-bold text-lg mb-2">Incentive Design</h4>
+                             <ul class="space-y-2 text-slate-600 checklist">
+                                <li>Use cash or cash-equivalent incentives (e.g., gift vouchers).</li>
+                                <li>Employ unconditional incentives (upfront) to build reciprocity.</li>
+                                <li>Here are a few options, aiming for a similar size and meaning:
+
+*   Employ phased/escalating incentives and completion bonuses for longitudinal research.
+*   In longitudinal research, structure incentives using phases, escalations, and a completion bonus.
+*   Offer escalating incentives, alongside a completion bonus, in longitudinal study designs.</li>
+                            </ul>
+                        </div>
+                        <div class="md:col-span-2 mt-4">
+                            <h4 class="font-bold text-lg mb-2">Additional Data Collection</h4>
+                             <ul class="space-y-2 text-slate-600 checklist">
+                                <li>Here are a few options, aiming for a similar length and clarity:
+
+*   **Sampling plan for refreshments:** Fresh random samples during follow-up address attrition's bias.
+*   **Refreshment sampling strategy:** Utilize new random follow-up samples to assess attrition bias.
+*   **Refreshment sample design:**  Follow-up draws aim to uncover attrition's bias.
+*   **Refreshment sample plan:**  Random follow-up data clarifies attrition bias.</li>
+                                <li>Here are a few options, all similar in length:
+
+*   Follow up intensely with a random attritor subset for weighting/bounds data.
+*   Intensely follow random attritors; gather better weighting/bounds information.
+*   Conduct deep follow-up on random attritors to refine weighting and bounds.
+*   Gather superior weighting/bounds data by intensively following a random sub-group.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Attrition Bias Section
+        const toggleBiasBtn = document.getElementById('toggleBiasBtn');
+        const scenarioTitle = document.getElementById('scenarioTitle');
+        const scenarioDescription = document.getElementById('scenarioDescription');
+        let biasScenario = false;
+
+        const attritionRateChartCtx = document.getElementById('attritionRateChart').getContext('2d');
+        const balanceChartCtx = document.getElementById('balanceChart').getContext('2d');
+        let attritionChart, balanceChart;
+
+        const chartOptions = (title) => ({
+            type: 'bar',
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: { legend: { display: false }, title: { display: false } },
+                scales: { 
+                    x: { suggestedMax: 0.3, ticks: { callback: v => (v*100)+'%' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        function updateBiasCharts() {
+            if (attritionChart) attritionChart.destroy();
+            if (balanceChart) balanceChart.destroy();
+
+            if (biasScenario) {
+                toggleBiasBtn.textContent = 'Switch to "No Bias" Scenario';
+                scenarioTitle.textContent = 'Scenario: Differential Attrition Bias';
+                scenarioDescription.textContent = 'With differential attrition, the attrition rate is higher in the control group. This breaks the baseline balance, making the remaining groups no longer comparable.';
+                
+                attritionChart = new Chart(attritionRateChartCtx, { ...chartOptions(), data: { labels: ['Control', 'Treatment'], datasets: [{ data: [0.25, 0.10], backgroundColor: ['#f472b6', '#60a5fa'] }] } });
+                balanceChart = new Chart(balanceChartCtx, { ...chartOptions(), data: { labels: ['Control', 'Treatment'], datasets: [{ data: [0.55, 0.48], backgroundColor: ['#f472b6', '#60a5fa'] }] } });
+            } else {
+                toggleBiasBtn.textContent = 'Switch to "Attrition Bias" Scenario';
+                scenarioTitle.textContent = 'Scenario: No Attrition Bias (Balanced Attrition)';
+                scenarioDescription.textContent = 'Absent attrition bias, equal attrition rates and balanced initial subject traits maintain the validity of comparisons.';
+
+                attritionChart = new Chart(attritionRateChartCtx, { ...chartOptions(), data: { labels: ['Control', 'Treatment'], datasets: [{ data: [0.15, 0.15], backgroundColor: ['#9ca3af', '#60a5fa'] }] } });
+                balanceChart = new Chart(balanceChartCtx, { ...chartOptions(), data: { labels: ['Control', 'Treatment'], datasets: [{ data: [0.50, 0.50], backgroundColor: ['#9ca3af', '#60a5fa'] }] } });
+            }
+        }
+        
+        toggleBiasBtn.addEventListener('click', () => {
+            biasScenario = !biasScenario;
+            updateBiasCharts();
+        });
+
+        updateBiasCharts();
+
+        // Bounding Section
+        const controlAttritionSlider = document.getElementById('controlAttrition');
+        const treatmentAttritionSlider = document.getElementById('treatmentAttrition');
+        const controlAttritionVal = document.getElementById('controlAttritionVal');
+        const treatmentAttritionVal = document.getElementById('treatmentAttritionVal');
+        const manskiBoundsEl = document.getElementById('manskiBounds');
+        const leeBoundsEl = document.getElementById('leeBounds');
+        const leeBoundsChartCtx = document.getElementById('leeBoundsChart').getContext('2d');
+        let leeChart;
+
+        const outcomeDist = Array.from({length: 101}, (_, i) => i);
+
+        function calculateBounds() {
+            const y_t_r = 60;
+            const y_c_r = 40;
+            const y_min = 0;
+            const y_max = 100;
+
+            const p_c_attrit = parseFloat(controlAttritionSlider.value) / 100;
+            const p_t_attrit = parseFloat(treatmentAttritionSlider.value) / 100;
+
+            controlAttritionVal.textContent = `${(p_c_attrit * 100).toFixed(0)}%`;
+            treatmentAttritionVal.textContent = `${(p_t_attrit * 100).toFixed(0)}%`;
+            
+            const p_c_resp = 1 - p_c_attrit;
+            const p_t_resp = 1 - p_t_attrit;
+
+            const E_y_t_lower = y_t_r * p_t_resp + y_min * p_t_attrit;
+            const E_y_t_upper = y_t_r * p_t_resp + y_max * p_t_attrit;
+            const E_y_c_lower = y_c_r * p_c_resp + y_min * p_c_attrit;
+            const E_y_c_upper = y_c_r * p_c_resp + y_max * p_c_attrit;
+
+            const manski_lb = E_y_t_lower - E_y_c_upper;
+            const manski_ub = E_y_t_upper - E_y_c_lower;
+            manskiBoundsEl.textContent = `[${manski_lb.toFixed(1)}, ${manski_ub.toFixed(1)}]`;
+
+            let lee_lb, lee_ub;
+            let trimmingGroup = '';
+            
+            if (p_t_resp > p_c_resp) { // Trim Treatment Group
+                trimmingGroup = 'Treatment';
+                const trim_prop = (p_t_resp - p_c_resp) / p_t_resp;
+                const trim_count = Math.round(trim_prop * outcomeDist.length);
+                
+                const trimmed_upper = outcomeDist.slice(trim_count); // Trim bottom
+                const y_t_lee_upper = trimmed_upper.reduce((a, b) => a + b, 0) / trimmed_upper.length;
+                lee_ub = y_t_lee_upper - y_c_r;
+
+                const trimmed_lower = outcomeDist.slice(0, -trim_count); // Trim top
+                const y_t_lee_lower = trimmed_lower.reduce((a, b) => a + b, 0) / trimmed_lower.length;
+                lee_lb = y_t_lee_lower - y_c_r;
+                updateLeeChart(trim_prop, true);
+
+            } else if (p_c_resp > p_t_resp) { // Trim Control Group
+                trimmingGroup = 'Control';
+                const trim_prop = (p_c_resp - p_t_resp) / p_c_resp;
+                const trim_count = Math.round(trim_prop * outcomeDist.length);
+
+                const trimmed_upper = outcomeDist.slice(trim_count); // Trim bottom for upper bound on control mean
+                const y_c_lee_upper = trimmed_upper.reduce((a,b)=>a+b,0) / trimmed_upper.length;
+                lee_lb = y_t_r - y_c_lee_upper;
+
+                const trimmed_lower = outcomeDist.slice(0, -trim_count); // Trim top for lower bound on control mean
+                const y_c_lee_lower = trimmed_lower.reduce((a,b)=>a+b,0) / trimmed_lower.length;
+                lee_ub = y_t_r - y_c_lee_lower;
+                updateLeeChart(trim_prop, false);
+            } else {
+                 lee_lb = y_t_r - y_c_r;
+                 lee_ub = y_t_r - y_c_r;
+                 updateLeeChart(0, true);
+            }
+             leeBoundsEl.textContent = `[${lee_lb.toFixed(1)}, ${lee_ub.toFixed(1)}]`;
+        }
+
+        function updateLeeChart(trim_prop, trim_treatment) {
+            if (leeChart) leeChart.destroy();
+            const trim_count = Math.round(trim_prop * 101);
+            
+            const backgroundColors = outcomeDist.map((_, i) => {
+                const isTrimmedTop = i >= (101 - trim_count);
+                const isTrimmedBottom = i < trim_count;
+                if (isTrimmedBottom) return '#fecaca'; // Trim bottom for upper bound
+                if (isTrimmedTop) return '#fca5a5'; // Trim top for lower bound
+                return '#93c5fd'; // Kept
+            });
+
+            leeChart = new Chart(leeBoundsChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: outcomeDist.map(v => v % 10 === 0 ? v : ''),
+                    datasets: [{
+                        label: 'Outcome Distribution',
+                        data: Array(101).fill(1),
+                        backgroundColor: backgroundColors,
+                        barPercentage: 1.0,
+                        categoryPercentage: 1.0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        title: { display: true, text: `Trimming ${trim_treatment ? 'Treatment' : 'Control'} Group (${(trim_prop*100).toFixed(1)}%)`},
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        y: { display: false },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+        
+        controlAttritionSlider.addEventListener('input', calculateBounds);
+        treatmentAttritionSlider.addEventListener('input', calculateBounds);
+        calculateBounds();
+
+        // Solutions Tabs
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.id.replace('tab-', 'content-');
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                tabContents.forEach(content => content.classList.toggle('active', content.id === targetId));
+            });
+        });
+
+    });
+    </script>
+
+
+</body></html>

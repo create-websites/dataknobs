@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>An Interactive Journey into Causal Inference</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Lora:ital,wght@0,400;0;600;1,400&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Chosen Palette: Calm Neutrals with Blue Accent (#F8F7F4, #34495e, #7f8c8d, #3498db) -->
+    <!-- Application Structure Plan: The SPA is designed as a narrative journey through causal inference. It starts with a simple, interactive hook to illustrate confounding, then moves to the core theoretical challenge (Fundamental Problem). It then dedicates sections to the two main modeling frameworks (Potential Outcomes and DAGs), with an interactive DAG builder as the centerpiece. Subsequent sections cover the main methods (Experimental, Quasi-Experimental) with dedicated interactive simulators for each major technique (Randomization, Matching, RDD, DiD). This structure is chosen to build concepts layer by layer, using interaction to solidify understanding before moving to the next topic. -->
+    <!-- Visualization & Content Choices:
+        - Confounding: Report Info -> Correlation vs Causation. Goal -> Inform/Engage. Viz -> Interactive bar chart. Interaction -> User clicks a button to reveal the confounder, which updates the chart's explanation. Justification -> A simple, powerful way to show how a third variable creates a spurious correlation. Library -> Chart.js.
+        - Fundamental Problem: Report Info -> Counterfactuals. Goal -> Explain a core concept. Viz -> HTML/CSS card animation. Interaction -> On hover/click, one path is revealed and the other fades, visualizing the unobservable counterfactual. Justification -> Makes an abstract epistemological problem feel concrete. Library -> HTML/CSS/JS.
+        - DAG Builder: Report Info -> Structural Causal Models/DAGs. Goal -> Allow exploration. Viz -> Interactive canvas. Interaction -> Users can add nodes/edges. The app identifies paths and suggests adjustment sets based on the back-door criterion. Justification -> The best way to learn DAG rules is by building them. Library -> Custom JS on Canvas.
+        - Randomization Simulator: Report Info -> RCTs. Goal -> Demonstrate randomization's power. Viz -> HTML table. Interaction -> User clicks to randomize units and sees the covariate balance table update, showing how balance is achieved on average. Justification -> Proves the concept of "balance in expectation." Library -> HTML/CSS/JS.
+        - Matching Simulator: Report Info -> Propensity Score Matching. Goal -> Explain the method. Viz -> Two scatter plots. Interaction -> A button press simulates matching, visually moving selected control units to a new "matched" plot, with updated balance stats. Justification -> Shows how matching constructs a new, more comparable control group. Library -> Chart.js.
+        - RDD Simulator: Report Info -> Regression Discontinuity. Goal -> Explain the method. Viz -> Scatter plot. Interaction -> A slider controls the bandwidth, showing how the local regression and the estimated effect change. Justification -> Clarifies the "local" nature of the RDD estimate. Library -> Chart.js.
+        - DiD Simulator: Report Info -> Difference-in-Differences. Goal -> Explain the method. Viz -> Line chart. Interaction -> A checkbox toggles the "parallel trends" assumption on/off to show how the DiD estimate is calculated and how it breaks if the assumption fails. Justification -> Visualizes the critical identifying assumption. Library -> Chart.js.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F7F4; color: #34495e; }
+        h1, h2, h3 { font-family: 'Lora', serif; color: #2c3e50; }
+        .nav-item { transition: all 0.2s ease-in-out; }
+        .nav-item:hover { color: #3498db; border-color: #3498db; }
+        .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 2rem; border: 1px solid #e2e8f0; }
+        .btn { padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s ease; display: inline-block; border: 1px solid transparent; }
+        .btn-primary { background-color: #3498db; color: white; }
+        .btn-primary:hover { background-color: #2980b9; }
+        .btn-secondary { background-color: #7f8c8d; color: white; }
+        .btn-secondary:hover { background-color: #6c7a7b; }
+        .chart-container { position: relative; width: 100%; height: 300px; max-width: 600px; margin: auto; }
+        #dag-canvas { cursor: crosshair; background-color: #f9fafb; border-radius: 0.5rem; border: 1px solid #e5e7eb; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Nav -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-slate-200">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-2xl font-semibold">Causal Inference Interactive</h1>
+                <nav class="hidden md:flex space-x-6 text-sm font-medium text-slate-600">
+                    <a class="nav-item border-b-2 border-transparent pb-1" href="#foundations">Foundations</a>
+                    <a class="nav-item border-b-2 border-transparent pb-1" href="#frameworks">Frameworks</a>
+                    <a class="nav-item border-b-2 border-transparent pb-1" href="#experimental">Experimental</a>
+                    <a class="nav-item border-b-2 border-transparent pb-1" href="#quasi-experimental">Quasi-Experimental</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 space-y-20">
+
+        <!-- Foundations Section -->
+        <section class="space-y-12" id="foundations">
+            <div class="text-center">
+                <h2 class="text-4xl font-bold">I. The Foundations</h2>
+                <p class="max-w-3xl mx-auto mt-2 text-slate-600">Here's a concise rewrite, roughly the same length:
+
+Causal inference goes beyond mere relationships, aiming to understand "what causes what?". This section delves into key ideas that distinguish correlation from causation, and the difficulties in establishing causal claims.</p>
+            </div>
+
+            <!-- Confounding -->
+            <div class="card grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h3 class="text-2xl font-semibold">Correlation is Not Causation</h3>
+                    <p class="mt-2 text-slate-500">Data analysis often falters by misinterpreting coincidences as causes. A lurking variable, also known as a **confounder**, frequently drives the observed relationship.</p>
+                    <p class="mt-4 text-slate-500">Here's a rewritten version of similar length:
+
+Ice cream sales and crime rates often rise together. Does one cause the other? Find out what's really happening below.</p>
+                    <div class="mt-6">
+                        <button class="btn btn-primary" id="confounder-btn">Reveal Confounder</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="chart-container h-64">
+                        <canvas id="confounder-chart"></canvas>
+                    </div>
+                    <p class="text-center text-sm text-slate-500 mt-2 h-10 transition-opacity duration-500 opacity-0" id="confounder-explanation">Certainly not. Warmer temperatures (the confounder) drive both higher ice cream purchases and more outdoor activity, which then boosts crime rates.</p>
+                </div>
+            </div>
+
+            <!-- Fundamental Problem -->
+            <div class="card">
+                <h3 class="text-2xl font-semibold text-center">The Fundamental Problem of Causal Inference</h3>
+                <p class="max-w-2xl mx-auto mt-2 text-slate-500 text-center">The central issue: we can't see how a person changes with and without something simultaneously. The other outcome, the **unseen reality**, is obscured. Hover to see this path.</p>
+                <div class="mt-8 flex justify-center items-center gap-10" id="fundamental-problem-viz">
+                     <div class="text-center">
+                        <p class="font-bold text-lg">Path 1: Receives Treatment</p>
+                        <div class="path-line h-1 bg-slate-300 w-full my-2"></div>
+                        <p class="outcome-box text-2xl font-bold p-4 bg-blue-100 text-blue-800 rounded-lg">Outcome A</p>
+                    </div>
+                    <div class="subject text-5xl p-4 rounded-full bg-slate-200">👤</div>
+                     <div class="text-center">
+                        <p class="font-bold text-lg">Path 2: No Treatment</p>
+                        <div class="path-line h-1 bg-slate-300 w-full my-2"></div>
+                        <p class="outcome-box text-2xl font-bold p-4 bg-slate-100 text-slate-800 rounded-lg">Outcome B</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Frameworks Section -->
+        <section class="space-y-12" id="frameworks">
+            <div class="text-center">
+                <h2 class="text-4xl font-bold">II. Causal Frameworks</h2>
+                <p class="max-w-3xl mx-auto mt-2 text-slate-600">Causality's study demands formal language; Structural Causal Models (SCMs) leverage graphs. Crafting a Directed Acyclic Graph (DAG) helps illuminate their function.</p>
+            </div>
+            
+            <div class="card">
+                <h3 class="text-2xl font-semibold">Interactive DAG Builder</h3>
+                <p class="text-slate-500 mt-2">To add variables, click the canvas; they become nodes. Drag between nodes to build causal paths (edges). The tool then analyzes these paths, identifying key ones and suggesting control variables for estimating the causal effect of 'T' (Treatment) on 'Y' (Outcome), if estimation is feasible.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                    <div class="md:col-span-2">
+                        <canvas height="400" id="dag-canvas" width="600"></canvas>
+                    </div>
+                    <div class="space-y-4">
+                         <div class="bg-slate-50 p-4 rounded-lg">
+                            <h4 class="font-semibold">Instructions</h4>
+                            <ul class="text-sm list-disc list-inside text-slate-500 mt-2">
+                                <li>**Add Node:** Click empty space</li>
+                                <li>**Add Edge:** Drag from node to node</li>
+                                <li>**Name Node:** Double-click a node</li>
+                                <li>**Reset:** Use button below</li>
+                            </ul>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-blue-800">Analysis Results</h4>
+                            <div class="text-sm text-blue-700 mt-2 space-y-1" id="dag-analysis">
+                                <p>Add nodes named 'T' and 'Y' to begin.</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary w-full" id="reset-dag-btn">Reset DAG</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experimental Methods Section -->
+        <section class="space-y-12" id="experimental">
+             <div class="text-center">
+                <h2 class="text-4xl font-bold">III. Experimental Methods</h2>
+                <p class="max-w-3xl mx-auto mt-2 text-slate-600">RCTs, considered the gold standard, use randomization to form comparable groups. This exploration investigates how these trials isolate cause-and-effect relationships.</p>
+            </div>
+            <div class="card">
+                <h3 class="text-2xl font-semibold">Randomization Simulator</h3>
+                <p class="text-slate-500 mt-2">Here's a rewritten version of similar length:
+
+You have 20 individuals and an initial characteristic (like age). Randomize them into Treatment and Control using the 'Randomize' button. Observe group balance on this characteristic. Though individual randomizations can vary, the process balances the groups overall.</p>
+                 <div class="mt-6 flex justify-center">
+                    <button class="btn btn-primary" id="randomize-btn">Randomize</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div>
+                        <h4 class="font-semibold text-center mb-2">Treatment Group (<span id="t-count">0</span>)</h4>
+                        <div class="p-4 bg-blue-50 rounded-lg h-48 overflow-y-auto" id="treatment-group"></div>
+                        <p class="text-center mt-2 font-medium">Avg. Age: <span class="text-blue-700" id="t-mean">N/A</span></p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-center mb-2">Control Group (<span id="c-count">0</span>)</h4>
+                        <div class="p-4 bg-slate-50 rounded-lg h-48 overflow-y-auto" id="control-group"></div>
+                        <p class="text-center mt-2 font-medium">Avg. Age: <span class="text-slate-700" id="c-mean">N/A</span></p>
+                    </div>
+                </div>
+                 <div class="mt-4 text-center">
+                    <p class="font-semibold">Standardized Difference: <span class="text-xl" id="balance-diff">N/A</span></p>
+                    <p class="text-xs text-slate-400">(A value &lt; 0.1 is considered well-balanced)</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Quasi-Experimental Section -->
+        <section class="space-y-12" id="quasi-experimental">
+            <div class="text-center">
+                <h2 class="text-4xl font-bold">IV. Quasi-Experimental Methods</h2>
+                <p class="max-w-3xl mx-auto mt-2 text-slate-600">In situations lacking RCTs, we employ quasi-experimental approaches, analyzing observed data. These methods hinge on innovative designs and core assumptions to approximate experimental rigor.</p>
+            </div>
+            
+            <div class="card">
+                 <h3 class="text-2xl font-semibold">Regression Discontinuity (RDD) Simulator</h3>
+                 <p class="text-slate-500 mt-2">RD design applies when a cutoff score determines treatment.  We presume those near the cutoff are alike; a jump in outcome indicates the treatment's impact. Bandwidth adjustment reveals how effect estimates vary with data selection around the threshold.</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-center mt-4">
+                    <div class="md:col-span-1">
+                         <label class="font-medium" for="rdd-slider">Bandwidth: <span id="rdd-bw-label">10</span></label>
+                        <input class="w-full" id="rdd-slider" max="50" min="2" type="range" value="10"/>
+                        <div class="mt-4 bg-blue-50 p-3 rounded-lg text-center">
+                            <p class="text-sm font-medium">Estimated Treatment Effect</p>
+                            <p class="text-2xl font-bold text-blue-800" id="rdd-effect">0</p>
+                        </div>
+                    </div>
+                    <div class="md:col-span-3 chart-container h-72">
+                        <canvas id="rdd-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="text-2xl font-semibold">Difference-in-Differences (DiD) Simulator</h3>
+                <p class="text-slate-500 mt-2">DiD analyzes outcome changes over time, contrasting treated and untreated groups. Its core relies on the **Parallel Trends Assumption**: groups would evolve similarly absent treatment. Flip the assumption to explore its effect.</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-center mt-4">
+                    <div class="md:col-span-1">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input checked="" class="form-checkbox h-5 w-5 text-blue-600" id="did-toggle" type="checkbox"/>
+                            <span class="font-medium">Parallel Trends Hold</span>
+                        </label>
+                        <div class="mt-4 bg-blue-50 p-3 rounded-lg text-center">
+                            <p class="text-sm font-medium">DiD Estimated Effect</p>
+                            <p class="text-2xl font-bold text-blue-800" id="did-effect">0</p>
+                        </div>
+                    </div>
+                    <div class="md:col-span-3 chart-container h-72">
+                        <canvas id="did-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- Section 1: Confounder Chart ---
+        const confounderBtn = document.getElementById('confounder-btn');
+        const confounderExplanation = document.getElementById('confounder-explanation');
+        const confounderCtx = document.getElementById('confounder-chart').getContext('2d');
+        let confounderChart = new Chart(confounderCtx, {
+            type: 'bar',
+            data: {
+                labels: ['May', 'June', 'July', 'August'],
+                datasets: [{
+                    label: 'Ice Cream Sales',
+                    data: [100, 150, 250, 300],
+                    backgroundColor: '#90E0EF',
+                    yAxisID: 'y'
+                }, {
+                    label: 'Crime Rate',
+                    data: [80, 120, 210, 240],
+                    backgroundColor: '#00B4D8',
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Sales' } },
+                    y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Crime Rate'} }
+                },
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+        confounderBtn.addEventListener('click', () => {
+            confounderExplanation.classList.remove('opacity-0');
+        });
+        
+        // --- Section 1: Fundamental Problem Viz ---
+        const fundamentalProblemViz = document.getElementById('fundamental-problem-viz');
+        fundamentalProblemViz.addEventListener('mouseenter', () => {
+            fundamentalProblemViz.children[0].style.opacity = '1';
+            fundamentalProblemViz.children[2].style.opacity = '0.2';
+        });
+         fundamentalProblemViz.addEventListener('mouseleave', () => {
+            fundamentalProblemViz.children[0].style.opacity = '1';
+            fundamentalProblemViz.children[2].style.opacity = '1';
+        });
+
+
+        // --- Section 2: DAG Builder ---
+        const dagCanvas = document.getElementById('dag-canvas');
+        const dagCtx = dagCanvas.getContext('2d');
+        const resetDagBtn = document.getElementById('reset-dag-btn');
+        const dagAnalysisEl = document.getElementById('dag-analysis');
+        let nodes = [], edges = [], dragging = false, startNode = null;
+
+        function drawDag() {
+            dagCtx.clearRect(0, 0, dagCanvas.width, dagCanvas.height);
+            // Draw edges
+            edges.forEach(edge => {
+                dagCtx.beginPath();
+                dagCtx.moveTo(edge.from.x, edge.from.y);
+                dagCtx.lineTo(edge.to.x, edge.to.y);
+                dagCtx.stroke();
+                // Arrowhead
+                const angle = Math.atan2(edge.to.y - edge.from.y, edge.to.x - edge.from.x);
+                dagCtx.save();
+                dagCtx.translate(edge.to.x, edge.to.y);
+                dagCtx.rotate(angle);
+                dagCtx.beginPath();
+                dagCtx.moveTo(0, 0);
+                dagCtx.lineTo(-10, -5);
+                dagCtx.lineTo(-10, 5);
+                dagCtx.closePath();
+                dagCtx.fill();
+                dagCtx.restore();
+            });
+            // Draw nodes
+            nodes.forEach(node => {
+                dagCtx.beginPath();
+                dagCtx.arc(node.x, node.y, 20, 0, 2 * Math.PI);
+                dagCtx.fillStyle = '#3498db';
+                dagCtx.fill();
+                dagCtx.fillStyle = 'white';
+                dagCtx.font = '12px Inter';
+                dagCtx.textAlign = 'center';
+                dagCtx.textBaseline = 'middle';
+                dagCtx.fillText(node.name, node.x, node.y);
+            });
+        }
+        
+        function analyzeDag() {
+            const tNode = nodes.find(n => n.name === 'T');
+            const yNode = nodes.find(n => n.name === 'Y');
+            if(!tNode || !yNode) {
+                dagAnalysisEl.innerHTML = "<p>Add nodes named 'T' and 'Y' to begin analysis.</p>";
+                return;
+            }
+            
+            // This is a highly simplified back-door path finder for demonstration
+            let confounders = [];
+            let mediators = [];
+            let colliders = [];
+
+            nodes.forEach(node => {
+                if (node.name === 'T' || node.name === 'Y') return;
+                
+                const isParentOfT = edges.some(e => e.from === node && e.to === tNode);
+                const isParentOfY = edges.some(e => e.from === node && e.to === yNode);
+                const isChildOfT = edges.some(e => e.from === tNode && e.to === node);
+                const isChildOfY = edges.some(e => e.from === yNode && e.to === node);
+                const isParentofCollider = edges.some(e => e.from === tNode && e.to === node) && edges.some(e => e.from === yNode && e.to === node)
+
+                if (isParentOfT && isParentOfY) {
+                    confounders.push(node.name);
+                } else if (isChildOfT && isParentOfY) {
+                    mediators.push(node.name);
+                }
+            });
+
+            let html = `<p class="font-bold">Causal Path (T → Y) is assumed.</p>`;
+            if (confounders.length > 0) {
+                html += `<p class="mt-2 font-semibold">Confounding Paths Found!</p>`;
+                html += `<p>To estimate the causal effect, you should control for: <strong>${confounders.join(', ')}</strong></p>`;
+            } else {
+                html += `<p class="mt-2 font-semibold text-green-600">No open back-door paths found.</p><p>Effect can be estimated directly.</p>`;
+            }
+             if (mediators.length > 0) {
+                 html += `<p class="mt-2 text-orange-600">Warning: Do not control for the mediator <strong>${mediators.join(', ')}</strong>, as it is on the causal pathway.</p>`;
+             }
+            dagAnalysisEl.innerHTML = html;
+        }
+
+        dagCanvas.addEventListener('mousedown', (e) => {
+            const rect = dagCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            let clickedNode = nodes.find(n => Math.sqrt((n.x - x)**2 + (n.y - y)**2) < 20);
+            if (clickedNode) {
+                dragging = true;
+                startNode = clickedNode;
+            }
+        });
+
+        dagCanvas.addEventListener('mousemove', (e) => {
+            if (!dragging || !startNode) return;
+            // This part can be enhanced to show a line while dragging
+        });
+
+        dagCanvas.addEventListener('mouseup', (e) => {
+            const rect = dagCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            let endNode = nodes.find(n => Math.sqrt((n.x - x)**2 + (n.y - y)**2) < 20);
+            if (dragging && startNode && endNode && startNode !== endNode) {
+                edges.push({ from: startNode, to: endNode });
+                drawDag();
+                analyzeDag();
+            }
+            dragging = false;
+            startNode = null;
+        });
+
+        dagCanvas.addEventListener('click', (e) => {
+            if (dragging) return;
+            const rect = dagCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            let clickedNode = nodes.find(n => Math.sqrt((n.x - x)**2 + (n.y - y)**2) < 20);
+            if (!clickedNode) {
+                nodes.push({ name: `V${nodes.length + 1}`, x, y });
+                drawDag();
+            }
+        });
+        
+        dagCanvas.addEventListener('dblclick', (e) => {
+            const rect = dagCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            let clickedNode = nodes.find(n => Math.sqrt((n.x - x)**2 + (n.y - y)**2) < 20);
+            if (clickedNode) {
+                const newName = prompt("Enter node name (e.g., T, Y, Z):", clickedNode.name);
+                if (newName) {
+                    clickedNode.name = newName.toUpperCase();
+                    drawDag();
+                    analyzeDag();
+                }
+            }
+        });
+
+        resetDagBtn.addEventListener('click', () => {
+            nodes = [];
+            edges = [];
+            drawDag();
+            analyzeDag();
+        });
+
+
+        // --- Section 3: Randomization Simulator ---
+        const randomizeBtn = document.getElementById('randomize-btn');
+        const treatmentGroupEl = document.getElementById('treatment-group');
+        const controlGroupEl = document.getElementById('control-group');
+        const tCountEl = document.getElementById('t-count');
+        const cCountEl = document.getElementById('c-count');
+        const tMeanEl = document.getElementById('t-mean');
+        const cMeanEl = document.getElementById('c-mean');
+        const balanceDiffEl = document.getElementById('balance-diff');
+        const population = Array.from({length: 20}, (_, i) => ({ id: i + 1, age: Math.floor(Math.random() * 50) + 20 }));
+
+        function runRandomization() {
+            let treatment = [];
+            let control = [];
+            population.forEach(p => {
+                if (Math.random() < 0.5) treatment.push(p);
+                else control.push(p);
+            });
+            
+            treatmentGroupEl.innerHTML = treatment.map(p => `<div class="text-sm">ID: ${p.id}, Age: ${p.age}</div>`).join('');
+            controlGroupEl.innerHTML = control.map(p => `<div class="text-sm">ID: ${p.id}, Age: ${p.age}</div>`).join('');
+
+            tCountEl.textContent = treatment.length;
+            cCountEl.textContent = control.length;
+            
+            const tMean = treatment.length > 0 ? treatment.reduce((sum, p) => sum + p.age, 0) / treatment.length : 0;
+            const cMean = control.length > 0 ? control.reduce((sum, p) => sum + p.age, 0) / control.length : 0;
+            
+            tMeanEl.textContent = tMean.toFixed(1);
+            cMeanEl.textContent = cMean.toFixed(1);
+            
+            const pooledSD = Math.sqrt((treatment.reduce((sum, p) => sum + (p.age - tMean)**2, 0) + control.reduce((sum, p) => sum + (p.age - cMean)**2, 0)) / (population.length - 2));
+
+            const stdDiff = pooledSD > 0 ? (tMean - cMean) / pooledSD : 0;
+            balanceDiffEl.textContent = stdDiff.toFixed(3);
+            balanceDiffEl.style.color = Math.abs(stdDiff) < 0.1 ? '#16a34a' : '#dc2626';
+        }
+        randomizeBtn.addEventListener('click', runRandomization);
+
+        // --- Section 4: RDD Simulator ---
+        const rddSlider = document.getElementById('rdd-slider');
+        const rddBwLabel = document.getElementById('rdd-bw-label');
+        const rddEffectEl = document.getElementById('rdd-effect');
+        const rddCtx = document.getElementById('rdd-chart').getContext('2d');
+        let rddChart;
+        const rddData = { control: [], treatment: [] };
+        for (let i = 0; i < 100; i++) {
+            const forcingVar = Math.random() * 100;
+            const error = (Math.random() - 0.5) * 20;
+            if (forcingVar < 50) {
+                rddData.control.push({ x: forcingVar, y: 10 + 0.8 * forcingVar + error });
+            } else {
+                rddData.treatment.push({ x: forcingVar, y: 10 + 0.8 * forcingVar + error + 20 }); // +20 is true effect
+            }
+        }
+
+        function updateRDD() {
+            if (rddChart) rddChart.destroy();
+            const bandwidth = parseInt(rddSlider.value);
+            rddBwLabel.textContent = bandwidth;
+
+            const controlSubset = rddData.control.filter(p => p.x > 50 - bandwidth);
+            const treatmentSubset = rddData.treatment.filter(p => p.x < 50 + bandwidth);
+            
+            // Simplified Local Linear Regression
+            const controlMean = controlSubset.length > 0 ? controlSubset.reduce((sum, p) => sum + p.y, 0) / controlSubset.length : 0;
+            const treatmentMean = treatmentSubset.length > 0 ? treatmentSubset.reduce((sum, p) => sum + p.y, 0) / treatmentSubset.length : 0;
+            const effect = treatmentMean - controlMean;
+            rddEffectEl.textContent = effect.toFixed(2);
+            
+            rddChart = new Chart(rddCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Control', data: rddData.control, backgroundColor: '#7f8c8d'
+                    }, {
+                        label: 'Treatment', data: rddData.treatment, backgroundColor: '#3498db'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: {
+                        x: { type: 'linear', position: 'bottom', title: { display: true, text: 'Forcing Variable' } },
+                        y: { title: { display: true, text: 'Outcome' } }
+                    },
+                    elements: { line: { tension: 0.1 } }
+                }
+            });
+        }
+        rddSlider.addEventListener('input', updateRDD);
+        
+
+        // --- Section 4: DiD Simulator ---
+        const didToggle = document.getElementById('did-toggle');
+        const didEffectEl = document.getElementById('did-effect');
+        const didCtx = document.getElementById('did-chart').getContext('2d');
+        let didChart;
+
+        function updateDiD() {
+            if (didChart) didChart.destroy();
+            const parallel = didToggle.checked;
+            
+            const treatmentData = [20, parallel ? 25 + 15 : 30 + 15]; // +15 is true effect
+            const controlData = [20, 25];
+            
+            const diff1 = treatmentData[1] - treatmentData[0];
+            const diff2 = controlData[1] - controlData[0];
+            const didEffect = diff1 - diff2;
+            didEffectEl.textContent = didEffect.toFixed(2);
+            
+            didChart = new Chart(didCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Pre-Treatment', 'Post-Treatment'],
+                    datasets: [{
+                        label: 'Treatment Group', data: treatmentData, borderColor: '#3498db', backgroundColor: '#3498db', fill: false
+                    }, {
+                        label: 'Control Group', data: controlData, borderColor: '#7f8c8d', backgroundColor: '#7f8c8d', fill: false
+                    }, {
+                        label: 'Counterfactual',
+                        data: [treatmentData[0], treatmentData[0] + (controlData[1] - controlData[0])],
+                        borderColor: '#3498db',
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: false, title: {display: true, text: 'Outcome'} } }
+                }
+            });
+        }
+        didToggle.addEventListener('change', updateDiD);
+
+        // Initial draws
+        drawDag();
+        runRandomization();
+        updateRDD();
+        updateDiD();
+    });
+    </script>
+
+
+</body></html>

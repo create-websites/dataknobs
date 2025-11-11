@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Web Guide to Options Data Providers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutrals with Slate Blue Accent -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive discovery tool, not a linear report. The core is a three-part structure: 1) A primary 'Explorer' view with dynamic filters (by Tier, Use Case) and provider 'cards' that reveal details on click, allowing users to narrow the field based on their needs. 2) An interactive 'Comparison Table' view for head-to-head analysis with sorting. 3) A 'Market Landscape' visualization (a conceptual quadrant chart) to provide a quick, high-level understanding of the price/quality trade-offs. This user-centric, task-oriented structure was chosen over a simple report layout to empower users to find the most suitable provider efficiently, catering to different decision-making styles (holistic view vs. specific criteria). -->
+    <!-- Visualization & Content Choices: Report Info: Provider Tiers/Use Cases -> Goal: Filter/Organize -> Viz: Filter buttons + Dynamic Cards -> Interaction: Click filters to update card grid -> Justification: The most intuitive way for users to navigate the complex provider landscape based on their identity or project type. Report Info: Table 1 Data -> Goal: Compare -> Viz: Interactive HTML Table -> Interaction: Sort by column -> Justification: Allows detailed, multi-vector comparison. Report Info: Price Tiers & Quality commentary -> Goal: Show Relationships/Inform -> Viz: 2D Scatter Plot (Chart.js) -> Interaction: Hover for tooltips -> Justification: Translates the abstract "Price-Quality Frontier" concept from the report into a tangible, easy-to-grasp visualization. All interactions are handled with vanilla JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 50vh; }
+        @media (min-width: 768px) { .chart-container { height: 500px; } }
+        .tab-button.active { border-color: #3b82f6; color: #3b82f6; background-color: #eff6ff; }
+        .provider-card { transition: all 0.3s ease-in-out; }
+        .details-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
+        .details-content.open { max-height: 2000px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">Web Guide to Options Data Providers</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">Here are a few options, keeping the size roughly similar:
+
+*   **Explore, compare, and choose your ideal historical options data provider for quant analysis: An interactive dashboard, based on the 2024 Due Diligence Report.**
+*   **Interactive dashboard: Discover, compare, and select the optimal historical options data provider, tailored to quantitative analysis, per the 2024 Due Diligence Report.**
+*   **Find your perfect historical options data provider: An interactive dashboard for exploration, comparison, and selection, informed by the 2024 Due Diligence Report.**
+*   **Leverage our dashboard to explore &amp; compare historical options data providers. Select the best fit for your quantitative analysis, informed by the 2024 Due Diligence.**</p>
+        </header>
+
+        <main>
+            <div class="mb-8 border-b border-gray-200">
+                <nav aria-label="Tabs" class="flex flex-wrap -mb-px">
+                    <button class="tab-button active text-lg font-medium text-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="explorer">🔍 Explorer</button>
+                    <button class="tab-button text-lg font-medium text-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="comparison">📊 Comparison Table</button>
+                    <button class="tab-button text-lg font-medium text-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="landscape">🗺️ Market Landscape</button>
+                </nav>
+            </div>
+
+            <div class="tab-content" id="explorer">
+                <div class="lg:flex lg:space-x-8">
+                    <aside class="lg:w-1/4 mb-8 lg:mb-0">
+                        <div class="sticky top-8">
+                            <h3 class="text-xl font-semibold mb-4 text-gray-700">Filter Providers</h3>
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="font-semibold text-gray-600 mb-2">By Tier</h4>
+                                    <div class="flex flex-wrap gap-2" id="tier-filters">
+                                        <button class="filter-btn active bg-blue-500 text-white px-3 py-1 text-sm rounded-full" data-filter="all" data-filter-group="tier">All Tiers</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-600 mb-2">By Use Case</h4>
+                                    <div class="flex flex-wrap gap-2" id="use-case-filters">
+                                         <button class="filter-btn active bg-blue-500 text-white px-3 py-1 text-sm rounded-full" data-filter="all" data-filter-group="useCase">All Use Cases</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-600 mb-2">Search by Name</h4>
+                                    <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" id="search-input" placeholder="e.g., SpiderRock" type="text"/>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                    <div class="lg:w-3/4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="provider-grid">
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content hidden" id="comparison">
+                 <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+                    <h2 class="text-2xl font-bold mb-1 text-gray-900">Provider Comparison</h2>
+                    <p class="mb-4 text-gray-600">Here are a few options, all similar in length:
+
+*   Sort the table by clicking column headers. Use Explorer filters to narrow the list.
+*   Sort by column header click. Refine the list using the 'Explorer' tab filters.
+*   Click column headers to sort. Filter this list using the 'Explorer' tab options.
+*   Sort the data: Click column headers. Filter with the 'Explorer' tab tools.</p>
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr id="table-head"></tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-content hidden" id="landscape">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-1 text-gray-900">Market Landscape: Price vs. Quality</h2>
+                    <p class="mb-4 text-gray-600">Here are a few options, all similar in length and conveying the same information:
+
+*   This chart illustrates the report's "Price-Quality Frontier," visualizing providers. It plots pricing tiers against qualitative data quality/feature scores. Mouse over points for insights.
+*   The chart depicts the "Price-Quality Frontier" from this report. Providers are positioned according to price tier and assessed data quality/features. Click points for specifics.
+*   This interactive chart visualizes the report's "Price-Quality Frontier." It shows provider placement based on pricing and the report's quality/feature scores. See details by hovering.
+*   Explore the report's "Price-Quality Frontier" through this interactive chart. Providers are plotted by pricing tier and quality/feature assessment. Hover for more.</p>
+                    <div class="chart-container">
+                        <canvas id="landscape-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const providersData = [
+                {
+                    id: 'optionmetrics',
+                    name: 'OptionMetrics',
+                    tier: 'Institutional & Academic',
+                    useCases: ['Academic Research', 'Institutional Quant'],
+                    strength: 'Academically-vetted, research-ready EOD data and volatility surfaces.',
+                    summary: `For over 25 years, OptionMetrics has solidified its position as the undisputed "gold standard" for historical options data, particularly within academic and institutional quantitative research circles. Its data forms the bedrock of a significant portion of published empirical finance research, making it essential for replicating or extending prior studies.`,
+                    offerings: [
+                        'IvyDB US: Flagship EOD data for all U.S. equity and index options since 1996.',
+                        'IvyDB Europe, ETF, Asia-Pacific, Canada: Broad global coverage.',
+                    ],
+                    characteristics: [
+                        'Granularity: End-of-day (EOD).',
+                        'Key Feature: Includes meticulously calculated implied volatilities, full Greeks, and standardized volatility surfaces.',
+                        'Data Quality: Robust handling of corporate actions with permanent IDs ensures time-series integrity.',
+                    ],
+                    delivery: 'Annual updates via platforms like WRDS for academics; daily updates and direct hosting for institutions.',
+                    pricing: 'Substantial annual subscription fees, placing it in the top institutional tier.',
+                    pro: `The "gold standard" for academic research; excellent data quality and handling of corporate actions.`,
+                    con: `Prohibitively expensive for individuals; EOD granularity only.`,
+                    table: { history: 1996, global: 'Yes', granularity: 'EOD', analytics: 'Advanced Calculated', tier: 'Enterprise' },
+                    chart: { quality: 9.5, price: 9 }
+                },
+                {
+                    id: 'bloomberg',
+                    name: 'Bloomberg (BQL)',
+                    tier: 'Institutional & Academic',
+                    useCases: ['Institutional Quant', 'Portfolio Management'],
+                    strength: 'Integrated ecosystem for cross-asset analysis.',
+                    summary: `A titan of the financial data industry, Bloomberg's value is its fully integrated ecosystem. Its proprietary Bloomberg Query Language (BQL) allows users to perform complex, server-side calculations that combine options data with fundamentals, macro data, and more, all within a single environment.`,
+                    offerings: [
+                        'Bloomberg Query Language (BQL): A sophisticated API for accessing the vast Bloomberg database.',
+                    ],
+                    characteristics: [
+                        'Granularity: Full spectrum from tick-level to EOD.',
+                        'Key Feature: Powerful server-side processing to perform calculations before downloading, saving on data limits.',
+                        'Coverage: Unparalleled breadth across virtually every asset class and geography.',
+                    ],
+                    delivery: 'Bloomberg Terminal, Excel Add-in, dedicated APIs.',
+                    pricing: 'High cost of Terminal subscription (>$25k/year) plus complex data download limits ("hits").',
+                    pro: `Unmatched breadth of data and powerful server-side analytics via BQL.`,
+                    con: `Extremely high cost of terminal subscription; complex data limits.`,
+                    table: { history: 'Extensive', global: 'Yes', granularity: 'Tick, Intraday, EOD', analytics: 'Calculated', tier: 'Enterprise' },
+                    chart: { quality: 9, price: 10 }
+                },
+                {
+                    id: 'spiderrock',
+                    name: 'SpiderRock',
+                    tier: 'Professional & Algorithmic',
+                    useCases: ['Institutional Quant', 'Quant Backtesting'],
+                    strength: '"Battle-tested" data derived from a live institutional trading platform.',
+                    summary: `SpiderRock is not just a data vendor but a technology provider whose data products are direct derivatives of its live institutional trading systems. This "battle-tested" pedigree means the data is continuously vetted in a real-money environment, ensuring an exceptionally high standard of quality and practical relevance.`,
+                    offerings: [
+                        'Options Close Marks (EOD): Since 2010.',
+                        'Quote Intervals: 5-min and 30-min snapshots.',
+                        'Options Print Set: Tick-level trade data since 2016.',
+                    ],
+                    characteristics: [
+                        'Data Fields: Comprehensive suite of analytics including all Greeks, IV, and constructed volatility surfaces.',
+                        'Delivery: Highly flexible via cloud files (S3), REST API, and low-latency multicast feeds.',
+                    ],
+                    delivery: 'API (REST), Cloud Files, Multicast Feeds.',
+                    pricing: 'Professional-tier pricing based on users and message volume, more accessible than a full Bloomberg subscription.',
+                    pro: `High-quality, practically relevant data; flexible granularity and delivery.`,
+                    con: `Pricing may be high for smaller firms; U.S. focus.`,
+                    table: { history: 2010, global: 'No', granularity: 'Tick, Minute, EOD', analytics: 'Advanced Calculated', tier: 'Institutional' },
+                    chart: { quality: 8.5, price: 8 }
+                },
+                {
+                    id: 'algoseek',
+                    name: 'AlgoSeek',
+                    tier: 'Professional & Algorithmic',
+                    useCases: ['Quant Backtesting', 'Machine Learning'],
+                    strength: 'Platform-integrated, research-ready intraday data.',
+                    summary: `AlgoSeek's mission is to provide high-quality, ready-to-use data tailored for quantitative firms and ML researchers. A key strategy is delivering data through integrated platforms like QuantConnect, which allows users to bypass data engineering and focus directly on strategy development.`,
+                    offerings: [
+                        'US Equity & Index Options: Minute-by-minute resolution data since 2012.',
+                    ],
+                    characteristics: [
+                        'Granularity: Primarily minute-level bars.',
+                        'Data Alignment: Data comes pre-linked with Security Master and Option Universe (Greeks/IV) datasets, solving a major engineering challenge.',
+                        'Quality: Perceived quality advantage over cheaper providers, with users noting significant improvements in backtest results.',
+                    ],
+                    delivery: 'Tight integration with platforms like QuantConnect; bulk file downloads.',
+                    pricing: `Professional tier, with minute-bar data for a single futures contract reportedly costing "north of $3,000."`,
+                    pro: `Reduces data engineering overhead; good quality for quant backtesting.`,
+                    con: `Can be tied to a specific platform; professional price point.`,
+                    table: { history: 2012, global: 'No', granularity: 'Minute, Daily', analytics: 'Calculated (Separate)', tier: 'Professional' },
+                    chart: { quality: 8, price: 7 }
+                },
+                {
+                    id: 'onetick',
+                    name: 'OneTick',
+                    tier: 'Institutional & Academic',
+                    useCases: ['HFT / Microstructure', 'Institutional Quant'],
+                    strength: 'Enterprise-grade tick/order book data infrastructure.',
+                    summary: `OneTick is not merely a data provider but an integrated provider of tick data infrastructure and analytics. Their core product is a high-performance time-series database and query engine built to handle petabytes of tick data, a challenge standard databases cannot solve.`,
+                    offerings: [
+                        'OneTick Cloud: On-demand access to global, normalized historical data since 1993.',
+                        'OneTick Platform: On-premise solution for capturing and analyzing data in-house.',
+                    ],
+                    characteristics: [
+                        'Granularity: Tick data, full Level 2 and Level 3 order book history.',
+                        'Coverage: Global, spanning over 200 markets.',
+                        'Features: Built-in tools for TCA, backtesting, and market surveillance.',
+                    ],
+                    delivery: 'On-prem/Cloud Platform, APIs (Python, SQL, REST), Bulk Files.',
+                    pricing: 'Highest institutional tier. Access to 10 years of U.S. Equity ticks is $5,000/month.',
+                    pro: `Unparalleled depth (tick/order book data); powerful analytics engine.`,
+                    con: `Extremely expensive; overkill for non-microstructure research.`,
+                    table: { history: 1993, global: 'Yes', granularity: 'Tick, L2/L3 Book', analytics: 'Raw', tier: 'Enterprise' },
+                    chart: { quality: 10, price: 9.5 }
+                },
+                {
+                    id: 'polygon',
+                    name: 'Polygon.io',
+                    tier: 'Modern API-First',
+                    useCases: ['Developer API', 'Algorithmic Trading'],
+                    strength: 'Modern, developer-friendly APIs and low-latency data streams.',
+                    summary: `Polygon.io aims to modernize financial data access with frictionless, easy-to-integrate APIs. Their slick, modern platform appeals to a tech-savvy audience of developers who value speed and ease of use, though user reviews on deep historical data quality are mixed.`,
+                    offerings: [
+                        'Real-time and historical data for US stocks, options, indices, forex, and crypto.',
+                    ],
+                    characteristics: [
+                        'Granularity: Tick-level data, NBBO quotes, and custom aggregates.',
+                        'Quality Concerns: While excellent for real-time applications, some users report "missing candles" and "wildly inaccurate ticks" in historical data, making it potentially unreliable for rigorous backtesting.',
+                    ],
+                    delivery: 'Well-documented REST API, WebSocket API, and flat files for bulk download.',
+                    pricing: 'Flexible tiered subscription model, significantly more accessible than institutional vendors.',
+                    pro: `Excellent API experience and documentation; flexible pricing.`,
+                    con: `Mixed user reviews on historical data quality and completeness.`,
+                    table: { history: 'Recent', global: 'No', granularity: 'Tick, Minute, EOD', analytics: 'Calculated (Index)', tier: 'Retail/Pro' },
+                    chart: { quality: 5, price: 4 }
+                },
+                {
+                    id: 'orats',
+                    name: 'ORATS',
+                    tier: 'Specialized Analytics',
+                    useCases: ['Volatility & Skew', 'Quant Backtesting'],
+                    strength: 'Proprietary volatility analytics and trading tools.',
+                    summary: `ORATS is a premier options analytics specialist. Their core business is not reselling data, but leveraging it to produce "more accurate market summarizations" and alpha-generating insights through proprietary volatility models. They are an "analytics-first" provider.`,
+                    offerings: [
+                        'Near EOD Data: Full options chain snapshot since 2007.',
+                        '1-Minute Intraday Data: Since August 2020.',
+                        'Volatility Surface Feed: With over 26 proprietary indicators.',
+                    ],
+                    characteristics: [
+                        'Data Fields: A library of over 100 proprietary indicators, including earnings-adjusted IVs, skew metrics, and implied borrow rates.',
+                        'Quality: User reviews are consistently and overwhelmingly positive, praising the power of the analytics.',
+                    ],
+                    delivery: 'REST API, FTP, AWS S3.',
+                    pricing: 'Flexible model with one-time bulk purchases or ongoing subscriptions. Includes powerful tools like a backtester.',
+                    pro: `Extensive library of unique, alpha-generating volatility indicators; great tools.`,
+                    con: `Proprietary models may not suit users wanting to build their own from scratch.`,
+                    table: { history: 2007, global: 'No', granularity: 'Minute, EOD', analytics: 'Advanced Proprietary', tier: 'Professional' },
+                    chart: { quality: 8, price: 6 }
+                },
+                 {
+                    id: 'ivolatility',
+                    name: 'iVolatility',
+                    tier: 'Specialized Analytics',
+                    useCases: ['Global Trading', 'Volatility & Skew'],
+                    strength: 'Broad global coverage and specialized, strategy-focused datasets.',
+                    summary: `A long-standing player since 2000, iVolatility is recognized for its extensive global data coverage and innovative, strategy-focused datasets. Their development of products like the IVX0DTE index demonstrates a responsiveness to evolving market trends like Zero-DTE options.`,
+                    offerings: [
+                        'Index & Equity Options: USA, Canada, Europe, Asia data since 2000 for U.S.',
+                        'Futures & Futures Options: Global coverage.',
+                        'Specialized Datasets: IVX0DTE index for backtesting 0DTE strategies.',
+                    ],
+                    characteristics: [
+                        'Granularity: EOD and intraday snapshots (1, 5, 15, 30, 60 min).',
+                        'Quality: Emphasizes two decades of experience in data cleansing, using multiple sources and manual verification.',
+                    ],
+                    delivery: 'Highly flexible: FTP, managed DB, API, Snowflake, AWS, Azure.',
+                    pricing: 'Adaptable models, including a "Pay-per-usage" download tool for retail clients, making it accessible for ad-hoc research.',
+                    pro: `Strong global coverage; innovative products; flexible pricing.`,
+                    con: `User reviews less prominent than for other specialized vendors.`,
+                    table: { history: 2000, global: 'Yes', granularity: 'Minute Snapshots, EOD', analytics: 'Calculated', tier: 'Retail/Pro' },
+                    chart: { quality: 7, price: 5 }
+                },
+                {
+                    id: 'cboe',
+                    name: 'CBOE LiveVol',
+                    tier: 'Exchange-Direct',
+                    useCases: ['Data Fidelity', 'Compliance'],
+                    strength: 'Authoritative data direct from the exchange operator.',
+                    summary: `Cboe LiveVol holds a unique position as the data arm of Cboe Global Markets. This direct affiliation lends its data an unparalleled level of authoritativeness and perceived integrity, as it comes "straight from the source," bypassing intermediate vendor processing layers.`,
+                    offerings: [
+                        'Cboe DataShop: Primary portal for custom historical data since 2004.',
+                        'LiveVol Pro/Core: Web-based real-time analytics platforms.',
+                    ],
+                    characteristics: [
+                        'Granularity: Full spectrum from Tick, Book Depth, Quotes, to EOD summaries.',
+                        'Analytics: Greeks/IV are calculated based on a 15:45 EST snapshot, which they argue is a more accurate representation of market liquidity.',
+                    ],
+                    delivery: 'DataShop website download, web platform, Excel RTD function.',
+                    pricing: 'Transparent professional-tier pricing (e.g., LiveVol Pro at $380/month + exchange fees).',
+                    pro: `Highest level of data authoritativeness and trust; official source for trade reviews.`,
+                    con: `More expensive than other professional options; analytics are an add-on cost.`,
+                    table: { history: 2004, global: 'No', granularity: 'Tick, Book, EOD', analytics: 'Calculated (Add-on)', tier: 'Professional' },
+                    chart: { quality: 9, price: 7 }
+                },
+                {
+                    id: 'newmark',
+                    name: 'NewMark Risk',
+                    tier: 'Specialized Analytics',
+                    useCases: ['Portfolio Management'],
+                    strength: 'High-level, decision-support analytics derived from options data.',
+                    summary: `NewMark Risk is not a raw data provider but a specialized fintech firm that transforms complex options data into actionable analytics for equity portfolio managers. Their value proposition is clear: "We handle the complexity of options data so you don't have to."`,
+                    offerings: [
+                        'A single feed of over 40 proprietary, options-derived analytics designed for portfolio management workflows.',
+                    ],
+                    characteristics: [
+                        'Coverage: U.S., Hong Kong, and Japan.',
+                        'Granularity: Daily data, with history from 2007 for the U.S.',
+                        'Target Audience: Aimed at fundamental PMs, not quants building strategies from scratch.',
+                    ],
+                    delivery: 'Daily files via AWS S3 (CSV or Parquet).',
+                    pricing: 'Annual subscription with free trials available.',
+                    pro: `Translates complex options data into actionable equity signals; saves analytical work.`,
+                    con: `Not a raw data provider; unsuitable for backtesting custom option strategies.`,
+                    table: { history: 2007, global: 'Yes', granularity: 'Daily', analytics: 'Advanced Proprietary', tier: 'Institutional' },
+                    chart: { quality: 7.5, price: 8.5 }
+                },
+                 {
+                    id: 'rithmic',
+                    name: 'Rithmic',
+                    tier: 'Execution-Focused',
+                    useCases: ['Live Execution'],
+                    strength: 'Low-latency trade execution platform.',
+                    summary: `Rithmic is fundamentally a trade execution platform, not a historical data vendor. Market data is a necessary component of their service, but it is ancillary to their main function as a high-speed execution gateway for futures and options on futures.`,
+                    offerings: [
+                        'Real-time market data for global futures and options exchanges.',
+                    ],
+                    characteristics: [
+                        'Granularity: Real-time data including Market-by-Order (MBO) with microsecond timestamps.',
+                        'Historical Data: Not a focus. Historical features are for reviewing recent trades, not multi-year backtests.',
+                    ],
+                    delivery: 'Proprietary trading front-end (`R | Trader Pro`) and a suite of execution APIs.',
+                    pricing: 'Execution-based: monthly platform fee (~$25), per-contract routing fees, plus pass-through exchange data fees.',
+                    pro: `Excellent for low-latency futures options execution.`,
+                    con: `Not a historical data provider for research; misplaced in this list.`,
+                    table: { history: 'N/A', global: 'Yes (Futures)', granularity: 'Real-time', analytics: 'Raw', tier: 'Professional' },
+                    chart: { quality: 3, price: 3 }
+                },
+                {
+                    id: 'eodhd',
+                    name: 'Endofdayhistoricaldata (EODHD)',
+                    tier: 'Budget-Conscious',
+                    useCases: ['Budget Projects', 'Learning'],
+                    strength: 'Extremely low price and broad accessibility.',
+                    summary: `EODHD competes aggressively on price, targeting developers, students, and budget-conscious users. This low-cost model represents the extreme end of the "cost versus quality" trade-off, with user reviews flagging significant data quality and support issues.`,
+                    offerings: [
+                        'US Stock Options API: EOD data for over 6,000 tickers.',
+                    ],
+                    characteristics: [
+                        'History: Limited to one year for options data.',
+                        'Quality Risk: The "you get what you pay for" theme is a consistent refrain in user reviews. Users must be prepared to undertake extensive data validation.',
+                    ],
+                    delivery: 'REST API (JSON format), plus no-code Excel and Google Sheets add-ons.',
+                    pricing: 'Extremely affordable, with options API plans starting at $29.99/month and a free tier available.',
+                    pro: `Very affordable; easy-to-use API and no-code tools.`,
+                    con: `Significant user-reported data quality and support issues; limited history.`,
+                    table: { history: '1 Year', global: 'Yes (Equities)', granularity: 'EOD (Options)', analytics: 'Calculated', tier: 'Retail' },
+                    chart: { quality: 2, price: 1 }
+                },
+            ];
+
+            const providerGrid = document.getElementById('provider-grid');
+            const tierFiltersContainer = document.getElementById('tier-filters');
+            const useCaseFiltersContainer = document.getElementById('use-case-filters');
+            const searchInput = document.getElementById('search-input');
+            const tabs = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const tableHead = document.getElementById('table-head');
+            const tableBody = document.getElementById('table-body');
+            
+            let currentTierFilter = 'all';
+            let currentUseCaseFilter = 'all';
+            let currentSearchTerm = '';
+            let landscapeChart;
+
+            function createCard(provider) {
+                return `
+                    <div class="provider-card bg-white rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 overflow-hidden flex flex-col" data-id="${provider.id}">
+                        <div class="p-6 flex-grow">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">${provider.name}</h3>
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">${provider.tier}</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">${provider.strength}</p>
+                        </div>
+                        <div class="details-content px-6">
+                             <p class="text-sm text-gray-700 mb-4">${provider.summary}</p>
+                             <div class="space-y-3 text-sm">
+                                <div><h4 class="font-semibold text-gray-800">Key Offerings:</h4><ul class="list-disc list-inside text-gray-600">${provider.offerings.map(o => `<li>${o}</li>`).join('')}</ul></div>
+                                <div><h4 class="font-semibold text-gray-800">Characteristics:</h4><ul class="list-disc list-inside text-gray-600">${provider.characteristics.map(c => `<li>${c}</li>`).join('')}</ul></div>
+                                <div><h4 class="font-semibold text-gray-800">Delivery:</h4><p class="text-gray-600">${provider.delivery}</p></div>
+                                <div><h4 class="font-semibold text-gray-800">Pricing:</h4><p class="text-gray-600">${provider.pricing}</p></div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                    <div class="bg-green-50 p-3 rounded-lg"><h4 class="font-semibold text-green-800">Pro 👍</h4><p class="text-green-700">${provider.pro}</p></div>
+                                    <div class="bg-red-50 p-3 rounded-lg"><h4 class="font-semibold text-red-800">Con 👎</h4><p class="text-red-700">${provider.con}</p></div>
+                                </div>
+                             </div>
+                        </div>
+                        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                           <button class="details-toggle font-semibold text-blue-600 hover:text-blue-800">Show Details ▼</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderProviders() {
+                const filtered = providersData.filter(p => {
+                    const tierMatch = currentTierFilter === 'all' || p.tier === currentTierFilter;
+                    const useCaseMatch = currentUseCaseFilter === 'all' || p.useCases.includes(currentUseCaseFilter);
+                    const searchMatch = currentSearchTerm === '' || p.name.toLowerCase().includes(currentSearchTerm);
+                    return tierMatch && useCaseMatch && searchMatch;
+                });
+
+                providerGrid.innerHTML = filtered.map(createCard).join('');
+                renderTable(filtered);
+            }
+            
+            function setupFilters() {
+                const tiers = [...new Set(providersData.map(p => p.tier))];
+                const useCases = [...new Set(providersData.flatMap(p => p.useCases))];
+
+                tierFiltersContainer.innerHTML += tiers.map(tier => `<button data-filter-group="tier" data-filter="${tier}" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-700">${tier}</button>`).join('');
+                useCaseFiltersContainer.innerHTML += useCases.map(useCase => `<button data-filter-group="useCase" data-filter="${useCase}" class="filter-btn px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-700">${useCase}</button>`).join('');
+
+                document.querySelectorAll('.filter-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const filterGroup = e.target.dataset.filterGroup;
+                        const filter = e.target.dataset.filter;
+
+                        document.querySelectorAll(`[data-filter-group="${filterGroup}"]`).forEach(btn => btn.classList.remove('active', 'bg-blue-500', 'text-white'));
+                        e.target.classList.add('active', 'bg-blue-500', 'text-white');
+                        e.target.classList.remove('bg-gray-200', 'text-gray-700');
+
+                        if(filterGroup === 'tier') currentTierFilter = filter;
+                        if(filterGroup === 'useCase') currentUseCaseFilter = filter;
+
+                        renderProviders();
+                    });
+                });
+            }
+
+            searchInput.addEventListener('input', (e) => {
+                currentSearchTerm = e.target.value.toLowerCase();
+                renderProviders();
+            });
+
+            providerGrid.addEventListener('click', function(e) {
+                if (e.target.classList.contains('details-toggle')) {
+                    const card = e.target.closest('.provider-card');
+                    const content = card.querySelector('.details-content');
+                    content.classList.toggle('open');
+                    e.target.textContent = content.classList.contains('open') ? 'Hide Details ▲' : 'Show Details ▼';
+                }
+            });
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    const tabName = tab.dataset.tab;
+                    tabContents.forEach(content => {
+                        if (content.id === tabName) {
+                            content.classList.remove('hidden');
+                            if(tabName === 'landscape' && !landscapeChart) {
+                                createLandscapeChart();
+                            }
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+            
+            const tableHeaders = [
+                { key: 'name', label: 'Provider' },
+                { key: 'tier', label: 'Pricing Tier' },
+                { key: 'history', label: 'U.S. History Since' },
+                { key: 'global', label: 'Global Coverage' },
+                { key: 'granularity', label: 'Granularity' },
+                { key: 'analytics', label: 'Greeks/IV Provided' },
+            ];
+            let sortConfig = { key: 'name', direction: 'asc' };
+
+            function renderTable(data) {
+                const sortedData = [...data].sort((a, b) => {
+                    const aVal = a.table[sortConfig.key] || a[sortConfig.key];
+                    const bVal = b.table[sortConfig.key] || b[sortConfig.key];
+
+                    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+                    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+                tableBody.innerHTML = sortedData.map(p => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap"><div class="font-medium text-gray-900">${p.name}</div></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.table.tier}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.table.history}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.table.global}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.table.granularity}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.table.analytics}</td>
+                    </tr>
+                `).join('');
+            }
+
+            tableHead.innerHTML = tableHeaders.map(h => {
+                const sortIndicator = h.key === sortConfig.key ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '';
+                return `<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort-key="${h.key}">${h.label} ${sortIndicator}</th>`
+            }).join('');
+            
+            tableHead.addEventListener('click', (e) => {
+                const key = e.target.dataset.sortKey;
+                if (!key) return;
+
+                if (sortConfig.key === key) {
+                    sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortConfig.key = key;
+                    sortConfig.direction = 'asc';
+                }
+                
+                tableHead.innerHTML = tableHeaders.map(h => {
+                    const sortIndicator = h.key === sortConfig.key ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '';
+                    return `<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort-key="${h.key}">${h.label} ${sortIndicator}</th>`
+                }).join('');
+                renderProviders();
+            });
+
+            function createLandscapeChart() {
+                const ctx = document.getElementById('landscape-chart').getContext('2d');
+                const chartData = providersData.map(p => ({
+                    x: p.chart.price,
+                    y: p.chart.quality,
+                    label: p.name,
+                    tier: p.tier
+                }));
+                
+                const tierColors = {
+                    'Institutional & Academic': 'rgba(239, 68, 68, 0.8)', // red-500
+                    'Professional & Algorithmic': 'rgba(59, 130, 246, 0.8)', // blue-500
+                    'Modern API-First': 'rgba(245, 158, 11, 0.8)', // amber-500
+                    'Specialized Analytics': 'rgba(34, 197, 94, 0.8)', // green-500
+                    'Exchange-Direct': 'rgba(139, 92, 246, 0.8)', // violet-500
+                    'Execution-Focused': 'rgba(107, 114, 128, 0.8)', // gray-500
+                    'Budget-Conscious': 'rgba(234, 179, 8, 0.8)', // yellow-500
+                };
+
+                landscapeChart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Data Providers',
+                            data: chartData,
+                            pointBackgroundColor: chartData.map(d => tierColors[d.tier] || '#ccc'),
+                            pointRadius: 8,
+                            pointHoverRadius: 12,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.raw.label;
+                                    }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Provider Landscape: Cost vs. Quality',
+                                font: { size: 18 }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Relative Cost / Price Tier →', font: { size: 14 } },
+                                min: 0,
+                                max: 11,
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return ['Low', '', '', '', '', 'Medium', '', '', '', '', 'High'][value];
+                                    }
+                                }
+                            },
+                            y: {
+                                title: { display: true, text: '↑ Assessed Quality / Features', font: { size: 14 } },
+                                min: 0,
+                                max: 11,
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return ['Low', '', '', '', '', 'Medium', '', '', '', '', 'High'][value];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            setupFilters();
+            renderProviders();
+        });
+    </script>
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Multi-Agent AI System for Customer Support</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Subtle & Sophisticated -->
+    <!-- Application Structure Plan: The SPA is structured as a top-down narrative, guiding the user from the problem to the solution and its impact. It starts with the 'Challenge' of traditional support, presents the 'AI Solution' with an interactive architecture diagram, details 'How It Works' with a process flowchart, and quantifies the 'Performance & Impact' with comparative charts. A final 'Agent Deep Dive' section allows for granular exploration. This thematic, sequential flow is ideal for explaining a complex technical system to a business audience, making it logical and easy to follow. -->
+    <!-- Visualization & Content Choices: 
+    - Report Info: Traditional Support KPIs -> Goal: Inform -> Viz: Key Stat Cards -> Interaction: None -> Justification: Quickly establishes the baseline problem with high-impact numbers. Method: HTML/CSS.
+    - Report Info: System Architecture (Agents) -> Goal: Organize -> Viz: Interactive HTML/CSS Diagram -> Interaction: Click nodes to show details -> Justification: Deconstructs the system visually without SVG/Mermaid. Clicking encourages exploration. Method: JS-powered content switching.
+    - Report Info: Ticket Triage Process -> Goal: Organize/Process -> Viz: HTML/CSS Flowchart -> Interaction: Hover highlight -> Justification: Clearly shows a linear workflow using basic web technologies, avoiding forbidden libraries. Method: HTML/CSS with Tailwind Flexbox.
+    - Report Info: Performance Metrics (Before vs. After) -> Goal: Compare -> Viz: Grouped Bar Chart -> Interaction: Hover tooltips -> Justification: The best method for a direct, quantitative comparison of performance metrics. Library: Chart.js (Canvas).
+    - Report Info: Ticket Categories by Volume -> Goal: Compare -> Viz: Donut Chart -> Interaction: Hover tooltips -> Justification: Excellent for showing the composition of total ticket volume in a simple, visual format. Library: Chart.js (Canvas).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5F5;
+            color: #424242;
+            scroll-behavior: smooth;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link.active {
+            color: #A1887F;
+            font-weight: 600;
+        }
+        .diagram-node {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .diagram-node.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px #A1887F;
+            border-color: #A1887F;
+        }
+        .tab.active {
+            background-color: #A1887F;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-lg text-[#424242]">AI Support System</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A1887F]" href="#challenge">The Challenge</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A1887F]" href="#solution">The Solution</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A1887F]" href="#workflow">Workflow</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A1887F]" href="#impact">Impact</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A1887F]" href="#deepdive">Agent Deep Dive</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <section class="text-center mb-20" id="hero">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-[#424242] mb-4">Revolutionizing Customer Support</h1>
+            <p class="max-w-3xl mx-auto text-lg text-[#757575]">Here are a few options, all similar in length and focusing on different aspects:
+
+*   **Automated ticket triage: How multi-agent AI boosts resolution speed and customer satisfaction.**
+*   **Multi-Agent AI: Revolutionizing customer service by automating ticket handling and improving experiences.**
+*   **Explore Multi-Agent AI's role: Automating ticket triage to expedite resolutions and enhance customer care.**
+*   **Elevate customer service: Multi-Agent AI automates ticket triage, speeding up resolution and improving experience.**
+*   **Ticket triage redefined: Multi-Agent AI systems for faster resolutions and superior customer experiences.**</p>
+        </section>
+
+        <section class="mb-20 scroll-mt-20" id="challenge">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-[#424242]">The Challenge with Traditional Support</h2>
+                <p class="mt-2 text-lg text-[#757575] max-w-2xl mx-auto">Here are a few rewritten options, aiming for a similar length and conveying the same core idea:
+
+*   Customer support scaling poses challenges. Increased tickets mean delays, agent fatigue, and unhappy customers.
+*   Growing customer support presents hurdles. More inquiries cause slow replies, agent stress, and lowered satisfaction.
+*   Expanding customer service is tough. High ticket counts strain resources, hurting response times and customer happiness.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg border border-gray-200 text-center shadow-sm">
+                    <p class="text-4xl font-bold text-[#A1887F]">24.4 Hours</p>
+                    <p class="mt-2 text-[#757575]">Avg. First Response Time</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg border border-gray-200 text-center shadow-sm">
+                    <p class="text-4xl font-bold text-[#A1887F]">42%</p>
+                    <p class="mt-2 text-[#757575]">Customers expect a response in under an hour</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg border border-gray-200 text-center shadow-sm">
+                    <p class="text-4xl font-bold text-[#A1887F]">$1.6 Trillion</p>
+                    <p class="mt-2 text-[#757575]">Lost by U.S. businesses due to poor service</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20 scroll-mt-20" id="solution">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-[#424242]">The Solution: A Multi-Agent AI Team</h2>
+                <p class="mt-2 text-lg text-[#757575] max-w-2xl mx-auto">Here are a few options, all similar in size and meaning:
+
+*   This system employs specialized AI agents that collaborate to manage customer requests effectively. Explore each agent's role by clicking.
+*   Customer requests are processed efficiently by this system, powered by a team of AI agents. Learn their specific functions; click on each.
+*   A team of AI agents powers this system, working in concert to handle customer requests quickly. Discover each agent's purpose by clicking.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 items-start">
+                <div class="md:col-span-2 relative h-96 md:h-[550px] bg-white rounded-lg p-6 border border-gray-200 shadow-sm" id="diagram-container">
+                     <div class="relative w-full h-full">
+                        <div class="diagram-node active" id="node-triage" style="position: absolute; top: 5%; left: 50%; transform: translateX(-50%); width: 160px; text-align: center; padding: 1rem; border: 2px solid #E0E0E0; border-radius: 0.5rem; background: white;">
+                            <h3 class="font-semibold">Triage Agent</h3><p class="text-xs text-gray-500">The Front Desk</p>
+                        </div>
+                        <div class="diagram-node" id="node-knowledge" style="position: absolute; top: 40%; left: 10%; width: 160px; text-align: center; padding: 1rem; border: 2px solid #E0E0E0; border-radius: 0.5rem; background: white;">
+                            <h3 class="font-semibold">Knowledge Agent</h3><p class="text-xs text-gray-500">The Researcher</p>
+                        </div>
+                        <div class="diagram-node" id="node-resolution" style="position: absolute; top: 40%; right: 10%; width: 160px; text-align: center; padding: 1rem; border: 2px solid #E0E0E0; border-radius: 0.5rem; background: white;">
+                            <h3 class="font-semibold">Resolution Agent</h3><p class="text-xs text-gray-500">The Problem Solver</p>
+                        </div>
+                        <div class="diagram-node" id="node-escalation" style="position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%); width: 160px; text-align: center; padding: 1rem; border: 2px solid #E0E0E0; border-radius: 0.5rem; background: white;">
+                            <h3 class="font-semibold">Escalation Agent</h3><p class="text-xs text-gray-500">The Human Handoff</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm h-full" id="diagram-details">
+                    <h3 class="text-xl font-bold mb-3 text-[#424242]" id="details-title">Triage Agent</h3>
+                    <p class="text-[#757575]" id="details-text">Initial point of interaction. It analyzes incoming customer tickets, identifies the user's need, classifies the issue (e.g., Billing, Tech, Feedback), assesses urgency, and directs the ticket to the right expert.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20 scroll-mt-20" id="workflow">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-[#424242]">How It Works: A Ticket's Journey</h2>
+                <p class="mt-2 text-lg text-[#757575] max-w-2xl mx-auto">Trace a customer support ticket's journey within the automated system, start to finish.</p>
+            </div>
+            <div class="bg-white p-8 rounded-lg border border-gray-200 shadow-sm">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-2">
+                    <div class="text-center p-4 flex-1">
+                        <div class="text-3xl mb-2">📥</div><h3 class="font-semibold">1. Ticket Arrives</h3><p class="text-sm text-gray-500">Customer submits a request via email or web form.</p>
+                    </div>
+                    <div class="text-2xl text-gray-300 transform rotate-90 md:rotate-0">→</div>
+                    <div class="text-center p-4 flex-1">
+                        <div class="text-3xl mb-2">🏷️</div><h3 class="font-semibold">2. Triage &amp; Categorize</h3><p class="text-sm text-gray-500">Triage Agent analyzes and routes the ticket.</p>
+                    </div>
+                    <div class="text-2xl text-gray-300 transform rotate-90 md:rotate-0">→</div>
+                    <div class="text-center p-4 flex-1">
+                        <div class="text-3xl mb-2">📖</div><h3 class="font-semibold">3. Information Gathering</h3><p class="text-sm text-gray-500">Knowledge Agent fetches data from help docs.</p>
+                    </div>
+                    <div class="text-2xl text-gray-300 transform rotate-90 md:rotate-0">→</div>
+                    <div class="text-center p-4 flex-1">
+                        <div class="text-3xl mb-2">✅</div><h3 class="font-semibold">4. Resolution / Escalation</h3><p class="text-sm text-gray-500">Here are a few options, all similar in length and meaning:
+
+*   **Automated tools solve, or a rep takes over.**
+*   **System fixes it, or a person intervenes.**
+*   **Bot handles it, or a human steps in.**
+*   **Processed automatically, or handed to staff.**
+*   **Solved digitally, or passed to a person.**</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-20 scroll-mt-20" id="impact">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-[#424242]">Performance &amp; Impact</h2>
+                <p class="mt-2 text-lg text-[#757575] max-w-2xl mx-auto">Here are a few options, all similar in length:
+
+*   AI automates tasks, boosting support metrics and enabling agents to focus on complex issues.
+*   Automated tasks improve support metrics, allowing human agents to handle more important interactions.
+*   The AI system automates tasks, leading to better support results and empowering agents with complex work.
+*   By automating, the AI boosts support KPIs and gives agents time for higher-level work.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                    <h3 class="text-center text-xl font-semibold mb-4">Key Metric Improvement</h3>
+                    <div class="chart-container">
+                        <canvas id="impactChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                    <h3 class="text-center text-xl font-semibold mb-4">Ticket Volume by Category</h3>
+                     <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-20" id="deepdive">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-[#424242]">Agent Deep Dive</h2>
+                <p class="mt-2 text-lg text-[#757575] max-w-2xl mx-auto">Here are a few options, all similar in length and capturing the essence of the original:
+
+*   **Examine agent behaviors: Understand the core prompts and available tools.**
+*   **Investigate agent design: Identify key prompts and tool access.**
+*   **Delve into agent mechanics: Analyze prompts and tool utilization.**
+*   **Uncover agent actions: Study core instructions and toolsets.**
+*   **Understand agent control: See the prompts and tool access used.**</p>
+            </div>
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                <div class="mb-4 border-b border-gray-200">
+                    <nav aria-label="Tabs" class="-mb-px flex space-x-4">
+                        <button class="tab active" data-tab="triage">Triage Agent</button>
+                        <button class="tab" data-tab="knowledge">Knowledge Agent</button>
+                        <button class="tab" data-tab="resolution">Resolution Agent</button>
+                    </nav>
+                </div>
+                <div>
+                    <div class="tab-content" id="content-triage">
+                        <h4 class="font-bold text-lg">Example Prompt: Triage Agent</h4>
+                        <p class="text-sm text-gray-500 mb-4">Here are a few options, all similar in length:
+
+*   This prompt guides the agent to analyze &amp; categorize tickets.
+*   This prompt defines how the agent should process incoming tickets.
+*   The agent is instructed here to analyze &amp; classify new tickets.
+*   This prompt outlines ticket analysis and classification steps.</p>
+                        <div class="bg-gray-100 p-4 rounded-md font-mono text-xs text-gray-700">
+                            <p><span class="font-semibold text-[#A1887F]">ROLE:</span> You are a Triage Agent for a SaaS company.</p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">TASK:</span> Please examine the customer ticket, then determine its category, sentiment, and urgency level.</p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">CATEGORIES:</span> ['Billing', 'Technical Support', 'Account Access', 'Feedback', 'Sales Inquiry']</p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">URGENCY:</span> ['Low', 'Normal', 'High', 'Critical']</p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">OUTPUT:</span> Return a JSON object with 'category', 'sentiment', and 'urgency' keys.</p>
+                        </div>
+                    </div>
+                    <div class="tab-content hidden" id="content-knowledge">
+                         <h4 class="font-bold text-lg">Example Prompt: Knowledge Agent</h4>
+                        <p class="text-sm text-gray-500 mb-4">Here are a few options, all similar in length:
+
+*   This prompt allows the agent to use a tool (the knowledge base) for responses.
+*   The agent uses a tool (the knowledge base) via this prompt to find answers.
+*   With this prompt, the agent can employ a tool (the knowledge base) for help.
+*   The agent accesses the knowledge base tool via this prompt for answers.</p>
+                        <div class="bg-gray-100 p-4 rounded-md font-mono text-xs text-gray-700">
+                            <p><span class="font-semibold text-[#A1887F]">ROLE:</span> You are a Knowledge Retrieval Specialist.</p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">CONTEXT:</span> The customer is asking about "{ticket_summary}".</p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">TOOL:</span> You have access to a function `search_knowledge_base(query)`. </p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">TASK:</span> Employ the tool to discover pertinent articles. Condense the core arguments of the top three.</p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">OUTPUT:</span> Return the summarized information as a concise text block.</p>
+                        </div>
+                    </div>
+                    <div class="tab-content hidden" id="content-resolution">
+                        <h4 class="font-bold text-lg">Example Prompt: Resolution Agent</h4>
+                        <p class="text-sm text-gray-500 mb-4">Here are a few options, keeping the size roughly similar:
+
+*   This prompt directs the agent to gather data and compose a customer response.
+*   The agent is prompted here to analyze info and write a customer message.
+*   The instruction is to compile details and create a reply for a client.
+*   This requests the agent to consolidate info and craft a customer email.</p>
+                        <div class="bg-gray-100 p-4 rounded-md font-mono text-xs text-gray-700">
+                            <p><span class="font-semibold text-[#A1887F]">ROLE:</span> You are a helpful and friendly Customer Support Agent.</p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">CONTEXT:</span> Here are a few rewritten options, maintaining a similar size:
+
+*   **Customer query:** '{ticket_summary}'. **Agent response:** '{knowledge_summary}'.
+
+*   **Question:** '{ticket_summary}'. **Answer:** '{knowledge_summary}'.
+
+*   **Inquiry:** '{ticket_summary}'. **Solution:** '{knowledge_summary}'.
+
+*   **The issue:** '{ticket_summary}'. **Agent's input:** '{knowledge_summary}'.</p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">TASK:</span> Craft a concise, courteous, and informative email, addressing the customer's query directly with the supplied details.</p>
+                            <p class="mt-2"><span class="font-semibold text-[#A1887F]">OUTPUT:</span> Return only the drafted email text.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const diagramNodes = document.querySelectorAll('.diagram-node');
+            const detailsTitle = document.getElementById('details-title');
+            const detailsText = document.getElementById('details-text');
+            const nodeDetails = {
+                'node-triage': { title: 'Triage Agent', text: 'The first point of contact. It reads the incoming customer ticket, understands the user\'s intent, categorizes the issue (e.g., Billing, Technical, Feedback), and determines its urgency. It then routes the ticket to the appropriate specialist agent.' },
+                'node-knowledge': { title: 'Knowledge Agent', text: 'This agent acts as a researcher. It takes the categorized ticket and queries internal knowledge bases, help documents, and past tickets to find relevant information and potential solutions.' },
+                'node-resolution': { title: 'Resolution Agent', text: 'The problem solver. It synthesizes the customer\'s query and the information from the Knowledge Agent to draft a direct, helpful response. For simple issues, this response can be sent automatically.' },
+                'node-escalation': { title: 'Escalation Agent', text: 'This agent determines when a problem is too complex for automation. It neatly packages the ticket, the customer\'s history, and all gathered information, then hands it off to a human agent for a seamless transition.' }
+            };
+
+            diagramNodes.forEach(node => {
+                node.addEventListener('click', () => {
+                    diagramNodes.forEach(n => n.classList.remove('active'));
+                    node.classList.add('active');
+                    const details = nodeDetails[node.id];
+                    detailsTitle.textContent = details.title;
+                    detailsText.textContent = details.text;
+                });
+            });
+
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const targetContentId = 'content-' + tab.dataset.tab;
+                    tabContents.forEach(content => {
+                        if (content.id === targetContentId) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+                
+                // Style tabs on init
+                const tabStyles = "px-3 py-2 font-medium text-sm rounded-md cursor-pointer text-gray-600 hover:bg-gray-200";
+                tab.className = tab.className + " " + tabStyles;
+                if(tab.classList.contains('active')) tab.classList.add('bg-[#A1887F]', 'text-white');
+
+            });
+            
+            const tooltipPluginConfig = {
+                tooltip: { callbacks: { title: function(tooltipItems) { const item = tooltipItems[0]; let label = item.chart.data.labels[item.dataIndex]; return Array.isArray(label) ? label.join(' ') : label; } } }
+            };
+
+            const impactCtx = document.getElementById('impactChart').getContext('2d');
+            new Chart(impactCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['First Response Time (Hours)', 'Resolution Time (Hours)', 'CSAT Score (%)'],
+                    datasets: [
+                        { label: 'Traditional Support', data: [24, 72, 82], backgroundColor: '#E0E0E0', },
+                        { label: 'AI-Agent System', data: [0.1, 4, 91], backgroundColor: '#A1887F', }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { ...tooltipPluginConfig } }
+            });
+
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Technical Support', 'Billing Inquiry', 'Account Access', 'General Feedback'],
+                    datasets: [{
+                        data: [45, 30, 15, 10],
+                        backgroundColor: ['#A1887F', '#C5B6AF', '#7986CB', '#E0E0E0'],
+                        borderColor: '#F5F5F5',
+                        borderWidth: 4,
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom' }, ...tooltipPluginConfig } }
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+            sections.forEach(section => observer.observe(section));
+        });
+    </script>
+
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

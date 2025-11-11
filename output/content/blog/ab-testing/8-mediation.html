@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Understanding Mediation in Field Experiments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Harmony (Stone, Slate, Amber) -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive learning module. It starts with the core problem of mediation (the "black box" and sequential ignorability). It then presents a "Design Toolkit," an interactive, card-based section where users can compare different experimental designs (Implicit, Causal-Chain, PED) and see their strengths and weaknesses. This is followed by an interactive visualization of the GOTV "mechanism experiment" case study, allowing users to see how different interventions produce different turnout levels, thereby demonstrating an implicit test of a mechanism. The app concludes with a section on practical challenges like noncompliance and attrition. This structure prioritizes conceptual understanding and design choice over the linear format of a textbook chapter. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: The core causal chain (T -> M -> Y). Goal: Organize. Viz/Presentation: A diagram built with HTML/CSS and Tailwind, showing the links. Interaction: Hovering over the M->Y link will reveal a warning about the Sequential Ignorability assumption. Justification: Visually grounds the user in the core model and immediately introduces the key problem. Method: HTML/CSS.
+        - Report Info: Comparing experimental designs. Goal: Compare/Organize. Viz/Presentation: A set of tabbed cards, one for each design (Measurement, Implicit, Causal-Chain, PED). Each card has a simplified HTML/CSS diagram, pros, and cons. Interaction: Clicking tabs to switch between designs. Justification: Allows for easy comparison of complex design trade-offs. Method: HTML/CSS.
+        - Report Info: GOTV Case Study data. Goal: Compare/Inform. Viz/Presentation: An interactive bar chart showing turnout rates for different GOTV mailings. Interaction: Buttons allow the user to select different mailings ("Civic Duty," "Neighbors," etc.), and the chart updates dynamically to show the effect size. Justification: Makes the abstract "mechanism experiment" concept concrete and engaging, showing how manipulating the mechanism (social pressure) affects the outcome. Library: Chart.js/Canvas.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Roboto', sans-serif; background-color: #f5f5f4; color: #57534e; }
+        h1, h2, h3, h4 { font-family: 'Merriweather', serif; color: #1c1917; }
+        .nav-link { transition: color 0.2s; }
+        .nav-link:hover, .nav-link.active { color: #f59e0b; }
+        .card { background-color: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05); padding: 1.5rem; border: 1px solid #e7e5e4; }
+        .tab { cursor: pointer; padding: 0.75rem 1rem; border-bottom: 2px solid transparent; color: #78716c; }
+        .tab.active { color: #475569; border-color: #475569; font-weight: 600;}
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        .tooltip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dotted #1c1917; }
+        .tooltip .tooltiptext { visibility: hidden; width: 280px; background-color: #292524; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -140px; opacity: 0; transition: opacity 0.3s; font-size: 0.875rem; font-weight: 400; }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        .diagram { display: flex; align-items: center; justify-content: center; gap: 1rem; font-family: 'Merriweather', serif; }
+        .diagram-node { background-color: #f3f4f6; border: 1px solid #d1d5db; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: bold; }
+        .diagram-arrow { font-size: 1.5rem; color: #9ca3af; }
+    </style>
+</head>
+<body class="antialiased leading-relaxed">
+
+    <header class="bg-white/95 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-slate-800 font-serif">Unpacking the Black Box</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4" id="nav-menu">
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#problem">The Problem</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#toolkit">Design Toolkit</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#case-study">Case Study</a>
+                        <a class="nav-link px-3 py-2 rounded-md text-sm font-semibold" href="#challenges">Challenges</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="py-16 sm:py-20 lg:py-24" id="problem">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight">Beyond "What Works" to "How it Works"</h1>
+                    <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-600">RCTs reveal *if* something functions; however, understanding *why* is key for enhanced theories &amp; policies. Mediation analysis explores causal mechanisms, presenting a core difficulty.</p>
+                </div>
+
+                <div class="mt-16 max-w-2xl mx-auto card">
+                    <h2 class="text-2xl font-bold text-center">The Central Challenge</h2>
+                     <p class="text-center mt-2 text-slate-600">For a standard experiment, we assess if Treatment (T) influences Outcome (Y) via a Mediator (M).</p>
+                    <div class="my-6 diagram">
+                        <div class="diagram-node">T</div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-node">M</div>
+                        <div class="diagram-arrow relative cursor-pointer" id="m-to-y">
+                            →
+                             <div class="tooltiptext" id="tooltip-text">
+                                <strong>The Sequential Ignorability Assumption:</strong> Here are a few rewrites, all roughly the same length and conveying the same core idea:
+
+*   This observation is not inherently causal. Claiming causality requires assuming away hidden factors that could explain the link between X and Y - a difficult and unverifiable premise.
+
+*   The observed association isn't proof of cause. To suggest it is, we need to presume no unseen variables impact the relationship; this is a potent, and untestable, precondition.
+
+*   This observed connection isn't causal on its own. Causal claims hinge on excluding the influence of unseen factors, a strong and ultimately untestable premise.
+                            </div>
+                        </div>
+                        <div class="diagram-node">Y</div>
+                    </div>
+                    <p class="text-center text-slate-600">Focusing on M's effect on Y, we randomize Treatment (T→M), but *observe* only the M-Y connection, which is correlation-based.  To infer causation needs the untestable assumption of **Sequential Ignorability**. Hover for details.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 sm:py-20 lg:py-24 bg-white" id="toolkit">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold">A Hierarchy of Experimental Designs</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">Strong causal insights come not from stats after the fact, but from superior experiment designs. Discover design options below to build stronger evidence.</p>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto">
+                    <div class="border-b border-stone-200">
+                        <nav aria-label="Tabs" class="-mb-px flex space-x-2 sm:space-x-6 justify-center">
+                            <div class="tab active" id="tab-measurement">Measurement</div>
+                            <div class="tab" id="tab-implicit">Implicit Test</div>
+                            <div class="tab" id="tab-chain">Causal Chain</div>
+                            <div class="tab" id="tab-ped">Encouragement</div>
+                        </nav>
+                    </div>
+                    <div class="mt-8">
+                        <div class="tab-content active card" id="content-measurement">
+                            <h3 class="text-xl font-bold text-center">Measurement-of-Mediation</h3>
+                            <p class="mt-3 text-slate-600">Here are a few options, all of similar length and conveying the same information:
+
+*   This is the typical approach: randomize the treatment, then assess the mediator and the outcome.
+*   The usual method: first, randomize treatment; next, measure the mediator and outcome variables.
+*   Commonly, you randomize the treatment and then measure the mediator and the final outcome.</p>
+                            <div class="my-4 diagram">
+                                <div class="diagram-node">Randomize T</div>
+                                <div class="diagram-arrow">→</div>
+                                <div class="diagram-node bg-yellow-100 border-yellow-300">Measure M</div>
+                                <div class="diagram-arrow">→</div>
+                                <div class="diagram-node">Measure Y</div>
+                            </div>
+                            <p class="font-semibold text-center">Here are a few rewrites of the line, keeping a similar size and conveying the same information:
+
+*   **Pros: Feasible, straightforward. Cons: Depends solely on unprovable Sequential Ignorability.**
+*   **Advantage: Easy to implement. Disadvantage: Solely relies on the unverifiable Sequential Ignorability.**
+*   **Good: Practical and clear. Bad: Built entirely on the unconfirmed Sequential Ignorability premise.**
+*   **Strengths: Practicality and ease of use. Weakness: Foundationally depends on unverified Sequential Ignorability.**</p>
+                        </div>
+                         <div class="tab-content card" id="content-implicit">
+                            <h3 class="text-xl font-bold text-center">Implicit Mediation (Mechanism Experiment)</h3>
+                            <p class="mt-3 text-slate-600">Focus on the mechanism itself: design a treatment to directly interfere with, or replicate, the hypothesized process.</p>
+                             <div class="my-4 diagram">
+                                <div class="diagram-node">Randomize T<br/>(e.g., Social Pressure Mail)</div>
+                                <div class="diagram-arrow">→</div>
+                                <div class="diagram-node bg-amber-100 border-amber-300">[Blocks M]</div>
+                                <div class="diagram-arrow">→</div>
+                                <div class="diagram-node">Measure Y</div>
+                            </div>
+                            <p class="font-semibold text-center">Here are a few rewritten options, maintaining a similar size and focusing on clarity:
+
+**Option 1 (Concise):**
+
+Strength: Effectively disproves theories without direct measurement. Weakness: Indirect impact isn't quantified.
+
+**Option 2 (Slightly more detail):**
+
+Strength: Adept at falsifying theories absent physical measurement. Weakness: Cannot assess the magnitude of indirect effects.
+
+**Option 3 (Emphasis on Limitation):**
+
+Strength: Capable of disproving theories without direct data. Weakness: Unable to determine the degree of the effect.</p>
+                        </div>
+                         <div class="tab-content card" id="content-chain">
+                            <h3 class="text-xl font-bold text-center">Experimental-Causal-Chain</h3>
+                            <p class="mt-3 text-slate-600">Here are a few options, all similar in length:
+
+*   Run two distinct experiments: first, to show T affects M; second, to show M affects Y.
+*   Perform two experiments: the first testing if T leads to M, the second testing if M leads to Y.
+*   Two experiments are needed: one to confirm that T influences M, the other to confirm M influences Y.
+*   We'll conduct two experiments: proving T's effect on M, and separately, M's effect on Y.</p>
+                             <div class="my-4 diagram">
+                                <div class="diagram-node">Exp 1: T→M</div>
+                                <div class="diagram-arrow">&amp;</div>
+                                <div class="diagram-node">Exp 2: M→Y</div>
+                            </div>
+                           <p class="font-semibold text-center">Here are a few rewritten options, aiming for a similar size and conveying the original meaning:
+
+**Option 1 (Concise):**
+
+Strength: Supports links with evidence. Weakness: Susceptible to product fallacy in diverse groups.
+
+**Option 2 (Slightly more detail):**
+
+Strength: Empirical support for connections. Weakness: Prone to product fallacy issues across populations.
+
+**Option 3 (Emphasizing the research aspect):**
+
+Strength: Experimental evidence validates the links. Weakness: Risk of product fallacy bias if populations vary.</p>
+                        </div>
+                        <div class="tab-content card" id="content-ped">
+                            <h3 class="text-xl font-bold text-center">Parallel Encouragement Design (PED)</h3>
+                            <p class="mt-3 text-slate-600">Employ a novel design, randomly boosting mediator adoption and leveraging encouragement as an instrumental variable.</p>
+                             <div class="my-4 diagram">
+                                <div class="diagram-node">Randomly Encourage M</div>
+                                <div class="diagram-arrow">→</div>
+                                <div class="diagram-node">Observe M</div>
+                                <div class="diagram-arrow">→</div>
+                                <div class="diagram-node">Measure Y</div>
+                            </div>
+                           <p class="font-semibold text-center">Here are a few options, all similar in length:
+
+*   **Pros:** Simplifies, fewer suppositions. **Cons:** Intricate; needs a proven 'nudge' tool.
+*   **Advantage:** Less restrictive mediation basis. **Disadvantage:** Complicated; uses 'incentive' element.
+*   **Benefit:** Simpler assumptions for mediation. **Drawback:** Involved; relies on a proven 'prompt'.
+*   **Positive:** Uses fewer baseline guesses. **Negative:** Involved; needs a reliable 'boost' test.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 sm:py-20 lg:py-24" id="case-study">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold">Case Study: Social Pressure &amp; Voter Turnout</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">A pivotal study explored how social pressure, the engine behind "Get-Out-The-Vote" mailings, operates. Researchers, rather than directly measuring pressure, crafted varying levels of social influence within the mailings. See the outcomes by clicking below.</p>
+                </div>
+
+                <div class="mt-12 max-w-4xl mx-auto card">
+                    <div class="text-center mb-6 flex flex-wrap justify-center gap-2">
+                        <button class="chart-btn bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition-colors" data-value="0.297">Control</button>
+                        <button class="chart-btn bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded-lg transition-colors" data-value="0.315">Civic Duty</button>
+                        <button class="chart-btn bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg transition-colors" data-value="0.322">Hawthorne</button>
+                        <button class="chart-btn bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 px-4 rounded-lg transition-colors" data-value="0.345">Self</button>
+                        <button class="chart-btn bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-lg transition-colors" data-value="0.378">Neighbors</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="gotvChart"></canvas>
+                    </div>
+                    <p class="text-center mt-4 text-sm text-slate-500">The "Neighbors" mailing, disclosing voter histories, significantly impacted turnout. This strongly suggests that social influence was the primary driver.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="py-16 sm:py-20 lg:py-24 bg-white" id="challenges">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                 <div class="text-center">
+                    <h2 class="text-3xl font-bold">Practical Challenges in the Field</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">Experiments in the real world are often complex. Noncompliance and attrition are two frequent challenges to mediation analysis.</p>
+                </div>
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    <div class="card">
+                        <h3 class="font-bold text-xl text-center">Treatment Noncompliance</h3>
+                        <p class="mt-3 text-slate-600">When individuals fail to fulfill their obligations, like skipping a training (treatment), we face challenges.  This leads us to estimating effects only for "compliers," potentially using tools such as instrumental variables.</p>
+                    </div>
+                     <div class="card">
+                        <h3 class="font-bold text-xl text-center">Participant Attrition</h3>
+                        <p class="mt-3 text-slate-600">Here's a rewritten version of the line, keeping a similar length and conveying the same information:
+
+Study dropouts present a challenge. If attrition varies systematically between treatment and control (**differential attrition**), the causal estimates may be biased. Address this with rigorous checks and consider statistical solutions such as bounding or weighting.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Tooltip interaction
+        const mToYArrow = document.getElementById('m-to-y');
+        const tooltip = document.getElementById('tooltip-text');
+        mToYArrow.addEventListener('mouseenter', () => tooltip.style.visibility = 'visible');
+        mToYArrow.addEventListener('mouseleave', () => tooltip.style.visibility = 'hidden');
+
+        // Tabs interaction
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.id.replace('tab-', 'content-');
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                tabContents.forEach(content => {
+                    content.classList.toggle('active', content.id === targetId);
+                });
+            });
+        });
+
+        // GOTV Chart
+        const chartBtns = document.querySelectorAll('.chart-btn');
+        const gotvChartCtx = document.getElementById('gotvChart').getContext('2d');
+        const initialData = {
+            label: 'Control',
+            value: 0.297,
+            color: '#64748b'
+        };
+
+        const gotvChart = new Chart(gotvChartCtx, {
+            type: 'bar',
+            data: {
+                labels: [initialData.label],
+                datasets: [{
+                    label: 'Voter Turnout Rate',
+                    data: [initialData.value],
+                    backgroundColor: [initialData.color],
+                    borderColor: [initialData.color],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 0.28,
+                        max: 0.40,
+                        ticks: {
+                            callback: function(value) {
+                                return (value * 100).toFixed(1) + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += (context.parsed.y * 100).toFixed(1) + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const dataMap = {
+            'Control':    { value: 0.297, color: '#64748b' },
+            'Civic Duty': { value: 0.315, color: '#0ea5e9' },
+            'Hawthorne':  { value: 0.322, color: '#f59e0b' },
+            'Self':       { value: 0.345, color: '#f43f5e' },
+            'Neighbors':  { value: 0.378, color: '#b91c1c' }
+        };
+
+        chartBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const label = btn.textContent;
+                const data = dataMap[label];
+                
+                gotvChart.data.labels = [label];
+                gotvChart.data.datasets[0].data = [data.value];
+                gotvChart.data.datasets[0].backgroundColor = [data.color];
+                gotvChart.data.datasets[0].borderColor = [data.color];
+                gotvChart.update();
+            });
+        });
+
+    });
+    </script>
+
+
+</body></html>

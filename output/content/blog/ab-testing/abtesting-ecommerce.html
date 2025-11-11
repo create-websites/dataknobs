@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Web Guide to E-commerce A/B Testing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Soothing Neutrals & Earth Tones -->
+    <!-- Application Structure Plan: The SPA is structured thematically to guide the user from foundational knowledge to practical application, rather than mirroring the report's linear chapters. It begins with 'The Framework' (the "how-to"), moves to an interactive 'Optimization Playbook' (the "what-to-do"), visualizes results in 'Case Studies' (the "proof"), and finishes with 'Advanced Concepts' and 'Tools'. A sticky navigation facilitates jumping between these logical sections. This user-centric flow is designed for quick reference and actionability, allowing a user to immediately explore test ideas for a specific page (e.g., PDP) without having to read the entire report sequentially. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Optimization Loop -> Goal: Organize -> Viz: Interactive Diagram -> Justification: Visually represents the cyclical process; interaction provides details on demand. -> Method: HTML/CSS with JS for interaction.
+        - Report Info: Prioritization Frameworks (ICE, PIE, PXL) -> Goal: Compare -> Viz: Tabbed Interface -> Justification: Allows easy comparison of frameworks without cluttering the page. -> Method: HTML/CSS with JS for tabs.
+        - Report Info: Test ideas for each page type (PDP, Checkout, etc.) -> Goal: Organize/Inform -> Viz: Interactive Cards -> Justification: Presents numerous test ideas in a digestible format; clicking to reveal details makes it an actionable exploration tool. -> Method: HTML/CSS with JS for card toggles.
+        - Report Info: Case Study Conversion Lifts -> Goal: Compare/Inform -> Viz: Bar Chart -> Justification: Best way to visually demonstrate the dramatic impact of successful tests. -> Library: Chart.js/Canvas.
+        - Report Info: A/B vs MVT vs Personalization -> Goal: Compare -> Viz: Interactive Table -> Justification: Clearly lays out the differences for strategic decision-making. -> Method: HTML/CSS with JS for hover effects.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f7f4; color: #44403c; }
+        .chart-container { position: relative; width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 450px; max-height: 500px; } }
+        .nav-link.active { color: #84cc16; border-bottom-color: #84cc16; }
+        .playbook-tab.active { background-color: #84cc16; color: #ffffff; }
+        .playbook-card-back { transform: rotateY(180deg); backface-visibility: hidden; }
+        .playbook-card.is-flipped .playbook-card-inner { transform: rotateY(180deg); }
+    </style>
+</head>
+<body>
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-2xl font-bold text-stone-800">E-commerce A/B Testing</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4" id="main-nav">
+                        <a class="nav-link text-stone-600 hover:text-lime-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent" href="#framework">The Framework</a>
+                        <a class="nav-link text-stone-600 hover:text-lime-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent" href="#playbook">Optimization Playbook</a>
+                        <a class="nav-link text-stone-600 hover:text-lime-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent" href="#case-studies">Case Studies</a>
+                        <a class="nav-link text-stone-600 hover:text-lime-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent" href="#advanced">Advanced Concepts</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <section class="scroll-mt-20" id="framework">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-stone-900">The Testing Framework</h2>
+                <p class="mt-4 text-lg text-stone-600 max-w-3xl mx-auto">Testing success hinges on a structured, iterative approach. This segment outlines core elements crucial for conducting effective, impactful experiments.</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-12">
+                <h3 class="text-2xl font-bold text-center text-stone-800 mb-8">The Continuous Optimization Loop</h3>
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    <div class="flex items-center">
+                        <div class="w-32 h-32 flex items-center justify-center bg-lime-100 rounded-full text-center p-2">
+                            <span class="font-bold text-lime-800">1. Research &amp; Data Collection</span>
+                        </div>
+                    </div>
+                    <div class="text-3xl text-lime-400 font-light hidden md:block">→</div>
+                    <div class="text-3xl text-lime-400 font-light md:hidden">↓</div>
+                    <div class="flex items-center">
+                        <div class="w-32 h-32 flex items-center justify-center bg-lime-100 rounded-full text-center p-2">
+                            <span class="font-bold text-lime-800">2. Hypothesize</span>
+                        </div>
+                    </div>
+                    <div class="text-3xl text-lime-400 font-light hidden md:block">→</div>
+                    <div class="text-3xl text-lime-400 font-light md:hidden">↓</div>
+                    <div class="flex items-center">
+                         <div class="w-32 h-32 flex items-center justify-center bg-lime-100 rounded-full text-center p-2">
+                            <span class="font-bold text-lime-800">3. Create &amp; Test</span>
+                        </div>
+                    </div>
+                    <div class="text-3xl text-lime-400 font-light hidden md:block">→</div>
+                     <div class="text-3xl text-lime-400 font-light md:hidden">↓</div>
+                    <div class="flex items-center">
+                         <div class="w-32 h-32 flex items-center justify-center bg-lime-100 rounded-full text-center p-2">
+                            <span class="font-bold text-lime-800">4. Analyze &amp; Learn</span>
+                        </div>
+                    </div>
+                     <div class="text-3xl text-lime-400 font-light hidden md:block">→</div>
+                    <div class="text-3xl text-lime-400 font-light md:hidden">↓</div>
+                     <div class="flex items-center">
+                        <div class="w-32 h-32 flex items-center justify-center bg-lime-100 rounded-full text-center p-2">
+                            <span class="font-bold text-lime-800">5. Iterate &amp; Implement</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-20" id="playbook">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-stone-900">Optimization Playbook</h2>
+                <p class="mt-4 text-lg text-stone-600 max-w-3xl mx-auto">Uncover A/B test strategies for your entire e-commerce funnel. Tap a card for insights and hypothesis examples.</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+                <div class="flex flex-wrap justify-center gap-2 mb-8" id="playbook-nav">
+                    <button class="playbook-tab active px-4 py-2 text-sm font-semibold text-stone-700 bg-stone-100 rounded-full hover:bg-lime-200 transition" data-tab="homepage">Homepage</button>
+                    <button class="playbook-tab px-4 py-2 text-sm font-semibold text-stone-700 bg-stone-100 rounded-full hover:bg-lime-200 transition" data-tab="pdp">Product Page (PDP)</button>
+                    <button class="playbook-tab px-4 py-2 text-sm font-semibold text-stone-700 bg-stone-100 rounded-full hover:bg-lime-200 transition" data-tab="cta">Calls-to-Action</button>
+                    <button class="playbook-tab px-4 py-2 text-sm font-semibold text-stone-700 bg-stone-100 rounded-full hover:bg-lime-200 transition" data-tab="pricing">Pricing &amp; Promotions</button>
+                    <button class="playbook-tab px-4 py-2 text-sm font-semibold text-stone-700 bg-stone-100 rounded-full hover:bg-lime-200 transition" data-tab="checkout">Checkout</button>
+                </div>
+
+                <div class="min-h-[400px]" id="playbook-content">
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-20 mt-20" id="case-studies">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-stone-900">Proof in the Numbers</h2>
+                <p class="mt-4 text-lg text-stone-600 max-w-3xl mx-auto">Here are a few options, all similar in length:
+
+*   **A/B testing proves its worth:** See how companies drive conversion gains with data-driven experiments in this visual.
+*   **A/B tests work: proof in charts.** This graphic showcases substantial conversion improvements earned by businesses using systematic trials.
+*   **Experience real change with A/B tests:** This chart demonstrates conversion uplifts achieved by firms through practical experimentation.</p>
+            </div>
+             <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
+                <div class="chart-container">
+                    <canvas id="caseStudyChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="scroll-mt-20 mt-20" id="advanced">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-stone-900">Advanced Concepts</h2>
+                <p class="mt-4 text-lg text-stone-600 max-w-3xl mx-auto">Elevate your optimization: Explore Multivariate Testing &amp; Personalization for a sophisticated program.</p>
+            </div>
+            <div class="overflow-x-auto bg-white rounded-xl shadow-lg p-6">
+                <table class="min-w-full text-left">
+                    <thead class="border-b-2 border-stone-200">
+                        <tr>
+                            <th class="p-4 text-sm font-bold uppercase text-stone-500">Feature</th>
+                            <th class="p-4 text-sm font-bold uppercase text-stone-500">A/B Testing</th>
+                            <th class="p-4 text-sm font-bold uppercase text-stone-500">Multivariate Testing (MVT)</th>
+                            <th class="p-4 text-sm font-bold uppercase text-stone-500">Personalization</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        <tr class="hover:bg-lime-50">
+                            <td class="p-4 font-semibold">Primary Goal</td>
+                            <td class="p-4">Find the single best version for the *average* user.</td>
+                            <td class="p-4">Understand *interaction effects* between multiple elements.</td>
+                            <td class="p-4">Create the best experience for *each specific segment*.</td>
+                        </tr>
+                        <tr class="hover:bg-lime-50">
+                            <td class="p-4 font-semibold">Traffic Requirement</td>
+                            <td class="p-4">Moderate</td>
+                            <td class="p-4">Very High</td>
+                            <td class="p-4">Varies by segment</td>
+                        </tr>
+                         <tr class="hover:bg-lime-50">
+                            <td class="p-4 font-semibold">Best Use Case</td>
+                            <td class="p-4">Testing radical redesigns or single-element changes.</td>
+                            <td class="p-4">Fine-tuning high-traffic pages where elements interact.</td>
+                            <td class="p-4">Targeting high-value segments with tailored content.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+<script>
+const playbookData = {
+    homepage: [
+        { title: 'Hero: Static Image vs. Video', details: 'Test if a dynamic product video in the hero section is more engaging than a high-quality static image.', hypothesis: "Because video can better demonstrate product value, we expect that replacing the static hero image with a product video will cause an increase in clicks to category pages. We will measure this using the hero CTA's click-through rate." },
+        { title: 'Hero: Single vs. Multiple CTAs', details: 'Compare a single, primary CTA (e.g., "Shop All") against multiple, segment-focused CTAs (e.g., "Shop Men\'s", "Shop Women\'s").', hypothesis: "Because our audience is split evenly between two segments, we expect that providing two primary CTAs will cause a higher overall click-through rate by reducing friction. We will measure this using clicks on either CTA." },
+        { title: 'Navigation: Standard vs. Mega Menu', details: 'For stores with many categories, test a mega menu that displays all categories at once against a standard dropdown menu.', hypothesis: "Because a mega menu reduces clicks and improves discoverability, we expect that implementing a mega menu will cause an increase in visits to deeper category pages. We will measure this using pages per session." },
+        { title: 'Social Proof: Logos vs. Testimonials', details: 'Test the effectiveness of showing "As Seen In" media logos against displaying powerful customer testimonials on the homepage.', hypothesis: "Because authentic testimonials are more relatable than corporate logos, we expect that featuring customer quotes will cause an increase in site-wide conversion rate. We will measure this using Revenue Per Visitor (RPV)." },
+    ],
+    pdp: [
+        { title: 'Images: Studio vs. Lifestyle', details: 'Test clean studio shots on a white background against photos of the product being used in a real-world, aspirational setting.', hypothesis: "Because lifestyle photos help customers envision the product in their lives, we expect that using a lifestyle image as the primary photo will cause an increase in Add-to-Cart rate. We will measure this using the Add-to-Cart button CTR." },
+        { title: 'Images: 360° View vs. Static', details: 'Test an interactive 360-degree product view against a gallery of static images to see which better communicates product details.', hypothesis: "Because a 360° view provides a richer, more tangible product experience, we expect that it will cause an increase in Add-to-Cart rate by reducing uncertainty. We will measure this using the Add-to-Cart button CTR." },
+        { title: 'Description: Paragraphs vs. Bullets', details: 'Compare a detailed product description written in paragraph form against a scannable list of bullet points highlighting key features and benefits.', hypothesis: "Because users scan online, we expect that a bulleted list of benefits will be easier to digest and will cause an increase in conversions. We will measure this using the Add-to-Cart rate." },
+        { title: 'Reviews: Placement Above vs. Below Fold', details: 'Test placing a summary of customer reviews and star ratings high on the page (above the fold) versus further down.', hypothesis: "Because trust is established early, we expect that showing star ratings prominently near the product title will cause an increase in Add-to-Cart rate. We will measure this using the Add-to-Cart rate." }
+    ],
+    cta: [
+        { title: 'Color: Brand Color vs. Contrast Color', details: 'Test a CTA button that uses a primary brand color against one that uses a high-contrast color designed to stand out from the page.', hypothesis: "Because a high-contrast color is more visually prominent, we expect that a contrasting CTA button will cause a higher click-through rate. We will measure this using the CTA's CTR." },
+        { title: 'Copy: "Add to Cart" vs. "Buy Now"', details: 'Test the CTA copy to see if the immediacy of "Buy Now" outperforms the Browse-friendly "Add to Cart". Best for single-product stores.', hypothesis: "Because 'Buy Now' signals a faster checkout, we expect it will cause a decrease in cart abandonment. We will measure this using the checkout completion rate." },
+        { title: 'Copy: Action-Oriented vs. Generic', details: 'Compare a specific, action-driven CTA ("Get Your Free Guide") against a generic one ("Submit" or "Download").', hypothesis: "Because specific copy sets clear expectations, we expect that action-oriented text will cause a higher CTR. We will measure this using the CTA's CTR." },
+        { title: 'Placement: Sticky vs. Static', details: 'For long pages, test a "sticky" CTA that is always visible on screen against a static CTA placed at the top or bottom of the page.', hypothesis: "Because a sticky CTA is always available, we expect it will cause an increase in clicks by reducing the effort needed to find the action button. We will measure this using the CTA's CTR." }
+    ],
+    pricing: [
+        { title: 'Framing: $ Off vs. % Off', details: 'Test the "Rule of 100": For items over $100, test a dollar-amount discount (e.g., "$50 Off") vs. a percentage (e.g., "25% Off").', hypothesis: "Because a large dollar amount feels more tangible for expensive items, we expect that a '$ Off' discount will cause a higher conversion rate for products over $100. We will measure this using conversion rate." },
+        { title: 'Urgency: Countdown Timer vs. No Timer', details: 'Test adding a countdown timer to a promotional offer to create urgency and encourage immediate purchase.', hypothesis: "Because a countdown timer creates Fear of Missing Out (FOMO), we expect its inclusion will cause an increase in conversion rate during the sale period. We will measure this using conversion rate." },
+        { title: 'Scarcity: Low Stock Alert', details: 'Test displaying a "Only 3 left in stock!" message on the PDP for items with low inventory.', hypothesis: "Because scarcity increases perceived value, we expect that showing low stock levels will cause an increase in Add-to-Cart rate. We will measure this using the Add-to-Cart rate." },
+        { title: 'Shipping: Free Shipping Threshold', details: 'Test different free shipping thresholds (e.g., "Free shipping on orders over $50" vs. "...over $75").', hypothesis: "Because a lower, more achievable threshold is more motivating, we expect that the $50 threshold will cause a higher Average Order Value (AOV) without harming the overall conversion rate. We will measure this using both AOV and conversion rate." }
+    ],
+    checkout: [
+        { title: 'Layout: Single-Page vs. Multi-Step', details: 'Test a single-page checkout where all fields are on one screen against a multi-step checkout broken into logical sections.', hypothesis: "Because a multi-step checkout feels less overwhelming, we expect it will cause a lower form abandonment rate for our first-time customers. We will measure this using the checkout completion rate." },
+        { title: 'Friction: Guest Checkout vs. Forced Login', details: 'Test offering a "Checkout as Guest" option against requiring all users to create an account before purchasing.', hypothesis: "Because forced account creation is a major friction point, we expect that offering a guest checkout option will cause a significant increase in the overall conversion rate. We will measure this using conversion rate." },
+        { title: 'Trust: Add Security Badges', details: 'Test adding trust badges (e.g., secure payment logos, money-back guarantees) directly on the cart and checkout pages.', hypothesis: "Because trust badges alleviate security concerns, we expect their inclusion will cause a decrease in cart abandonment. We will measure this using checkout completion rate." },
+        { title: 'Forms: Remove Non-Essential Fields', details: 'Audit your checkout form and test removing optional fields like "Company Name" or a second address line.', hypothesis: "Because a shorter form requires less effort, we expect that removing optional fields will cause an increase in the checkout completion rate. We will measure this using form completion rate." }
+    ]
+};
+
+const caseStudyData = {
+    labels: ['Susty Party', 'Going', '37signals', 'L\'Axelle', 'Clear Within', 'WorkZone'],
+    datasets: [{
+        label: 'Conversion Lift (%)',
+        data: [250, 104, 102.5, 93, 80, 34],
+        backgroundColor: [ '#84cc16', '#a3e635', '#bef264', '#d9f99d', '#ecfccb', '#f7fee7' ],
+        borderColor: '#f8f7f4',
+        borderWidth: 2,
+        borderRadius: 4,
+    }]
+};
+const caseStudyDetails = [
+    "Test: Added testimonials & security affirmation, removed distracting video from homepage.",
+    "Test: Changed CTA copy from 'Sign up for free' to the more action-oriented 'Trial for free'.",
+    "Test: Replaced original design with a large photo of a happy, smiling customer.",
+    "Test: Changed headline from passive ('Feel fresh...') to active command ('Put an end to...').",
+    "Test: Moved the primary CTA from below the fold to a prominent position above the fold.",
+    "Test: De-emphasized distracting customer logos by changing them to black and white."
+];
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const playbookNav = document.getElementById('playbook-nav');
+    const playbookContent = document.getElementById('playbook-content');
+
+    function renderPlaybookTab(tabName) {
+        const data = playbookData[tabName] || [];
+        playbookContent.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 perspective-[1000px]">
+                ${data.map(item => `
+                    <div class="playbook-card rounded-lg cursor-pointer" onclick="this.classList.toggle('is-flipped')">
+                        <div class="playbook-card-inner relative w-full h-full text-center transition-transform duration-700" style="transform-style: preserve-3d;">
+                            <div class="playbook-card-front absolute w-full h-full backface-hidden bg-white shadow-md rounded-lg p-6 flex flex-col justify-center items-center">
+                                <h4 class="text-xl font-bold text-stone-800">${item.title}</h4>
+                                <p class="text-sm text-stone-500 mt-4">(Click to Flip)</p>
+                            </div>
+                            <div class="playbook-card-back absolute w-full h-full backface-hidden bg-lime-600 text-white shadow-xl rounded-lg p-6 flex flex-col justify-center">
+                                <p class="text-sm font-light mb-2">${item.details}</p>
+                                <p class="text-xs italic border-t border-lime-500 pt-2 mt-2"><strong>Hypothesis:</strong> ${item.hypothesis}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        const cards = playbookContent.querySelectorAll('.playbook-card');
+        cards.forEach(card => {
+          const front = card.querySelector('.playbook-card-front');
+          const back = card.querySelector('.playbook-card-back');
+          const minHeight = Math.max(front.offsetHeight, back.offsetHeight, 200);
+          card.style.height = `${minHeight}px`;
+        });
+    }
+
+    playbookNav.addEventListener('click', (e) => {
+        if (e.target.matches('button[data-tab]')) {
+            const tabName = e.target.dataset.tab;
+            playbookNav.querySelectorAll('.playbook-tab').forEach(tab => tab.classList.remove('active'));
+            e.target.classList.add('active');
+            renderPlaybookTab(tabName);
+        }
+    });
+
+    renderPlaybookTab('homepage');
+
+    const ctx = document.getElementById('caseStudyChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: caseStudyData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                    ticks: { color: '#57534e', font: { size: 12 }, callback: value => value + '%' },
+                    title: { display: true, text: 'Conversion Rate Lift', color: '#44403c', font: { size: 14, weight: 'bold' } }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { color: '#44403c', font: { size: 14, weight: 'bold' } }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#44403c',
+                    titleColor: '#f8f7f4',
+                    bodyColor: '#d6d3d1',
+                    padding: 12,
+                    cornerRadius: 6,
+                    displayColors: false,
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            return Array.isArray(label) ? label.join(' ') : label;
+                        },
+                        label: function(context) {
+                            return `Lift: +${context.parsed.x}%`;
+                        },
+                        afterLabel: function(context) {
+                            return caseStudyDetails[context.dataIndex] || '';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    const mainNavLinks = document.querySelectorAll('#main-nav .nav-link');
+    const sections = document.querySelectorAll('main section');
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.3
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                mainNavLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === entry.target.id) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+
+});
+</script>
+
+
+</body></html>

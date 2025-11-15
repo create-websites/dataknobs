@@ -1,23 +1,4 @@
-<!DOCTYPE html>
-<html lang="en"><head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Interactive Foundations of Causal Inference</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Lora:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet"/>
-    <!-- Chosen Palette: Scholarly Blue & Neutral Gray -->
-    <!-- Application Structure Plan: The application is designed as a learning journey. It starts by visualizing the abstract 'Fundamental Problem' to establish why causal inference is hard. It then introduces the goal (ATE). The centerpiece is an interactive simulation contrasting 'The Gold Standard' (Randomization) with its main pitfall (Selection Bias), allowing users to see the mechanisms of bias and balance directly. Finally, it presents the 'Rules of the Game' (Core Assumptions) in a digestible, interactive format. This structure moves from problem to solution to pitfalls to principles, making the concepts from the source report tangible and easier to grasp than a linear document. -->
-    <!-- Visualization & Content Choices: 
-        - The Fundamental Problem: Report Info -> Potential Outcomes & the Counterfactual. Goal -> Explain the core challenge. Viz -> HTML/CSS card flip animation. Interaction -> Hover to see the "what if" scenario. Justification -> Makes the abstract idea of an unobservable counterfactual immediately visible and intuitive. Library/Method -> Tailwind CSS, JS.
-        - Average Treatment Effect: Report Info -> ATE definition. Goal -> Show how we measure effects on average. Viz -> Bar Chart. Interaction -> Button click updates the chart. Justification -> A simple bar chart is the clearest way to show a difference in means between two groups. Library/Method -> Chart.js.
-        - Randomization vs. Bias: Report Info -> Random Sampling, Random Assignment, Selection Bias. Goal -> Contrast the power of randomization with the danger of selection bias. Viz -> Custom interactive simulation with icons representing people. Interaction -> Buttons to 'Sample', 'Assign', and 'Self-Select'. Justification -> This is the most critical interactive element. It allows users to *perform* the actions of randomization and selection, and see the immediate result on group balance and the final ATE estimate, demonstrating the concept of internal validity directly. Library/Method -> Vanilla JS, HTML/CSS.
-        - Core Assumptions: Report Info -> SUTVA, Ignorability, Positivity, Excludability. Goal -> Explain the necessary conditions for valid inference. Viz -> Interactive accordion/collapsible sections. Interaction -> Click to expand/collapse. Justification -> Breaks down dense, definitional content into manageable pieces, preventing user overload and encouraging focused reading on each specific assumption. Library/Method -> Vanilla JS, Tailwind CSS.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Interactive Foundations of Causal Inference</title><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Lora:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet"/><style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         h1, h2, h3, h4 { font-family: 'Lora', serif; }
         .chart-container { position: relative; width: 100%; max-width: 600px; height: 300px; margin-left: auto; margin-right: auto; max-height: 400px; }
@@ -30,254 +11,35 @@
         .perspective-container:hover .flip-card { transform: rotateY(180deg); }
         .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
         .flip-card-back { transform: rotateY(180deg); }
-    </style>
-</head>
-<body class="text-slate-800">
-
-    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
-        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <h1 class="text-xl md:text-2xl font-bold text-slate-900">Interactive Causal Inference</h1>
-            <div class="hidden md:flex items-center space-x-6">
-                <a class="nav-link font-semibold text-slate-600 pb-1" href="#problem">The Problem</a>
-                <a class="nav-link font-semibold text-slate-600 pb-1" href="#randomization">The Solution</a>
-                <a class="nav-link font-semibold text-slate-600 pb-1" href="#assumptions">The Rules</a>
-            </div>
-        </nav>
-    </header>
-
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        
-        <section class="text-center py-12" id="intro">
-            <h2 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-4">Why is "Why?" a Hard Question?</h2>
-            <p class="max-w-3xl mx-auto text-lg text-slate-600">
+    </style></head><body class="text-slate-800"><header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50"><nav class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16"><h1 class="text-xl md:text-2xl font-bold text-slate-900">Interactive Causal Inference</h1><div class="hidden md:flex items-center space-x-6"><a class="nav-link font-semibold text-slate-600 pb-1" href="#problem">The Problem</a><a class="nav-link font-semibold text-slate-600 pb-1" href="#randomization">The Solution</a><a class="nav-link font-semibold text-slate-600 pb-1" href="#assumptions">The Rules</a></div></nav></header><main class="container mx-auto px-4 sm:px-6 lg:px-8 py-10"><section class="text-center py-12" id="intro"><h2 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-4">Why is "Why?" a Hard Question?</h2><p class="max-w-3xl mx-auto text-lg text-slate-600">
                 This interactive guide visualizes causal inference, moving past mere correlation to explore frameworks for identifying *causal* relationships.
-            </p>
-        </section>
-
-        <hr class="border-slate-200 my-12"/>
-
-        <section class="scroll-mt-20" id="problem">
-            <div class="text-center mb-10">
-                <h3 class="text-3xl font-bold text-slate-900">The Fundamental Problem of Causal Inference</h3>
-                <p class="max-w-2xl mx-auto text-lg text-slate-600 mt-2">The outcome of a different choice, unobserved simultaneously, is the **counterfactual**. See the issue by hovering over the card.</p>
-            </div>
-            <div class="flex justify-center">
-                <div class="w-full max-w-sm h-64 perspective-container">
-                    <div class="w-full h-full flip-card">
-                        <div class="flip-card-front flex flex-col items-center justify-center bg-white rounded-xl shadow-lg border border-slate-200 p-6">
-                            <span class="text-5xl mb-3">🧑‍⚕️</span>
-                            <h4 class="text-xl font-bold">Observed Reality</h4>
-                            <p class="text-center text-slate-600 mt-2">Alex took the new medication. We observe their outcome: <span class="font-bold text-blue-600">Blood Pressure = 120</span>.</p>
-                            <p class="text-xs text-slate-400 mt-4">Hover to see the counterfactual</p>
-                        </div>
-                        <div class="flip-card-back flex flex-col items-center justify-center bg-slate-800 text-white rounded-xl shadow-lg p-6">
-                            <span class="text-5xl mb-3">🤔</span>
-                            <h4 class="text-xl font-bold">The Counterfactual</h4>
-                            <p class="text-center text-slate-300 mt-2">Here are a few options, aiming for similar length and meaning:
+            </p></section><hr class="border-slate-200 my-12"/><section class="scroll-mt-20" id="problem"><div class="text-center mb-10"><h3 class="text-3xl font-bold text-slate-900">The Fundamental Problem of Causal Inference</h3><p class="max-w-2xl mx-auto text-lg text-slate-600 mt-2">The outcome of a different choice, unobserved simultaneously, is the **counterfactual**. See the issue by hovering over the card.</p></div><div class="flex justify-center"><div class="w-full max-w-sm h-64 perspective-container"><div class="w-full h-full flip-card"><div class="flip-card-front flex flex-col items-center justify-center bg-white rounded-xl shadow-lg border border-slate-200 p-6"><span class="text-5xl mb-3">🧑‍⚕️</span><h4 class="text-xl font-bold">Observed Reality</h4><p class="text-center text-slate-600 mt-2">Alex took the new medication. We observe their outcome: <span class="font-bold text-blue-600">Blood Pressure = 120</span>.</p><p class="text-xs text-slate-400 mt-4">Hover to see the counterfactual</p></div><div class="flip-card-back flex flex-col items-center justify-center bg-slate-800 text-white rounded-xl shadow-lg p-6"><span class="text-5xl mb-3">🤔</span><h4 class="text-xl font-bold">The Counterfactual</h4><p class="text-center text-slate-300 mt-2">Here are a few options, aiming for similar length and meaning:
 
 *   **If Alex skipped the meds, what then?** That remains unseeable.
 *   **Without the medicine, what transpired?** This state's unrevealed.
-*   **Had Alex refused the pills?** The result's hypothetical.</p>
-                            <p class="font-bold text-yellow-400 mt-2">Potential Outcome = ?</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-             <p class="text-center mt-8 max-w-2xl mx-auto text-slate-600">Because we can't isolate the individual causal impact, we're forced to estimate the **average effect of treatment (ATE)** for a cohort.</p>
-        </section>
+*   **Had Alex refused the pills?** The result's hypothetical.</p><p class="font-bold text-yellow-400 mt-2">Potential Outcome = ?</p></div></div></div></div><p class="text-center mt-8 max-w-2xl mx-auto text-slate-600">Because we can't isolate the individual causal impact, we're forced to estimate the **average effect of treatment (ATE)** for a cohort.</p></section><hr class="border-slate-200 my-12"/><section class="scroll-mt-20" id="randomization"><div class="text-center mb-10"><h3 class="text-3xl font-bold text-slate-900">The Solution: Randomization</h3><p class="max-w-3xl mx-auto text-lg text-slate-600 mt-2">**Random allocation** is the benchmark for impartial conclusions. It yields comparable groups, differing mainly due to the intervention. This lets us use the control group's average result as a sound comparison for the treated group. Let's explore this, highlighting its key challenge: selection bias.</p></div><div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 lg:p-8"><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="border-b lg:border-b-0 lg:border-r border-slate-200 pb-8 lg:pr-8 lg:pb-0"><h4 class="text-2xl font-bold text-slate-900">Experiment Simulation</h4><p class="text-slate-600 mt-2 mb-4">Here's a rewrite of similar length:
 
-        <hr class="border-slate-200 my-12"/>
-
-        <section class="scroll-mt-20" id="randomization">
-            <div class="text-center mb-10">
-                <h3 class="text-3xl font-bold text-slate-900">The Solution: Randomization</h3>
-                <p class="max-w-3xl mx-auto text-lg text-slate-600 mt-2">**Random allocation** is the benchmark for impartial conclusions. It yields comparable groups, differing mainly due to the intervention. This lets us use the control group's average result as a sound comparison for the treated group. Let's explore this, highlighting its key challenge: selection bias.</p>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 lg:p-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- CONTROLS -->
-                    <div class="border-b lg:border-b-0 lg:border-r border-slate-200 pb-8 lg:pr-8 lg:pb-0">
-                        <h4 class="text-2xl font-bold text-slate-900">Experiment Simulation</h4>
-                        <p class="text-slate-600 mt-2 mb-4">Here's a rewrite of similar length:
-
-We assess two population traits: drive (High 🧠 / Low 😴) and health status (Good 💚 / Fair 💛). We aim to gauge the impact of a 'Wellness Program'.</p>
-                        <div class="space-y-3">
-                            <button class="w-full bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg transition" id="populate-btn">1. Generate Population</button>
-                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition disabled:bg-slate-300" disabled="" id="assign-btn">2. Randomly Assign to Groups</button>
-                            <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg transition disabled:bg-slate-300" disabled="" id="bias-btn">Alternate Step 2: Allow Self-Selection (Bias)</button>
-                             <button class="w-full bg-slate-400 hover:bg-slate-500 text-white font-bold py-2 px-4 rounded-lg transition mt-4" id="reset-btn">Reset Simulation</button>
-                        </div>
-                        <div class="mt-6 space-y-4" id="simulation-results"></div>
-                    </div>
-
-                    <!-- VISUALIZATION -->
-                    <div>
-                        <div class="grid grid-cols-2 gap-4">
-                             <div>
-                                <h4 class="text-xl font-bold text-center mb-2">Treatment Group</h4>
-                                <div class="h-64 bg-slate-100 rounded-lg p-2 relative flex flex-wrap gap-2 content-start" id="treatment-group-box"></div>
-                            </div>
-                            <div>
-                                <h4 class="text-xl font-bold text-center mb-2">Control Group</h4>
-                                <div class="h-64 bg-slate-100 rounded-lg p-2 relative flex flex-wrap gap-2 content-start" id="control-group-box"></div>
-                            </div>
-                        </div>
-                        <div class="h-40 mt-4 border-2 border-dashed border-slate-300 rounded-lg p-2 relative flex flex-wrap gap-2 content-start" id="population-box">
-                             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-400 font-semibold">Population Area</div>
-                        </div>
-                    </div>
-                </div>
-                 <div class="mt-8 hidden" id="chart-section">
-                    <h4 class="text-2xl font-bold text-slate-900 text-center">Estimated Treatment Effect</h4>
-                    <div class="chart-container mt-4">
-                        <canvas id="ateChart"></canvas>
-                    </div>
-                    <p class="text-center mt-4 max-w-2xl mx-auto text-slate-600" id="chart-explanation"></p>
-                </div>
-            </div>
-        </section>
-        
-        <hr class="border-slate-200 my-12"/>
-
-        <section class="scroll-mt-20" id="assumptions">
-            <div class="text-center mb-10">
-                <h3 class="text-3xl font-bold text-slate-900">The Rules of the Game: Core Assumptions</h3>
-                <p class="max-w-2xl mx-auto text-lg text-slate-600 mt-2">Here are a few options, aiming for a similar size and meaning:
+We assess two population traits: drive (High 🧠 / Low 😴) and health status (Good 💚 / Fair 💛). We aim to gauge the impact of a 'Wellness Program'.</p><div class="space-y-3"><button class="w-full bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg transition" id="populate-btn">1. Generate Population</button><button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition disabled:bg-slate-300" disabled="" id="assign-btn">2. Randomly Assign to Groups</button><button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg transition disabled:bg-slate-300" disabled="" id="bias-btn">Alternate Step 2: Allow Self-Selection (Bias)</button><button class="w-full bg-slate-400 hover:bg-slate-500 text-white font-bold py-2 px-4 rounded-lg transition mt-4" id="reset-btn">Reset Simulation</button></div><div class="mt-6 space-y-4" id="simulation-results"></div></div><div><div class="grid grid-cols-2 gap-4"><div><h4 class="text-xl font-bold text-center mb-2">Treatment Group</h4><div class="h-64 bg-slate-100 rounded-lg p-2 relative flex flex-wrap gap-2 content-start" id="treatment-group-box"></div></div><div><h4 class="text-xl font-bold text-center mb-2">Control Group</h4><div class="h-64 bg-slate-100 rounded-lg p-2 relative flex flex-wrap gap-2 content-start" id="control-group-box"></div></div></div><div class="h-40 mt-4 border-2 border-dashed border-slate-300 rounded-lg p-2 relative flex flex-wrap gap-2 content-start" id="population-box"><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-400 font-semibold">Population Area</div></div></div></div><div class="mt-8 hidden" id="chart-section"><h4 class="text-2xl font-bold text-slate-900 text-center">Estimated Treatment Effect</h4><div class="chart-container mt-4"><canvas id="ateChart"></canvas></div><p class="text-center mt-4 max-w-2xl mx-auto text-slate-600" id="chart-explanation"></p></div></div></section><hr class="border-slate-200 my-12"/><section class="scroll-mt-20" id="assumptions"><div class="text-center mb-10"><h3 class="text-3xl font-bold text-slate-900">The Rules of the Game: Core Assumptions</h3><p class="max-w-2xl mx-auto text-lg text-slate-600 mt-2">Here are a few options, aiming for a similar size and meaning:
 
 *   Valid causal claims hinge on several key assumptions. Beyond statistical tests, these reflect basic truths about your study's world.
 *   Causal inferences require adherence to crucial assumptions. These are not merely statistical, but foundational principles about the system you're analyzing.
-*   Validating a causal claim necessitates specific assumptions. These go beyond stats, representing core beliefs about the study's underlying mechanisms.</p>
-            </div>
-            <div class="space-y-4 max-w-3xl mx-auto">
-                <div class="assumption-card bg-white rounded-lg border border-slate-200 shadow-sm" data-card="sutva">
-                    <button class="w-full flex justify-between items-center p-5 text-left font-semibold text-lg">
+*   Validating a causal claim necessitates specific assumptions. These go beyond stats, representing core beliefs about the study's underlying mechanisms.</p></div><div class="space-y-4 max-w-3xl mx-auto"><div class="assumption-card bg-white rounded-lg border border-slate-200 shadow-sm" data-card="sutva"><button class="w-full flex justify-between items-center p-5 text-left font-semibold text-lg">
                         SUTVA: Stable Unit Treatment Value Assumption
-                        <span class="text-2xl transform transition-transform card-arrow">+</span>
-                    </button>
-                    <div class="px-5 pb-5 max-h-0">
-                        <p class="text-slate-600">This is a compound assumption with two key parts:</p>
-                        <ol class="list-decimal list-inside mt-2 space-y-2 text-slate-600">
-                            <li><strong>No Interference:</strong> Here are a few options, all similar in length and meaning:
+                        <span class="text-2xl transform transition-transform card-arrow">+</span></button><div class="px-5 pb-5 max-h-0"><p class="text-slate-600">This is a compound assumption with two key parts:</p><ol class="list-decimal list-inside mt-2 space-y-2 text-slate-600"><li><strong>No Interference:</strong> Here are a few options, all similar in length and meaning:
 
 *   Individual results are independent of others' treatment.
 *   Each person's result is unaffected by others' outcomes.
 *   Treatment success is independent across individuals.
-*   One's response is separate from others' responses. <br/><em>Example Violation:</em> If a vaccine protects my friend, thus lowering my illness risk, their treatment impacted my health outcome.</li>
-                            <li><strong>Consistency:</strong> All patients receive identical treatment; no undisclosed differences exist. <br/><em>Example Violation:</em> A tutoring program offering inconsistent support, with some students receiving 1 hour and others 10 hours of assistance.</li>
-                        </ol>
-                    </div>
-                </div>
-                <div class="assumption-card bg-white rounded-lg border border-slate-200 shadow-sm" data-card="ignorability">
-                    <button class="w-full flex justify-between items-center p-5 text-left font-semibold text-lg">
+*   One's response is separate from others' responses. <br/><em>Example Violation:</em> If a vaccine protects my friend, thus lowering my illness risk, their treatment impacted my health outcome.</li><li><strong>Consistency:</strong> All patients receive identical treatment; no undisclosed differences exist. <br/><em>Example Violation:</em> A tutoring program offering inconsistent support, with some students receiving 1 hour and others 10 hours of assistance.</li></ol></div></div><div class="assumption-card bg-white rounded-lg border border-slate-200 shadow-sm" data-card="ignorability"><button class="w-full flex justify-between items-center p-5 text-left font-semibold text-lg">
                         Ignorability (or Exchangeability)
-                         <span class="text-2xl transform transition-transform card-arrow">+</span>
-                    </button>
-                     <div class="px-5 pb-5 max-h-0">
-                        <p class="text-slate-600">This hinges on the critical assumption of no unobserved confounding: treatment assignment is independent of potential outcomes, conditional on observed covariates (X). This holds by construction in randomized controlled trials. In observational studies, it requires measuring and adjusting for all relevant confounders, ensuring treatment and control groups become 'exchangeable' with respect to X.</p>
-                    </div>
-                </div>
-                <div class="assumption-card bg-white rounded-lg border border-slate-200 shadow-sm" data-card="positivity">
-                    <button class="w-full flex justify-between items-center p-5 text-left font-semibold text-lg">
+                         <span class="text-2xl transform transition-transform card-arrow">+</span></button><div class="px-5 pb-5 max-h-0"><p class="text-slate-600">This hinges on the critical assumption of no unobserved confounding: treatment assignment is independent of potential outcomes, conditional on observed covariates (X). This holds by construction in randomized controlled trials. In observational studies, it requires measuring and adjusting for all relevant confounders, ensuring treatment and control groups become 'exchangeable' with respect to X.</p></div></div><div class="assumption-card bg-white rounded-lg border border-slate-200 shadow-sm" data-card="positivity"><button class="w-full flex justify-between items-center p-5 text-left font-semibold text-lg">
                         Positivity (or Common Support)
-                         <span class="text-2xl transform transition-transform card-arrow">+</span>
-                    </button>
-                     <div class="px-5 pb-5 max-h-0">
-                        <p class="text-slate-600">Here are a few options, all similar in length:
+                         <span class="text-2xl transform transition-transform card-arrow">+</span></button><div class="px-5 pb-5 max-h-0"><p class="text-slate-600">Here are a few options, all similar in length:
 
 *   Regardless of attributes, assignment to treatment or control is possible.
 *   Every individual, with any traits, can be in either group.
 *   Each person, with their specific features, might be treated or controlled.
-*   For any profile, there's a treatment or control group option. <br/><em>Example Violation:</em> Due to the program's age restriction (40+), its impact on younger employees (&lt;40) is unmeasurable because a comparable, untreated younger group doesn't exist.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-    
-    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
-  <div class="container mx-auto px-6 py-12 lg:px-8">
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-      
-      <div>
-        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
-        <ul class="space-y-2">
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
-        <ul class="space-y-2">
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
-        <ul class="space-y-2">
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
-
-          
-        </ul>
-      </div>
-
-      <div>
-        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
-        <div class="space-y-2">
-          <p>Redmond<br/>WA, USA</p>
-          <p>
-            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
-          </p>
-          <p>
-            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
-      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
-      
-      <div class="flex space-x-4 mt-4 sm:mt-0">
-        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
-          <span class="sr-only">Facebook</span>
-          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
-          </svg>
-        </a>
-        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
-          <span class="sr-only">Twitter</span>
-          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
-          </svg>
-        </a>
-        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
-          <span class="sr-only">LinkedIn</span>
-          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
-          </svg>
-        </a>
-      </div>
-    </div>
-  </div>
-</footer></body></html>
-
-
-    <script>
+*   For any profile, there's a treatment or control group option. <br/><em>Example Violation:</em> Due to the program's age restriction (40+), its impact on younger employees (&lt;40) is unmeasurable because a comparable, untreated younger group doesn't exist.</p></div></div></div></section></main><html><head></head><body><footer class="bg-gray-800 text-gray-300"><div class="container mx-auto px-6 py-12 lg:px-8"><div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4"><div><h5 class="text-lg font-semibold text-white mb-4">Company</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Products</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5><div class="space-y-2"><p>Redmond<br/>WA, USA</p><p><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a></p><p><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a></p></div></div></div><div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row"><p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p><div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/"><span class="sr-only">Facebook</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path></svg></a><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/"><span class="sr-only">Twitter</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg></a><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/"><span class="sr-only">LinkedIn</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path></svg></a></div></div></div></footer></body></html><script>
     document.addEventListener('DOMContentLoaded', () => {
         // Navigation
         const sections = document.querySelectorAll('section');
@@ -371,16 +133,7 @@ We assess two population traits: drive (High 🧠 / Low 😴) and health status 
             const treatmentStats = calculateGroupStats(treatmentGroupBox);
             const controlStats = calculateGroupStats(controlGroupBox);
             resultsDiv.innerHTML = `
-                <div class="p-3 bg-slate-50 rounded-md">
-                    <h5 class="font-bold">Treatment Group Stats</h5>
-                    <p class="text-sm">🧠 High Motivation: ${treatmentStats.mot}%</p>
-                    <p class="text-sm">💚 Good Health: ${treatmentStats.health}%</p>
-                </div>
-                <div class="p-3 bg-slate-50 rounded-md">
-                    <h5 class="font-bold">Control Group Stats</h5>
-                    <p class="text-sm">🧠 High Motivation: ${controlStats.mot}%</p>
-                    <p class="text-sm">💚 Good Health: ${controlStats.health}%</p>
-                </div>
+                <div class="p-3 bg-slate-50 rounded-md"><h5 class="font-bold">Treatment Group Stats</h5><p class="text-sm">🧠 High Motivation: ${treatmentStats.mot}%</p><p class="text-sm">💚 Good Health: ${treatmentStats.health}%</p></div><div class="p-3 bg-slate-50 rounded-md"><h5 class="font-bold">Control Group Stats</h5><p class="text-sm">🧠 High Motivation: ${controlStats.mot}%</p><p class="text-sm">💚 Good Health: ${controlStats.health}%</p></div>
             `;
         }
 
@@ -484,7 +237,4 @@ We assess two population traits: drive (High 🧠 / Low 😴) and health status 
         });
 
     });
-    </script>
-
-
-</body></html>
+    </script></body></html>

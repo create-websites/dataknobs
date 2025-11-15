@@ -1,23 +1,4 @@
-<!DOCTYPE html>
-<html lang="en"><head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Dataknobs: An Interactive Partnership Ecosystem Analysis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <!-- Chosen Palette: "Cool Slate" - A professional palette using slate grays, a deep blue for primary actions, and a teal accent for data highlights. This creates a calm, corporate, and tech-focused feel. -->
-    <!-- Application Structure Plan: The SPA is designed around a central, interactive "Ecosystem Hub" that acts as the primary navigation. Users select a partner from this hub to dynamically display detailed information in an adjacent content panel. This thematic, non-linear structure is chosen over a simple report scroll because it encourages exploration and direct comparison between partners, making the complex relationships easier to understand. A secondary tab allows users to pivot to a "Product-centric" view, which directly addresses the user task of checking product availability across platforms. This dual-view approach provides multiple pathways to explore the same core information, enhancing usability. -->
-    <!-- Visualization & Content Choices: 
-        - Ecosystem Hub (HTML/CSS): Report Info: All partners and their relationship to Dataknobs. -> Goal: Organize/Navigate. -> Viz: Interactive diagram built with Tailwind CSS. -> Interaction: Click a partner logo to update the main content view. -> Justification: More responsive and lightweight than a canvas chart for simple navigation. -> Method: HTML/JS.
-        - Partnership Model Chart (Chart.js Radar Chart): Report Info: Qualitative assessment of each partnership type (Marketplace, Compatibility, etc.). -> Goal: Compare. -> Viz: Radar chart. -> Interaction: Tooltips on hover provide scores. -> Justification: A radar chart is excellent for comparing multiple entities across several qualitative dimensions simultaneously. -> Library: Chart.js.
-        - Product Availability Table (HTML/CSS): Report Info: Which products are on which platforms. -> Goal: Inform. -> Viz: A clear, checkmark-based table. -> Interaction: None needed, clarity is key. -> Justification: A simple table is the most direct and universally understood way to present this matrix of information. -> Method: HTML.
-        - Dynamic Text Panels (HTML/JS): Report Info: Detailed text descriptions for each partnership. -> Goal: Inform. -> Viz: Text blocks. -> Interaction: Content changes based on hub selection. -> Justification: Keeps the UI clean and focused on one topic at a time, preventing information overload. -> Method: JS DOM manipulation.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Dataknobs: An Interactive Partnership Ecosystem Analysis</title><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc; /* slate-50 */
@@ -52,154 +33,7 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-    </style>
-</head>
-<body class="text-slate-700">
-
-    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        
-        <header class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-slate-900 tracking-tight">Dataknobs' Strategic Partnership Ecosystem</h1>
-            <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">An interactive analysis of the multi-layered strategy balancing broad market distribution with targeted expert engagement.</p>
-        </header>
-
-        <main>
-            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-                
-                <div class="flex border-b border-slate-200 mb-6">
-                    <button class="tab py-3 px-5 text-slate-500 border-b-2 border-transparent transition-colors duration-200 ease-in-out" id="tab-partners">Partnership View</button>
-                    <button class="tab py-3 px-5 text-slate-500 border-b-2 border-transparent transition-colors duration-200 ease-in-out" id="tab-products">Product View</button>
-                </div>
-
-                <div id="view-partners">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-1">
-                            <h2 class="text-xl font-bold text-slate-800 mb-4">Ecosystem Hub</h2>
-                            <p class="text-slate-600 mb-6">Select a partner to explore their role in the Dataknobs ecosystem. Each partnership is tailored to a specific strategic goal, from broad distribution to technology enablement.</p>
-                            <div class="space-y-4" id="ecosystem-hub">
-                                <!-- Partner logos will be dynamically inserted here -->
-                            </div>
-                        </div>
-                        <div class="lg:col-span-2 bg-slate-50 rounded-xl p-6 min-h-[400px]" id="partner-details-container">
-                            <!-- Dynamic partner details will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="hidden" id="view-products">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Product Portfolio Availability</h2>
-                    <p class="text-slate-600 mb-6">This table shows the availability of Dataknobs' core products across its key marketplace partners. The strategy emphasizes product parity on major hyperscalers while offering specialized solutions on platforms like Databricks.</p>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white border border-slate-200 rounded-lg">
-                            <thead class="bg-slate-100">
-                                <tr>
-                                    <th class="text-left font-semibold text-slate-700 p-4">Product</th>
-                                    <th class="text-center font-semibold text-slate-700 p-4">Microsoft Azure</th>
-                                    <th class="text-center font-semibold text-slate-700 p-4">Google Cloud (GCP)</th>
-                                    <th class="text-center font-semibold text-slate-700 p-4">Databricks</th>
-                                </tr>
-                            </thead>
-                            <tbody id="product-table-body">
-                                <!-- Product availability data will be inserted here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mt-12">
-                <h2 class="text-2xl font-bold text-slate-800 text-center mb-2">Strategic Synthesis</h2>
-                <p class="text-slate-600 text-center max-w-3xl mx-auto mb-8">Dataknobs employs four distinct partnership models. This chart visually compares these models across key strategic dimensions, highlighting the nuanced approach the company takes to its ecosystem.</p>
-                <div class="chart-container">
-                    <canvas id="strategyChart"></canvas>
-                </div>
-            </div>
-
-        </main>
-
-        <html><head></head><body><footer class="bg-gray-800 text-gray-300">
-  <div class="container mx-auto px-6 py-12 lg:px-8">
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-      
-      <div>
-        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
-        <ul class="space-y-2">
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
-        <ul class="space-y-2">
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
-        <ul class="space-y-2">
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
-          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
-
-          
-        </ul>
-      </div>
-
-      <div>
-        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
-        <div class="space-y-2">
-          <p>Redmond<br/>WA, USA</p>
-          <p>
-            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
-          </p>
-          <p>
-            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
-      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
-      
-      <div class="flex space-x-4 mt-4 sm:mt-0">
-        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
-          <span class="sr-only">Facebook</span>
-          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
-          </svg>
-        </a>
-        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
-          <span class="sr-only">Twitter</span>
-          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
-          </svg>
-        </a>
-        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
-          <span class="sr-only">LinkedIn</span>
-          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
-          </svg>
-        </a>
-      </div>
-    </div>
-  </div>
-</footer></body></html>
-    </div>
-
-    <script>
+    </style></head><body class="text-slate-700"><div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12"><header class="text-center mb-12"><h1 class="text-4xl font-bold text-slate-900 tracking-tight">Dataknobs' Strategic Partnership Ecosystem</h1><p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">An interactive analysis of the multi-layered strategy balancing broad market distribution with targeted expert engagement.</p></header><main><div class="bg-white rounded-2xl shadow-lg p-6 md:p-8"><div class="flex border-b border-slate-200 mb-6"><button class="tab py-3 px-5 text-slate-500 border-b-2 border-transparent transition-colors duration-200 ease-in-out" id="tab-partners">Partnership View</button><button class="tab py-3 px-5 text-slate-500 border-b-2 border-transparent transition-colors duration-200 ease-in-out" id="tab-products">Product View</button></div><div id="view-partners"><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-1"><h2 class="text-xl font-bold text-slate-800 mb-4">Ecosystem Hub</h2><p class="text-slate-600 mb-6">Select a partner to explore their role in the Dataknobs ecosystem. Each partnership is tailored to a specific strategic goal, from broad distribution to technology enablement.</p><div class="space-y-4" id="ecosystem-hub"></div></div><div class="lg:col-span-2 bg-slate-50 rounded-xl p-6 min-h-[400px]" id="partner-details-container"></div></div></div><div class="hidden" id="view-products"><h2 class="text-2xl font-bold text-slate-800 mb-4">Product Portfolio Availability</h2><p class="text-slate-600 mb-6">This table shows the availability of Dataknobs' core products across its key marketplace partners. The strategy emphasizes product parity on major hyperscalers while offering specialized solutions on platforms like Databricks.</p><div class="overflow-x-auto"><table class="min-w-full bg-white border border-slate-200 rounded-lg"><thead class="bg-slate-100"><tr><th class="text-left font-semibold text-slate-700 p-4">Product</th><th class="text-center font-semibold text-slate-700 p-4">Microsoft Azure</th><th class="text-center font-semibold text-slate-700 p-4">Google Cloud (GCP)</th><th class="text-center font-semibold text-slate-700 p-4">Databricks</th></tr></thead><tbody id="product-table-body"></tbody></table></div></div></div><div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mt-12"><h2 class="text-2xl font-bold text-slate-800 text-center mb-2">Strategic Synthesis</h2><p class="text-slate-600 text-center max-w-3xl mx-auto mb-8">Dataknobs employs four distinct partnership models. This chart visually compares these models across key strategic dimensions, highlighting the nuanced approach the company takes to its ecosystem.</p><div class="chart-container"><canvas id="strategyChart"></canvas></div></div></main><html><head></head><body><footer class="bg-gray-800 text-gray-300"><div class="container mx-auto px-6 py-12 lg:px-8"><div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4"><div><h5 class="text-lg font-semibold text-white mb-4">Company</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Products</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5><div class="space-y-2"><p>Redmond<br/>WA, USA</p><p><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a></p><p><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a></p></div></div></div><div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row"><p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p><div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/"><span class="sr-only">Facebook</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path></svg></a><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/"><span class="sr-only">Twitter</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg></a><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/"><span class="sr-only">LinkedIn</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path></svg></a></div></div></div></footer></body></html></div><script>
         const appData = {
             partners: {
                 azure: {
@@ -322,29 +156,18 @@
                 let productListHTML = '';
                 if (partner.products.length > 0) {
                     productListHTML = `
-                        <h4 class="font-semibold text-slate-700 mt-4 mb-2">Key Products on Platform:</h4>
-                        <div class="flex flex-wrap gap-2">
+                        <h4 class="font-semibold text-slate-700 mt-4 mb-2">Key Products on Platform:</h4><div class="flex flex-wrap gap-2">
                             ${partner.products.map(p => `<span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">${p}</span>`).join('')}
                         </div>
                     `;
                 } else {
                     productListHTML = `
-                        <h4 class="font-semibold text-slate-700 mt-4 mb-2">Product Availability:</h4>
-                        <p class="text-sm text-slate-500">This is a platform compatibility or technology enablement partnership, not a direct commercial marketplace.</p>
+                        <h4 class="font-semibold text-slate-700 mt-4 mb-2">Product Availability:</h4><p class="text-sm text-slate-500">This is a platform compatibility or technology enablement partnership, not a direct commercial marketplace.</p>
                     `;
                 }
 
                 const detailsHTML = `
-                    <div class="fade-in">
-                        <div class="flex items-center mb-4">
-                            <img src="${partner.logo}" alt="${partner.name} Logo" class="w-10 h-10 mr-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-slate-900">${partner.name}</h3>
-                                <p class="text-sm font-semibold text-teal-600">${partner.type}</p>
-                            </div>
-                        </div>
-                        <p class="text-slate-600 mb-4">${partner.summary}</p>
-                        <ul class="space-y-2 text-slate-600 list-disc list-inside">
+                    <div class="fade-in"><div class="flex items-center mb-4"><img src="${partner.logo}" alt="${partner.name} Logo" class="w-10 h-10 mr-4"><div><h3 class="text-2xl font-bold text-slate-900">${partner.name}</h3><p class="text-sm font-semibold text-teal-600">${partner.type}</p></div></div><p class="text-slate-600 mb-4">${partner.summary}</p><ul class="space-y-2 text-slate-600 list-disc list-inside">
                             ${partner.details.map(d => `<li>${d}</li>`).join('')}
                         </ul>
                         ${productListHTML}
@@ -361,13 +184,7 @@
                 for (const key in appData.partners) {
                     const partner = appData.partners[key];
                     hubHTML += `
-                        <button class="partner-logo w-full text-left flex items-center p-4 bg-white rounded-lg border-2 border-slate-200 hover:border-blue-500 transition-all duration-200" data-partner="${key}">
-                            <img src="${partner.logo}" alt="${partner.name} Logo" class="w-8 h-8 mr-4">
-                            <div>
-                                <span class="font-semibold text-slate-800">${partner.name}</span>
-                                <span class="block text-sm text-slate-500">${partner.type}</span>
-                            </div>
-                        </button>
+                        <button class="partner-logo w-full text-left flex items-center p-4 bg-white rounded-lg border-2 border-slate-200 hover:border-blue-500 transition-all duration-200" data-partner="${key}"><img src="${partner.logo}" alt="${partner.name} Logo" class="w-8 h-8 mr-4"><div><span class="font-semibold text-slate-800">${partner.name}</span><span class="block text-sm text-slate-500">${partner.type}</span></div></button>
                     `;
                 }
                 ecosystemHub.innerHTML = hubHTML;
@@ -389,12 +206,7 @@
 
                 appData.products.forEach(product => {
                     tableHTML += `
-                        <tr class="border-b border-slate-200 last:border-b-0">
-                            <td class="p-4 font-medium text-slate-800">${product}</td>
-                            <td class="p-4 text-center">${availableOn(product, 'azure') ? '<span class="text-green-500 text-2xl">✓</span>' : '<span class="text-slate-300 text-xl">-</span>'}</td>
-                            <td class="p-4 text-center">${availableOn(product, 'gcp') ? '<span class="text-green-500 text-2xl">✓</span>' : '<span class="text-slate-300 text-xl">-</span>'}</td>
-                            <td class="p-4 text-center">${availableOn(product, 'databricks') ? '<span class="text-green-500 text-2xl">✓</span>' : '<span class="text-slate-300 text-xl">-</span>'}</td>
-                        </tr>
+                        <tr class="border-b border-slate-200 last:border-b-0"><td class="p-4 font-medium text-slate-800">${product}</td><td class="p-4 text-center">${availableOn(product, 'azure') ? '<span class="text-green-500 text-2xl">✓</span>' : '<span class="text-slate-300 text-xl">-</span>'}</td><td class="p-4 text-center">${availableOn(product, 'gcp') ? '<span class="text-green-500 text-2xl">✓</span>' : '<span class="text-slate-300 text-xl">-</span>'}</td><td class="p-4 text-center">${availableOn(product, 'databricks') ? '<span class="text-green-500 text-2xl">✓</span>' : '<span class="text-slate-300 text-xl">-</span>'}</td></tr>
                     `;
                 });
                 productTableBody.innerHTML = tableHTML;
@@ -468,7 +280,4 @@
             renderPartnerDetails('azure');
             renderStrategyChart();
         });
-    </script>
-
-
-</body></html>
+    </script></body></html>

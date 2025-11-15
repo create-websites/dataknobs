@@ -1,0 +1,239 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Fine-Tuning LLMs with Earnings Calls &amp; Analyst Reports</title><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #334155; /* slate-700 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #0284c7; /* sky-600 */
+        }
+        .nav-link.active {
+            color: #0369a1; /* sky-700 */
+            border-bottom-color: #0369a1;
+        }
+    </style></head><body class="antialiased"><header class="bg-slate-800 text-white shadow-md sticky top-0 z-50"><div class="container mx-auto px-6 py-4 flex justify-between items-center"><h1 class="text-2xl font-bold tracking-tight">LLMs: Earnings Calls &amp; Analyst Reports</h1><nav class="hidden md:flex space-x-6 text-sm font-medium"><a class="nav-link border-b-2 border-transparent pb-1" href="#process">Process</a><a class="nav-link border-b-2 border-transparent pb-1" href="#data">Data</a><a class="nav-link border-b-2 border-transparent pb-1" href="#curation">Curation</a><a class="nav-link border-b-2 border-transparent pb-1" href="#method">Method</a><a class="nav-link border-b-2 border-transparent pb-1" href="#evaluation">Evaluation</a><a class="nav-link border-b-2 border-transparent pb-1" href="#challenges">Challenges</a></nav></div></header><main class="container mx-auto px-6 py-12"><section class="text-center mb-16" id="intro"><h2 class="text-4xl font-bold text-slate-900 mb-4">AI-Powered Document Analysis</h2><p class="max-w-3xl mx-auto text-lg text-slate-600">
+                This guide provides a focused walkthrough for fine-tuning a Large Language Model (LLM) to analyze and extract insights from complex financial documents, specifically earnings call transcripts and analyst reports. Learn how to turn qualitative text into quantitative signals.
+            </p></section><section class="mb-20" id="process"><h3 class="text-3xl font-bold text-center text-slate-900 mb-2">The Document Fine-Tuning Lifecycle</h3><p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+                Transforming a general LLM into a specialized financial document reader follows a structured lifecycle. Each stage is vital for building a model that can understand corporate jargon and analyst sentiment. Hover over each stage to learn more.
+            </p><div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4"><div class="process-step group" data-info="Collect historical earnings call transcripts, analyst reports, and related SEC filings."><span class="text-2xl">📄</span><span class="font-semibold">Data Sourcing</span></div><div class="process-arrow">→</div><div class="process-step group" data-info="Clean text, segment documents, and structure the data into a prompt-completion format."><span class="text-2xl">✨</span><span class="font-semibold">Data Curation</span></div><div class="process-arrow">→</div><div class="process-step group" data-info="Select a fine-tuning technique and train the model to understand financial narratives."><span class="text-2xl">⚙️</span><span class="font-semibold">Fine-Tuning</span></div><div class="process-arrow">→</div><div class="process-step group" data-info="Assess the model's ability to extract correct data and generate profitable signals."><span class="text-2xl">📈</span><span class="font-semibold">Evaluation</span></div><div class="hidden absolute bg-slate-800 text-white text-sm rounded-lg px-3 py-2 mt-2 shadow-lg transition-opacity duration-300" id="process-info-box"></div></div></section><section class="mb-20" id="data"><h3 class="text-3xl font-bold text-center text-slate-900 mb-2">Fueling the Model: Core Documents</h3><p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+                The model's analytical ability is entirely dependent on the quality and relevance of the documents it's trained on. For this task, we focus on the primary sources of corporate performance and market expectations.
+            </p><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div class="bg-white p-6 rounded-lg shadow-lg border border-slate-200"><h4 class="font-bold text-lg text-sky-700 mb-2">Earnings Call Transcripts</h4><p class="text-slate-600">Direct source of management's commentary on performance, outlook, and strategy. Crucial for understanding tone, sentiment, and future guidance.</p></div><div class="bg-white p-6 rounded-lg shadow-lg border border-slate-200"><h4 class="font-bold text-lg text-sky-700 mb-2">Analyst Reports</h4><p class="text-slate-600">Provide expert third-party analysis, financial models, price targets, and ratings changes. Key for capturing market expectations and sentiment shifts.</p></div><div class="bg-white p-6 rounded-lg shadow-lg border border-slate-200"><h4 class="font-bold text-lg text-sky-700 mb-2">SEC Filings (10-K, 10-Q)</h4><p class="text-slate-600">The official, audited financial statements. They provide the ground-truth data to verify claims made in earnings calls and reports.</p></div></div></section><section class="mb-20" id="curation"><h3 class="text-3xl font-bold text-center text-slate-900 mb-2">Shaping the Knowledge: Data Curation</h3><p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+                Raw transcripts are unstructured text. Curation involves cleaning this text and formatting it into instructions that teach the LLM specific tasks, such as extracting key performance indicators (KPIs) or classifying sentiment.
+            </p><div class="bg-white p-8 rounded-lg shadow-lg border border-slate-200 max-w-4xl mx-auto"><h4 class="font-bold text-lg text-center text-sky-700 mb-4">Instruction Formatting Example</h4><p class="text-center text-slate-600 mb-6">The goal is to teach the model to parse management commentary and extract specific, structured information from it, linking it to the subsequent market reaction.</p><div class="text-center mb-6"><button class="bg-sky-600 text-white font-semibold px-6 py-2 rounded-md hover:bg-sky-700 transition-colors" id="format-toggle-btn">Show Formatted Example</button></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="code-views"><div id="raw-view"><h5 class="font-semibold mb-2 text-slate-800">Raw Data (Inputs)</h5><pre class="bg-slate-100 p-4 rounded-md text-sm overflow-x-auto"><code><span class="font-bold">Earnings Call Snippet:</span> "Our cloud division saw unprecedented growth of 45% year-over-year, driven by enterprise adoption. We are raising our full-year revenue guidance to $50 billion."
+<span class="font-bold">Market Reaction (1d):</span> +12.5%</code></pre></div><div class="hidden" id="formatted-view"><h5 class="font-semibold mb-2 text-slate-800">Formatted for LLM</h5><pre class="bg-green-50 p-4 rounded-md text-sm text-green-900 overflow-x-auto"><code>{
+  "instruction": "From the earnings call excerpt, extract the key growth metric, the reason for growth, and future guidance. Determine the sentiment and correlate it with the market reaction.",
+  "input": "Excerpt: 'Our cloud division saw unprecedented growth of 45% year-over-year, driven by enterprise adoption. We are raising our full-year revenue guidance to $50 billion.' Market Reaction: +12.5%",
+  "output": "{ 'sentiment': 'Very Positive', 'kpi': 'Cloud growth 45% YoY', 'driver': 'Enterprise adoption', 'guidance': 'Raised full-year revenue to $50B' }"
+}</code></pre></div></div></div></section><section class="mb-20" id="method"><h3 class="text-3xl font-bold text-center text-slate-900 mb-2">Choosing Your Tuning Strategy</h3><p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+                Not all fine-tuning methods are created equal. The strategy you choose involves trade-offs between computational cost, training time, and performance. For most financial applications, Parameter-Efficient Fine-Tuning (PEFT) offers the best balance.
+            </p><div class="bg-white p-8 rounded-lg shadow-lg border border-slate-200"><div class="chart-container"><canvas id="tuningMethodChart"></canvas></div><p class="text-center mt-4 text-sm text-slate-500">PEFT methods like LoRA are significantly more efficient, making them ideal for experimenting with financial data without the massive resource requirements of a full fine-tuning.</p></div></section><section class="mb-20" id="evaluation"><h3 class="text-3xl font-bold text-center text-slate-900 mb-2">Defining Success: Evaluation Metrics</h3><p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+               Evaluating a financial LLM requires a blend of NLP metrics to check text extraction accuracy and, most importantly, rigorous financial metrics derived from backtesting the signals generated from the documents.
+            </p><div class="bg-white p-8 rounded-lg shadow-lg border border-slate-200"><div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center"><div class="chart-container h-64 md:h-auto"><canvas id="metricsChart"></canvas></div><div><h4 class="font-bold text-lg text-sky-700 mb-4">Key Metric Types</h4><ul class="space-y-3"><li class="flex items-start"><span class="text-green-500 mr-3 mt-1">✓</span><div><h5 class="font-semibold">Financial Backtesting</h5><p class="text-slate-600 text-sm">The ultimate test. Simulates trading based on signals extracted from calls/reports to calculate Sharpe Ratio, Max Drawdown, and Alpha.</p></div></li><li class="flex items-start"><span class="text-yellow-500 mr-3 mt-1">✓</span><div><h5 class="font-semibold">Information Correlation</h5><p class="text-slate-600 text-sm">Measures if the extracted sentiment/KPIs statistically correlate with future stock returns (e.g., Information Coefficient).</p></div></li><li class="flex items-start"><span class="text-blue-500 mr-3 mt-1">✓</span><div><h5 class="font-semibold">NLP Quality Metrics</h5><p class="text-slate-600 text-sm">Assesses the accuracy of KPI extraction and summary generation (e.g., F1-score for extraction, ROUGE for summaries).</p></div></li></ul></div></div></div></section><section class="mb-16" id="challenges"><h3 class="text-3xl font-bold text-center text-slate-900 mb-2">Navigating the Pitfalls</h3><p class="text-center max-w-2xl mx-auto text-slate-600 mb-12">
+                Fine-tuning on financial documents presents unique challenges. Overcoming them is key to building a model that provides a genuine analytical edge rather than just summarizing text.
+            </p><div class="max-w-3xl mx-auto space-y-4"><div class="bg-white p-4 rounded-lg shadow border border-slate-200"><h4 class="font-semibold text-slate-800">Interpreting Nuanced Language</h4><p class="text-sm text-slate-600">Teaching the model to distinguish between genuine corporate optimism ("strong demand") and cautious corporate-speak ("seeing some pockets of softness").</p></div><div class="bg-white p-4 rounded-lg shadow border border-slate-200"><h4 class="font-semibold text-slate-800">Look-Ahead Bias</h4><p class="text-sm text-slate-600">Ensuring the model's prediction for a given day only uses documents and market data available *before* that day. A critical and common error.</p></div><div class="bg-white p-4 rounded-lg shadow border border-slate-200"><h4 class="font-semibold text-slate-800">Quantifying Qualitative Data</h4><p class="text-sm text-slate-600">Developing a consistent system to map subjective language (e.g., "slightly better than expected") to a numerical sentiment score for backtesting.</p></div></div></section></main><html><head></head><body><footer class="bg-gray-800 text-gray-300"><div class="container mx-auto px-6 py-12 lg:px-8"><div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4"><div><h5 class="text-lg font-semibold text-white mb-4">Company</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Products</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5><div class="space-y-2"><p>Redmond<br/>WA, USA</p><p><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a></p><p><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a></p></div></div></div><div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row"><p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p><div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/"><span class="sr-only">Facebook</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path></svg></a><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/"><span class="sr-only">Twitter</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg></a><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/"><span class="sr-only">LinkedIn</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path></svg></a></div></div></div></footer></body></html><script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const sections = document.querySelectorAll('main section');
+            const navLinks = document.querySelectorAll('header nav a');
+
+            function updateActiveLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            window.addEventListener('scroll', updateActiveLink);
+            updateActiveLink();
+
+            const formatBtn = document.getElementById('format-toggle-btn');
+            const rawView = document.getElementById('raw-view');
+            const formattedView = document.getElementById('formatted-view');
+            const codeViewsContainer = document.getElementById('code-views');
+            let isFormatted = false;
+
+            formatBtn.addEventListener('click', () => {
+                isFormatted = !isFormatted;
+                if(isFormatted) {
+                    rawView.classList.add('hidden');
+                    formattedView.classList.remove('hidden');
+                    codeViewsContainer.classList.remove('md:grid-cols-2');
+                    codeViewsContainer.classList.add('md:grid-cols-1');
+                    formatBtn.textContent = 'Show Raw Inputs';
+                } else {
+                    rawView.classList.remove('hidden');
+                    formattedView.classList.add('hidden');
+                    codeViewsContainer.classList.add('md:grid-cols-2');
+                    codeViewsContainer.classList.remove('md:grid-cols-1');
+                    formatBtn.textContent = 'Show Formatted Example';
+                }
+            });
+
+            const processSteps = document.querySelectorAll('.process-step');
+            const infoBox = document.getElementById('process-info-box');
+
+            processSteps.forEach(step => {
+                step.addEventListener('mouseenter', (e) => {
+                    infoBox.textContent = step.dataset.info;
+                    infoBox.classList.remove('hidden');
+                    const rect = step.getBoundingClientRect();
+                    infoBox.style.left = `${rect.left + window.scrollX}px`;
+                    infoBox.style.top = `${rect.bottom + window.scrollY + 10}px`;
+                });
+                step.addEventListener('mouseleave', () => {
+                    infoBox.classList.add('hidden');
+                });
+            });
+
+            const tuningCtx = document.getElementById('tuningMethodChart').getContext('2d');
+            new Chart(tuningCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Compute Cost', 'Training Time', 'Performance', 'Risk of Forgetting'],
+                    datasets: [{
+                        label: 'Full Fine-Tuning',
+                        data: [95, 90, 100, 80],
+                        backgroundColor: 'rgba(56, 189, 248, 0.6)',
+                        borderColor: 'rgba(56, 189, 248, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'PEFT (e.g., LoRA)',
+                        data: [10, 15, 95, 20],
+                        backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) { return value + '%' }
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Comparison: Full Fine-Tuning vs. PEFT',
+                            font: { size: 16 },
+                            color: '#334155'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}% (Relative Scale)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const metricsCtx = document.getElementById('metricsChart').getContext('2d');
+            new Chart(metricsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Financial Backtesting', 'Information Correlation', 'NLP Quality'],
+                    datasets: [{
+                        label: 'Importance',
+                        data: [60, 25, 15],
+                        backgroundColor: [
+                            'rgba(34, 197, 94, 0.7)',
+                            'rgba(234, 179, 8, 0.7)',
+                            'rgba(59, 130, 246, 0.7)'
+                        ],
+                        borderColor: [
+                             'rgba(34, 197, 94, 1)',
+                            'rgba(234, 179, 8, 1)',
+                            'rgba(59, 130, 246, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Relative Importance of Metric Types',
+                            font: { size: 16 },
+                            color: '#334155'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        
+            const sharedStyles = `
+                .process-step {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: 0.5rem;
+                    border: 1px solid #e2e8f0;
+                    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    min-width: 150px;
+                }
+                .process-step:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+                    border-color: #38bdf8;
+                }
+                .process-arrow {
+                    font-size: 2rem;
+                    color: #94a3b8;
+                    margin: 0 1rem;
+                }
+                @media (max-width: 767px) {
+                    .process-arrow {
+                        transform: rotate(90deg);
+                        margin: 0.5rem 0;
+                    }
+                }
+            `;
+            const styleSheet = document.createElement("style");
+            styleSheet.innerText = sharedStyles;
+            document.head.appendChild(styleSheet);
+        });
+    </script></body></html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>The Reddit Data Engine for LLMs: An Interactive Guide</title><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #404040;
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #F3F4F6;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .process-step {
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+        }
+        .process-step.active {
+            background-color: #DBEAFE;
+            border-color: #3B82F6;
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .btn-filter {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .btn-filter.active {
+            background-color: #2563eb;
+            color: white;
+        }
+    </style></head><body class="antialiased"><header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg shadow-sm"><div class="container mx-auto px-4 sm:px-6 lg:px-8"><div class="flex items-center justify-between h-16"><h1 class="text-xl md:text-2xl font-bold text-gray-800">LLMs &amp; Reddit Data</h1><nav class="hidden md:flex space-x-8"><a class="nav-link text-gray-600 font-medium pb-1 border-b-2 border-transparent" href="#why">Why Reddit?</a><a class="nav-link text-gray-600 font-medium pb-1 border-b-2 border-transparent" href="#process">The Process</a><a class="nav-link text-gray-600 font-medium pb-1 border-b-2 border-transparent" href="#tradeoffs">Pros vs. Cons</a><a class="nav-link text-gray-600 font-medium pb-1 border-b-2 border-transparent" href="#cost">The Cost</a></nav></div></div></header><main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12"><section class="text-center mb-20"><h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">The Unseen Engine: How Reddit Fuels Modern AI</h2><p class="max-w-3xl mx-auto text-lg text-gray-600">
+                Large Language Models (LLMs) are reshaping our world, but their power comes from an insatiable appetite for data. This interactive guide explores why Reddit, with its vast ocean of human conversation, has become a critical and controversial resource for training the next generation of artificial intelligence.
+            </p></section><section class="mb-24 scroll-mt-20" id="why"><div class="text-center mb-12"><h3 class="text-3xl font-bold text-gray-800">Why Reddit?</h3><p class="mt-2 text-lg text-gray-600 max-w-2xl mx-auto">Reddit provides a unique combination of scale, diversity, and authenticity that is hard to find elsewhere. This section breaks down the core attributes that make its data so valuable for training conversational AI.</p></div><div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16"><div class="card p-6 rounded-lg text-center"><div class="text-4xl mb-3">📈</div><h4 class="font-bold text-xl mb-2">Immense Scale</h4><p class="text-gray-600">Billions of comments and posts offer a massive dataset covering nearly every topic imaginable, crucial for building comprehensive models.</p></div><div class="card p-6 rounded-lg text-center"><div class="text-4xl mb-3">💬</div><h4 class="font-bold text-xl mb-2">Authentic Conversation</h4><p class="text-gray-600">The data reflects real-world slang, idioms, and conversational patterns, teaching models to sound more natural and human-like.</p></div><div class="card p-6 rounded-lg text-center"><div class="text-4xl mb-3">🌍</div><h4 class="font-bold text-xl mb-2">Topical Diversity</h4><p class="text-gray-600">From niche hobbies to global news, subreddits provide structured, topic-specific conversations perfect for fine-tuning specialized AI.</p></div><div class="card p-6 rounded-lg text-center"><div class="text-4xl mb-3">🔗</div><h4 class="font-bold text-xl mb-2">Valuable Structure</h4><p class="text-gray-600">The threaded nature of comments, with replies and upvotes, provides implicit labels for conversational quality and relevance.</p></div></div><div class="bg-white p-6 rounded-lg shadow-md"><h4 class="text-xl font-bold text-center mb-4">Data Volume Comparison (Estimated Petabytes)</h4><div class="chart-container"><canvas id="volumeChart"></canvas></div></div></section><section class="mb-24 scroll-mt-20" id="process"><div class="text-center mb-12"><h3 class="text-3xl font-bold text-gray-800">The Data-to-Model Pipeline</h3><p class="mt-2 text-lg text-gray-600 max-w-2xl mx-auto">Transforming raw Reddit conversations into a trained LLM is a multi-step process. Click on each stage below to understand how developers acquire, clean, and utilize this vast dataset to build intelligent models.</p></div><div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-8"><div class="process-step active w-full md:w-auto text-center border-2 border-blue-500 rounded-lg p-4" id="step-1"><h4 class="font-semibold">1. Data Acquisition</h4></div><div class="text-2xl text-gray-400 hidden md:block">→</div><div class="process-step w-full md:w-auto text-center border-2 border-gray-300 rounded-lg p-4" id="step-2"><h4 class="font-semibold">2. Preprocessing &amp; Cleaning</h4></div><div class="text-2xl text-gray-400 hidden md:block">→</div><div class="process-step w-full md:w-auto text-center border-2 border-gray-300 rounded-lg p-4" id="step-3"><h4 class="font-semibold">3. Filtering &amp; Curation</h4></div><div class="text-2xl text-gray-400 hidden md:block">→</div><div class="process-step w-full md:w-auto text-center border-2 border-gray-300 rounded-lg p-4" id="step-4"><h4 class="font-semibold">4. Model Training</h4></div></div><div class="bg-white p-8 rounded-lg shadow-inner min-h-[200px] transition-all duration-300" id="process-details"></div></section><section class="mb-24 scroll-mt-20" id="tradeoffs"><div class="text-center mb-12"><h3 class="text-3xl font-bold text-gray-800">The Balancing Act: Pros vs. Cons</h3><p class="mt-2 text-lg text-gray-600 max-w-2xl mx-auto">Using Reddit's data offers immense benefits but also presents significant challenges. Explore the trade-offs through a side-by-side comparison and see how they stack up from different perspectives using the interactive chart.</p></div><div class="grid md:grid-cols-2 gap-8 mb-12"><div class="bg-green-50 p-6 rounded-lg border border-green-200"><h4 class="text-2xl font-bold text-green-800 mb-4">Pros 👍</h4><ul class="space-y-3 text-green-700"><li><strong>Unparalleled Scale:</strong> Provides massive amounts of diverse training data.</li><li><strong>Real-World Language:</strong> Captures nuances, slang, and cultural context.</li><li><strong>High Signal for Quality:</strong> Upvote/downvote systems help identify useful content.</li><li><strong>Cost-Effective:</strong> Historically cheaper than creating proprietary datasets.</li></ul></div><div class="bg-red-50 p-6 rounded-lg border border-red-200"><h4 class="text-2xl font-bold text-red-800 mb-4">Cons 👎</h4><ul class="space-y-3 text-red-700"><li><strong>Inherent Bias &amp; Toxicity:</strong> Models can learn and amplify harmful stereotypes.</li><li><strong>Noise and Low Quality:</strong> Sarcasm, jokes, and misinformation are rampant.</li><li><strong>Privacy Concerns:</strong> User data can be scraped without explicit consent for AI training.</li><li><strong>Copyright Issues:</strong> Models may reproduce copyrighted content from user posts.</li></ul></div></div><div class="bg-white p-6 rounded-lg shadow-md"><h4 class="text-xl font-bold text-center mb-2">Interactive Trade-off Analysis</h4><p class="text-center text-gray-600 mb-4">View the balance of factors from different perspectives.</p><div class="flex justify-center space-x-2 mb-4" id="radar-filters"><button class="btn-filter active px-4 py-2 text-sm font-medium rounded-full bg-gray-200" data-filter="quality">Data Quality</button><button class="btn-filter px-4 py-2 text-sm font-medium rounded-full bg-gray-200" data-filter="ethics">Ethical Concerns</button><button class="btn-filter px-4 py-2 text-sm font-medium rounded-full bg-gray-200" data-filter="feasibility">Feasibility</button></div><div class="chart-container"><canvas id="tradeoffRadar"></canvas></div></div></section><section class="scroll-mt-20" id="cost"><div class="text-center mb-12"><h3 class="text-3xl font-bold text-gray-800">The Financial Equation</h3><p class="mt-2 text-lg text-gray-600 max-w-2xl mx-auto">While powerful, harnessing Reddit's data isn't free. From API access fees to massive computational power, there are significant costs involved. This section breaks down the typical expenses and allows you to explore how costs scale with project size.</p></div><div class="bg-white p-6 rounded-lg shadow-md"><h4 class="text-xl font-bold text-center mb-4">Estimated Cost Distribution</h4><div class="grid md:grid-cols-2 gap-8 items-center"><div class="chart-container"><canvas id="costDonut"></canvas></div><div><div class="mb-6"><label class="block font-medium text-gray-700 mb-2" for="projectScale">Adjust Project Scale:</label><input class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" id="projectScale" max="3" min="1" type="range" value="2"/><div class="flex justify-between text-sm text-gray-500 mt-1"><span>Small</span><span>Medium</span><span>Large</span></div></div><div id="cost-breakdown-text"><h5 class="font-bold text-lg mb-2">Medium Project Breakdown:</h5><ul class="space-y-2"><li class="flex items-center"><span class="h-3 w-3 rounded-full bg-blue-500 mr-2"></span><span class="font-semibold">Compute Power:</span> Major expense for training.</li><li class="flex items-center"><span class="h-3 w-3 rounded-full bg-teal-500 mr-2"></span><span class="font-semibold">API Access &amp; Data Storage:</span> Increasing cost due to API changes.</li><li class="flex items-center"><span class="h-3 w-3 rounded-full bg-purple-500 mr-2"></span><span class="font-semibold">Human Labor:</span> Significant cost for curation and annotation.</li></ul></div></div></div></div></section></main><html><head></head><body><footer class="bg-gray-800 text-gray-300"><div class="container mx-auto px-6 py-12 lg:px-8"><div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4"><div><h5 class="text-lg font-semibold text-white mb-4">Company</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Products</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5><div class="space-y-2"><p>Redmond<br/>WA, USA</p><p><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a></p><p><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a></p></div></div></div><div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row"><p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p><div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/"><span class="sr-only">Facebook</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path></svg></a><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/"><span class="sr-only">Twitter</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg></a><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/"><span class="sr-only">LinkedIn</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path></svg></a></div></div></div></footer></body></html><script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const data = {
+        processSteps: {
+            'step-1': {
+                title: 'Step 1: Data Acquisition',
+                description: 'This is the initial phase where developers collect vast amounts of text data from Reddit. Historically, this was done via free APIs or publicly available data dumps like Pushshift. Now, it increasingly involves paying for access to Reddit\'s official, more restrictive API. The goal is to gather a raw corpus of billions of comments and posts that will form the foundation of the model\'s knowledge.'
+            },
+            'step-2': {
+                title: 'Step 2: Preprocessing & Cleaning',
+                description: 'The raw data is messy. This step involves automated scripts to clean the text. Tasks include removing HTML tags, deleting duplicate comments, handling special characters, and stripping out user metadata to protect privacy. The aim is to standardize the text format, making it suitable for the model to process efficiently.'
+            },
+            'step-3': {
+                title: 'Step 3: Filtering & Curation',
+                description: 'This is a critical and challenging stage. Automated filters and human reviewers work to remove harmful content, including hate speech, explicit material, and personal information. High-quality conversations are often selected based on metrics like upvotes or subreddit reputation. The goal is to create a safer, less biased, and more useful dataset, though this process is imperfect.'
+            },
+            'step-4': {
+                title: 'Step 4: Model Training',
+                description: 'The curated dataset is fed into the LLM during its training phase. The model processes the text, learning grammar, facts, reasoning abilities, and conversational styles. It identifies patterns in the vast network of human language from Reddit. This computationally intensive process can take weeks or months and requires massive server farms (GPUs) to complete.'
+            }
+        },
+        radarData: {
+            quality: {
+                labels: ['Scale', 'Authenticity', 'Structure', 'Noise', 'Factual Accuracy'],
+                datasets: [{
+                    label: 'Pros',
+                    data: [9, 8, 7, 2, 4],
+                    backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                    borderColor: 'rgba(37, 99, 235, 1)',
+                    pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                }, {
+                    label: 'Cons',
+                    data: [3, 2, 3, 9, 8],
+                    backgroundColor: 'rgba(220, 38, 38, 0.2)',
+                    borderColor: 'rgba(220, 38, 38, 1)',
+                    pointBackgroundColor: 'rgba(220, 38, 38, 1)',
+                }]
+            },
+            ethics: {
+                labels: ['Privacy', 'Consent', 'Bias', 'Toxicity', 'Copyright'],
+                datasets: [{
+                    label: 'Pros',
+                    data: [2, 2, 2, 2, 3],
+                    backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                    borderColor: 'rgba(37, 99, 235, 1)',
+                    pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                }, {
+                    label: 'Cons',
+                    data: [9, 9, 8, 8, 7],
+                    backgroundColor: 'rgba(220, 38, 38, 0.2)',
+                    borderColor: 'rgba(220, 38, 38, 1)',
+                    pointBackgroundColor: 'rgba(220, 38, 38, 1)',
+                }]
+            },
+            feasibility: {
+                labels: ['Cost', 'Accessibility', 'Tooling', 'Legal Risk', 'Compute Needs'],
+                datasets: [{
+                    label: 'Pros',
+                    data: [7, 6, 8, 4, 3],
+                    backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                    borderColor: 'rgba(37, 99, 235, 1)',
+                    pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                }, {
+                    label: 'Cons',
+                    data: [8, 8, 3, 7, 9],
+                    backgroundColor: 'rgba(220, 38, 38, 0.2)',
+                    borderColor: 'rgba(220, 38, 38, 1)',
+                    pointBackgroundColor: 'rgba(220, 38, 38, 1)',
+                }]
+            }
+        },
+        costData: {
+            small: [30, 20, 50],
+            medium: [45, 25, 30],
+            large: [60, 25, 15]
+        }
+    };
+
+    let volumeChart, tradeoffRadar, costDonut;
+
+    const createVolumeChart = () => {
+        const ctx = document.getElementById('volumeChart').getContext('2d');
+        volumeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Wikipedia (English)', 'Google Books', 'Common Crawl', 'Reddit (Full History)'],
+                datasets: [{
+                    label: 'Estimated Data Size (Petabytes)',
+                    data: [0.02, 4, 12, 15],
+                    backgroundColor: ['#93c5fd', '#60a5fa', '#3b82f6', '#2563eb'],
+                    borderColor: '#1e40af',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `${context.raw} PB`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Petabytes (PB)'
+                        }
+                    }
+                }
+            }
+        });
+    };
+    
+    const setupProcessSteps = () => {
+        const steps = document.querySelectorAll('.process-step');
+        const detailsContainer = document.getElementById('process-details');
+
+        const updateDetails = (stepId) => {
+            const stepData = data.processSteps[stepId];
+            detailsContainer.innerHTML = `
+                <h4 class="text-xl font-bold mb-2">${stepData.title}</h4><p class="text-gray-600">${stepData.description}</p>
+            `;
+            steps.forEach(s => {
+                s.classList.remove('active');
+                s.classList.replace('border-blue-500', 'border-gray-300');
+            });
+            const activeStep = document.getElementById(stepId);
+            activeStep.classList.add('active');
+            activeStep.classList.replace('border-gray-300', 'border-blue-500');
+        };
+
+        steps.forEach(step => {
+            step.addEventListener('click', () => updateDetails(step.id));
+        });
+
+        updateDetails('step-1');
+    };
+
+    const createTradeoffRadar = (filter = 'quality') => {
+        const ctx = document.getElementById('tradeoffRadar').getContext('2d');
+        if (tradeoffRadar) {
+            tradeoffRadar.destroy();
+        }
+        tradeoffRadar = new Chart(ctx, {
+            type: 'radar',
+            data: data.radarData[filter],
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: '#e5e7eb'
+                        },
+                        grid: {
+                            color: '#e5e7eb'
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 12
+                            },
+                            color: '#374151'
+                        },
+                        ticks: {
+                            backdropColor: 'transparent',
+                            stepSize: 2,
+                            max: 10,
+                            min: 0,
+                            color: '#6b7280'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                }
+            }
+        });
+    };
+
+    const setupRadarFilters = () => {
+        const filters = document.getElementById('radar-filters');
+        filters.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const filter = e.target.dataset.filter;
+                createTradeoffRadar(filter);
+                filters.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+            }
+        });
+    };
+
+    const createCostDonut = (scale = 'medium') => {
+        const ctx = document.getElementById('costDonut').getContext('2d');
+        if (costDonut) {
+            costDonut.destroy();
+        }
+        costDonut = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Compute Power', 'API & Storage', 'Human Labor'],
+                datasets: [{
+                    data: data.costData[scale],
+                    backgroundColor: ['#3b82f6', '#14b8a6', '#8b5cf6'],
+                    borderColor: '#FDFBF8',
+                    borderWidth: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                         callbacks: {
+                            label: (context) => `${context.label}: ${context.raw}%`
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    const setupCostSlider = () => {
+        const slider = document.getElementById('projectScale');
+        const breakdownText = document.getElementById('cost-breakdown-text');
+
+        slider.addEventListener('input', (e) => {
+            const scaleMap = { '1': 'small', '2': 'medium', '3': 'large' };
+            const currentScale = scaleMap[e.target.value];
+            createCostDonut(currentScale);
+
+            const titleText = `${currentScale.charAt(0).toUpperCase() + currentScale.slice(1)} Project Breakdown:`;
+            let description = '';
+            if(currentScale === 'small') {
+                description = 'Human labor is the dominant cost for smaller, highly curated datasets.';
+            } else if (currentScale === 'medium') {
+                description = 'Costs are more balanced, with significant spending on both compute and labor.';
+            } else {
+                description = 'Compute power for training on massive datasets becomes the largest expense.';
+            }
+            breakdownText.innerHTML = `
+                <h5 class="font-bold text-lg mb-2">${titleText}</h5><p class="mb-2 text-gray-600">${description}</p><ul class="space-y-2"><li class="flex items-center"><span class="h-3 w-3 rounded-full bg-blue-500 mr-2"></span><span class="font-semibold">Compute Power</span></li><li class="flex items-center"><span class="h-3 w-3 rounded-full bg-teal-500 mr-2"></span><span class="font-semibold">API Access & Data Storage</span></li><li class="flex items-center"><span class="h-3 w-3 rounded-full bg-purple-500 mr-2"></span><span class="font-semibold">Human Labor</span></li></ul>
+            `;
+        });
+    };
+
+    const setupNavScroll = () => {
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section[id]');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 80) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 70, 
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    };
+
+
+    createVolumeChart();
+    setupProcessSteps();
+    createTradeoffRadar();
+    setupRadarFilters();
+    createCostDonut();
+    setupCostSlider();
+    setupNavScroll();
+});
+</script></body></html>

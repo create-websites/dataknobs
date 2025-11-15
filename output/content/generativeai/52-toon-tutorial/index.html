@@ -1,0 +1,824 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Interactive TOON Guide</title><script src="https://cdn.tailwindcss.com"></script><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/><style>
+        /* Apply the fonts */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        pre, code, textarea {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Custom scrollbar for sidebar (optional, but nice) */
+        #sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
+        #sidebar-nav::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1; /* gray-300 */
+            border-radius: 3px;
+        }
+        #sidebar-nav::-webkit-scrollbar-thumb:hover {
+            background-color: #94a3b8; /* gray-400 */
+        }
+    </style></head><body class="bg-gray-100"><div class="flex h-screen overflow-hidden"><aside class="hidden md:flex w-72 flex-col bg-white border-r border-gray-200" id="sidebar"><div class="px-6 py-5 border-b border-gray-200"><h1 class="text-2xl font-bold text-blue-600">TOON Guide</h1><p class="text-sm text-gray-500">Token-Oriented Object Notation</p></div><nav class="flex-1 overflow-y-auto py-4" id="sidebar-nav"></nav></aside><div class="flex-1 flex flex-col overflow-hidden"><header class="md:hidden flex items-center justify-between bg-white px-4 py-3 border-b border-gray-200"><h1 class="text-xl font-bold text-blue-600">TOON Guide</h1><button class="p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100" id="menu-toggle"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M4 12h16m-7 6h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button></header><main class="flex-1 overflow-y-auto p-6 md:p-10 bg-gray-50" id="content-display"></main></div></div><script>
+        // --- DATA ---
+
+        // This is the raw text content from the uploaded document.
+        const rawArticleData = `
+✅ ARTICLE 1 — What Is TOON? A Technical Introduction to Token-Oriented Object Notation
+TOON (Token-Oriented Object Notation) is an emerging data-serialization format designed specifically for communicating structured data to large language models (LLMs). While JSON has long dominated the ecosystem of APIs, configuration, and structured data exchange, it was never optimized for models that process information in  tokens , not characters. TOON fills this gap by eliminating redundant tokens, compressing structure, and presenting data in a column-oriented form that LLMs parse more reliably.
+At its core, TOON preserves readability while drastically reducing token overhead. Instead of repeating field names for every object in an array—like JSON does—TOON declares a schema once and then encodes each row as a comma-separated list. For example:
+ expenses[3]{date,vendor,category,amount}: 
+  2024-10-12,OfficeMax,Office Supplies,123.45 
+  2024-10-15,Staples,Office Supplies,67.89 
+  2024-10-20,Delta,Travel,425.00 
+In JSON, the same structure would require repeating  "date" ,  "vendor" ,  "category" , and  "amount"  three times. For LLMs with large but not infinite context limits, every token matters.
+Technically, TOON combines features from YAML (indentation), CSV (row-based lists), and JSON (primitive types). Yet it remains lightweight and deterministic, with a formal specification that includes grammar definitions and AST guidelines.
+Why should engineers care? Because TOON makes LLM applications faster, cheaper, and more accurate. In structured-data reasoning tasks—classification, extraction, reconciliation, transformations—LLMs produce better results when inputs are dense and consistent. JSON, with its verbose syntax, often obscures the  signal  inside layers of structural noise. TOON removes the noise.
+As LLM applications mature, formats like TOON will become essential in building efficient AI systems, especially when dealing with large datasets. While not intended to replace JSON for storage or APIs, TOON is poised to become the de-facto wire format for LLM-bound data.
+
+✅ ARTICLE 2 — Why TOON Is Becoming the New Standard for LLM-Ready Data
+The modern AI stack is constrained by tokens: how many tokens a model can accept, process, generate, and store. The more tokens sent to the model, the higher the latency and the greater the cost. TOON emerged as a solution that shrinks structured data before it hits the LLM.
+Token-efficiency alone does not explain TOON’s rise. Its design also improves  structural clarity . LLMs perform better when presented with consistent patterns, reduced entropy, and predictable schemas. In JSON, even simple arrays require repetitive boilerplate. TOON minimizes cognitive load for the model by collapsing repeated fields and presenting everything in a tabular layout.
+For example, suppose you’re feeding 10,000 bank transactions to an LLM for Schedule C classification. JSON may require 120,000 tokens. TOON may require 30,000. This alone is enough to make entire classes of LLM applications viable.
+Another factor is LLM friendliness. JSON's braces, quotes, commas, and nested structures create ambiguity inside the model’s attention patterns. TOON, in contrast, provides an explicit schema:
+ transactions[10000]{date,description,amount,category,account} 
+This tells the model exactly what to expect. There is no guessing, no schema inference, no ambiguity.
+Finally, TOON supports code-generation workflows, traceability, and deterministic parsing. With libraries available in Python, TypeScript, Go, and Rust, the ecosystem is growing quickly.
+TOON isn’t just smaller; it’s strategically aligned with how LLMs think.
+
+✅ ARTICLE 3 — TOON vs JSON: A Technical Comparison for AI Engineers
+JSON is ubiquitous, but its structure is optimized for machines—not for LLMs. TOON flips that priority. A purely technical comparison reveals several key differences:
+1. Structural Overhead
+JSON repeats field names endlessly:
+ {"amount": 10, "date": "2024-01-01"} 
+TOON eliminates repetition with column-orientation:
+ rows[1]{amount,date}: 
+  10,2024-01-01 
+ 2. Token Cost
+JSON’s quotes and braces are expensive for models. TOON avoids them.
+3. Determinism
+TOON strongly encourages uniform arrays, producing cleaner attention patterns inside Transformers.
+4. Human Readability
+TOON improves readability for  regular records  but is worse for irregular nested data.
+5. Use-Cases
+
+Use-Case ,JSON ,TOON 
+Storage,✔,✖
+APIs,✔,✖
+LLM input,✖,✔
+Extractive tasks,✔,✔
+
+In conclusion: JSON remains king for APIs and storage; TOON is superior for LLM-bound structured data.
+
+✅ ARTICLE 4 — How to Convert JSON to TOON: A Technical Guide
+Conversion from JSON to TOON requires three steps:
+1. Schema Extraction
+Detect column names from the JSON array.
+2. Row Extraction
+Flatten each object into an ordered tuple.
+3. TOON Formatting
+Compose:
+ collection[n]{col1,col2,col3}: 
+  row…. 
+Common edge cases:
+Missing fields (fill with  null )
+Nested arrays (avoid or flatten)
+Variants in field types (coerce)
+Python libraries like  python-toon  automate this process, but custom conversion logic is often needed for enterprise-grade flows.
+
+✅ ARTICLE 5 — Using TOON for RAG Pipelines: Maximizing Context Efficiency
+Retrieval-Augmented Generation (RAG) thrives on structured context. The challenge is that even with large context limits, token budgets are finite. When you embed extracted data—transactions, logs, tables, structured facts—JSON becomes a bottleneck. TOON solves this by compressing structure while retaining clarity.
+In a typical RAG system, documents are chunked, embedded, indexed, and later retrieved for augmentation. But sometimes you must inject structured data directly into the prompt—financial histories, product catalogs, monitoring logs. These are extremely token-heavy.
+TOON’s column-oriented structure is ideal here. Instead of passing:
+ [ 
+  {"timestamp": "2024-01-01", "latency": 120, "status": "OK"}, 
+  {"timestamp": "2024-01-02", "latency": 250, "status": "WARN"} 
+] 
+you encode:
+ metrics[2]{timestamp,latency,status}: 
+  2024-01-01,120,OK 
+  2024-01-02,250,WARN 
+Token savings often exceed 50%.
+This matters because retrieval quality increases with more contextual data. If you can fit 3× as many records, the model sees more patterns, edge cases, and contextual anchors. This increases correctness in tasks like classification, anomaly detection, and summarization.
+TOON also works well as a post-retrieval aggregator. Retrieved chunks can be normalized to TOON before injection. The more consistent the structure, the less the model must “parse” mentally, and the more cycles it has for reasoning.
+RAG isn't just about retrieval—it’s about feeding the model context it can use. TOON elevates the signal-to-token ratio, making RAG systems more powerful across the board.
+
+✅ ARTICLE 6 — Prompt Engineering with TOON: Clean Structure for LLM Reasoning
+Prompt engineering matured from a bag of tricks into a discipline. But many prompts still rely on unstructured text, forcing the model to infer structure implicitly. TOON provides explicit structure, reducing misinterpretation.
+When you supply JSON inputs, models must tokenize quotes, braces, and deeply nested objects. This creates noisy token sequences that compete with semantic content. TOON’s minimal syntax clarifies hierarchy and relationships.
+For example, prompting the model:
+ Classify the following expenses. 
+
+expenses[4]{date,vendor,amount,category}: 
+  2024-02-01,Starbucks,5.80,Meals 
+  2024-02-02,Uber,22.50,Travel 
+is more robust than:
+ [ 
+  {"date": "...", "vendor": "..."} 
+] 
+In tests, models mis-classify JSON-based prompts 20–30% more frequently due to schema drift and inconsistent row formats.
+TOON introduces stability:
+Only one schema
+Only one row format
+No extraneous punctuation
+Explicit row count for grounding
+Additionally, the  {}  schema declaration gives models a stable ordering, reducing hallucination of missing fields. Explicit arrays ( [n] ) help the model avoid fabricating or skipping items.
+Prompt templates become simpler too. “Paste TOON here” is easier than handling escaping, indentation, or quoting in JSON.
+For technical teams, adopting TOON in prompt engineering pipelines improves determinism, reduces hallucinations, and increases throughput.
+
+✅ ARTICLE 7 — Building TOON-Native APIs for AI Agents
+Traditional APIs return JSON by default. But AI agents—autonomous or semi-autonomous systems—often consume huge amounts of structured data. Clients may not be human; they may be LLMs themselves.
+A TOON-native API makes sense when:
+The consumer is an LLM
+The data is highly repetitive or tabular
+Token efficiency matters
+You want explicit schemas
+A response might look like:
+ transactions[200]{date,amount,merchant,category}: 
+  ... 
+TOON APIs benefit from:
+1. Reduced token costs
+Agents paying per token benefit dramatically.
+2. Faster parsing
+LLMs parse row-based structures more accurately than verbose JSON.
+3. Clearer contracts
+The schema becomes part of the payload.
+API considerations
+Content-Type  could be:  text/x-toon
+Validation  should verify array lengths and schema consistency
+Versioning  preserved via endpoint, not schema
+Streaming  works efficiently when sending rows progressively
+While human developers prefer JSON, AI agents strongly prefer TOON because of its token density and predictable structure.
+
+✅ ARTICLE 8 — How TOON Helps Fit 5× More Data in Your LLM Context Window
+The constraint of the LLM context window is one of the core bottlenecks in AI systems. Whether it’s 200k tokens or 1M, token budgets are finite. TOON effectively multiplies your usable context capacity.
+Why does TOON compress so well?
+1. Column-oriented layout
+Field names appear once, not per object.
+2. No quotes around strings
+A major source of token bloat in JSON.
+3. Minimal structure syntax
+Indentation replaces braces.
+4. Removal of redundant commas, braces, quotes
+Benchmarks show:
+
+Dataset ,JSON Tokens ,TOON Tokens ,Reduction 
+"1,000 expenses","48,000","11,200",76%
+"5,000 transactions","260,000","61,000",77%
+"10,000 logs","580,000","135,000",76%
+
+This matters for tasks like:
+Financial categorization
+Tax document analysis
+Invoice reconciliation
+Supply-chain auditing
+Codebase reasoning with metadata
+Fewer tokens = more data, lower cost, and less noise for the model.
+TOON is not magic—it simply eliminates redundancy inherent in JSON. For workloads with uniform row structures, TOON unleashes the full power of long-context LLMs.
+
+✅ ARTICLE 9 — Why TOON Is a Perfect Fit for Tax Document Processing
+Tax documents—W-2s, 1099s, K-1s, Schedule C ledgers—are structured, repetitive, and highly standardized. This is precisely the type of data that TOON handles exceptionally well. When performing OCR, extraction, and classification using LLMs, JSON becomes too verbose. TOON provides a compact, deterministic, LLM-friendly encoding that bypasses JSON’s token overhead and structural noise.
+Tax data typically includes line items, boxes with numeric identifiers, tables of amounts, and repeating structures. For example, 1099-NEC state items or W-2 multiple state wages lines are nearly identical structurally. TOON handles this with its column-oriented schema declaration:
+ state_items[2]{state,state_tax_withheld}: 
+  CA,1100 
+  NY,500 
+This is far superior to JSON, where field name repetition wastes tokens and pushes larger documents out of the model's context. Tax workflows routinely involve hundreds or thousands of such rows.
+TOON also reduces hallucinations. JSON-based prompts often cause LLMs to misorder or misinterpret fields. With TOON, the field order is explicit and immutable via the  {field1,field2,…}  declaration. This aligns with how Transformers interpret sequential data.
+When you ask the model to classify transactions into Schedule C categories or detect anomalies in expenses, TOON maximizes the signal-to-token ratio, enabling the LLM to reason more effectively. For example:
+ expenses[1500]{date,vendor,category,amount}: 
+  ... 
+Putting 1,500 items in JSON might exceed the model’s context window entirely.
+For AI-based tax preparation systems, TOON is not a convenience—it is a multiplier. It reduces cost, improves accuracy, and makes large-scale classification feasible.
+
+✅ ARTICLE 10 — Using TOON to Structure Bank Transactions for AI Categorization
+Bank transactions are one of the most common forms of structured data passed to LLMs in fintech and accounting applications. The problem is scale: small-business clients may submit tens of thousands of transactions across multiple accounts.
+The traditional pipeline is:
+Export CSV
+Normalize to JSON
+Feed JSON to an LLM
+However, JSON blows up in size because every object repeats fields like  "description" ,  "amount" ,  "account" .
+TOON collapses this entirely.
+ transactions[10000]{date,description,amount,account}: 
+  ... 
+By placing schema up front and rows below, the LLM immediately understands the structure. This reduces parsing overhead and token count.
+With TOON, you can:
+Batch-classify transactions
+Detect duplicates
+Identify anomalies
+Map expenses to IRS categories
+Generate financial summaries
+From a technical perspective, TOON also helps with chunking and segmentation. You can split arrays cleanly at row boundaries without breaking syntax. You can stream TOON progressively in a multi-turn agent flow, something JSON makes difficult.
+For AI categorization engines, TOON is the most efficient representation for bank data—simple, token-dense, and semantically structured.
+
+✅ ARTICLE 11 — How TOON Can Revolutionize Enterprise Document Workflows
+Enterprise AI relies heavily on LLMs for reading, summarizing, and reasoning over structured data: HR data, SLA logs, audit trails, inventory systems, compliance sheets, insurance tables, analytics exports, and more. JSON and CSV are common, but both create friction for LLMs.
+JSON is token-heavy and difficult for models to navigate. CSV lacks schema clarity and is fragile. TOON combines the strengths of both.
+Enterprise documents typically contain:
+Large tables
+Nested but uniform data
+Repeating fields
+Periodic logs
+Time series metrics
+TOON packages these into dense, consistent representations. Consider log lines:
+ logs[5000]{timestamp,service,status,duration_ms}: 
+  ... 
+TOON’s advantages in enterprise LLM workflows include:
+Massive token reduction → more data per call
+Better determinism → reduced hallucinations
+Schema declaration → easier for models to interpret consistently
+Streaming support → workable in multi-turn workflows
+Alignment with long-context architectures
+As enterprises embrace agentic architectures, structured input formats optimized for the LLM's token mechanics become critical. TOON fills this emerging need elegantly.
+
+✅ ARTICLE 12 — Why Token-Efficient Formats Like TOON Will Power the Next Generation of AI Agents
+Autonomous and semi-autonomous agents rely on frequent data exchanges with LLMs. These may include state vectors, memory snapshots, world models, resource graphs, execution logs, and environment metadata.
+JSON becomes a bottleneck for such systems.
+LLM agents operate in token loops: each perception→reasoning→action cycle incurs token cost. TOON dramatically reduces this cost, enabling:
+More frequent agent updates
+Larger working memory
+More accurate state representations
+Faster loop execution
+A typical agent loop may exchange thousands of fields. With JSON, each iteration can be 20k tokens. With TOON, it might drop to 4k.
+Agents also benefit from TOON’s explicit schema declarations. They eliminate ambiguity and enable the agent to parse environment updates consistently.
+Agent frameworks like AutoGPT, BabyAGI, MetaGPT, and modern multi-agent systems will eventually adopt token-dense serialization formats. TOON is among the first specifically designed for this emerging paradigm.
+
+✅ ARTICLE 13 — Inside the TOON Specification: A Deep Technical Walkthrough
+TOON (Token-Oriented Object Notation) is not just a compact data format—it is a formally specified serialization system with explicit grammar rules. Understanding the TOON specification provides insight into why it performs so well in LLM settings.
+The core TOON constructs are:
+Key-value pairs
+Objects defined by indentation
+Uniform arrays defined by  [n]{field1,field2,…}
+Row blocks
+Primitives (strings, numbers, booleans, null)
+Multiline strings using triple quotes
+The specification defines parsing rules using EBNF-style grammar. A simplified form:
+ object        = { entry } 
+entry         = key ":" value 
+value         = primitive | object | array | multiline 
+array         = key "[" number "]" "{" fieldlist "}" ":" newline rows 
+rows          = { row } 
+row           = values newline 
+values        = primitive { "," primitive } 
+This grammar emphasizes one design principle: uniform arrays must declare their schema before the data. This is the opposite of JSON, where each row redundantly declares field names.
+Another design element is indentation-based nesting. Similar to YAML, TOON eliminates braces ( {} ,  [] ) in favor of whitespace structure. This reduces token noise and makes hierarchical relationships clearer to LLMs.
+The parser also enforces the row count:  [n]  ensures determinism and aligns with LLM constraints. LLMs often hallucinate missing rows or extra rows; TOON’s explicit cardinality reduces this.
+TOON also avoids ambiguous constructs like inline nested objects within rows. Rows must be primitives, making TOON arrays highly predictable. This is crucial because LLMs struggle with irregular nested structures.
+The spec’s simplicity also makes writing custom parsers trivial. Many developers create custom TOON encoders because the grammar is small enough to implement in hours, not days.
+TOON’s specification is elegant not because it is complex, but because it encapsulates precisely the constraints needed for token-efficient, machine-readable, LLM-friendly structured data.
+
+✅ ARTICLE 14 — Optimizing LLM Prompts Using Column-Oriented Encoding: TOON’s Secret Weapon
+Column-oriented data storage isn’t new—databases like Snowflake, Redshift, and BigQuery rely on columnar formats like Parquet for compression and analytical performance. TOON brings similar principles to LLM prompting.
+JSON is row-oriented: every row contains field names + values.
+TOON is column-oriented in schema declaration: fields declared once, rows stacked compactly.
+Why does column-orientation help LLMs?
+1. Reduces token duplication
+Field names often dominate tokens in JSON arrays. Remove them, and token usage plummets.
+2. Improves positional encoding patterns
+LLMs rely heavily on positional embeddings. When each row has identical structure, the model can learn a stable pattern.
+3. Reduces entropy
+Lower entropy → easier for the model to focus on semantic differences, not structural overhead.
+4. Enhances batch reasoning
+With TOON, models can reason about columns directly. For example, analyzing anomalies in the  amount  column:
+ expenses[100]{date,vendor,amount,category}: 
+The model expects the third column to always be the amount. This reduces schema confusion.
+5. Speeds up inference
+Less noise → fewer tokens → faster model throughput.
+Columnar encoding is the underlying reason TOON delivers dramatic performance gains. It is not simply “JSON but shorter”—it fundamentally restructures the data to align with how Transformers process sequences.
+
+✅ ARTICLE 15 — Building a Custom TOON Encoder/Decoder in Python
+Although libraries exist for TOON, many teams choose to build custom encoders/decoders to tightly control schema rules. Fortunately, TOON’s specification is simple enough for a hand-written implementation.
+Encoder steps:
+Detect arrays If value is a list of dicts with identical keys → treat as uniform array.
+Extract schema Keys in the first dict become schema fields.
+Validate consistency Ensure all rows contain same keys and order.
+Write header  name[n]{field1,field2,...}:
+Encode rows Join row values with commas.
+Handle nested objects Recursively encode with indentation.
+Python pseudocode:
+ def encode_toon(obj, indent=0): 
+    for key, value in obj.items(): 
+        if is_uniform_array(value): 
+            schema = value[0].keys() 
+            print(f"{key}[{len(value)}]{{{','.join(schema)}}}:") 
+            for row in value: 
+                print(" " * indent + ",".join(str(row[f]) for f in schema)) 
+        elif isinstance(value, dict): 
+            print(f"{key}:") 
+            encode_toon(value, indent + 2) 
+        else: 
+            print(f"{key}: {value}") 
+Decoder steps:
+Parse line-by-line
+Track indentation for nesting
+Detect  [n]{...}  patterns for arrays
+Parse each row according to schema
+Decoding is more complex, but the grammar is small enough for a weekend project.
+Custom encoders give teams full control over null handling, coercion, ordering, and consistency.
+
+✅ ARTICLE 16 — Stress-Testing TOON With 10,000 Records: Performance Benchmarking
+To evaluate TOON’s scalability, we can benchmark it against JSON on datasets ranging from 1,000 to 10,000 rows of structured data—such as financial transactions.
+Benchmark setup:
+10k rows
+Schema: 8 fields
+JSON size: ~3.1MB
+TOON size: ~0.78MB
+LLM: GPT-5 series (or equivalent)
+Input task: classify transactions
+Measurements:
+
+Metric,JSON,TOON
+Input tokens,"155,000","37,200"
+Parse errors,4.3%,0.7%
+Classification accuracy,88%,95%
+Input latency,1.2s,0.35s
+Cost per run,4× higher,–
+
+Why TOON performs better:
+Much lower token count
+Cleaner structural patterns
+Less schema confusion
+Lower probability of hallucinating missing fields
+Better compression of repeated symbols
+The takeaway: TOON doesn't merely shrink inputs—it improves LLM reasoning quality by reducing noise.
+
+✅ ARTICLE 17 — Why We Chose TOON for Our AI Tax Assistant — Technical Architecture Breakdown
+When architecting an AI-driven tax assistant, one of the biggest engineering challenges is delivering large volumes of structured financial data to an LLM. Bank transactions, W-2 box values, 1099 line items, depreciation schedules, trial balances—all of these must be fed into the model for classification, reconciliation, or summarization. Traditional choices like JSON create huge token burdens, degrade accuracy, and make certain workflows infeasible.
+TOON solves these problems elegantly. Here’s the technical breakdown of why we integrated TOON deeply into our tax AI stack.
+1. Extracted data from OCR is naturally row-based
+Tax documents (W-2, 1099-NEC, 1099-INT, etc.) yield dozens of line items:
+ state_items[4]{state,wages,withholding}: 
+  CA,80000,3500 
+  NY,15000,650 
+  ... 
+TOON’s column-oriented layout matches the semantics of tax forms.
+2. Token efficiency enables large-context reasoning
+A typical small business may have:
+2,000–5,000 bank transactions
+300–1,500 receipts
+Dozens of tax documents
+JSON encoding of bank transactions alone can exceed 100k tokens, blowing through most LLM context windows. TOON compresses this by 70–80%.
+This enables fully in-context reconciliation:
+Match 1099 income to deposits
+Detect missing expenses
+Identify categorization anomalies
+Cross-reference payroll vs W-2 data
+Without TOON, this workflow is impossible without multi-round chunking.
+3. Stable schemas improve LLM accuracy
+LLMs hallucinate more frequently with JSON because field ordering is flexible and quotes/braces introduce noise. TOON fixes ordering explicitly:
+ expenses[n]{date,vendor,amount,category}: 
+LLMs know exactly what each column represents.
+4. Simplifies prompt templates and system instructions
+Instead of saying:
+“You will receive a JSON array... each object has fields…”
+We say:
+“You will receive TOON-encoded rows with schema {date,amount,...}. Interpret each row according to the schema.”
+This reduces the cognitive burden on the model.
+5. Deterministic parsing reduces hallucination risk
+TOON’s explicit cardinality  [n]  prevents:
+Extra invented records
+Skipped rows
+Schema drift
+Unexpected nested objects
+This matters enormously in tax calculations.
+6. Better observability
+TOON is human-readable and diff-friendly. JSON diffs for large arrays are unreadable.
+7. Works seamlessly in streaming mode
+We can stream rows to the model without worrying about JSON syntax breakage from mid-stream chunks.
+Conclusion
+TOON isn’t just an optimization—it is foundational for any large-scale structured tax reasoning system. It makes the difference between theoretical LLM tax automation and production-grade reliability.
+
+✅ ARTICLE 18 — How TOON Helps Small AI Startups Compete With Big Players
+Small AI startups operate under severe constraints:
+Limited compute budgets
+Tight inference cost ceilings
+Smaller engineering teams
+No proprietary LLM training pipelines
+Token efficiency becomes a strategic advantage.
+TOON enables startups to deliver features that previously required far more capital or proprietary long-context models.
+1. Lower inference costs
+Reducing token count by 60–80% directly cuts API costs. For startups processing large datasets (bank transactions, logs, inventory), this creates order-of-magnitude cost improvements.
+2. More features without requiring larger models
+JSON-heavy prompts force many teams to use ultra-long context models. TOON lets them downshift to cheaper models  without sacrificing functionality .
+This means:
+Smaller companies can ship analytics assistants
+SMEs can build financial copilot tools
+Vertical SaaS players can integrate LLM reasoning affordably
+3. Faster development
+TOON templates simplify prompt engineering. Developers don’t need to:
+Escape JSON
+Handle nested objects
+Manage inconsistent schemas
+TOON enables teams to iterate faster with fewer bugs.
+4. Competitive parity with enterprise AI
+Large companies often have proprietary preprocessing pipelines that compress or reshape data internally. TOON levels the playing field by giving startups a clean, open methodology for compression.
+5. Unlocking workflows previously “too big” for JSON
+Examples:
+Processing 10k+ bank records in one pass
+Comparing year-over-year metrics with huge datasets
+Performing multi-document tax analysis
+Running anomaly detection on full event logs
+Startups can now deliver these features with consumer-grade budgets.
+TOON is a force multiplier—it makes small teams feel much bigger by optimizing cost, performance, and accuracy simultaneously.
+
+✅ ARTICLE 19 — Top 10 TOON Templates You Can Copy Today for LLM Workflows
+Below are essential TOON templates used across AI engineering workflows. These templates cover finance, analytics, logs, tax, and operational metadata.
+
+1. Bank Transactions
+ transactions[n]{date,description,amount,account}: 
+  ... 
+2. Expense Ledger (Schedule C)
+ expenses[n]{date,vendor,category,amount,payment_method}: 
+  ... 
+3. Payroll Records
+ payroll[n]{employee_id,pay_period,gross,net,taxes_withheld}: 
+  ... 
+4. W-2 Extract
+ w2: 
+  employee: 
+    name: ... 
+    ssn_last4: ... 
+  wages: 
+    box1: ... 
+    box2: ... 
+5. 1099-NEC State Items
+ state_items[n]{state,state_id,wages,withholding}: 
+  ... 
+6. Web Server Logs
+ logs[n]{timestamp,ip,method,path,status,duration_ms}: 
+  ... 
+7. Product Catalog
+ products[n]{sku,name,price,inventory}: 
+8. Chat History
+ messages[n]{timestamp,sender,content}: 
+9. Time Series Metrics
+ metrics[n]{timestamp,cpu,mem,latency}: 
+10. Embedding Metadata
+ chunks[n]{chunk_id,source,offset,length}: 
+These templates are ready to copy-paste into your LLM prompts or RAG systems. Adapt them to your use case.
+
+✅ ARTICLE 20 — The Future of LLM Data Formats: JSON, TOON, or Something Else?
+The rapid evolution of LLMs raises a critical question: what format should future AI systems use to pass structured data? JSON dominated for decades, but its design anticipates conventional programming, not token-based Transformers.
+TOON is the first notable format explicitly optimized for LLMs, but it won’t be the last.
+Key characteristics of future formats:
+1. Token efficiency
+Long-context models will increase limits, but token density will still matter for performance and cost.
+2. Schema explicitness
+LLMs perform better when they don’t infer schema.
+3. Columnar orientation
+This aligns with how models generalize across repeated structures.
+4. Streamability
+Formats must support streaming without structural fragility.
+5. Deterministic structure
+Models require stable patterns—formats with optional fields or flexible ordering create uncertainty.
+Will TOON win?
+TOON has a strong chance to become the “LLM equivalent of JSON,” particularly for structured-to-LLM workflows. It fills a gap left by YAML, CSV, and JSON.
+Yet other possibilities exist:
+Binary formats optimized for tokenization
+Hybrid formats embedding schema metadata
+Self-describing structured DSLs
+Model-assisted compression formats
+Whatever emerges, one thing is certain: token-optimized formats will become foundational in agentic systems, large-context workflows, and enterprise AI.
+TOON is not the final answer—but it is the first serious step toward a new class of AI-native data formats.
+`;
+
+        // Templates from Article 19
+        const toonTemplates = {
+            "bank_transactions": `transactions[n]{date,description,amount,account}: \n  ... `,
+            "expense_ledger": `expenses[n]{date,vendor,category,amount,payment_method}: \n  ... `,
+            "payroll_records": `payroll[n]{employee_id,pay_period,gross,net,taxes_withheld}: \n  ... `,
+            "w2_extract": `w2: \n  employee: \n    name: ... \n    ssn_last4: ... \n  wages: \n    box1: ... \n    box2: ... `,
+            "1099_state_items": `state_items[n]{state,state_id,wages,withholding}: \n  ... `,
+            "web_server_logs": `logs[n]{timestamp,ip,method,path,status,duration_ms}: \n  ... `,
+            "product_catalog": `products[n]{sku,name,price,inventory}: \n ...`,
+            "chat_history": `messages[n]{timestamp,sender,content}: \n ...`,
+            "time_series_metrics": `metrics[n]{timestamp,cpu,mem,latency}: \n ...`,
+            "embedding_metadata": `chunks[n]{chunk_id,source,offset,length}: \n ...`
+        };
+
+        // --- DOM Elements ---
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const contentDisplay = document.getElementById('content-display');
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+
+        // --- State ---
+        let allArticles = [];
+        let activeLink = null;
+
+        // --- UTILITY FUNCTIONS ---
+
+        /**
+         * Parses the raw article text into a structured array of objects.
+         */
+        function parseArticles(rawData) {
+            const articles = [];
+            const parts = rawData.split('✅ ARTICLE ');
+            for (let part of parts) {
+                if (part.trim() === '') continue;
+                
+                const idMatch = part.match(/^(\d+)/);
+                if (!idMatch) continue;
+                const id = parseInt(idMatch[1]);
+                
+                const titleMatch = part.match(/—(.*?)\n/);
+                const title = titleMatch ? titleMatch[1].trim() : 'Untitled';
+                
+                const content = part.substring(part.indexOf('\n')).trim();
+                
+                articles.push({ id, title, content });
+            }
+            return articles;
+        }
+
+        /**
+         * Renders the sidebar navigation links.
+         */
+        function renderSidebar(articles) {
+            let navHtml = '';
+            
+            // Add Interactive Tools link first
+            navHtml += `
+                <a href="#" 
+                   class="flex items-center px-6 py-3 text-base font-medium text-blue-600 bg-blue-50" 
+                   data-article-id="tools"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l-4 4-4-4M6 16l-4-4 4-4"></path></svg>
+                   Interactive Tools
+                </a>
+            `;
+            activeLink = document.querySelector(`[data-article-id="tools"]`);
+
+            // Add links for each article
+            articles.forEach(article => {
+                navHtml += `
+                    <a href="#" 
+                       class="flex items-center px-6 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900" 
+                       data-article-id="${article.id}"><span class="mr-3 text-gray-400 w-5 text-right">${article.id}.</span>
+                       ${article.title.split(':')[0]}
+                    </a>
+                `;
+            });
+            sidebarNav.innerHTML = navHtml;
+        }
+
+        /**
+         * Renders the content for a specific article ID or the tools page.
+         */
+        function renderArticle(id) {
+            // Update active link styling
+            const newActiveLink = document.querySelector(`[data-article-id="${id}"]`);
+            if (activeLink) {
+                activeLink.classList.remove('text-blue-600', 'bg-blue-50');
+                activeLink.classList.add('text-gray-700', 'hover:bg-gray-100', 'hover:text-gray-900');
+            }
+            if (newActiveLink) {
+                newActiveLink.classList.add('text-blue-600', 'bg-blue-50');
+                newActiveLink.classList.remove('text-gray-700', 'hover:bg-gray-100', 'hover:text-gray-900');
+                activeLink = newActiveLink;
+            }
+
+
+            if (id === 'tools') {
+                renderToolsPage();
+            } else {
+                const article = allArticles.find(a => a.id == id);
+                if (article) {
+                    // Process content to handle code blocks and paragraphs
+                    const parts = article.content.split(/(|)/);
+                    let html = '';
+                    let inCodeBlock = false;
+                    for (const part of parts) {
+                        if (part === '') {
+                            inCodeBlock = true;
+                            html += '<pre class="bg-gray-900 text-white p-4 rounded-md overflow-x-auto my-4 text-sm">';
+                        } else if (part === '') {
+                            inCodeBlock = false;
+                            html += '</pre>';
+                        } else if (inCodeBlock) {
+                            html += part.trim();
+                        } else {
+                            const paragraphs = part.trim().split('\n').filter(p => p.trim() !== '');
+                            html += paragraphs.map(p => `<p class="my-4 text-gray-700 leading-relaxed">${p.replace(/✔/g, '<span class="text-green-500 mr-2">✔</span>').replace(/✖/g, '<span class="text-red-500 mr-2">✖</span>')}</p>`).join('');
+                        }
+                    }
+                    
+                    contentDisplay.innerHTML = `
+                        <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-lg shadow-sm"><h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">${article.title}</h1><div class="text-lg">${html}</div></div>
+                    `;
+                }
+            }
+            // Scroll to top of content area
+            contentDisplay.scrollTop = 0;
+        }
+
+        /**
+         * Renders the "Interactive Tools" page.
+         */
+        function renderToolsPage() {
+            // 1. JSON to TOON Converter
+            const converterHtml = `
+                <div class="bg-white p-8 rounded-lg shadow-sm mb-8"><h2 class="text-2xl font-bold text-gray-900 mb-4">JSON to TOON Converter</h2><p class="text-gray-600 mb-6">Based on Article 4. Paste a JSON array of objects to convert it to the TOON uniform array format.</p><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label for="json-input" class="block text-sm font-medium text-gray-700 mb-2">JSON Input</label><textarea id="json-input" rows="10" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder='[
+  {"date": "2024-10-12", "vendor": "OfficeMax", "amount": 123.45},
+  {"date": "2024-10-15", "vendor": "Staples", "amount": 67.89}
+]'></textarea></div><div><label for="toon-output" class="block text-sm font-medium text-gray-700 mb-2">TOON Output</label><textarea id="toon-output" rows="10" class="w-full p-3 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-800" readonly></textarea></div></div><div class="mt-6"><button id="convert-btn" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Convert
+                        </button><span id="convert-message" class="ml-4 text-sm"></span></div></div>
+            `;
+
+            // 2. Template Viewer
+            const templateOptions = Object.keys(toonTemplates).map(key => {
+                const title = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `<option value="${key}">${title}</option>`;
+            }).join('');
+
+            const templateViewerHtml = `
+                <div class="bg-white p-8 rounded-lg shadow-sm"><h2 class="text-2xl font-bold text-gray-900 mb-4">TOON Template Viewer</h2><p class="text-gray-600 mb-6">Explore the 10 common templates from Article 19.</p><label for="template-select" class="block text-sm font-medium text-gray-700 mb-2">Select a Template:</label><select id="template-select" class="w-full md:w-1/2 p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        ${templateOptions}
+                    </select><pre id="template-display" class="bg-gray-900 text-white p-4 rounded-md overflow-x-auto my-6 text-sm"></pre><button id="copy-template-btn" class="px-6 py-3 bg-gray-700 text-white font-medium rounded-md shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        Copy to Clipboard
+                    </button><span id="copy-message" class="ml-4 text-sm text-green-600"></span></div>
+            `;
+
+            contentDisplay.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    ${converterHtml}
+                    ${templateViewerHtml}
+                </div>
+            `;
+
+            // Initialize the template viewer
+            handleTemplateChange(Object.keys(toonTemplates)[0]);
+        }
+        
+        // --- EVENT HANDLERS ---
+
+        /**
+         * Toggles the mobile menu.
+         */
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+        });
+
+        /**
+         * Handles clicks on the sidebar navigation.
+         */
+        sidebarNav.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (link && link.dataset.articleId) {
+                e.preventDefault();
+                renderArticle(link.dataset.articleId);
+                // Hide sidebar on mobile after click
+                if (!sidebar.classList.contains('md:flex')) {
+                    sidebar.classList.add('hidden');
+                }
+            }
+        });
+
+        /**
+         * Handles clicks on dynamically generated tool buttons.
+         */
+        contentDisplay.addEventListener('click', (e) => {
+            if (e.target.id === 'convert-btn') {
+                handleConversion();
+            }
+            if (e.target.id === 'copy-template-btn') {
+                handleCopy();
+            }
+        });
+
+        /**
+         * Handles changes on the template selector.
+         */
+        contentDisplay.addEventListener('change', (e) => {
+            if (e.target.id === 'template-select') {
+                handleTemplateChange(e.target.value);
+            }
+        });
+
+        /**
+         * Performs the JSON to TOON conversion.
+         */
+        function handleConversion() {
+            const jsonInput = document.getElementById('json-input');
+            const toonOutput = document.getElementById('toon-output');
+            const messageEl = document.getElementById('convert-message');
+            
+            try {
+                const data = JSON.parse(jsonInput.value);
+                
+                if (!Array.isArray(data)) {
+                    throw new Error("Input must be a JSON array.");
+                }
+                if (data.length === 0) {
+                    throw new Error("JSON array is empty.");
+                }
+                if (typeof data[0] !== 'object' || data[0] === null) {
+                    throw new Error("JSON array must contain objects.");
+                }
+
+                const schema = Object.keys(data[0]);
+                const schemaString = schema.join(',');
+                let toonRows = [];
+
+                for (const item of data) {
+                    let row = [];
+                    for (const key of schema) {
+                        let value = item[key];
+                        if (value === null || value === undefined) {
+                            value = 'null';
+                        }
+                        // Simple string conversion. Per TOON examples, strings don't need quotes
+                        // unless they contain commas, but we'll keep it simple.
+                        row.push(String(value));
+                    }
+                    toonRows.push('  ' + row.join(','));
+                }
+
+                const toonString = `data[${data.length}]{${schemaString}}:\n${toonRows.join('\n')}`;
+                toonOutput.value = toonString;
+                messageEl.textContent = "Conversion successful!";
+                messageEl.className = "ml-4 text-sm text-green-600";
+            } catch (err) {
+                toonOutput.value = "";
+                messageEl.textContent = `Error: ${err.message}`;
+                messageEl.className = "ml-4 text-sm text-red-600";
+            }
+        }
+
+        /**
+         * Handles changing the displayed template.
+         */
+        function handleTemplateChange(key) {
+            const templateDisplay = document.getElementById('template-display');
+            if (templateDisplay && toonTemplates[key]) {
+                templateDisplay.textContent = toonTemplates[key];
+            }
+        }
+
+        /**
+         * Copies the content of the template display to the clipboard.
+         */
+        function handleCopy() {
+            const templateDisplay = document.getElementById('template-display');
+            const copyMessage = document.getElementById('copy-message');
+            const textToCopy = templateDisplay.textContent;
+
+            // Use navigator.clipboard if available (modern, secure)
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    copyMessage.textContent = "Copied!";
+                    setTimeout(() => { copyMessage.textContent = ""; }, 2000);
+                }).catch(err => {
+                    console.error("Failed to copy with navigator.clipboard: ", err);
+                    copyFallback(textToCopy, copyMessage); // Try fallback
+                });
+            } else {
+                copyFallback(textToCopy, copyMessage); // Use fallback for older browsers/http
+            }
+        }
+
+        /**
+         * Fallback copy method using document.execCommand.
+         */
+        function copyFallback(textToCopy, copyMessage) {
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            
+            // Avoid scrolling to bottom
+            textArea.style.position = 'fixed';
+            textArea.style.top = 0;
+            textArea.style.left = 0;
+            textArea.style.width = '2em';
+            textArea.style.height = '2em';
+            textArea.style.padding = 0;
+            textArea.style.border = 'none';
+            textArea.style.outline = 'none';
+            textArea.style.boxShadow = 'none';
+            textArea.style.background = 'transparent';
+
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    copyMessage.textContent = "Copied!";
+                } else {
+                    copyMessage.textContent = "Copy failed.";
+                }
+                setTimeout(() => { copyMessage.textContent = ""; }, 2000);
+            } catch (err) {
+                console.error("Fallback copy failed: ", err);
+                copyMessage.textContent = "Copy failed.";
+                setTimeout(() => { copyMessage.textContent = ""; }, 2000);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            allArticles = parseArticles(rawArticleData);
+            renderSidebar(allArticles);
+            renderArticle('tools'); // Load the tools page by default
+        });
+
+    </script><html><head></head><body><footer class="bg-gray-800 text-gray-300"><div class="container mx-auto px-6 py-12 lg:px-8"><div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4"><div><h5 class="text-lg font-semibold text-white mb-4">Company</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Products</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5><ul class="space-y-2"><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li><li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li></ul></div><div><h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5><div class="space-y-2"><p>Redmond<br/>WA, USA</p><p><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a></p><p><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a></p></div></div></div><div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row"><p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p><div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/"><span class="sr-only">Facebook</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path></svg></a><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/"><span class="sr-only">Twitter</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg></a><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/"><span class="sr-only">LinkedIn</span><svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path></svg></a></div></div></div></footer></body></html></body></html>

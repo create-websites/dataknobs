@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Report: The Weak Supervision Framework</title>
+    <!-- Chosen Palette: Earthy Neutral -->
+    <!-- Application Structure Plan: The SPA is structured as a narrative journey through weak supervision. It begins with the high-level problem (labeling bottleneck), introduces weak supervision as the solution, then interactively deconstructs its core components (types of weakness, the two-stage model), offers a practical "lab" for understanding labeling functions, explores the modern LLM-driven paradigm, and concludes by showing how it integrates with other data-centric AI techniques. This thematic, guided-tour structure was chosen to make a complex, academic topic accessible and engaging, encouraging exploration rather than linear reading. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Comparative Analysis of ML Paradigms (Table 1) -> Goal: Compare -> Viz/Method: Interactive cards with hover effects and a comparative donut chart (Chart.js) -> Interaction: Hovering a card highlights its slice on the chart representing relative annotation cost. -> Justification: More dynamic and less dense than a static table, immediately visualizing the key pain point weak supervision solves.
+        - Report Info: Taxonomy of Weakness (Incomplete, Inexact, Inaccurate) -> Goal: Organize/Inform -> Viz/Method: Clickable tabs built with HTML/CSS/JS -> Interaction: User clicks a type of weakness to reveal its definition and solution. -> Justification: Breaks down a core concept into digestible, user-controlled chunks.
+        - Report Info: The Weak Supervision Pipeline (LF dev -> Label Model -> End Model) -> Goal: Organize/Inform -> Viz/Method: A central, multi-stage diagram built with HTML/Tailwind CSS. -> Interaction: Clicking on each stage reveals more detailed information in a separate panel. -> Justification: Provides a clear visual anchor for the entire process. NO SVG/Mermaid used.
+        - Report Info: Typology of LFs (Table 2) -> Goal: Compare -> Viz/Method: A Radar Chart (Chart.js) comparing LF types across Precision, Coverage, and Development Effort. -> Interaction: Checkboxes to toggle different LF types on the chart. -> Justification: Visually communicates the multi-dimensional trade-offs in LF development more effectively than a table. Chart.js on Canvas used.
+        - Report Info: LLMs as LFs & The Correlation Problem -> Goal: Explain/Compare -> Viz/Method: A side-by-side comparison using styled cards. Visualized the correlation with a simple matrix-like diagram made with HTML divs. -> Justification: Clearly contrasts the old vs. new way of creating LFs and visualizes a key technical challenge. NO SVG/Mermaid used.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+            color: #292524; /* stone-800 */
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #0d9488; /* teal-600 */
+            border-bottom-color: #0d9488;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 350px;
+            max-height: 45vh;
+            width: 100%;
+            max-width: 500px;
+        }
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-button.active {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+        }
+        .pipeline-step {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .pipeline-step.active {
+            transform: scale(1.05);
+            border-color: #0d9488; /* teal-600 */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <header class="py-6 border-b border-stone-200">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-stone-900">The Weak Supervision Framework</h1>
+                    <p class="mt-1 text-lg text-stone-600">Programmatic Data Labeling in the Era of LLMs</p>
+                </div>
+                <nav class="mt-4 md:mt-0 flex flex-wrap justify-center space-x-4 sm:space-x-6" id="main-nav">
+                    <a class="nav-link py-2 text-sm sm:text-base font-medium text-stone-600" href="#intro">Introduction</a>
+                    <a class="nav-link py-2 text-sm sm:text-base font-medium text-stone-600" href="#anatomy">Anatomy</a>
+                    <a class="nav-link py-2 text-sm sm:text-base font-medium text-stone-600" href="#workflow">Workflow</a>
+                    <a class="nav-link py-2 text-sm sm:text-base font-medium text-stone-600" href="#lab">LF Lab</a>
+                    <a class="nav-link py-2 text-sm sm:text-base font-medium text-stone-600" href="#llms">LLM Era</a>
+                    <a class="nav-link py-2 text-sm sm:text-base font-medium text-stone-600" href="#synergy">Synergy</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="py-8 md:py-12">
+            
+            <!-- Section 1: Intro -->
+            <section class="content-section" id="intro">
+                <div class="fade-in text-center">
+                    <h2 class="text-2xl font-bold text-stone-900 mb-4">The Data Labeling Bottleneck</h2>
+                    <p class="text-lg text-stone-700 mb-8 max-w-3xl mx-auto">The modern AI era demands extensive labeled data, yet manual labeling is a slow, costly, and expert-intensive process. This section presents Weak Supervision, a method designed to overcome this data bottleneck through the programmatic generation of expansive training datasets.</p>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div class="text-left space-y-4">
+                           <div class="bg-white p-6 rounded-lg shadow-sm border border-stone-200 transition-all duration-300 hover:shadow-md hover:-translate-y-1" data-paradigm="supervised">
+                                <h3 class="font-bold text-teal-800">Supervised Learning</h3>
+                                <p class="text-sm text-stone-600">Relies on massive, perfectly labeled "gold" datasets. Extremely high cost.</p>
+                           </div>
+                           <div class="bg-white p-6 rounded-lg shadow-sm border border-stone-200 transition-all duration-300 hover:shadow-md hover:-translate-y-1" data-paradigm="semi-supervised">
+                                <h3 class="font-bold text-teal-800">Semi-Supervised &amp; Active Learning</h3>
+                                <p class="text-sm text-stone-600">Leverage a small, annotated data subset to train on a large, unlabeled dataset. Moderate expense.</p>
+                           </div>
+                           <div class="bg-white p-6 rounded-lg shadow-sm border border-stone-200 transition-all duration-300 hover:shadow-md hover:-translate-y-1" data-paradigm="weak-supervision">
+                                <h3 class="font-bold text-teal-800">Weak Supervision</h3>
+                                <p class="text-sm text-stone-600">Here are a few options, keeping the size roughly similar:
+
+*   Employs quick, imprecise rules to auto-tag data.  Inexpensive.
+
+*   Leverages fast, rule-based methods for data labeling. Cost-effective.
+
+*   Applies rough, automated rules to label data cheaply.</p>
+                           </div>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-center mb-4">Relative Annotation Cost</h3>
+                            <div class="chart-container" style="height: 300px; max-height: 300px;">
+                                <canvas id="paradigmChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Anatomy -->
+            <section class="content-section" id="anatomy">
+                <div class="fade-in">
+                    <h2 class="text-2xl font-bold text-stone-900 mb-4 text-center">Anatomy of Weakness</h2>
+                    <p class="text-lg text-stone-700 mb-8 text-center max-w-3xl mx-auto">Supervision's "weakness" isn't simple. It's a structured classification of label flaws. Identifying the specific type of imperfection is key to selecting the appropriate fix. Explore each category for details.</p>
+                    
+                    <div class="bg-white rounded-lg shadow-md border border-stone-200 p-2">
+                        <div class="flex border-b border-stone-200">
+                            <button class="tab-button flex-1 py-3 px-4 font-semibold text-stone-600 rounded-t-md" data-tab="incomplete">Incomplete</button>
+                            <button class="tab-button flex-1 py-3 px-4 font-semibold text-stone-600 rounded-t-md" data-tab="inexact">Inexact</button>
+                            <button class="tab-button flex-1 py-3 px-4 font-semibold text-stone-600 rounded-t-md" data-tab="inaccurate">Inaccurate</button>
+                        </div>
+                        <div class="p-6 min-h-[150px]" id="tab-content">
+                            <!-- Content loaded by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 3: Workflow -->
+            <section class="content-section" id="workflow">
+                <div class="fade-in">
+                    <h2 class="text-2xl font-bold text-stone-900 mb-4 text-center">The Programmatic Workflow</h2>
+                    <p class="text-lg text-stone-700 mb-8 text-center max-w-3xl mx-auto">This modern approach uses a two-step process: (1) a generative model cleans and combines labeling heuristics; (2) a discriminative model trains on the resulting probabilistic labels for generalization. Click to explore each stage.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 items-start">
+                        <div class="flex flex-col items-center justify-around space-y-4">
+                           <div class="pipeline-step bg-white p-6 rounded-lg shadow-md border-2 border-transparent w-full" id="step-1">
+                               <h3 class="font-bold text-lg text-teal-800">① Develop Labeling Functions (LFs)</h3>
+                               <p class="text-sm text-stone-600">Here are a few options, all similar in length:
+
+*   Experts use code (heuristics, regex) to tag data with domain knowledge.
+*   Domain experts leverage code (heuristics, regex) for programmatic data labeling.
+*   Data is labeled programmatically using expert-coded rules (heuristics, regex).
+*   Domain knowledge is encoded into code (heuristics, regex) to label data.</p>
+                           </div>
+                           <div class="text-2xl text-stone-400">↓</div>
+                           <div class="pipeline-step bg-white p-6 rounded-lg shadow-md border-2 border-transparent w-full" id="step-2">
+                               <h3 class="font-bold text-lg text-teal-800">② Train Generative Label Model</h3>
+                               <p class="text-sm text-stone-600">By learning LF performance, the model generates a single, refined probabilistic label for each data instance.</p>
+                           </div>
+                            <div class="text-2xl text-stone-400">↓</div>
+                           <div class="pipeline-step bg-white p-6 rounded-lg shadow-md border-2 border-transparent w-full" id="step-3">
+                               <h3 class="font-bold text-lg text-teal-800">③ Train Discriminative End Model</h3>
+                               <p class="text-sm text-stone-600">Here are a few options, all similar in length and conveying the same general idea:
+
+*   A strong model (like a transformer) learns feature-rich representations by training on probabilistic labels.
+*   By training on probabilistic labels, a robust model (e.g., a transformer) extracts rich features for generalization.
+*   To learn rich features and generalize, a powerful model (such as a transformer) is trained using probabilistic labels.
+*   Probabilistic labels enable a powerful model, such as a transformer, to learn rich features and generalize effectively.</p>
+                           </div>
+                        </div>
+                        <div class="bg-teal-50 border-l-4 border-teal-500 p-6 rounded-r-lg text-stone-700 min-h-[300px] sticky top-8" id="pipeline-description">
+                             Select a step on the left to see details.
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 4: LF Lab -->
+            <section class="content-section" id="lab">
+                <div class="fade-in">
+                    <h2 class="text-2xl font-bold text-stone-900 mb-4 text-center">The Labeling Function (LF) Lab</h2>
+                    <p class="text-lg text-stone-700 mb-8 text-center max-w-3xl mx-auto">Weak supervision hinges on Labeling Functions (LFs), code that automatically labels data. Success with LFs depends on balancing precision (label accuracy), coverage (data labeled), and development effort. Compare different LF types using the toggles provided.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 items-center bg-white p-6 rounded-lg shadow-lg border border-stone-200">
+                        <div>
+                            <div class="chart-container">
+                                <canvas id="lfChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="space-y-2" id="lf-toggles">
+                             <h3 class="font-bold text-lg text-stone-800 mb-2">Compare LF Types:</h3>
+                            <!-- Toggles generated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 5: LLMs -->
+            <section class="content-section" id="llms">
+                 <div class="fade-in">
+                    <h2 class="text-2xl font-bold text-stone-900 mb-4 text-center">The LLM Revolution</h2>
+                    <p class="text-lg text-stone-700 mb-8 text-center max-w-3xl mx-auto">Here's a concise rewrite, similar in length:
+
+LLMs represent flexible labeling tools, replacing code with prompts. This reduces access barriers, but presents new challenges, particularly regarding correlation effects.</p>
+                    
+                     <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                            <h3 class="font-bold text-lg text-teal-800 mb-3">Traditional vs. Prompted LFs</h3>
+                             <p class="mb-4 text-stone-600">The shift from code to prompts democratizes weak supervision.</p>
+                             <div class="mb-4">
+                                <strong class="text-sm text-stone-500">TRADITIONAL (CODE)</strong>
+                                <code class="block bg-stone-100 p-2 rounded text-sm mt-1">if re.search("review.*horrible", text): return "NEGATIVE"</code>
+                             </div>
+                             <div>
+                                <strong class="text-sm text-stone-500">MODERN (PROMPT)</strong>
+                                <p class="block bg-stone-100 p-2 rounded text-sm mt-1">"Is the following review NEGATIVE? Review: [...]"</p>
+                             </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                            <h3 class="font-bold text-lg text-teal-800 mb-3">The Correlation Challenge</h3>
+                            <p class="text-stone-600">Given their shared LLM origin, prompt-induced errors exhibit strong correlation.  Therefore, advanced methods, such as a Structure Refining Module, are essential to address these dependencies by examining prompt similarity.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Synergy -->
+            <section class="content-section" id="synergy">
+                <div class="fade-in">
+                    <h2 class="text-2xl font-bold text-stone-900 mb-4 text-center">Synergistic AI: A Unified Approach</h2>
+                    <p class="text-lg text-stone-700 mb-8 text-center max-w-3xl mx-auto">Weak Supervision is a key component of data-centric AI. It integrates with methods like Active Learning and data augmentation, creating valuable collaborative effects within the toolkit.</p>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-teal-500">
+                            <h3 class="font-bold text-lg text-teal-800">Weak Supervision</h3>
+                            <p class="text-stone-600 mt-2"><strong>Role:</strong> Generate Labels. <br/>Here are a few options, all similar in length and capturing the essence of the original:
+
+*   Generates a noisy, large training set from unlabeled data, inexpensively.
+*   Leverages unlabeled data to produce a large, affordable, and labeled dataset.
+*   Transforms unlabeled data into a cost-effective, noisy training corpus.
+*   Creates a large, inexpensive training dataset by labeling unlabeled data imperfectly.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-teal-500">
+                             <h3 class="font-bold text-lg text-teal-800">Active Learning</h3>
+                            <p class="text-stone-600 mt-2"><strong>Role:</strong> Select Data. <br/>Here are a few options, all similar in length and meaning:
+
+*   **Chooses key data for efficient, high-quality human labeling.**
+*   **Smartly picks valuable data points for costly, manual labeling.**
+*   **Optimizes data selection for precise, expensive human annotation.**
+*   **Strategically finds the best data for premium manual labeling.**
+*   **Curates impactful data for detailed, costly human review.**</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-teal-500">
+                             <h3 class="font-bold text-lg text-teal-800">Data Augmentation</h3>
+                            <p class="text-stone-600 mt-2"><strong>Role:</strong> Create Data. <br/>Here are a few options, all similar in length and meaning to the original:
+
+*   **Boosts dataset robustness by transforming labeled data, preserving labels.**
+*   **Enhances labeled datasets' resilience via label-consistent transformations.**
+*   **Improves model robustness by augmenting a labeled set with transformed data.**
+*   **Creates a more robust dataset through label-preserving data transformations.**
+*   **Augments labeled data with label-safe transforms, strengthening dataset quality.**</p>
+                        </div>
+                    </div>
+                     <p class="text-center text-stone-600 mt-8"><strong>Powerful Combination:</strong> Here are a few rewritten options, all roughly the same length and conveying the same meaning:
+
+*   **Begin with Weak Supervision for initial labeling, then refine with Active Learning to correct key errors. Finally, augment the data for a robust final model.**
+
+*   **Label a large dataset using Weak Supervision. Employ Active Learning to pinpoint and rectify labeling inaccuracies. Conclude with Data Augmentation for a well-trained model.**
+
+*   **Leverage Weak Supervision for initial labeling. Employ Active Learning to address critical errors. Then, augment the refined dataset to build a strong, final model.**</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const state = {
+                activeSection: 'intro',
+                tabContent: {
+                    'incomplete': { title: 'Incomplete Supervision', text: 'Here, only a small subset of data has high-quality "gold" labels. The problem is a lack of labels. This is solved with techniques like <strong>Active Learning</strong> (to intelligently acquire more labels) or <strong>Semi-Supervised Learning</strong> (to propagate information from the labeled to unlabeled data).', },
+                    'inexact': { title: 'Inexact Supervision', text: 'The labels are not wrong, but they are too coarse or imprecise for the task. For example, knowing a document is about a "financial event" but not if it\'s a "merger" or "bankruptcy". This is often addressed with <strong>Multi-Instance Learning (MIL)</strong>, which infers specific labels from coarse ones.', },
+                    'inaccurate': { title: 'Inaccurate Supervision', text: 'This is the most common form in programmatic labeling. The labels themselves are noisy and potentially incorrect, coming from multiple conflicting heuristics. This is solved with a <strong>Generative Label Model</strong> (like Snorkel) that learns to denoise and aggregate the weak signals.', },
+                },
+                pipelineDescription: {
+                    'step-1': 'The process begins with human experts writing a set of Labeling Functions (LFs). These are not perfect; they are heuristics that capture domain knowledge, like keyword matches or business rules. The goal is to create a diverse set of noisy but informative signals.',
+                    'step-2': 'This is the core of modern weak supervision. A statistical model analyzes the patterns of agreement and disagreement among all the LFs across the entire dataset. From these patterns, it learns to estimate the accuracy and correlations of each LF—without any ground truth data. It then produces a single, weighted probabilistic label for every data point.',
+                    'step-3': 'The label model alone can\'t generalize to new data it hasn\'t seen. Therefore, a high-capacity discriminative model (like a BERT or Llama model) is trained on the large, probabilistically-labeled dataset. This model learns deep feature representations from the data itself, allowing it to generalize beyond the specific rules defined in the LFs.'
+                },
+                paradigmData: {
+                    labels: ['Supervised', 'Semi-Supervised/Active', 'Weak Supervision'],
+                    datasets: [{
+                        label: 'Relative Annotation Cost',
+                        data: [100, 30, 5],
+                        backgroundColor: ['#f87171', '#fbbf24', '#4ade80'],
+                        borderColor: '#f5f5f4',
+                        borderWidth: 4
+                    }]
+                },
+                lfData: {
+                    labels: ['Precision', 'Coverage', 'Dev Effort'],
+                    datasets: [
+                        { label: 'Keyword/Regex', data: [8, 4, 2], borderColor: '#f87171', backgroundColor: 'rgba(248, 113, 113, 0.2)', hidden: false },
+                        { label: 'Heuristic Rules', data: [7, 7, 7], borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, 0.2)', hidden: false },
+                        { label: 'Distant Supervision', data: [4, 9, 3], borderColor: '#4ade80', backgroundColor: 'rgba(74, 222, 128, 0.2)', hidden: false },
+                        { label: 'Pre-trained Models', data: [6, 8, 1], borderColor: '#60a5fa', backgroundColor: 'rgba(96, 165, 250, 0.2)', hidden: false },
+                        { label: 'LLM Prompts', data: [9, 9, 4], borderColor: '#818cf8', backgroundColor: 'rgba(129, 140, 248, 0.2)', hidden: false },
+                    ]
+                }
+            };
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            let paradigmChart, lfChart;
+
+            function navigateTo(hash) {
+                const targetSectionId = hash.substring(1);
+                state.activeSection = targetSectionId;
+
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === hash);
+                });
+
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetSectionId);
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            window.addEventListener('popstate', () => navigateTo(window.location.hash || '#intro'));
+            document.querySelector('#main-nav').addEventListener('click', (e) => {
+                if (e.target.tagName === 'A') {
+                    e.preventDefault();
+                    const hash = e.target.getAttribute('href');
+                    navigateTo(hash);
+                    window.history.pushState(null, null, hash);
+                }
+            });
+
+            // Section 1: Paradigm Chart
+            const paradigmCtx = document.getElementById('paradigmChart')?.getContext('2d');
+            if (paradigmCtx) {
+                paradigmChart = new Chart(paradigmCtx, {
+                    type: 'doughnut',
+                    data: state.paradigmData,
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                document.querySelectorAll('[data-paradigm]').forEach(card => {
+                    card.addEventListener('mouseenter', (e) => {
+                        const paradigm = e.currentTarget.dataset.paradigm.replace('-', ' ');
+                        const index = state.paradigmData.labels.findIndex(l => l.toLowerCase().includes(paradigm));
+                        if(index > -1) paradigmChart.setActiveElements([{ datasetIndex: 0, index: index }]);
+                        paradigmChart.update();
+                    });
+                     card.addEventListener('mouseleave', () => {
+                        paradigmChart.setActiveElements([]);
+                        paradigmChart.update();
+                    });
+                });
+            }
+
+            // Section 2: Anatomy Tabs
+            const tabContainer = document.querySelector('.tab-button').parentElement;
+            const tabContentEl = document.getElementById('tab-content');
+            tabContainer.addEventListener('click', (e) => {
+                if (e.target.matches('.tab-button')) {
+                    const tabId = e.target.dataset.tab;
+                    tabContainer.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    const content = state.tabContent[tabId];
+                    tabContentEl.innerHTML = `<div class="fade-in"><h3 class="font-bold text-lg text-teal-800 mb-2">${content.title}</h3><p>${content.text}</p></div>`;
+                }
+            });
+            tabContainer.querySelector('.tab-button').click();
+            
+            // Section 3: Workflow
+            const pipelineSteps = document.querySelectorAll('.pipeline-step');
+            const pipelineDescription = document.getElementById('pipeline-description');
+            pipelineSteps.forEach(step => {
+                step.addEventListener('click', () => {
+                    pipelineSteps.forEach(s => s.classList.remove('active'));
+                    step.classList.add('active');
+                    pipelineDescription.innerHTML = `<p class="fade-in">${state.pipelineDescription[step.id]}</p>`;
+                });
+            });
+            pipelineSteps[0].click();
+
+            // Section 4: LF Lab
+            const lfCtx = document.getElementById('lfChart')?.getContext('2d');
+            const lfTogglesContainer = document.getElementById('lf-toggles');
+            if(lfCtx && lfTogglesContainer) {
+                 lfChart = new Chart(lfCtx, {
+                    type: 'radar',
+                    data: state.lfData,
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { r: { beginAtZero: true, max: 10, ticks: { display: false } } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                
+                state.lfData.datasets.forEach((ds, index) => {
+                    const color = ds.borderColor;
+                    lfTogglesContainer.innerHTML += `
+                     <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-stone-100 cursor-pointer">
+                        <input type="checkbox" class="lf-toggle accent-teal-600" data-index="${index}" checked>
+                        <span class="w-4 h-4 rounded-full" style="background-color: ${color};"></span>
+                        <span class="font-medium text-stone-700">${ds.label}</span>
+                    </label>`;
+                });
+
+                lfTogglesContainer.addEventListener('change', e => {
+                    if(e.target.classList.contains('lf-toggle')){
+                        const index = parseInt(e.target.dataset.index);
+                        lfChart.getDatasetMeta(index).hidden = !e.target.checked;
+                        lfChart.update();
+                    }
+                });
+            }
+
+            // Initial load
+            navigateTo(window.location.hash || '#intro');
+        });
+    </script>
+
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

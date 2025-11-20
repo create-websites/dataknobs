@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Architecting Datasets in a Data-Scarce World</title>
+    <!-- Chosen Palette: Calm Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed as a guided journey through modern data engineering, structured into four thematic sections: Weak Supervision, Active Learning, Synthetic Generation (OT), and a final interactive 'Unified Framework'. This structure transforms the three separate reports into a single, cohesive narrative that follows the logical workflow of building a dataset from scratch: first, label what you have (WS); second, refine efficiently (AL); third, create what you're missing (OT/Synthetic); and finally, decide on the right strategy. This user-centric flow is more intuitive than simply summarizing each report and is designed to teach the concepts in a practical order. -->
+    <!-- Visualization & Content Choices:
+        - Report Info: WS Pipeline -> Goal: Organize -> Viz/Method: Animated HTML/CSS flowchart -> Interaction: Steps fade in sequentially to explain the process. Justification: Clearly visualizes the multi-stage nature of weak supervision. NO SVG/Mermaid.
+        - Report Info: AL Query Strategies (Table 2) -> Goal: Compare -> Viz/Method: Interactive Dropdown + Text/Canvas -> Interaction: User selects a strategy family to see its principle and a simple visual. Justification: More engaging and digestible than a static table. Canvas used.
+        - Report Info: OT for Augmentation -> Goal: Compare -> Viz/Method: Side-by-side Canvas diagrams -> Interaction: Visual shows OT barycenters respecting data manifold vs. naive interpolation. Justification: Illustrates the geometric advantage of OT in a clear, visual manner. Canvas used.
+        - Report Info: Overall paradigm comparison (Table 1) -> Goal: Guide -> Viz/Method: Interactive Decision Framework -> Interaction: User answers questions to get a recommended workflow. Justification: Transforms a static comparison into a personalized, actionable tool.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #212529; }
+        .nav-link { transition: all 0.2s ease-in-out; border-bottom: 2px solid transparent; }
+        .nav-link.active, .nav-link:hover { color: #4f46e5; border-bottom-color: #4f46e5; }
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.6s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .chart-container { position: relative; margin: auto; height: 300px; max-height: 40vh; width: 100%; max-width: 500px; }
+        .interactive-card { transition: all 0.3s ease; }
+        .interactive-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        .flow-step { opacity: 0; transform: translateX(-20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .flow-step.visible { opacity: 1; transform: translateX(0px); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+
+        <header class="py-10 text-center">
+            <h1 class="text-4xl lg:text-5xl font-extrabold text-gray-800">Architecting Datasets Under Scarcity</h1>
+            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Here are a few options, all similar in length and meaning:
+
+*   **Dataset creation: A data-driven approach for resource-limited scenarios.**
+*   **Crafting datasets: A guide for quality data in absence of perfect samples.**
+*   **Building datasets strategically: Addressing data scarcity and imperfections.**
+*   **Dataset construction: Focused on quality when data is sparse or flawed.**</p>
+        </header>
+
+        <nav class="sticky top-0 z-50 bg-[#f8f9fa]/90 backdrop-blur-lg border-b border-gray-200 flex justify-center space-x-4 md:space-x-8 py-3 mb-12" id="main-nav">
+            <a class="nav-link font-semibold p-2" href="#ws">Weak Supervision</a>
+            <a class="nav-link font-semibold p-2" href="#al">Active Learning</a>
+            <a class="nav-link font-semibold p-2" href="#ot">Generative Methods (OT)</a>
+            <a class="nav-link font-semibold p-2" href="#framework">Unified Framework</a>
+        </nav>
+
+        <main id="main-content">
+
+            <section class="content-section space-y-12" id="ws">
+                <div>
+                    <h2 class="text-3xl font-bold text-center text-gray-800">I. Weak Supervision</h2>
+                    <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">Leveraging extensive unlabeled data? Weak Supervision (WS) provides the initial strategy. This potent approach enables programmatic, scaled creation of noisy labels, effectively channeling domain knowledge into a vast training dataset.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-2xl font-semibold text-center text-gray-700 mb-8">The Programmatic Labeling Pipeline</h3>
+                    <div class="space-y-4">
+                        <div class="flow-step flex items-center space-x-4">
+                            <div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">1</div>
+                            <div>
+                                <h4 class="font-semibold">Write Labeling Functions (LFs)</h4>
+                                <p class="text-gray-600">Here are a few options for rewriting the line, maintaining a similar size and conveying the same meaning:
+
+*   **Implement domain expertise via functions (keywords, patterns, prompts) that label or decline.**
+*   **Translate domain understanding into functions (keywords, patterns, prompts) to assign or withhold labels.**
+*   **Utilize functions (keywords, patterns, prompts) informed by domain knowledge to decide labels or abstain.**
+*   **Create label-voting functions (keywords, patterns, prompts) incorporating domain knowledge, with abstention allowed.**
+*   **Incorporate domain knowledge through functions (keywords, patterns, prompts) to either label or avoid labeling.**</p>
+                            </div>
+                        </div>
+                        <div class="h-12 w-px bg-gray-300 ml-6"></div>
+                        <div class="flow-step flex items-center space-x-4">
+                            <div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">2</div>
+                             <div>
+                                <h4 class="font-semibold">Run Generative Label Model</h4>
+                                <p class="text-gray-600">Here are a few options, aiming for a similar size and meaning:
+
+*   **This model gauges LF accuracy &amp; correlation by analyzing agreement, sans ground truth.**
+*   **Without gold labels, this model assesses LF accuracy and inter-LF relationships by analyzing agreement.**
+*   **The model estimates LF accuracy and correlations, leveraging LF agreement patterns and avoiding ground truth.**
+*   **Analyzing LF consensus, this model derives LF accuracy and correlation metrics, independently of ground truth.**</p>
+                            </div>
+                        </div>
+                         <div class="h-12 w-px bg-gray-300 ml-6"></div>
+                        <div class="flow-step flex items-center space-x-4">
+                            <div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">3</div>
+                            <div>
+                                <h4 class="font-semibold">Produce Probabilistic Labels</h4>
+                                <p class="text-gray-600">Here are a few rewritten options, maintaining a similar length and meaning:
+
+*   This creates a complete training set with "soft" labels, reflecting the model's confidence as percentages (e.g., A:90%, B:10%).
+*   The result is a comprehensive training set using "soft" labels, such as 90% Class A and 10% Class B, representing the model's certainty.
+*   The final output is a full training set utilizing "soft" labels, where confidence is indicated (e.g., 90% A, 10% B).
+*   We'll generate a complete training set using "soft" labels. These labels, like 90% A / 10% B, represent model confidence.</p>
+                            </div>
+                        </div>
+                         <div class="h-12 w-px bg-gray-300 ml-6"></div>
+                         <div class="flow-step flex items-center space-x-4">
+                            <div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">4</div>
+                            <div>
+                                <h4 class="font-semibold">Train Discriminative End Model</h4>
+                                <p class="text-gray-600">Leveraging these probabilistic labels, a strong model (like a Transformer) is trained. This enables generalization beyond LF heuristics, yielding a resilient, high-performing model.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section space-y-12" id="al">
+                 <div>
+                    <h2 class="text-3xl font-bold text-center text-gray-800">II. Active Learning</h2>
+                    <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">Active Learning (AL) offers a distinct approach to the labeling challenge. Rather than indiscriminately labeling vast amounts, AL intelligently selects data for annotation, optimizing model gains and minimizing annotation expenses.</p>
+                </div>
+                 <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-2xl font-semibold text-center text-gray-700 mb-2">The Query Strategy Explorer</h3>
+                    <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto">Choose a query strategy family; its central idea shapes the active learner.</p>
+                    <div class="max-w-xl mx-auto">
+                         <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="al-strategy-selector">
+                            <option value="uncertainty">Uncertainty Sampling</option>
+                            <option value="qbc">Query-by-Committee (QBC)</option>
+                            <option value="diversity">Diversity Sampling</option>
+                        </select>
+                        <div class="mt-6 p-6 bg-gray-50 rounded-lg min-h-[150px]" id="al-strategy-display">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section space-y-12" id="ot">
+                 <div>
+                    <h2 class="text-3xl font-bold text-center text-gray-800">III. Generative Methods &amp; Optimal Transport</h2>
+                    <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">For data augmentation, handling exceptions, or general data creation, generative methods excel. Optimal Transport (OT) offers a robust, geometric approach for generating realistic synthetic data.</p>
+                </div>
+
+                 <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-2xl font-semibold text-center text-gray-700 mb-8">Principled Augmentation with OT</h3>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div class="text-center">
+                            <h4 class="font-semibold text-gray-600 mb-2">Naive Interpolation (e.g., Mixup)</h4>
+                            <div class="w-full h-48 bg-gray-100 rounded-lg"><canvas id="naive-interp-canvas"></canvas></div>
+                            <p class="text-sm text-gray-500 mt-2">Averaging data risks generating synthetic points that stray from the actual data distribution.</p>
+                        </div>
+                        <div class="text-center">
+                            <h4 class="font-semibold text-gray-600 mb-2">Wasserstein Barycenters (OT)</h4>
+                            <div class="w-full h-48 bg-gray-100 rounded-lg"><canvas id="ot-interp-canvas"></canvas></div>
+                            <p class="text-sm text-gray-500 mt-2">OT computes a geometric mean, preserving data structure for authentic, in-distribution samples.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                     <h3 class="text-2xl font-semibold text-center text-gray-700 mb-8">The OT Data-Centric Toolkit</h3>
+                     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="interactive-card bg-gray-50 p-6 rounded-lg">
+                            <h4 class="font-bold text-indigo-700">WGANs</h4>
+                            <p class="text-sm text-gray-600 mt-2">Employing Wasserstein distance to enhance GAN stability, producing superior synthetic data.</p>
+                        </div>
+                         <div class="interactive-card bg-gray-50 p-6 rounded-lg">
+                            <h4 class="font-bold text-indigo-700">Domain Adaptation</h4>
+                            <p class="text-sm text-gray-600 mt-2">Here are a few options for rewriting the line, all similar in length and capturing the core meaning:
+
+*   Matches data distributions, connecting source and target domains.
+*   Maps source data onto the target domain, closing the gap.
+*   Transforms data distributions, bridging the domain difference.
+*   Adapts source distributions to align with a target domain.
+*   Reduces domain discrepancy by matching data distributions.</p>
+                        </div>
+                        <div class="interactive-card bg-gray-50 p-6 rounded-lg">
+                            <h4 class="font-bold text-indigo-700">Coreset Selection</h4>
+                            <p class="text-sm text-gray-600 mt-2">Here are a few options for rewriting the line, all similar in length:
+
+*   Creates a smaller, key sample of a large dataset for faster model training.
+*   Selects a concise, useful portion of a large dataset for quicker model training.
+*   Generates a compact, representative sample from a large dataset to train models.
+*   Extracts a smaller, focused dataset from a larger one to speed up training.</p>
+                        </div>
+                     </div>
+                </div>
+            </section>
+            
+            <section class="content-section space-y-12" id="framework">
+                 <div>
+                    <h2 class="text-3xl font-bold text-center text-gray-800">IV. The Unified Framework</h2>
+                    <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">**Here are a few options, maintaining a similar length and tone:**
+
+*   **Synergy unlocks the greatest potential.** Consult this web guide to tailor your data-building approach effectively.
+
+*   **Integration yields optimal results.** Explore this online guide to select the right data strategy for you.
+
+*   **Maximize impact through collaboration.** This web resource will help you choose your ideal data-building method.</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 max-w-4xl mx-auto">
+                    <div class="space-y-6">
+                         <div>
+                            <label class="font-semibold text-gray-700" for="q1">1. What is your starting point?</label>
+                            <select class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="q1">
+                                <option value="unlabeled">Large pool of unlabeled data, no labels</option>
+                                <option value="small_labeled">Small set of high-quality labels, large unlabeled pool</option>
+                                <option value="no_data">Very little or no initial data</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label class="font-semibold text-gray-700" for="q2">2. What is your primary bottleneck?</label>
+                            <select class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="q2">
+                                <option value="cost">Manual labeling is too expensive/slow</option>
+                                <option value="gaps">My data lacks diversity or has edge case gaps</option>
+                                <option value="performance">My model's performance on a small dataset is poor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-indigo-50 p-6 rounded-lg border border-indigo-200" id="recommendation-panel">
+                         <h4 class="font-bold text-indigo-800 text-lg mb-2">Recommended Strategy:</h4>
+                         <div class="text-gray-700 space-y-2" id="recommendation-content">
+                            <p>Your recommended workflow will appear here...</p>
+                         </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const state = {
+        activeSection: 'ws',
+        alStrategy: 'uncertainty',
+        recommendations: {
+            unlabeled: {
+                cost: "1. Start with <strong>Weak Supervision</strong> to programmatically label your data. <br> 2. Use <strong>Active Learning</strong> to identify the most uncertain outputs from your WS model for targeted manual correction and LF refinement.",
+                gaps: "1. Start with <strong>Weak Supervision</strong> to get baseline labels. <br> 2. Use <strong>Generative Models (OT/GANs)</strong> to synthesize data for underrepresented areas, then label this new data with your WS system.",
+                performance: "1. Start with <strong>Weak Supervision</strong> to generate a large training set. This is often the fastest way to boost performance from zero. <br> 2. Follow up with <strong>Active Learning</strong> to fix the most impactful errors."
+            },
+            small_labeled: {
+                cost: "1. Start with <strong>Active Learning</strong> to make the most of your limited annotation budget. <br> 2. Once your labeled set grows, use it to bootstrap <strong>Weak Supervision</strong> Labeling Functions for even greater scale.",
+                gaps: "1. Use your labeled set to fine-tune a <strong>Generative Model</strong>. <br> 2. Create synthetic data for your gap areas. <br> 3. Use <strong>Active Learning</strong> to select the most valuable synthetic and real data for labeling.",
+                performance: "1. Start with <strong>Active Learning</strong> to find the most impactful data points to label first. This ensures the steepest initial learning curve for your model."
+            },
+            no_data: {
+                cost: "1. Your only option is <strong>Synthetic Data Generation</strong>. Use simulators or generative models (like LLMs) to create a foundational dataset from scratch. <br> 2. Treat this synthetic data as your initial 'unlabeled' pool and proceed with a WS/AL strategy.",
+                gaps: "1. Your only option is <strong>Synthetic Data Generation</strong>. Focus on prompting generative models to specifically create data covering the diversity and edge cases you anticipate needing.",
+                performance: "1. Your only option is <strong>Synthetic Data Generation</strong>. Create a large, diverse dataset first. Then, you can begin training a model."
+            }
+        }
+    };
+
+    const navLinks = document.querySelectorAll('.nav-link');
+    const contentSections = document.querySelectorAll('.content-section');
+    const flowSteps = document.querySelectorAll('.flow-step');
+
+    const alSelector = document.getElementById('al-strategy-selector');
+    const alDisplay = document.getElementById('al-strategy-display');
+    
+    const recQ1 = document.getElementById('q1');
+    const recQ2 = document.getElementById('q2');
+    const recContent = document.getElementById('recommendation-content');
+
+    const alContent = {
+        uncertainty: {
+            title: "Principle: Query what you don't know.",
+            text: "This strategy selects data points where the model is least confident. It's excellent for quickly refining decision boundaries but can be prone to selecting non-representative outliers.",
+        },
+        qbc: {
+            title: "Principle: Query what the 'experts' disagree on.",
+            text: "This strategy uses an ensemble of models and selects points where they disagree the most. It's robust but computationally expensive.",
+        },
+        diversity: {
+            title: "Principle: Query to cover all your bases.",
+            text: "This strategy selects points that are representative of the entire dataset, ensuring broad coverage and avoiding redundant queries. It helps build a more generalized model.",
+        }
+    };
+
+    function updateALDisplay() {
+        const strategy = alSelector.value;
+        const content = alContent[strategy];
+        alDisplay.innerHTML = `
+            <h4 class="font-bold text-gray-800">${content.title}</h4>
+            <p class="mt-2 text-gray-600">${content.text}</p>
+        `;
+    }
+
+    function updateRecommendation() {
+        const q1 = recQ1.value;
+        const q2 = recQ2.value;
+        const recommendation = state.recommendations[q1][q2];
+        recContent.innerHTML = `<p>${recommendation}</p>`;
+    }
+
+    function observeFlowSteps() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const step = entry.target;
+                    const delay = Array.from(flowSteps).indexOf(step) * 150;
+                    setTimeout(() => {
+                        step.classList.add('visible');
+                    }, delay);
+                }
+            });
+        }, { threshold: 0.1 });
+        flowSteps.forEach(step => observer.observe(step));
+    }
+    
+    function navigateTo(hash) {
+        const targetId = hash ? hash.substring(1) : 'ws';
+        state.activeSection = targetId;
+
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${targetId}`);
+        });
+
+        contentSections.forEach(section => {
+            section.classList.toggle('active', section.id === targetId);
+        });
+
+        if (targetId === 'ws') {
+            observeFlowSteps();
+        }
+        
+        // Lazy load charts only when their section is active
+        if (targetId === 'ot' && !window.otChartsInitialized) {
+            initOTCharts();
+            window.otChartsInitialized = true;
+        }
+    }
+    
+    // Canvas drawing functions
+    function drawClusters(canvasId, showInterpolation, useOT) {
+        const canvas = document.getElementById(canvasId);
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const cluster1 = { x: w * 0.2, y: h * 0.3, r: w * 0.1 };
+        const cluster2 = { x: w * 0.8, y: h * 0.7, r: w * 0.1 };
+        const p1 = { x: cluster1.x, y: cluster1.y };
+        const p2 = { x: cluster2.x, y: cluster2.y };
+
+        // Draw clusters
+        ctx.fillStyle = 'rgba(79, 70, 229, 0.1)';
+        ctx.beginPath();
+        ctx.arc(cluster1.x, cluster1.y, cluster1.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cluster2.x, cluster2.y, cluster2.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw points
+        ctx.fillStyle = '#4f46e5';
+        ctx.beginPath(); ctx.arc(p1.x, p1.y, 5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(p2.x, p2.y, 5, 0, Math.PI*2); ctx.fill();
+        
+        if (showInterpolation) {
+            let interpPoint;
+            if (useOT) {
+                // Simulate OT path (curved)
+                interpPoint = { x: w * 0.45, y: h * 0.55 };
+                ctx.strokeStyle = '#10B981';
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.quadraticCurveTo(w*0.7, h*0.3, p2.x, p2.y);
+                ctx.stroke();
+            } else {
+                // Linear interpolation
+                interpPoint = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+                ctx.strokeStyle = '#EF4444';
+                 ctx.setLineDash([5, 5]);
+                ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+            }
+             ctx.setLineDash([]);
+             ctx.fillStyle = useOT ? '#10B981' : '#EF4444';
+             ctx.beginPath(); ctx.arc(interpPoint.x, interpPoint.y, 7, 0, Math.PI*2); ctx.fill();
+             ctx.fillStyle = 'white';
+             ctx.beginPath(); ctx.arc(interpPoint.x, interpPoint.y, 4, 0, Math.PI*2); ctx.fill();
+        }
+    }
+
+    function initOTCharts() {
+        drawClusters('naive-interp-canvas', true, false);
+        drawClusters('ot-interp-canvas', true, true);
+    }
+
+
+    document.querySelector('#main-nav').addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') {
+            e.preventDefault();
+            const hash = e.target.getAttribute('href');
+            navigateTo(hash);
+            window.history.pushState(null, null, hash);
+        }
+    });
+    
+    if (alSelector) {
+        alSelector.addEventListener('change', updateALDisplay);
+        updateALDisplay();
+    }
+    
+    if (recQ1 && recQ2) {
+        recQ1.addEventListener('change', updateRecommendation);
+        recQ2.addEventListener('change', updateRecommendation);
+        updateRecommendation();
+    }
+    
+    // Initial navigation based on URL hash or default
+    navigateTo(window.location.hash || '#ws');
+});
+</script>
+
+
+
+</body></html>

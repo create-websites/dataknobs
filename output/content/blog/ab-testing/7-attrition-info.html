@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Infographic: The Challenge of Attrition in Experiments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Brilliant Blues -->
+    <!-- Application Structure Plan: This infographic follows a logical narrative designed for researchers. It begins with a hook defining attrition as the "Achilles' Heel" of experiments. It then moves to a "Diagnosis" section with two bar charts to visually demonstrate how differential attrition breaks randomization. The core of the story is the "Bounding" section, which uses a horizontal bar chart to contrast assumption-free Manski bounds with assumption-laden but tighter Lee bounds. This is followed by a high-level overview of "Analytical Solutions" and concludes with actionable "Prevention Strategies" presented as a checklist. This structure guides the user from problem to solution in a clear, linear fashion. -->
+    <!-- Visualization & Content Choices: 
+        - Data Point: Attrition Rates & Covariate Balance. Goal: Compare. Viz: Two Bar Charts. Justification: Bar charts are the clearest way to show the difference in rates (differential attrition) and the resulting imbalance in a key baseline variable, making the abstract concept of bias concrete. Library: Chart.js/Canvas.
+        - Data Point: Bounding the ATE. Goal: Compare/Inform. Viz: A horizontal floating bar chart. Justification: This visualization compellingly shows the trade-off between the wide, assumption-free Manski bounds and the tighter, more informative Lee bounds, highlighting the cost and benefit of the monotonicity assumption. Library: Chart.js/Canvas.
+        - Data Point: Analytical Strategies. Goal: Inform. Viz: Styled HTML cards with Unicode icons. Justification: For these complex models, a simple, iconic representation is better for an infographic format than a detailed chart, providing awareness without overwhelming the user. Method: HTML/CSS.
+        - Data Point: Prevention Strategies. Goal: Organize. Viz: A styled HTML checklist. Justification: A checklist is a highly effective and easily digestible format for presenting actionable advice. Method: HTML/CSS.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .hero-title { color: #003554; }
+        .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -2px rgb(0 0 0 / 0.05); }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; height: 300px; max-height: 350px; }
+        .stat-value { color: #0582CA; }
+        .checklist-item { position: relative; padding-left: 2rem; }
+        .checklist-item::before { content: '✓'; position: absolute; left: 0; top: 0; color: #00A6FB; font-size: 1.5rem; font-weight: bold; line-height: 1; }
+    </style>
+</head>
+<body class="text-slate-600">
+
+    <div class="container mx-auto px-4 py-12 md:py-20">
+
+        <section class="text-center max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-6xl font-extrabold hero-title leading-tight">THE EXPERIMENTER'S ACHILLES' HEEL</h1>
+            <p class="mt-6 text-lg md:text-xl">**Attrition**, the loss of participants over time, is the most persistent threat to the validity of field experiments. It can break the balance created by randomization, reintroducing the very selection bias an experiment is designed to eliminate.</p>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">Diagnosing the Bias: A Tale of Two Groups</h2>
+            <p class="text-center mt-4 max-w-3xl mx-auto">Bias arises from **differential attrition**, where the rate or type of dropout differs between groups. This means the people who remain in the treatment group are no longer comparable to those in the control group.</p>
+            <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold hero-title text-center">1. Attrition Rates Diverge</h3>
+                    <p class="text-center mt-2 text-slate-500 text-sm">A higher dropout rate in one group is the first warning sign. Here, the treatment group's rate is more than double the control's.</p>
+                    <div class="chart-container mt-4">
+                        <canvas id="attritionRateChart"></canvas>
+                    </div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold hero-title text-center">2. Baseline Balance is Broken</h3>
+                    <p class="text-center mt-2 text-slate-500 text-sm">Because of differential attrition, the remaining groups are no longer balanced on key pre-treatment characteristics like income.</p>
+                    <div class="chart-container mt-4">
+                        <canvas id="balanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">Bounding the Uncertainty</h2>
+            <p class="text-center mt-4 max-w-3xl mx-auto">When attrition occurs, we can't be certain of the true treatment effect. Bounding calculates a range of plausible effects under different assumptions about the missing participants.</p>
+             <div class="mt-12 max-w-4xl mx-auto card p-8">
+                <h3 class="text-xl font-bold hero-title text-center">Manski vs. Lee Bounds: The Assumption/Precision Trade-off</h3>
+                 <p class="text-center mt-2 text-slate-500 text-sm">Manski bounds are assumption-free but wide. Lee bounds are tighter but require the untestable "monotonicity" assumption.</p>
+                <div class="chart-container mt-6" style="height: 200px;">
+                    <canvas id="boundsChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">The Analyst's Toolbox: Correcting for Bias</h2>
+             <p class="text-center mt-4 max-w-3xl mx-auto">When willing to make stronger assumptions, researchers can use statistical models to generate a single point estimate of the treatment effect.</p>
+             <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="card p-6 text-center">
+                    <p class="text-5xl">⚖️</p>
+                    <h3 class="mt-4 text-xl font-bold hero-title">Inverse Probability Weighting (IPW)</h3>
+                    <p class="mt-2 text-slate-600 text-sm">Gives more weight to observed individuals who are similar to those who dropped out, creating a re-weighted "pseudo-population".</p>
+                </div>
+                <div class="card p-6 text-center">
+                    <p class="text-5xl">🔧</p>
+                    <h3 class="mt-4 text-xl font-bold hero-title">Heckman Selection Models</h3>
+                    <p class="mt-2 text-slate-600 text-sm">Explicitly models the attrition process itself, attempting to correct for bias caused by unobserved factors.</p>
+                </div>
+                 <div class="card p-6 text-center">
+                    <p class="text-5xl">✨</p>
+                    <h3 class="mt-4 text-xl font-bold hero-title">Multiple Imputation (MI)</h3>
+                    <p class="mt-2 text-slate-600 text-sm">"Fills in" the missing data multiple times based on observed patterns, creating several complete datasets for analysis.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">Prevention is the Best Cure: Proactive Design</h2>
+            <p class="text-center mt-4 max-w-3xl mx-auto">The most effective strategy is to minimize attrition from the start with thoughtful fieldwork and design.</p>
+            <div class="mt-12 max-w-4xl mx-auto card p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                    <div class="checklist-item">
+                        <h4 class="font-bold text-lg hero-title">Build Trust &amp; Rapport</h4>
+                        <p>Be transparent, use empathetic survey staff, and express appreciation to make participants feel like valued partners.</p>
+                    </div>
+                     <div class="checklist-item">
+                        <h4 class="font-bold text-lg hero-title">Design Smart Incentives</h4>
+                        <p>Use cash-equivalent incentives and a phased or completion-bonus structure to motivate long-term participation.</p>
+                    </div>
+                     <div class="checklist-item">
+                        <h4 class="font-bold text-lg hero-title">Collect Rich Tracking Data</h4>
+                        <p>At baseline, get multiple phone numbers, emails, and contact details for at least two secondary informants.</p>
+                    </div>
+                     <div class="checklist-item">
+                        <h4 class="font-bold text-lg hero-title">Minimize Participant Burden</h4>
+                        <p>Keep surveys concise, pilot them extensively, and respect participants' time by offering flexible scheduling.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const chartTooltipTitleCallback = function(tooltipItems) {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) { return label.join(' '); } 
+            return label;
+        };
+
+        new Chart(document.getElementById('attritionRateChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Control Group', 'Treatment Group'],
+                datasets: [{
+                    label: 'Attrition Rate',
+                    data: [0.10, 0.25],
+                    backgroundColor: ['#0582CA', '#00A6FB'],
+                    barThickness: 50,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, ticks: { callback: value => (value * 100) + '%' } } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: chartTooltipTitleCallback,
+                            label: context => `Attrition: ${(context.raw * 100).toFixed(0)}%`
+                        }
+                    }
+                }
+            }
+        });
+        
+        new Chart(document.getElementById('balanceChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Control Respondents', 'Treatment Respondents'],
+                datasets: [{
+                    label: 'Average Baseline Income',
+                    data: [50000, 58000],
+                    backgroundColor: ['#0582CA', '#00A6FB'],
+                    barThickness: 50,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: false, ticks: { callback: value => '$' + (value / 1000) + 'k' } } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                           title: chartTooltipTitleCallback,
+                           label: context => `Income: $${context.raw.toLocaleString()}`
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('boundsChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Lee Bounds', 'Manski Bounds'],
+                datasets: [{
+                    label: 'Range of Plausible Effects',
+                    data: [
+                        [5, 18],  // Lee Bounds
+                        [-15, 35] // Manski Bounds
+                    ],
+                    backgroundColor: ['#00A6FB', '#0582CA'],
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { 
+                    x: { 
+                        title: { display: true, text: 'Estimated Treatment Effect (%)' }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                           title: chartTooltipTitleCallback,
+                           label: (context) => {
+                                const bound = context.raw;
+                                return `Range: ${bound[0]}% to ${bound[1]}%`;
+                           }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

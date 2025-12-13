@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Infographic: Two-Sided Noncompliance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Energetic & Playful -->
+    <!-- Application Structure Plan: The infographic uses a narrative structure to guide the user from theory to application. 1) Introduction: A hook explaining the core problem of two-sided noncompliance. 2) The Population: Visually defines the four Principal Strata. 3) The Questions: Contrasts the two key estimands (ITT vs. CACE). 4) Case Study Intro: Sets the stage for the Vietnam Draft Lottery example. 5) Data Visualization: Two side-by-side bar charts showing the raw effects on mortality and service rates. 6) The Calculation: A flowchart visualizes the Wald Estimator, showing how the CACE is a ratio of the two effects from the charts. 7) The Conclusion: Presents the final ITT and CACE as large, clear stats. This structure simplifies a complex topic into a logical, visual story. -->
+    <!-- Visualization & Content Choices: 
+        - Data Point: Principal Strata. Goal: Organize. Viz: Styled HTML cards with Unicode icons. Justification: A clean, direct way to present the four types without chart complexity. Method: HTML/CSS.
+        - Data Point: ITT vs. CACE definitions. Goal: Compare/Inform. Viz: Side-by-side descriptive cards. Justification: Clearly contrasts the "effect of offer" vs. the "effect of receipt". Method: HTML/CSS.
+        - Data Point: Draft Lottery Data. Goal: Compare. Viz: Two Bar Charts. Justification: Bar charts are perfect for comparing the rates between the 'Eligible' and 'Not Eligible' groups, making the two ITT effects (the inputs for the CACE formula) visually obvious. Library: Chart.js/Canvas.
+        - Data Point: CACE Estimation. Goal: Explain Process. Viz: A flowchart made from styled HTML/CSS divs. Justification: Deconstructs the Wald Estimator into a simple, understandable ratio, connecting the charts to the final number. Method: HTML/CSS.
+        - Data Point: Final Results. Goal: Inform. Viz: "Single Big Number" style stats. Justification: Maximizes the impact of the key takeaways from the analysis. Method: HTML/CSS.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .hero-title { color: #073B4C; }
+        .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -2px rgb(0 0 0 / 0.05); padding: 1.5rem; text-align: center; }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; height: 300px; max-height: 350px; }
+        .flow-box { border: 2px solid; padding: 1rem; border-radius: 0.5rem; text-align: center; font-weight: 600; }
+        .flow-arrow { position: relative; width: 100%; height: 30px; }
+        .flow-arrow::after { content: '÷'; font-size: 28px; font-weight: bold; color: #EF476F; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <div class="container mx-auto px-4 py-12 md:py-20">
+
+        <section class="text-center max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-6xl font-extrabold hero-title leading-tight">THE ENCOURAGEMENT DILEMMA</h1>
+            <p class="mt-6 text-lg md:text-xl text-slate-600">In many experiments, we can't force people to act. We can only randomize an *encouragement*. Some who are encouraged won't act, and some who *aren't* encouraged will act anyway. This is **Two-Sided Noncompliance**, and it makes finding the true effect of a treatment tricky.</p>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">Who's Who in the Population?</h2>
+            <p class="text-center mt-4 max-w-2xl mx-auto text-slate-600">To solve this, we imagine everyone belongs to one of four hidden groups (**Principal Strata**) based on how they'd react to being encouraged or not.</p>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="card border-t-4 border-[#06D6A0]">
+                    <p class="text-5xl">✓</p>
+                    <h3 class="mt-4 text-xl font-bold hero-title">Compliers</h3>
+                    <p class="mt-2 text-slate-600 text-sm">Take the treatment *if and only if* encouraged. They follow directions.</p>
+                </div>
+                <div class="card border-t-4 border-[#118AB2]">
+                    <p class="text-5xl">→</p>
+                    <h3 class="mt-4 text-xl font-bold hero-title">Always-Takers</h3>
+                    <p class="mt-2 text-slate-600 text-sm">Take the treatment *no matter what*. They are self-motivated.</p>
+                </div>
+                 <div class="card border-t-4 border-[#EF476F]">
+                    <p class="text-5xl">✗</p>
+                    <h3 class="mt-4 text-xl font-bold hero-title">Never-Takers</h3>
+                    <p class="mt-2 text-slate-600 text-sm">Will *never* take the treatment, even if encouraged.</p>
+                </div>
+                 <div class="card border-t-4 border-[#FFD166]">
+                    <p class="text-5xl">?</p>
+                    <h3 class="mt-4 text-xl font-bold hero-title">Defiers</h3>
+                    <p class="mt-2 text-slate-600 text-sm">Do the *opposite* of what they are encouraged to do. (Assumed to be rare).</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">What Are We Actually Measuring?</h2>
+            <p class="text-center mt-4 max-w-3xl mx-auto text-slate-600">With noncompliance, we must choose our question carefully. We can measure the effect of the *offer* or the effect of the *treatment itself*—but only for one group.</p>
+             <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="p-6 bg-slate-50 rounded-lg">
+                    <h3 class="text-2xl font-bold text-[#118AB2] text-center">Intention-to-Treat (ITT)</h3>
+                    <p class="mt-3 text-lg font-semibold text-center">The effect of the <span class="bg-yellow-200 px-1 rounded">ENCOURAGEMENT</span>.</p>
+                    <p class="mt-2 text-slate-600">This compares everyone assigned to the encouragement group vs. everyone assigned to control. It's a real-world policy effect, but it's "diluted" by people who don't follow their assignment.</p>
+                </div>
+                 <div class="p-6 bg-slate-50 rounded-lg">
+                    <h3 class="text-2xl font-bold text-[#06D6A0] text-center">Complier Average Causal Effect (CACE)</h3>
+                    <p class="mt-3 text-lg font-semibold text-center">The effect of the <span class="bg-yellow-200 px-1 rounded">TREATMENT</span> for Compliers.</p>
+                    <p class="mt-2 text-slate-600">This estimates the true effect of the treatment itself, but only for the Compliers—the group whose behavior was actually changed by the encouragement.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">Case Study: The Vietnam Draft Lottery</h2>
+             <p class="text-center mt-4 max-w-3xl mx-auto text-slate-600">A classic example used a random lottery number as an "encouragement" (instrument) for military service. This allows us to estimate the causal effect of serving in the military on later-life mortality.</p>
+             <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                <div class="card">
+                     <h3 class="text-xl font-bold hero-title">Effect of Draft Eligibility on Mortality</h3>
+                    <p class="text-center mt-2 text-slate-600 text-sm">This is the Intention-to-Treat effect on the outcome ($ITT_Y$). It shows the raw effect of the encouragement.</p>
+                    <div class="chart-container mt-4">
+                        <canvas id="ittOutcomeChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-bold hero-title">Effect of Draft Eligibility on Service Rate</h3>
+                     <p class="text-center mt-2 text-slate-600 text-sm">This is the Intention-to-Treat effect on participation ($ITT_D$). It shows how much the encouragement changed behavior.</p>
+                    <div class="chart-container mt-4">
+                        <canvas id="ittTakeupChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-20 md:mt-28">
+            <h2 class="text-3xl font-bold text-center hero-title">The CACE Formula: Un-diluting the Effect</h2>
+            <p class="text-center mt-4 max-w-3xl mx-auto text-slate-600">The logic to find the true effect on Compliers (CACE) is to simply "inflate" the diluted ITT effect by the compliance rate. This is called the Wald Estimator.</p>
+            <div class="mt-12 max-w-md mx-auto">
+                <div class="flow-box border-[#EF476F] text-[#EF476F]">
+                    <p>Effect on Mortality ($ITT_Y$)</p>
+                </div>
+                <div class="flow-arrow"></div>
+                <div class="flow-box border-[#118AB2] text-[#118AB2]">
+                    <p>Effect on Service Rate ($ITT_D$)</p>
+                </div>
+                <div class="my-4 text-center text-4xl font-bold">=</div>
+                 <div class="flow-box border-[#06D6A0] text-[#06D6A0] bg-green-50">
+                    <p>Effect for Compliers (CACE)</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-20 md:mt-28 text-center">
+            <h2 class="text-3xl font-bold hero-title">The Final Results</h2>
+            <p class="text-center mt-4 max-w-3xl mx-auto text-slate-600">Plugging in the numbers from the draft lottery reveals the true impact of military service for those induced to serve.</p>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="card p-8">
+                    <p class="text-lg font-semibold text-[#118AB2]">Intention-to-Treat (ITT) Effect</p>
+                    <p class="text-6xl font-extrabold text-[#118AB2] mt-2">+0.6%</p>
+                    <p class="mt-3 text-slate-600">Being draft-eligible increased mortality by 0.6 percentage points. This is the diluted policy effect.</p>
+                </div>
+                 <div class="card p-8">
+                    <p class="text-lg font-semibold text-[#06D6A0]">Complier Average Causal Effect (CACE)</p>
+                    <p class="text-6xl font-extrabold text-[#06D6A0] mt-2">+4.0%</p>
+                    <p class="mt-3 text-slate-600">For Compliers (men who served *because* of the draft), military service increased mortality by 4.0 percentage points.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const draftData = {
+            eligible: { mortality: 0.040, service: 0.30 },
+            notEligible: { mortality: 0.034, service: 0.15 }
+        };
+
+        const chartTooltipTitleCallback = function(tooltipItems) {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) { return label.join(' '); } 
+            return label;
+        };
+        
+        const sharedChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: value => (value * 100).toFixed(1) + '%' }
+                },
+                x: { grid: { display: false } }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: chartTooltipTitleCallback,
+                        label: context => (context.raw * 100).toFixed(1) + '%'
+                    }
+                }
+            }
+        };
+
+        new Chart(document.getElementById('ittOutcomeChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Not Eligible', 'Eligible'],
+                datasets: [{
+                    label: 'Mortality Rate',
+                    data: [draftData.notEligible.mortality, draftData.eligible.mortality],
+                    backgroundColor: ['#118AB2', '#EF476F'],
+                    barThickness: 50,
+                }]
+            },
+            options: sharedChartOptions
+        });
+        
+        new Chart(document.getElementById('ittTakeupChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Not Eligible', 'Eligible'],
+                datasets: [{
+                    label: 'Service Rate',
+                    data: [draftData.notEligible.service, draftData.eligible.service],
+                    backgroundColor: ['#118AB2', '#06D6A0'],
+                    barThickness: 50,
+                }]
+            },
+            options: sharedChartOptions
+        });
+    </script>
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

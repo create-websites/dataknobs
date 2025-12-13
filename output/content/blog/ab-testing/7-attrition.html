@@ -59,12 +59,12 @@
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center">
                     <h1 class="text-4xl sm:text-5xl font-bold tracking-tight">The Achilles' Heel of Field Experiments</h1>
-                    <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-600">Participant dropout, the gradual loss of subjects, frequently jeopardizes the integrity of randomized trials. This attrition weakens the core randomization principle – equal group similarity – and potentially reintroduces the bias the trial aimed to avoid.</p>
+                    <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-600">Attrition, the loss of participants over time, is one of the most persistent threats to the validity of randomized controlled trials. It undermines the very foundation of randomization—that the treatment and control groups are comparable—and can reintroduce the selection bias the experiment was designed to eliminate.</p>
                 </div>
 
                 <div class="mt-16">
                     <h2 class="text-3xl font-bold text-center">Diagnosing Attrition Bias</h2>
-                    <p class="mt-4 max-w-2xl mx-auto text-center text-slate-600">The key issue is **unequal dropout**, as groups lose participants at varying rates or in dissimilar ways. This undermines the initial balance of randomized groups. See below to understand how differential attrition skews final group characteristics.</p>
+                    <p class="mt-4 max-w-2xl mx-auto text-center text-slate-600">The core problem is **differential attrition**, where the rate or nature of dropouts differs between groups. This breaks the baseline equivalence randomization created. Click the button below to see how differential attrition can unbalance baseline characteristics in the final analyzed sample.</p>
                     
                     <div class="max-w-5xl mx-auto mt-8 p-6 card">
                         <div class="text-center mb-6">
@@ -85,7 +85,7 @@
                                 </div>
                             </div>
                         </div>
-                         <p class="text-center mt-6 text-sm text-slate-500" id="scenarioDescription">Absent attrition bias, equal attrition rates and balanced initial subject traits maintain the validity of comparisons.</p>
+                         <p class="text-center mt-6 text-sm text-slate-500" id="scenarioDescription">With no attrition bias, both attrition rates and baseline characteristics of the remaining subjects are balanced across groups. The comparison remains valid.</p>
                     </div>
                 </div>
             </div>
@@ -95,13 +95,13 @@
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                  <div class="text-center">
                     <h2 class="text-3xl font-bold">Placing Bounds on the Treatment Effect</h2>
-                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">Faced with high attrition, the Average Treatment Effect (ATE) becomes uncertain. Bounding techniques address this by quantifying the uncertainty: they define a plausible ATE range derived from various missing data assumptions.</p>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">When attrition is a problem, we can't be certain about the true Average Treatment Effect (ATE). Bounding methods make this uncertainty explicit by calculating a range of plausible values for the ATE based on different assumptions about the missing data.</p>
                 </div>
                 <div class="mt-12 max-w-6xl mx-auto card">
                     <h3 class="text-2xl font-bold text-center mb-6">Interactive Bounding Calculator</h3>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                         <div>
-                            <p class="text-slate-600 mb-6">Adjust attrition rates with the sliders to observe their impact on ATE bounds. Outcomes are simulated: 60 for treatment, 40 for control, range 0-100.</p>
+                            <p class="text-slate-600 mb-6">Use the sliders to see how attrition rates affect the estimated bounds on the ATE. We assume the true outcome for respondents is 60 in the treatment group and 40 in the control group, with an outcome range of 0 to 100.</p>
                             
                             <div class="space-y-4">
                                 <div>
@@ -129,7 +129,7 @@
                         </div>
                         <div class="flex flex-col items-center">
                            <h4 class="text-lg font-bold text-center">Visualizing Lee Bounds</h4>
-                           <p class="text-sm text-center text-slate-500 mb-2">To establish bounds, we adjust the higher-response group's outcomes, "trimming" them for comparability.</p>
+                           <p class="text-sm text-center text-slate-500 mb-2">To get the bounds, we "trim" the outcomes from the group with lower attrition (higher response rate) to make it comparable to the other group.</p>
                             <div class="chart-container w-full h-64">
                                 <canvas id="leeBoundsChart"></canvas>
                             </div>
@@ -143,7 +143,7 @@
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center">
                     <h2 class="text-3xl font-bold">Analytical Strategies for Correction</h2>
-                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">By making bolder assumptions, statistical models allow us to produce a single, attrition-corrected estimate of the treatment effect.</p>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">When we are willing to make stronger assumptions, we can use statistical models to generate a single point estimate of the treatment effect, corrected for attrition bias.</p>
                 </div>
                 <div class="mt-12 max-w-4xl mx-auto">
                     <div class="border-b border-slate-200">
@@ -156,18 +156,18 @@
                     <div class="mt-8">
                         <div class="tab-content active card" id="content-ipw">
                             <h3 class="text-xl font-bold text-center">Inverse Probability Weighting (IPW)</h3>
-                            <p class="mt-3 text-slate-600">IPW adjusts for dropout by re-weighting observed individuals. This process emphasizes those similar to dropouts, effectively simulating the full sample statistically.</p>
-                            <p class="mt-3 font-semibold text-center">Key Assumption: <span class="tooltip">Missing at Random (MAR)<span class="tooltiptext">Attrition's causes relate to known factors, but not to unseen results, after accounting for those factors.</span></span></p>
+                            <p class="mt-3 text-slate-600">IPW works by giving more weight to observed individuals who are similar to those who dropped out. This creates a re-weighted sample that statistically mimics the original, full sample.</p>
+                            <p class="mt-3 font-semibold text-center">Key Assumption: <span class="tooltip">Missing at Random (MAR)<span class="tooltiptext">Attrition can depend on observed baseline characteristics, but not on the unobserved outcomes themselves, once we control for those characteristics.</span></span></p>
                         </div>
                          <div class="tab-content card" id="content-heckman">
                             <h3 class="text-xl font-bold text-center">Heckman Selection Models</h3>
-                            <p class="mt-3 text-slate-600">The Heckman model tackles selection bias head-on, modeling the very process of attrition. It's used when missing data are believed to stem from hidden influences.</p>
-                            <p class="mt-3 font-semibold text-center">Key Assumption: <span class="tooltip">Exclusion Restriction<span class="tooltiptext">For this analysis, you need an 'instrument,' a predictor of attrition that solely influences the outcome through attrition itself. This is a demanding and often difficult requirement.</span></span></p>
+                            <p class="mt-3 text-slate-600">The Heckman model directly addresses selection bias by modeling the attrition process itself. It's designed for cases where attrition is thought to depend on unobserved factors.</p>
+                            <p class="mt-3 font-semibold text-center">Key Assumption: <span class="tooltip">Exclusion Restriction<span class="tooltiptext">You must have an "instrument"—a variable that predicts attrition but has no direct effect on the outcome of interest. This is a very strong and hard-to-satisfy assumption.</span></span></p>
                         </div>
                          <div class="tab-content card" id="content-mi">
                             <h3 class="text-xl font-bold text-center">Multiple Imputation (MI)</h3>
-                            <p class="mt-3 text-slate-600">Rather than discarding or adjusting the data's weights, MI generates multiple complete datasets by "filling in" the missing values. Each is analyzed, and the results are combined to yield a final, more accurate estimate reflecting missing data uncertainty.</p>
-                            <p class="mt-3 font-semibold text-center">Key Assumption: <span class="tooltip">Missing at Random (MAR)<span class="tooltiptext">Similar to IPW, Multiple Imputation (MI) also relies on the assumption of sufficient observed data for accurate imputation.</span></span></p>
+                            <p class="mt-3 text-slate-600">Instead of re-weighting or discarding data, MI "fills in" the missing values multiple times, creating several complete datasets. The analysis is run on each dataset, and the results are pooled to produce a final estimate that properly accounts for the uncertainty of the missing data.</p>
+                            <p class="mt-3 font-semibold text-center">Key Assumption: <span class="tooltip">Missing at Random (MAR)<span class="tooltiptext">Like IPW, MI assumes that we have enough observed data to reliably predict the values of the missing data.</span></span></p>
                         </div>
                     </div>
                 </div>
@@ -178,7 +178,7 @@
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center">
                     <h2 class="text-3xl font-bold">Prevention is Better Than Cure</h2>
-                    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">Preventing attrition is key, even though analytical fixes help. Strong design and careful fieldwork are essential for researchers.</p>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">While analytical corrections are valuable, the best strategy is to prevent attrition in the first place. Good design and thoughtful fieldwork are a researcher's most powerful tools.</p>
                 </div>
                 <div class="mt-12 max-w-4xl mx-auto card">
                     <h3 class="text-xl font-bold mb-6">A Researcher's Prevention Checklist</h3>
@@ -186,7 +186,7 @@
                         <div>
                             <h4 class="font-bold text-lg mb-2">Tracking &amp; Engagement</h4>
                             <ul class="space-y-2 text-slate-600 checklist">
-                                <li>Gather detailed baseline tracking data (multiple contacts, emails, and secondary details).</li>
+                                <li>Collect comprehensive tracking info at baseline (multiple numbers, emails, secondary contacts).</li>
                                 <li>Maintain regular, positive contact (newsletters, holiday cards).</li>
                                 <li>Minimize participant burden with concise, well-piloted surveys.</li>
                             </ul>
@@ -196,28 +196,14 @@
                              <ul class="space-y-2 text-slate-600 checklist">
                                 <li>Use cash or cash-equivalent incentives (e.g., gift vouchers).</li>
                                 <li>Employ unconditional incentives (upfront) to build reciprocity.</li>
-                                <li>Here are a few options, aiming for a similar size and meaning:
-
-*   Employ phased/escalating incentives and completion bonuses for longitudinal research.
-*   In longitudinal research, structure incentives using phases, escalations, and a completion bonus.
-*   Offer escalating incentives, alongside a completion bonus, in longitudinal study designs.</li>
+                                <li>For longitudinal studies, use a phased or escalating incentive structure with a completion bonus.</li>
                             </ul>
                         </div>
                         <div class="md:col-span-2 mt-4">
                             <h4 class="font-bold text-lg mb-2">Additional Data Collection</h4>
                              <ul class="space-y-2 text-slate-600 checklist">
-                                <li>Here are a few options, aiming for a similar length and clarity:
-
-*   **Sampling plan for refreshments:** Fresh random samples during follow-up address attrition's bias.
-*   **Refreshment sampling strategy:** Utilize new random follow-up samples to assess attrition bias.
-*   **Refreshment sample design:**  Follow-up draws aim to uncover attrition's bias.
-*   **Refreshment sample plan:**  Random follow-up data clarifies attrition bias.</li>
-                                <li>Here are a few options, all similar in length:
-
-*   Follow up intensely with a random attritor subset for weighting/bounds data.
-*   Intensely follow random attritors; gather better weighting/bounds information.
-*   Conduct deep follow-up on random attritors to refine weighting and bounds.
-*   Gather superior weighting/bounds data by intensively following a random sub-group.</li>
+                                <li>Plan for **refreshment samples**: new random samples drawn during follow-up to diagnose the nature of attrition bias.</li>
+                                <li>Conduct intensive follow-up on a random sub-sample of attritors to get better data for weighting or bounds.</li>
                             </ul>
                         </div>
                     </div>
@@ -348,7 +334,7 @@
             } else {
                 toggleBiasBtn.textContent = 'Switch to "Attrition Bias" Scenario';
                 scenarioTitle.textContent = 'Scenario: No Attrition Bias (Balanced Attrition)';
-                scenarioDescription.textContent = 'Absent attrition bias, equal attrition rates and balanced initial subject traits maintain the validity of comparisons.';
+                scenarioDescription.textContent = 'With no attrition bias, both attrition rates and baseline characteristics of the remaining subjects are balanced across groups. The comparison remains valid.';
 
                 attritionChart = new Chart(attritionRateChartCtx, { ...chartOptions(), data: { labels: ['Control', 'Treatment'], datasets: [{ data: [0.15, 0.15], backgroundColor: ['#9ca3af', '#60a5fa'] }] } });
                 balanceChart = new Chart(balanceChartCtx, { ...chartOptions(), data: { labels: ['Control', 'Treatment'], datasets: [{ data: [0.50, 0.50], backgroundColor: ['#9ca3af', '#60a5fa'] }] } });

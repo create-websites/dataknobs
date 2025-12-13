@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="Interactive report on AI Agents for transaction and behavior surveillance. Discover how adaptive AI moves beyond static rules to detect AML, UDAAP, and insider risks while reducing false positives." name="description"/>
+    <meta content="AI surveillance, transaction monitoring, AML, anti-money laundering, behavior surveillance, UDAAP, insider risk, AI agents, fraud detection, financial compliance, adaptive security" name="keywords"/>
+    <title>AI Agent: Beyond Rules Surveillance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; color: #1F2937; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .transition-all-300 { transition: all 0.3s ease-in-out; }
+        .active-tab { border-bottom: 2px solid #2563EB; color: #2563EB; background-color: #EFF6FF; }
+        .hidden-content { display: none; opacity: 0; }
+        .fade-in { animation: fadeIn 0.5s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Chosen Palette: Slate & Blue (Minimalist, Professional, Tech-focused) -->
+    <!-- Application Structure Plan: 
+         1. Hero: Introduces the core shift from Static Rules to AI Agents.
+         2. The Problem (Interactive Toggle): Visualizes the limitations of static rules vs. novel patterns.
+         3. The AI Agent Workflow (Process Flow): Break down the Observe -> Adapt -> Escalate cycle with clickable details.
+         4. Simulation Lab (Dashboard): The core interactive component. Users select use cases (AML, UDAAP, Insider) to see simulated data and the AI's "Context & Rationale" output.
+         5. Outcomes (Metrics): A comparative chart showing the efficiency gains.
+         Rationale: The report is conceptual. The structure moves from "Why change?" to "How it works" to "See it in action" to "Results", facilitating a logical learning path.
+    -->
+    <!-- Visualization & Content Choices:
+         - Hero: Text & Iconography. Goal: Hook the user.
+         - Problem Section: CSS/JS Toggle. Goal: Conceptual understanding.
+         - Workflow: Interactive Cards. Goal: Explain the mechanics.
+         - Simulation Lab: Dynamic Chart.js visualizations. Goal: Demonstrate specific use cases (AML/UDAAP/Insider) with data visualization (Line/Bar/Scatter). Justification: Shows "behavior shifts" better than text.
+         - Outcomes: Bar Chart. Goal: Quantify success (Signal vs False Positives).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="text-xl font-bold text-slate-800">Surveillance<span class="text-blue-600">AI</span></span>
+                    </div>
+                </div>
+                <div class="hidden sm:flex sm:space-x-8 items-center">
+                    <button class="text-slate-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium" onclick="scrollToSection('problem')">The Problem</button>
+                    <button class="text-slate-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium" onclick="scrollToSection('solution')">AI Solution</button>
+                    <button class="text-slate-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium" onclick="scrollToSection('simulation')">Live Simulation</button>
+                    <button class="text-slate-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium" onclick="scrollToSection('outcomes')">Outcomes</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
+                <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
+                    <div class="sm:text-center lg:text-left">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-slate-900 sm:text-5xl md:text-6xl">
+                            <span class="block xl:inline">Beyond Static Rules:</span>
+                            <span class="block text-blue-600 xl:inline">AI Agent Surveillance</span>
+                        </h1>
+                        <p class="mt-3 text-base text-slate-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                            Move beyond rigid logic. Discover how AI Agents observe behavior, adapt to novel patterns, and escalate with rationale to reduce false positives and catch hidden risks.
+                        </p>
+                        <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                            <div class="rounded-md shadow">
+                                <button class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg transition-all-300" onclick="scrollToSection('simulation')">
+                                    Launch Simulation
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+        <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-slate-50 flex items-center justify-center">
+            <!-- Abstract visualization using DOM elements instead of image/SVG -->
+            <div class="grid grid-cols-3 gap-4 opacity-50 p-10">
+                <div class="w-16 h-16 bg-blue-100 rounded-lg animate-pulse"></div>
+                <div class="w-16 h-16 bg-blue-200 rounded-lg"></div>
+                <div class="w-16 h-16 bg-blue-300 rounded-lg animate-pulse delay-75"></div>
+                <div class="w-16 h-16 bg-blue-400 rounded-lg"></div>
+                <div class="w-16 h-16 bg-blue-500 rounded-lg animate-pulse delay-150"></div>
+                <div class="w-16 h-16 bg-blue-400 rounded-lg"></div>
+                <div class="w-16 h-16 bg-blue-300 rounded-lg animate-pulse delay-75"></div>
+                <div class="w-16 h-16 bg-blue-200 rounded-lg"></div>
+                <div class="w-16 h-16 bg-blue-100 rounded-lg animate-pulse"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 1: The Problem -->
+    <section class="py-16 bg-slate-50" id="problem">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-base text-blue-600 font-semibold tracking-wide uppercase">The Challenge</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-slate-900 sm:text-4xl">Static Rules Miss Novel Patterns</p>
+                <p class="mt-4 max-w-2xl text-xl text-slate-500 mx-auto">
+                    Traditional surveillance relies on pre-defined "if/then" logic. See how rigid structures fail against evolving threats.
+                </p>
+            </div>
+
+            <div class="mt-12 bg-white rounded-xl shadow-lg p-6 lg:p-10">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Concept Visualization Box -->
+                    <div class="bg-slate-100 rounded-lg p-8 flex flex-col items-center justify-center relative overflow-hidden h-64 border-2 border-slate-200" id="problem-visual">
+                        <div class="absolute inset-0 grid grid-cols-4 gap-4 p-4 transition-opacity duration-500" id="static-net">
+                            <!-- Rigid Net -->
+                            <div class="border-2 border-slate-300"></div><div class="border-2 border-slate-300"></div><div class="border-2 border-slate-300"></div><div class="border-2 border-slate-300"></div>
+                            <div class="border-2 border-slate-300"></div><div class="border-2 border-slate-300"></div><div class="border-2 border-slate-300"></div><div class="border-2 border-slate-300"></div>
+                        </div>
+                        <div class="z-10 text-center">
+                            <div class="text-4xl mb-2 transition-all duration-500 transform" id="threat-indicator">⚠️</div>
+                            <p class="font-bold text-slate-700" id="problem-text">Novel Threat</p>
+                        </div>
+                        <div class="absolute bottom-4 bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium" id="status-message">Passed through filter</div>
+                    </div>
+
+                    <!-- Interactive Controls -->
+                    <div class="flex flex-col justify-center space-y-6">
+                        <div>
+                            <h3 class="text-lg font-medium text-slate-900">Compare Methodologies</h3>
+                            <p class="text-slate-500 text-sm mt-1">Toggle below to see the difference between static rules and adaptive AI.</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <button class="w-full text-left p-4 rounded-lg border-2 border-blue-500 bg-blue-50 transition-all-300 hover:bg-blue-100" id="btn-static" onclick="setProblemMode('static')">
+                                <div class="font-bold text-blue-900">Option A: Static Rules</div>
+                                <div class="text-sm text-blue-700 mt-1">Detects only what is explicitly programmed. New fraud patterns slip through the gaps.</div>
+                            </button>
+                            <button class="w-full text-left p-4 rounded-lg border-2 border-slate-200 bg-white transition-all-300 hover:border-blue-300 hover:bg-slate-50" id="btn-ai" onclick="setProblemMode('ai')">
+                                <div class="font-bold text-slate-900">Option B: AI Agent</div>
+                                <div class="text-sm text-slate-600 mt-1">Adapts logic as patterns evolve. Captures novel behavior that rules miss.</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: AI Solution Workflow -->
+    <section class="py-16 bg-white" id="solution">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center mb-12">
+                <h2 class="text-base text-blue-600 font-semibold tracking-wide uppercase">The AI Role</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-slate-900 sm:text-4xl">How the Agent Works</p>
+                <p class="mt-4 max-w-2xl text-xl text-slate-500 lg:mx-auto">
+                    The AI Agent doesn't just match rules; it understands context. Click the steps below to explore the workflow.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <!-- Step 1 -->
+                <div class="relative group cursor-pointer" onclick="toggleSolutionDetails('observe')">
+                    <div class="absolute inset-0 bg-blue-500 rounded-2xl transform rotate-3 opacity-10 group-hover:rotate-6 transition-all-300"></div>
+                    <div class="relative bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all-300 h-full flex flex-col items-center">
+                        <div class="h-12 w-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl font-bold mb-4">1</div>
+                        <h3 class="text-xl font-bold text-slate-900">Observe</h3>
+                        <p class="mt-2 text-slate-500">Holistic monitoring across channels.</p>
+                        <div class="hidden-content mt-4 text-sm text-slate-600 bg-slate-50 p-3 rounded text-left w-full" id="details-observe">
+                            <ul class="list-disc pl-4 space-y-1">
+                                <li>Transaction data</li>
+                                <li>Customer interactions</li>
+                                <li>Agent behavior logs</li>
+                            </ul>
+                        </div>
+                        <span class="mt-auto pt-4 text-blue-500 text-sm font-medium group-hover:translate-y-1 transition-transform">Click for details ↓</span>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative group cursor-pointer" onclick="toggleSolutionDetails('adapt')">
+                    <div class="absolute inset-0 bg-indigo-500 rounded-2xl transform -rotate-3 opacity-10 group-hover:-rotate-6 transition-all-300"></div>
+                    <div class="relative bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all-300 h-full flex flex-col items-center">
+                        <div class="h-12 w-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-2xl font-bold mb-4">2</div>
+                        <h3 class="text-xl font-bold text-slate-900">Adapt</h3>
+                        <p class="mt-2 text-slate-500">Dynamic logic evolution.</p>
+                        <div class="hidden-content mt-4 text-sm text-slate-600 bg-slate-50 p-3 rounded text-left w-full" id="details-adapt">
+                            <p>As patterns evolve (e.g., new fraud techniques), the agent updates its detection logic automatically, without waiting for manual rule rewrites.</p>
+                        </div>
+                        <span class="mt-auto pt-4 text-indigo-500 text-sm font-medium group-hover:translate-y-1 transition-transform">Click for details ↓</span>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative group cursor-pointer" onclick="toggleSolutionDetails('escalate')">
+                    <div class="absolute inset-0 bg-teal-500 rounded-2xl transform rotate-2 opacity-10 group-hover:rotate-4 transition-all-300"></div>
+                    <div class="relative bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all-300 h-full flex flex-col items-center">
+                        <div class="h-12 w-12 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-2xl font-bold mb-4">3</div>
+                        <h3 class="text-xl font-bold text-slate-900">Escalate</h3>
+                        <p class="mt-2 text-slate-500">High-signal alerts with reasoning.</p>
+                        <div class="hidden-content mt-4 text-sm text-slate-600 bg-slate-50 p-3 rounded text-left w-full" id="details-escalate">
+                            <p>Instead of just flagging a transaction, it provides:</p>
+                            <ul class="list-disc pl-4 mt-1">
+                                <li>Full Context</li>
+                                <li>Rationale for suspicion</li>
+                                <li>Linked entities</li>
+                            </ul>
+                        </div>
+                        <span class="mt-auto pt-4 text-teal-500 text-sm font-medium group-hover:translate-y-1 transition-transform">Click for details ↓</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Simulation Lab (Examples) -->
+    <section class="py-16 bg-slate-900 text-white" id="simulation">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10">
+                <h2 class="text-blue-400 font-semibold tracking-wide uppercase text-sm">Interactive Simulation</h2>
+                <h3 class="text-3xl font-bold mt-2">Surveillance Lab: Detect the Undetectable</h3>
+                <p class="text-slate-400 mt-4 max-w-3xl">
+                    Select a use case below to see how the AI Agent analyzes real-time data streams to identify complex risks that rules might miss.
+                </p>
+            </div>
+
+            <!-- Lab Interface -->
+            <div class="bg-slate-800 rounded-xl shadow-2xl border border-slate-700 overflow-hidden">
+                <!-- Tabs -->
+                <div class="flex border-b border-slate-700 overflow-x-auto">
+                    <button class="flex-1 py-4 px-6 text-center text-sm font-medium hover:bg-slate-700 focus:outline-none transition-colors active-tab text-blue-400 border-b-2 border-blue-400" id="tab-aml" onclick="loadSimulation('aml')">
+                        Example 1: AML Behavior Shift
+                    </button>
+                    <button class="flex-1 py-4 px-6 text-center text-sm font-medium hover:bg-slate-700 focus:outline-none transition-colors text-slate-400 border-b-2 border-transparent" id="tab-udaap" onclick="loadSimulation('udaap')">
+                        Example 2: UDAAP Discovery
+                    </button>
+                    <button class="flex-1 py-4 px-6 text-center text-sm font-medium hover:bg-slate-700 focus:outline-none transition-colors text-slate-400 border-b-2 border-transparent" id="tab-insider" onclick="loadSimulation('insider')">
+                        Example 3: Insider Risk
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-0">
+                    <!-- Data Panel -->
+                    <div class="lg:col-span-2 p-6 border-r border-slate-700 bg-slate-800">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-bold text-white" id="sim-title">Transaction Volume Analysis</h4>
+                            <span class="px-2 py-1 bg-blue-900 text-blue-300 text-xs rounded border border-blue-700 animate-pulse">● Live Stream</span>
+                        </div>
+                        <!-- Chart Container -->
+                        <div class="chart-container bg-slate-900 rounded-lg p-2 border border-slate-700">
+                            <canvas id="simulationChart"></canvas>
+                        </div>
+                        <p class="mt-4 text-slate-400 text-sm" id="sim-description">
+                            Monitoring transaction velocity for potential structuring patterns.
+                        </p>
+                    </div>
+
+                    <!-- AI Agent Insight Panel -->
+                    <div class="p-6 bg-slate-800">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center">
+                                <span class="text-white font-bold text-xs">AI</span>
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-bold text-white">Agent Output</h5>
+                                <p class="text-xs text-slate-400">Context &amp; Rationale Engine</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4" id="ai-output-box">
+                            <!-- Dynamic AI content goes here -->
+                            <div class="bg-slate-700/50 p-4 rounded border border-slate-600">
+                                <span class="text-xs uppercase tracking-wider text-slate-400 block mb-1">Observation</span>
+                                <p class="text-sm text-slate-200">Analyzing recurring transaction sequences below reporting thresholds.</p>
+                            </div>
+                            <div class="bg-red-900/20 p-4 rounded border border-red-800/50">
+                                <span class="text-xs uppercase tracking-wider text-red-400 block mb-1">Escalation Rationale</span>
+                                <p class="text-sm text-red-200">Anomaly Detected: Multiple small transfers totaling $9,800 within 24 hours. Pattern matches evolved 'structuring' behavior not caught by single-transaction limits.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Outcomes -->
+    <section class="py-16 bg-slate-50" id="outcomes">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-slate-900">The Outcome</h2>
+                <p class="mt-4 text-xl text-slate-500">Higher Signal, Fewer False Positives.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="chart-container bg-white p-4 rounded-xl shadow-lg">
+                        <canvas id="outcomeChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Why It Matters</h3>
+                    <div class="space-y-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-green-500 text-white font-bold text-xl">✓</div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg leading-6 font-medium text-slate-900">Precision Surveillance</h4>
+                                <p class="mt-2 text-base text-slate-500">AI Agents reduce noise by understanding context, ensuring investigators focus on genuine risks rather than false alarms.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white font-bold text-xl">↗</div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg leading-6 font-medium text-slate-900">Adaptive Security</h4>
+                                <p class="mt-2 text-base text-slate-500">Security doesn't degrade over time. As bad actors shift tactics, the Agent learns and adapts logic instantly.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Navigation Scroll ---
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // --- Section 1: Problem Interaction ---
+        function setProblemMode(mode) {
+            const visual = document.getElementById('problem-visual');
+            const net = document.getElementById('static-net');
+            const text = document.getElementById('problem-text');
+            const indicator = document.getElementById('threat-indicator');
+            const status = document.getElementById('status-message');
+            const btnStatic = document.getElementById('btn-static');
+            const btnAi = document.getElementById('btn-ai');
+
+            if (mode === 'static') {
+                // Style buttons
+                btnStatic.classList.add('border-blue-500', 'bg-blue-50');
+                btnStatic.classList.remove('border-slate-200', 'bg-white');
+                btnAi.classList.remove('border-blue-500', 'bg-blue-50');
+                btnAi.classList.add('border-slate-200', 'bg-white');
+
+                // Visual updates
+                net.classList.remove('opacity-20');
+                net.classList.add('opacity-100');
+                text.innerText = "Novel Threat Missed";
+                indicator.innerText = "⚠️";
+                indicator.style.transform = "scale(1)";
+                status.innerText = "Passed through filter";
+                status.className = "absolute bottom-4 bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium fade-in";
+                visual.className = "bg-slate-100 rounded-lg p-8 flex flex-col items-center justify-center relative overflow-hidden h-64 border-2 border-red-200";
+            } else {
+                // Style buttons
+                btnAi.classList.add('border-blue-500', 'bg-blue-50');
+                btnAi.classList.remove('border-slate-200', 'bg-white');
+                btnStatic.classList.remove('border-blue-500', 'bg-blue-50');
+                btnStatic.classList.add('border-slate-200', 'bg-white');
+
+                // Visual updates
+                net.classList.remove('opacity-100');
+                net.classList.add('opacity-20'); // Net fades/morphs
+                text.innerText = "Pattern Detected";
+                indicator.innerText = "🛡️";
+                indicator.style.transform = "scale(1.5)";
+                status.innerText = "Escalated with Context";
+                status.className = "absolute bottom-4 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium fade-in";
+                visual.className = "bg-blue-50 rounded-lg p-8 flex flex-col items-center justify-center relative overflow-hidden h-64 border-2 border-blue-200";
+            }
+        }
+
+        // --- Section 2: Solution Interaction ---
+        function toggleSolutionDetails(step) {
+            const details = document.getElementById(`details-${step}`);
+            // Toggle visibility logic
+            if (details.classList.contains('hidden-content')) {
+                details.classList.remove('hidden-content');
+                details.classList.add('fade-in');
+            } else {
+                details.classList.add('hidden-content');
+                details.classList.remove('fade-in');
+            }
+        }
+
+        // --- Section 3: Simulation Lab Logic ---
+        let simChart = null;
+
+        const simulationData = {
+            aml: {
+                title: "AML / Fraud Behavior Shift",
+                desc: "The chart shows a sudden deviation in transaction patterns. Static rules look for single large amounts. The AI Agent detects a 'shift'—a cluster of smaller transactions that cumulatively indicate risk.",
+                chartType: 'line',
+                labels: ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'],
+                datasets: [
+                    {
+                        label: 'Transaction Value ($)',
+                        data: [500, 450, 2900, 2800, 2950, 400, 600],
+                        borderColor: '#F87171',
+                        backgroundColor: 'rgba(248, 113, 113, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 6
+                    },
+                    {
+                        label: 'Typical Baseline',
+                        data: [600, 600, 600, 600, 600, 600, 600],
+                        borderColor: '#64748B',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        pointRadius: 0
+                    }
+                ],
+                aiOutput: {
+                    obs: "Observation: 3 transactions between $2,800 - $2,950 within 2 hours.",
+                    rat: "Rationale: Amount is just below the $3k reporting threshold. High velocity suggests intentional structuring to evade static detection rules."
+                }
+            },
+            udaap: {
+                title: "UDAAP Pattern Discovery (Call Transcripts)",
+                desc: "Analyzing call center logs for 'Unfair, Deceptive, or Abusive Acts'. The AI Agent processes natural language to find aggressive sales tactics.",
+                chartType: 'bar',
+                labels: ['Neutral Terms', 'Product Info', 'Compliance', 'Pressure Keywords', 'Deceptive Phrases'],
+                datasets: [{
+                    label: 'Frequency Count',
+                    data: [45, 30, 25, 82, 12],
+                    backgroundColor: ['#94A3B8', '#94A3B8', '#94A3B8', '#F59E0B', '#EF4444']
+                }],
+                aiOutput: {
+                    obs: "Observation: Spike in 'Pressure Keywords' (e.g., 'must buy now', 'limited time offer') in elderly customer segment.",
+                    rat: "Rationale: Pattern matches 'Aggressive Sales' UDAAP definition. Agent behavior deviates 300% from team average."
+                }
+            },
+            insider: {
+                title: "Insider Risk Detection",
+                desc: "Correlating access times with data volume download. Static rules check for 'Unauthorized Access', but AI checks for 'Unusual Authorized Access'.",
+                chartType: 'scatter',
+                labels: [], // Scatter uses x/y
+                datasets: [{
+                    label: 'Normal User Activity',
+                    data: [{x: 9, y: 10}, {x: 10, y: 20}, {x: 14, y: 15}, {x: 16, y: 30}, {x: 11, y: 12}],
+                    backgroundColor: '#94A3B8'
+                }, {
+                    label: 'Suspicious Activity',
+                    data: [{x: 23, y: 450}], // Late night, high volume
+                    backgroundColor: '#EF4444',
+                    pointRadius: 8
+                }],
+                aiOutput: {
+                    obs: "Observation: User accessed 450 files at 11:00 PM (23:00).",
+                    rat: "Rationale: User has valid credentials, but volume is 20x daily average and timing is outside standard deviation. Potential data exfiltration."
+                }
+            }
+        };
+
+        function loadSimulation(type) {
+            // Update UI Tabs
+            ['aml', 'udaap', 'insider'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === type) {
+                    btn.classList.add('active-tab', 'text-blue-400', 'border-blue-400');
+                    btn.classList.remove('text-slate-400', 'border-transparent');
+                } else {
+                    btn.classList.remove('active-tab', 'text-blue-400', 'border-blue-400');
+                    btn.classList.add('text-slate-400', 'border-transparent');
+                }
+            });
+
+            const data = simulationData[type];
+            
+            // Update Text
+            document.getElementById('sim-title').innerText = data.title;
+            document.getElementById('sim-description').innerText = data.desc;
+
+            // Update AI Output with animation
+            const aiBox = document.getElementById('ai-output-box');
+            aiBox.innerHTML = `
+                <div class="bg-slate-700/50 p-4 rounded border border-slate-600 fade-in">
+                    <span class="text-xs uppercase tracking-wider text-slate-400 block mb-1">Observation</span>
+                    <p class="text-sm text-slate-200">${data.aiOutput.obs}</p>
+                </div>
+                <div class="bg-red-900/20 p-4 rounded border border-red-800/50 fade-in" style="animation-delay: 0.2s">
+                    <span class="text-xs uppercase tracking-wider text-red-400 block mb-1">Escalation Rationale</span>
+                    <p class="text-sm text-red-200">${data.aiOutput.rat}</p>
+                </div>
+            `;
+
+            // Update Chart
+            if (simChart) {
+                simChart.destroy();
+            }
+
+            const ctx = document.getElementById('simulationChart').getContext('2d');
+            
+            // Chart Config based on type
+            let config = {
+                type: data.chartType,
+                data: {
+                    labels: data.labels,
+                    datasets: data.datasets
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: { labels: { color: '#CBD5E1' } },
+                        tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#fff', bodyColor: '#ccc' }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94A3B8' }
+                        },
+                        x: { 
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94A3B8' }
+                        }
+                    }
+                }
+            };
+            
+            if (type === 'insider') {
+                config.options.scales.x.type = 'linear';
+                config.options.scales.x.position = 'bottom';
+                config.options.scales.x.title = { display: true, text: 'Hour of Day (24h)', color: '#94A3B8' };
+                config.options.scales.y.title = { display: true, text: 'Files Accessed', color: '#94A3B8' };
+            }
+
+            simChart = new Chart(ctx, config);
+        }
+
+        // --- Section 4: Outcome Chart ---
+        function loadOutcomeChart() {
+            const ctx = document.getElementById('outcomeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['True Risk Signals', 'False Positives'],
+                    datasets: [
+                        {
+                            label: 'Static Rules',
+                            data: [40, 85],
+                            backgroundColor: '#94A3B8',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'AI Agent',
+                            data: [92, 15],
+                            backgroundColor: '#2563EB',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw + '% Efficiency';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Performance Metric (%)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSimulation('aml'); // Load default sim
+            loadOutcomeChart(); // Load outcome chart
+        });
+
+    </script>
+
+</body></html>

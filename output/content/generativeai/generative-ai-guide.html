@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="Explore the Generative AI landscape: Implementation strategies (LLM API vs RAG), model modalities, the evolution to Agentic AI, and mitigation of key challenges." name="description"/>
+    <meta content="Generative AI, GenAI, LLM, RAG, Agentic AI, AI Implementation, AI Risks, Machine Learning, Interactive Report" name="keywords"/>
+    <title>Generative AI: Landscape &amp; Evolution</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Chosen Palette: Warm Neutrals & Calming Accents */
+        /* Background: #FDFCF8 (Cream) */
+        /* Primary Text: #1F2937 (Gray-800) */
+        /* Secondary Text: #4B5563 (Gray-600) */
+        /* Accents: #6366F1 (Indigo - Tech), #10B981 (Emerald - Success), #F59E0B (Amber - Caution) */
+
+        body {
+            background-color: #FDFCF8;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #1F2937;
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #6366F1;
+            color: #6366F1;
+            font-weight: 600;
+        }
+
+        .tab-inactive {
+            color: #6B7280;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-inactive:hover {
+            color: #374151;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Utility for hiding sections */
+        .hidden-section {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <!-- Application Structure Plan: 
+         1. Header: Title and brief intro.
+         2. Navigation: Tabs for the four main logic sections derived from the report: 
+            - Implementation Strategies (Industry use, APIs vs Models)
+            - Model Modalities (Types of models)
+            - The Agentic Shift (Evolution)
+            - Risk & Mitigation (Challenges)
+         3. Dynamic Content Area: 
+            - Section 1: Uses a Radar Chart to compare strategies (Cost vs Control vs Complexity) and clickable cards for details.
+            - Section 2: Dashboard style with a Doughnut chart for modality usage and dynamic text updates.
+            - Section 3: A vertical step-flow for evolution with a Line chart showing complexity growth.
+            - Section 4: Interactive split view where hovering a risk highlights the mitigation, paired with a Bar chart.
+         4. Why this structure? It breaks dense technical info into digestible, thematic chunks. Users can jump to what interests them (e.g., "How do I build it?" vs "What are the risks?").
+    -->
+    <!-- Visualization & Content Choices:
+         - Radar Chart (Implementation): Best for comparing multi-variate trade-offs (Cost, Control, Speed) of different AI adoption strategies.
+         - Doughnut Chart (Modalities): Visually distinguishes the different media types (Text, Audio, Video) as parts of the GenAI whole.
+         - Line Chart (Evolution): Illustrates the trajectory and increasing autonomy/complexity over time from Chatbots to Agents.
+         - Bar Chart (Risks): Quantifies the theoretical impact of risks vs the effectiveness of mitigations (before/after scenario).
+         - Interaction: Click-to-filter and Hover-to-reveal reduce cognitive load, revealing detail only when requested.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
+		(function (w, d, s, l, i) {
+			w[l] = w[l] || []; w[l].push({
+				'gtm.start':
+					new Date().getTime(), event: 'gtm.js'
+			}); var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --></head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Generative AI Landscape</h1>
+                    <p class="text-sm text-gray-500">From Industry Implementation to Agentic Evolution</p>
+                </div>
+                <div class="hidden md:block text-xs text-gray-400">
+                    Interactive Report
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div aria-label="Tabs" class="flex space-x-8 overflow-x-auto">
+                <button class="tab-active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-implementation" onclick="switchTab('implementation')">
+                    Implementation Strategies
+                </button>
+                <button class="tab-inactive whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-modalities" onclick="switchTab('modalities')">
+                    Model Modalities
+                </button>
+                <button class="tab-inactive whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-evolution" onclick="switchTab('evolution')">
+                    Evolution to Agents
+                </button>
+                <button class="tab-inactive whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-challenges" onclick="switchTab('challenges')">
+                    Challenges &amp; Mitigation
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- SECTION 1: IMPLEMENTATION STRATEGIES -->
+        <section class="fade-in space-y-8" id="implementation">
+            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-md">
+                <h2 class="text-lg font-semibold text-indigo-900">Deploying Generative AI in Industry</h2>
+                <p class="text-indigo-700 text-sm mt-1">
+                    Organizations face a spectrum of choices when adopting GenAI. This section explores the trade-offs between consuming ready-made APIs, customizing via RAG, or building proprietary models from scratch. Select a card below to see details.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left: Interactive List -->
+                <div class="space-y-4">
+                    <h3 class="text-gray-900 font-medium mb-2">Select a Strategy:</h3>
+                    <div class="space-y-3" id="strategy-list">
+                        <!-- Strategy Cards populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Right: Visualization & Details -->
+                <div class="flex flex-col space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-gray-900 font-bold text-center mb-4">Trade-off Analysis</h3>
+                        <div class="chart-container">
+                            <canvas id="strategyRadarChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-gray-400 mt-2">Comparison of Cost, Control, and Complexity</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-indigo-500" id="strategy-detail-panel">
+                        <h4 class="text-lg font-bold text-gray-900" id="detail-title">Select a strategy...</h4>
+                        <p class="text-gray-600 mt-2 text-sm" id="detail-desc">Click on a strategy on the left to see specific implementation details, pros, and cons.</p>
+                        <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-4 text-sm" id="detail-metrics">
+                            <!-- Metrics injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: MODEL MODALITIES -->
+        <section class="hidden-section fade-in space-y-8" id="modalities">
+            <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-md">
+                <h2 class="text-lg font-semibold text-emerald-900">Types of Generative Models</h2>
+                <p class="text-emerald-700 text-sm mt-1">
+                    GenAI is not just text. It encompasses images, audio, video, and more. Explore the different modalities below to understand their applications and maturity.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left: Donut Chart -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-gray-900 font-bold text-center mb-4">Market Maturity Estimate</h3>
+                    <div class="chart-container">
+                        <canvas id="modalityDonutChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Grid -->
+                <div class="lg:col-span-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="modality-grid">
+                        <!-- Modality Cards injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Banner -->
+            <div class="bg-gray-800 text-white p-6 rounded-xl shadow-lg mt-6 hidden" id="modality-banner">
+                <div class="flex items-start space-x-4">
+                    <div class="text-4xl" id="banner-icon"></div>
+                    <div>
+                        <h3 class="text-xl font-bold" id="banner-title"></h3>
+                        <p class="text-gray-300 mt-1 text-sm" id="banner-desc"></p>
+                        <div class="mt-3">
+                            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Key Use Cases:</span>
+                            <div class="flex flex-wrap gap-2 mt-2" id="banner-tags"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: EVOLUTION TO AGENTS -->
+        <section class="hidden-section fade-in space-y-8" id="evolution">
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-md">
+                <h2 class="text-lg font-semibold text-amber-900">From GenAI to Agentic AI</h2>
+                <p class="text-amber-700 text-sm mt-1">
+                    The technology is shifting from passive "Question &amp; Answer" models to autonomous "Agents" that can reason, plan, and execute tasks using tools.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Timeline/Steps -->
+                <div class="lg:col-span-1 space-y-6 relative">
+                    <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                    
+                    <!-- Step 1 -->
+                    <div class="relative pl-10 cursor-pointer group" onclick="updateEvolution(0)">
+                        <div class="absolute left-1.5 top-1.5 w-5 h-5 bg-white border-2 border-gray-400 rounded-full group-hover:border-amber-500 z-10"></div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group-hover:border-amber-500 transition-colors">
+                            <h4 class="font-bold text-gray-900">1. Foundation Models</h4>
+                            <p class="text-xs text-gray-500">Passive generation based on prompts.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="relative pl-10 cursor-pointer group" onclick="updateEvolution(1)">
+                        <div class="absolute left-1.5 top-1.5 w-5 h-5 bg-white border-2 border-gray-400 rounded-full group-hover:border-amber-500 z-10"></div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group-hover:border-amber-500 transition-colors">
+                            <h4 class="font-bold text-gray-900">2. RAG &amp; Embedding</h4>
+                            <p class="text-xs text-gray-500">Connecting models to live, private data.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="relative pl-10 cursor-pointer group" onclick="updateEvolution(2)">
+                        <div class="absolute left-1.5 top-1.5 w-5 h-5 bg-white border-2 border-gray-400 rounded-full group-hover:border-amber-500 z-10"></div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group-hover:border-amber-500 transition-colors">
+                            <h4 class="font-bold text-gray-900">3. Agentic AI</h4>
+                            <p class="text-xs text-gray-500">Reasoning loops, tool use, and autonomy.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Display Area -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Chart -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                        <div class="chart-container">
+                            <canvas id="evolutionLineChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Dynamic Info Box -->
+                    <div class="bg-amber-50 p-6 rounded-xl border border-amber-100" id="evolution-info">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2" id="evo-title">Select a Stage</h3>
+                        <p class="text-gray-700" id="evo-desc">Click on the timeline steps to understand how AI capabilities are expanding.</p>
+                        <div class="mt-4 flex gap-2" id="evo-badges"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: CHALLENGES & MITIGATION -->
+        <section class="hidden-section fade-in space-y-8" id="challenges">
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md">
+                <h2 class="text-lg font-semibold text-red-900">Navigating Challenges</h2>
+                <p class="text-red-700 text-sm mt-1">
+                    Deployment is not without risk. Understanding challenges like hallucinations and bias is crucial to implementing effective mitigation strategies.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Challenges List -->
+                <div class="space-y-4">
+                    <h3 class="font-bold text-gray-700">Key Challenges (Hover to Mitigate)</h3>
+                    <div class="space-y-3" id="challenge-list">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Mitigation & Chart -->
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-gray-300 min-h-[150px] transition-all duration-300" id="mitigation-panel">
+                        <h4 class="text-sm uppercase tracking-wide text-gray-400 font-bold mb-1">Mitigation Strategy</h4>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2" id="mit-title">Hover over a challenge</h3>
+                        <p class="text-gray-600 text-sm" id="mit-desc">Discover how to solve these problems.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                        <h4 class="text-sm font-bold text-center text-gray-700 mb-2">Impact of Mitigation</h4>
+                        <div class="chart-container">
+                            <canvas id="riskBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- DATA STORE ---
+        const strategies = [
+            {
+                id: 'llm-api',
+                title: 'LLM API (Closed)',
+                desc: 'Using models like GPT-4 or Claude via API. Fastest time to market but creates dependency.',
+                metrics: { cost: 30, control: 20, complexity: 10, performance: 90, privacy: 40 },
+                details: 'Pay-per-token model. Minimal infrastructure management. Data leaves your VPC.',
+                pros: ['Instant Access', 'State-of-the-Art Logic'],
+                cons: ['Data Privacy Concerns', 'Vendor Lock-in']
+            },
+            {
+                id: 'open-model',
+                title: 'Open Models (Self-Hosted)',
+                desc: 'Hosting Llama 3 or Mistral on your own GPU infrastructure.',
+                metrics: { cost: 60, control: 80, complexity: 70, performance: 75, privacy: 100 },
+                details: 'Requires GPU provisioning. Full data sovereignty. Maintenance overhead is significant.',
+                pros: ['100% Data Privacy', 'No Token Costs'],
+                cons: ['High Infrastructure Cost', 'Maintenance Burden']
+            },
+            {
+                id: 'rag',
+                title: 'RAG (Retrieval Augmented Gen)',
+                desc: 'Enhancing generic models with specific company data via vector search.',
+                metrics: { cost: 50, control: 70, complexity: 60, performance: 85, privacy: 70 },
+                details: 'Connects LLM to Vector DB. Reduces hallucinations. Grounded in your facts.',
+                pros: ['Up-to-date Knowledge', 'Reduces Hallucination'],
+                cons: ['Retrieval Latency', 'Context Window Limits']
+            },
+            {
+                id: 'finetuning',
+                title: 'Fine-Tuning',
+                desc: 'Retraining weights of a model on a specific niche dataset.',
+                metrics: { cost: 80, control: 90, complexity: 85, performance: 95, privacy: 90 },
+                details: 'Teaches the model "style" or "jargon". Does not necessarily teach new facts.',
+                pros: ['Domain Specificity', 'Consistent Formatting'],
+                cons: ['Risk of Catastrophic Forgetting', 'Expensive compute']
+            },
+            {
+                id: 'scratch',
+                title: 'Building from Scratch',
+                desc: 'Training a proprietary foundation model from raw data.',
+                metrics: { cost: 100, control: 100, complexity: 100, performance: 100, privacy: 100 },
+                details: 'Only for tech giants or extreme use cases. Requires massive compute and data.',
+                pros: ['Ultimate IP Ownership', 'Perfect Fit'],
+                cons: ['Millions of Dollars', 'Months of Training']
+            }
+        ];
+
+        const modalities = [
+            { 
+                type: 'Language', 
+                icon: '📝', 
+                share: 45, 
+                desc: 'Text generation, summarization, and translation.',
+                tags: ['Chatbots', 'Coding', 'Marketing Copy'] 
+            },
+            { 
+                type: 'Image', 
+                icon: '🖼️', 
+                share: 25, 
+                desc: 'Creating visual assets from text prompts.',
+                tags: ['Design', 'Advertising', 'Game Assets'] 
+            },
+            { 
+                type: 'Audio', 
+                icon: '🎤', 
+                share: 15, 
+                desc: 'Voice cloning, text-to-speech, and music generation.',
+                tags: ['Dubbing', 'Podcasts', 'Accessibility'] 
+            },
+            { 
+                type: 'Video', 
+                icon: '🎥', 
+                share: 10, 
+                desc: 'Generating short clips or editing existing footage.',
+                tags: ['Social Media', 'Education', 'Simulation'] 
+            },
+            { 
+                type: '3D/Code/Bio', 
+                icon: '🧬', 
+                share: 5, 
+                desc: 'Specialized models for objects, protein folding, etc.',
+                tags: ['Pharma', 'Gaming', 'Research'] 
+            }
+        ];
+
+        const evolutionSteps = [
+            {
+                title: 'Foundation Models',
+                desc: 'The era of "Prompt & Pray". Models are static engines. Users must provide all context in the prompt manually. Capabilities are limited to what was in the training data.',
+                complexity: 20,
+                autonomy: 10,
+                tags: ['ChatGPT Launch', 'Zero-shot', 'Static']
+            },
+            {
+                title: 'RAG & Context',
+                desc: 'Models gain "eyes" into enterprise data. The system retrieves relevant documents before generating an answer. This grounds the AI in reality and private knowledge.',
+                complexity: 50,
+                autonomy: 30,
+                tags: ['Vector DBs', 'Embeddings', 'Search']
+            },
+            {
+                title: 'Agentic AI',
+                desc: 'Models gain "hands". Agents can plan multi-step workflows, use external tools (calculators, APIs, web browsers), and reflect on their own output to correct errors.',
+                complexity: 90,
+                autonomy: 85,
+                tags: ['Function Calling', 'Reasoning Loops', 'Multi-Agent']
+            }
+        ];
+
+        const challenges = [
+            {
+                id: 'hallucination',
+                title: 'Hallucinations',
+                text: 'Models confidently stating falsehoods.',
+                mitigation: 'RAG (Retrieval Augmented Generation) & Grounding',
+                mitigationDesc: 'Force the model to cite sources from a trusted database. Limit the creativity temperature.',
+                riskScore: 90,
+                mitigatedScore: 20,
+                color: 'border-l-rose-500'
+            },
+            {
+                id: 'bias',
+                title: 'Bias & Toxicity',
+                text: 'Outputting prejudiced or harmful content.',
+                mitigation: 'RLHF & Curated Datasets',
+                mitigationDesc: 'Reinforcement Learning from Human Feedback aligns model behavior with safety guidelines.',
+                riskScore: 70,
+                mitigatedScore: 15,
+                color: 'border-l-orange-500'
+            },
+            {
+                id: 'security',
+                title: 'Data Security',
+                text: 'Leaking private data into public models.',
+                mitigation: 'Private Instances & Governance',
+                mitigationDesc: 'Use enterprise agreements (Zero Data Retention) or self-host open source models.',
+                riskScore: 85,
+                mitigatedScore: 5,
+                color: 'border-l-yellow-500'
+            },
+            {
+                id: 'cost',
+                title: 'Cost/Latency',
+                text: 'Inference costs scaling uncontrollably.',
+                mitigation: 'Small Language Models (SLMs)',
+                mitigationDesc: 'Use specialized, smaller models (e.g., Llama-7B) for specific tasks instead of GPT-4.',
+                riskScore: 60,
+                mitigatedScore: 25,
+                color: 'border-l-blue-500'
+            }
+        ];
+
+        // --- CHART INSTANCES ---
+        let radarChart, donutChart, lineChart, barChart;
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initImplementationSection();
+            initModalitiesSection();
+            initEvolutionSection();
+            initChallengesSection();
+            
+            // Render first chart initially
+            renderRadarChart(strategies[0]);
+        });
+
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            // Update Tab Styles
+            ['implementation', 'modalities', 'evolution', 'challenges'].forEach(id => {
+                const btn = document.getElementById(`tab-${id}`);
+                const section = document.getElementById(id);
+                
+                if (id === tabId) {
+                    btn.classList.remove('tab-inactive');
+                    btn.classList.add('tab-active');
+                    section.classList.remove('hidden-section');
+                    // Trigger chart resize/render when tab becomes visible
+                    if (id === 'implementation' && radarChart) radarChart.resize();
+                    if (id === 'modalities' && !donutChart) renderDonutChart();
+                    if (id === 'evolution' && !lineChart) renderLineChart();
+                    if (id === 'challenges' && !barChart) renderBarChart(null);
+                } else {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('tab-inactive');
+                    section.classList.add('hidden-section');
+                }
+            });
+        }
+
+        // --- SECTION 1: IMPLEMENTATION ---
+        function initImplementationSection() {
+            const list = document.getElementById('strategy-list');
+            strategies.forEach((s, index) => {
+                const btn = document.createElement('div');
+                btn.className = `p-4 bg-white border border-gray-200 rounded-lg cursor-pointer card-hover flex justify-between items-center ${index === 0 ? 'ring-2 ring-indigo-500' : ''}`;
+                btn.innerHTML = `<span class="font-medium text-gray-800">${s.title}</span> <span class="text-gray-400 text-lg">›</span>`;
+                btn.onclick = () => selectStrategy(s, btn);
+                list.appendChild(btn);
+            });
+            selectStrategy(strategies[0], list.children[0]);
+        }
+
+        function selectStrategy(strategy, element) {
+            // Highlight list item
+            const list = document.getElementById('strategy-list');
+            Array.from(list.children).forEach(c => c.classList.remove('ring-2', 'ring-indigo-500'));
+            element.classList.add('ring-2', 'ring-indigo-500');
+
+            // Update Text Details
+            document.getElementById('detail-title').innerText = strategy.title;
+            document.getElementById('detail-desc').innerText = strategy.details;
+
+            const metricsDiv = document.getElementById('detail-metrics');
+            metricsDiv.innerHTML = `
+                <div>
+                    <h5 class="font-bold text-emerald-600 mb-1">Pros</h5>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        ${strategy.pros.map(p => `<li>${p}</li>`).join('')}
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold text-rose-600 mb-1">Cons</h5>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        ${strategy.cons.map(c => `<li>${c}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            // Update Chart
+            updateRadarChart(strategy);
+        }
+
+        function renderRadarChart(data) {
+            const ctx = document.getElementById('strategyRadarChart').getContext('2d');
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Cost (High=Bad)', 'Control', 'Complexity', 'Performance', 'Privacy'],
+                    datasets: [{
+                        label: data.title,
+                        data: Object.values(data.metrics),
+                        fill: true,
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: 'rgb(99, 102, 241)',
+                        pointBackgroundColor: 'rgb(99, 102, 241)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(99, 102, 241)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#E5E7EB' },
+                            grid: { color: '#E5E7EB' },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function updateRadarChart(data) {
+            if (!radarChart) return;
+            radarChart.data.datasets[0].label = data.title;
+            radarChart.data.datasets[0].data = Object.values(data.metrics);
+            radarChart.update();
+        }
+
+        // --- SECTION 2: MODALITIES ---
+        function initModalitiesSection() {
+            const grid = document.getElementById('modality-grid');
+            modalities.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-xl border border-gray-200 card-hover cursor-pointer group';
+                card.onclick = () => showModalityDetails(m);
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl bg-gray-50 p-2 rounded-full">${m.icon}</span>
+                        <div>
+                            <h4 class="font-bold text-gray-800 group-hover:text-emerald-600 transition-colors">${m.type}</h4>
+                            <p class="text-xs text-gray-500">Maturity: ${m.share > 20 ? 'High' : 'Emerging'}</p>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderDonutChart() {
+            const ctx = document.getElementById('modalityDonutChart').getContext('2d');
+            donutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: modalities.map(m => m.type),
+                    datasets: [{
+                        data: modalities.map(m => m.share),
+                        backgroundColor: [
+                            '#10B981', // Emerald
+                            '#3B82F6', // Blue
+                            '#F59E0B', // Amber
+                            '#EF4444', // Red
+                            '#8B5CF6'  // Purple
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function showModalityDetails(modality) {
+            const banner = document.getElementById('modality-banner');
+            banner.classList.remove('hidden');
+            banner.classList.add('fade-in');
+            
+            document.getElementById('banner-icon').innerText = modality.icon;
+            document.getElementById('banner-title').innerText = modality.type + ' Models';
+            document.getElementById('banner-desc').innerText = modality.desc;
+            
+            const tagsContainer = document.getElementById('banner-tags');
+            tagsContainer.innerHTML = modality.tags.map(t => 
+                `<span class="bg-white/20 px-2 py-1 rounded text-xs text-white">${t}</span>`
+            ).join('');
+        }
+
+        // --- SECTION 3: EVOLUTION ---
+        function initEvolutionSection() {
+            // Initialize with first step
+            updateEvolution(0);
+        }
+
+        function updateEvolution(index) {
+            const step = evolutionSteps[index];
+            document.getElementById('evo-title').innerText = step.title;
+            document.getElementById('evo-desc').innerText = step.desc;
+            document.getElementById('evo-badges').innerHTML = step.tags.map(t => 
+                `<span class="bg-amber-200 text-amber-900 px-2 py-1 rounded text-xs font-bold">${t}</span>`
+            ).join('');
+
+            // Highlight Step UI would go here (simplified by onclick logic)
+
+            if (lineChart) {
+                // Highlight point on chart
+                const colors = ['#E5E7EB', '#E5E7EB', '#E5E7EB'];
+                colors[index] = '#F59E0B'; // Amber
+                lineChart.data.datasets[0].pointBackgroundColor = colors;
+                lineChart.data.datasets[0].pointRadius = [5, 5, 5];
+                lineChart.data.datasets[0].pointRadius[index] = 10;
+                lineChart.update();
+            }
+        }
+
+        function renderLineChart() {
+            const ctx = document.getElementById('evolutionLineChart').getContext('2d');
+            lineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: evolutionSteps.map(s => s.title),
+                    datasets: [{
+                        label: 'Autonomy Level',
+                        data: evolutionSteps.map(s => s.autonomy),
+                        borderColor: '#F59E0B',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: ['#F59E0B', '#E5E7EB', '#E5E7EB'],
+                        pointRadius: [10, 5, 5]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 100,
+                            title: { display: true, text: 'Autonomy & Complexity (%)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- SECTION 4: CHALLENGES ---
+        function initChallengesSection() {
+            const list = document.getElementById('challenge-list');
+            challenges.forEach(c => {
+                const item = document.createElement('div');
+                item.className = `p-4 bg-white border-l-4 ${c.color} shadow-sm rounded-r-md cursor-pointer hover:bg-gray-50 transition-colors`;
+                item.innerHTML = `
+                    <div class="flex justify-between">
+                        <span class="font-bold text-gray-800">${c.title}</span>
+                        <span class="text-xs text-gray-400">Hover for fix</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">${c.text}</p>
+                `;
+                item.onmouseenter = () => showMitigation(c);
+                list.appendChild(item);
+            });
+        }
+
+        function showMitigation(challenge) {
+            const panel = document.getElementById('mitigation-panel');
+            // Change border color dynamically
+            panel.className = `bg-white p-6 rounded-xl shadow-md border-t-4 ${challenge.color.replace('border-l-', 'border-t-')} min-h-[150px] transition-all duration-300`;
+            
+            document.getElementById('mit-title').innerText = challenge.mitigation;
+            document.getElementById('mit-desc').innerText = challenge.mitigationDesc;
+
+            updateBarChart(challenge);
+        }
+
+        function renderBarChart(initialData) {
+            const ctx = document.getElementById('riskBarChart').getContext('2d');
+            barChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Initial Risk', 'Residual Risk (After Mitigation)'],
+                    datasets: [{
+                        label: 'Risk Score (0-100)',
+                        data: [0, 0], // Init empty
+                        backgroundColor: ['#EF4444', '#10B981'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function updateBarChart(challenge) {
+            if (!barChart) {
+                renderBarChart();
+            }
+            barChart.data.datasets[0].data = [challenge.riskScore, challenge.mitigatedScore];
+            barChart.update();
+        }
+
+    </script>
+
+</body></html>

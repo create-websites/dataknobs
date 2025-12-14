@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Interactive Report: Dataknobs AI &amp; Data Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: The application is structured as a single-page interactive dashboard. It starts with a high-level overview and key value propositions. The core is divided into three main, navigable sections: 1) 'Solutions Showcase', an interactive, filterable grid of use cases, 2) 'Platform Deep Dive', a visual exploration of the core technology modules, and 3) 'Foundational Strengths', which highlights the data science expertise. This structure was chosen to allow different user personas (e.g., business executive, technical manager) to find relevant information quickly. A business leader can browse solutions by industry, while a tech lead can dive into the platform architecture. This non-linear exploration path is more engaging and user-friendly than a static report. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Market Growth (Digital Twin, AI in Finance, etc.) -> Goal: Show market opportunity -> Viz: Interactive Bar Chart (Chart.js) -> Interaction: Tooltips on hover show specific values -> Justification: Visually compelling way to contextualize Dataknobs' relevance.
+        - Report Info: Solution Categories & Use Cases -> Goal: Allow exploration -> Presentation: Interactive Cards with modal pop-ups -> Interaction: Filtering by industry/function, clicking a card reveals detailed info in a modal -> Justification: Organizes a large amount of information cleanly, letting users self-select what's relevant.
+        - Report Info: Core Platform Components (Kreate, Kontrols, etc.) -> Goal: Explain architecture -> Viz: Diagram built with HTML/CSS (Flexbox/Grid) -> Interaction: Hovering over a component reveals its description -> Justification: A visual, interactive diagram is more intuitive for understanding system architecture than plain text.
+        - Report Info: Foundational Data Science Techniques (Weak Supervision, etc.) -> Goal: Emphasize core competency -> Presentation: Accordion-style expandable sections -> Interaction: Clicking a title expands to show details -> Justification: Keeps the section clean and allows users to explore complex topics without being overwhelmed.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #D97706; /* Amber-600 */
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background-color: #D97706;
+            transition: width 0.3s, left 0.3s;
+        }
+        .nav-link.active::after, .nav-link:hover::after {
+            width: 100%;
+            left: 0;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #F3F4F6;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.75);
+        }
+        .modal-content {
+            background-color: #FDFBF8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
+		(function (w, d, s, l, i) {
+			w[l] = w[l] || []; w[l].push({
+				'gtm.start':
+					new Date().getTime(), event: 'gtm.js'
+			}); var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --></head>
+<body class="antialiased">
+
+    <div class="fixed inset-0 z-50 items-center justify-center hidden p-4 modal-overlay" id="modal-container">
+        <div class="relative w-full max-w-4xl max-h-full overflow-y-auto rounded-lg shadow-xl modal-content">
+            <div class="p-6 md:p-8" id="modal-content-body"></div>
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-800" id="modal-close-btn">
+                <span class="text-2xl">×</span>
+            </button>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-sm border-b border-gray-200">
+        <div class="container px-4 mx-auto">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="flex items-center justify-center w-8 h-8 text-white rounded-md bg-amber-600">
+                        <span class="text-lg font-bold">D</span>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800">Use Cases Built by Dataknobs</h1>
+                </div>
+                <nav class="hidden space-x-8 md:flex">
+                    <a class="text-gray-600 nav-link active" href="#solutions">Solutions Showcase</a>
+                    <a class="text-gray-600 nav-link" href="#platform">Platform Deep Dive</a>
+                    <a class="text-gray-600 nav-link" href="#strengths">Foundational Strengths</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container px-4 py-8 mx-auto md:py-12">
+        <section class="text-center mb-16" id="hero">
+            <h2 class="text-4xl font-bold tracking-tight text-gray-900 md:text-5xl">Data Products , GenAI and Agentic AI Use Cases</h2>
+            <p class="max-w-3xl mx-auto mt-6 text-lg text-gray-600">Dataknobs enables businesses to build custom GenAI agents and data products — from privacy compliance monitors and financial analytics copilots to personalized AI assistants for consumers."</p>
+        </section>
+        
+        <div class="grid grid-cols-1 gap-12 md:grid-cols-3 mb-16">
+            <div class="p-6 text-center bg-white rounded-lg shadow-sm">
+                <h3 class="text-4xl font-bold text-amber-600">AI Agents For Analysis</h3>
+                <p class="mt-2 text-gray-600">AI Agent for eCommerce and Finance — automate sales, revenue, and customer behavior analysis to uncover insights and drive growth</p>
+            </div>
+            <div class="p-6 text-center bg-white rounded-lg shadow-sm">
+                <h3 class="text-4xl font-bold text-amber-600">Automate Compliance</h3>
+                <p class="mt-2 text-gray-600">Stay ahead of privacy risks — use AI agents to audit your features and ensure compliance with evolving regulations</p>
+            </div>
+            <div class="p-6 text-center bg-white rounded-lg shadow-sm">
+                <h3 class="text-4xl font-bold text-amber-600">Personalized Assistant</h3>
+                <p class="mt-2 text-gray-600">Offer your consumers personalized AI assistants — from financial planners to retirement advisors and diet coaches, tailored guidance at scale.</p>
+            </div>
+        </div>
+
+        <section class="pt-16 mb-16" id="solutions">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900">Solutions Showcase</h2>
+                <p class="max-w-2xl mx-auto mt-4 text-gray-600">This section provides an interactive overview of Dataknobs' proven solutions. Use the filters to explore use cases by industry or business function, and click on any card to see a detailed analysis of the business challenge, technical implementation, and value delivered.</p>
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-4 mb-8">
+                <span class="font-semibold text-gray-700">Filter by Industry:</span>
+                <div class="flex flex-wrap gap-2" id="filters-container">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" id="solutions-grid">
+            </div>
+        </section>
+
+        <section class="pt-16 mb-16 bg-gray-50 py-16 rounded-lg" id="platform">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900">Platform Deep Dive</h2>
+                <p class="max-w-2xl mx-auto mt-4 text-gray-600">At the core of Dataknobs' offerings is a unified, modular platform. This design enables the rapid development of customized, scalable, and governed AI solutions. Hover over each component below to understand its role in the ecosystem, from data ingestion to user engagement.</p>
+            </div>
+            <div class="max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div class="md:col-span-3 p-4 text-center font-semibold text-lg bg-amber-100 text-amber-800 rounded-t-lg">Kreate Platform</div>
+                    <div class="grid grid-cols-1 col-span-1 md:col-span-3 md:grid-cols-3 gap-4">
+                        <div class="platform-card" data-desc="The foundational data engine for ingestion, processing, summarization, and advanced data generation. It builds the high-quality knowledge bases that power all specialized applications." data-title="KreateData">
+                            <h4 class="font-bold">KreateData</h4>
+                            <p class="text-sm">Data Engine</p>
+                        </div>
+                        <div class="platform-card" data-desc="A no-code/low-code engine for creating sophisticated conversational AI agents, enabling rapid deployment of chatbots and virtual assistants trained on client-specific knowledge." data-title="KreateBots">
+                            <h4 class="font-bold">KreateBots</h4>
+                            <p class="text-sm">Conversational AI</p>
+                        </div>
+                        <div class="platform-card" data-desc="A no-code tool for the rapid generation of custom websites and web portals, leveraging templates and AI to create SEO-compliant digital presences with integrated AI features." data-title="KreateWebsites">
+                            <h4 class="font-bold">KreateWebsites</h4>
+                            <p class="text-sm">Web Deployment</p>
+                        </div>
+                    </div>
+                    <div class="md:col-span-3 p-4 text-center font-semibold text-lg bg-gray-200 text-gray-800">Governance &amp; Optimization</div>
+                    <div class="grid grid-cols-1 col-span-1 md:col-span-3 md:grid-cols-2 gap-4">
+                        <div class="platform-card" data-desc="The critical governance layer ensuring all applications adhere to compliance, accuracy, and security standards. Essential for regulated industries like finance and healthcare." data-title="Kontrols">
+                            <h4 class="font-bold">Kontrols</h4>
+                            <p class="text-sm">Governance Layer</p>
+                        </div>
+                        <div class="platform-card" data-desc="Provides capabilities for A/B testing and optimizing user engagement, allowing clients to empirically validate and continuously improve AI-driven features based on real-world data." data-title="ABExperiment">
+                            <h4 class="font-bold">ABExperiment</h4>
+                            <p class="text-sm">Optimization Engine</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 p-6 bg-white rounded-lg shadow-inner min-h-[100px] flex items-center justify-center text-center" id="platform-info">
+                    <p class="text-gray-500">Hover over a platform component to see details.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="pt-16 mb-16" id="strengths">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900">Foundational Strengths</h2>
+                <p class="max-w-2xl mx-auto mt-4 text-gray-600">Dataknobs' most significant competitive advantage is its deep expertise in foundational data science. This section explores the 'data factory' capabilities that ensure the quality, robustness, and trustworthiness of every AI solution delivered, addressing the core challenge of data scarcity in enterprise AI.</p>
+            </div>
+            <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+                <div class="space-y-6">
+                    <div class="accordion-item">
+                        <button class="accordion-header">
+                            <h3 class="text-xl font-semibold">Advanced Data Generation</h3>
+                            <span class="accordion-icon">+</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p>The performance of any AI model is constrained by its training data. Dataknobs overcomes this with an internal 'data factory' that programmatically creates and enriches datasets. This includes engineering high-level features (like a server 'health index') from raw data, accelerating model development and leading to more accurate outcomes.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header">
+                            <h3 class="text-xl font-semibold">Weak Supervision &amp; Active Learning</h3>
+                            <span class="accordion-icon">+</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p>Instead of slow manual labeling, we use Weak Supervision to apply programmatic rules and heuristics to label massive datasets automatically. Active Learning is then used to have the AI identify the most uncertain data points, ensuring human expert time is spent on the most informative examples, dramatically increasing efficiency.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header">
+                            <h3 class="text-xl font-semibold">Optimal Transport Algorithms</h3>
+                            <span class="accordion-icon">+</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p>To further improve data quality, we apply Optimal Transport, a powerful mathematical framework. This allows us to intelligently generate synthetic data to balance datasets, for example, by creating more examples of a rare equipment failure. This leads to more robust, less biased models that perform better in the real world.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center">
+                    <div class="chart-container">
+                        <canvas id="marketGrowthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!--
+    <footer class="py-8 bg-gray-800 text-white">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 Dataknobs Solutions. An Interactive Report.</p>
+        </div>
+    </footer>
+    -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const solutionsData = [
+                {
+                    category: 'Predictive Maintenance & Data Health',
+                    value: 'Reduce Downtime, Lower Costs, Improve Reliability',
+                    industries: ['Cloud Infrastructure', 'Manufacturing', 'Energy'],
+                    title: 'Data Center Health Score',
+                    client: 'Large Cloud Provider, USA',
+                    challenge: 'The operational uptime of data centers is paramount. Traditional reactive maintenance is inefficient and risky, potentially leading to catastrophic outages, data loss, and financial penalties.',
+                    solution: 'Developed a dynamic "Data Center Health Score" by ingesting vast streams of real-time sensor and log data. The system provides early warning alerts, shifting the operational model from reactive repair to proactive, planned intervention.',
+                    tech: 'Utilized time-series analysis and ML to predict failures. Implemented an Asset Health Index and Remaining Useful Life (RUL) models. Leveraged an "AI Twin" (digital twin) for simulating maintenance strategies.'
+                },
+                {
+                    category: 'Generative AI for Analytics & Compliance',
+                    value: 'Automate Insights, Enhance Compliance, Improve Service',
+                    industries: ['Financial Services', 'E-commerce', 'Customer Service'],
+                    title: 'E-commerce Analytics & Compliance',
+                    client: 'Large Financial Institution, USA',
+                    challenge: 'Needed to extract actionable insights from massive, unstructured data sources, including sales reports and thousands of call center transcripts, to drive revenue and ensure regulatory compliance.',
+                    solution: 'Deployed a dual-purpose AI. An E-commerce Analytics Assistant sifts through sales reports to find trends and drivers. A Call Center Compliance Monitor scans transcripts to detect policy violations and complaint patterns.',
+                    tech: 'Used Large Language Models (LLMs) for parsing and analysis. Fine-tuned models on domain-specific financial and compliance data. Implemented vector databases for semantic search to allow interactive Q&A on the data.'
+                },
+                {
+                    category: 'Financial Services AI Assistants',
+                    value: 'Accelerate Research, Personalize Planning, Augment Productivity',
+                    industries: ['FinTech', 'Wealth Management', 'Tax & Accounting'],
+                    title: 'Tax Research & Financial Planning Assistants',
+                    client: 'FinTech Company, USA',
+                    challenge: 'Financial professionals spend countless hours on manual research in complex tax codes and developing personalized client plans. This limits their ability to scale services and provide in-depth, data-driven advice.',
+                    solution: 'Deployed two assistants: a Tax Research Assistant for instant answers from tax law, and a Financial Planning Assistant to generate personalized plans and forecasts. This augments advisor productivity and enhances service quality.',
+                    tech: 'Built on the KreateBots module with curated knowledge bases from KreateData (tax codes, market data). The Kontrols governance layer ensures advice is compliant and safe.'
+                },
+                {
+                    category: 'Sports Analytics & Content Automation',
+                    value: 'Automate Content, Enhance Fan Engagement, Generate Reports',
+                    industries: ['Sports Media', 'Broadcasting'],
+                    title: 'Cricket Commentary Generator',
+                    client: 'Sports Media',
+                    challenge: 'Creating engaging, real-time content for sports fans requires significant manual effort, especially for generating narrative summaries from live game data.',
+                    solution: 'Developed a system that ingests real-time, ball-by-ball cricket data from APIs and transforms it into human-like commentary, match summaries, and player reports, automating content for web portals and fan experiences.',
+                    tech: 'A sophisticated structured-to-text generation model trained on the specific domain knowledge and terminology of cricket. It converts numerical data (runs, wickets) into a coherent narrative.'
+                },
+                {
+                    category: 'Healthcare & Diet AI Assistants',
+                    value: 'Scale Personalized Guidance, Improve Outcomes, Support Wellness',
+                    industries: ['Health & Fitness', 'Healthcare Providers'],
+                    title: 'Virtual Dietitian & Trainer',
+                    client: 'Health & Fitness Sector',
+                    challenge: 'Scaling personalized health and diet advice is impossible with a purely human-staffed model, limiting the reach and affordability of expert guidance.',
+                    solution: 'Built a virtual coach providing personalized diet plans, nutritional advice, and workout routines based on user goals and health data. This allows wellness providers to scale their expertise to thousands of clients simultaneously.',
+                    tech: 'A conversational AI built with KreateBots, powered by a comprehensive knowledge base from KreateData covering nutrition and exercise science, with the Kontrols layer ensuring advice is safe and aligns with standards.'
+                },
+                {
+                    category: 'Rapid Website & Chatbot Deployment',
+                    value: 'Accelerate Digital Presence, Automate Inquiries, Democratize AI',
+                    industries: ['SMEs', 'Consulting', 'Manufacturing'],
+                    title: 'AI-Powered Websites & Internal Portals',
+                    client: 'Cross-Industry (USA, UK, UAE, India)',
+                    challenge: 'Many businesses, especially SMEs or non-tech departments, lack the resources to build a sophisticated online presence with integrated AI for customer or employee support.',
+                    solution: 'Delivered custom websites with integrated AI assistants for a diverse client base, from a UK consultancy (FAQ bot) to a Dubai manufacturer (internal equipment data bot), enabling rapid deployment of a digital footprint.',
+                    tech: 'Leveraged the KreateWebsites and KreateBots no-code modules. Chatbots are trained on client-specific knowledge bases (product manuals, FAQs) for context-aware support.'
+                }
+            ];
+
+            const solutionsGrid = document.getElementById('solutions-grid');
+            const filtersContainer = document.getElementById('filters-container');
+            const modalContainer = document.getElementById('modal-container');
+            const modalContentBody = document.getElementById('modal-content-body');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            let allIndustries = new Set();
+            solutionsData.forEach(s => s.industries.forEach(i => allIndustries.add(i)));
+            
+            Array.from(allIndustries).sort().forEach(industry => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.textContent = industry;
+                btn.dataset.filter = industry;
+                filtersContainer.appendChild(btn);
+            });
+            
+            function renderSolutions(filter = 'all') {
+                solutionsGrid.innerHTML = '';
+                const filteredData = filter === 'all' 
+                    ? solutionsData 
+                    : solutionsData.filter(s => s.industries.includes(filter));
+
+                filteredData.forEach((solution, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'p-6 rounded-lg cursor-pointer card fade-in';
+                    card.innerHTML = `
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-lg mr-4">${solution.category.charAt(0)}</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">${solution.title}</h3>
+                                <p class="text-sm text-gray-500">${solution.category}</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600">${solution.value}</p>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            ${solution.industries.map(i => `<span class="text-xs font-medium text-amber-800 bg-amber-100 px-2 py-1 rounded-full">${i}</span>`).join('')}
+                        </div>
+                    `;
+                    card.addEventListener('click', () => openModal(solution));
+                    solutionsGrid.appendChild(card);
+                });
+            }
+
+            function openModal(solution) {
+                modalContentBody.innerHTML = `
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">${solution.title}</h2>
+                    <p class="text-md text-gray-500 mb-6">${solution.client}</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3 border-b-2 border-amber-500 pb-2">Business Challenge</h4>
+                            <p class="text-gray-600">${solution.challenge}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3 border-b-2 border-amber-500 pb-2">Dataknobs' Solution</h4>
+                            <p class="text-gray-600">${solution.solution}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3 border-b-2 border-amber-500 pb-2">Technical Implementation</h4>
+                            <p class="text-gray-600">${solution.tech}</p>
+                        </div>
+                    </div>
+                `;
+                modalContainer.classList.remove('hidden');
+                modalContainer.classList.add('flex');
+            }
+
+            modalCloseBtn.addEventListener('click', () => {
+                modalContainer.classList.add('hidden');
+                modalContainer.classList.remove('flex');
+            });
+
+            modalContainer.addEventListener('click', (e) => {
+                if (e.target === modalContainer) {
+                    modalContainer.classList.add('hidden');
+                    modalContainer.classList.remove('flex');
+                }
+            });
+
+            filtersContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderSolutions(e.target.dataset.filter);
+                }
+            });
+
+            renderSolutions();
+
+            const platformCards = document.querySelectorAll('.platform-card');
+            const platformInfo = document.getElementById('platform-info');
+            platformCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    platformInfo.innerHTML = `
+                        <div class="fade-in">
+                            <h4 class="text-xl font-bold text-gray-800">${card.dataset.title}</h4>
+                            <p class="mt-2 text-gray-600">${card.dataset.desc}</p>
+                        </div>
+                    `;
+                });
+            });
+
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const icon = item.querySelector('.accordion-icon');
+                content.style.maxHeight = '0px';
+                content.style.overflow = 'hidden';
+                content.style.transition = 'max-height 0.5s ease-out';
+                header.addEventListener('click', () => {
+                    const isOpen = content.style.maxHeight !== '0px';
+                    accordionItems.forEach(i => {
+                        i.querySelector('.accordion-content').style.maxHeight = '0px';
+                        i.querySelector('.accordion-icon').textContent = '+';
+                    });
+                    if (!isOpen) {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.textContent = '-';
+                    }
+                });
+            });
+            
+            const marketGrowthCtx = document.getElementById('marketGrowthChart').getContext('2d');
+            new Chart(marketGrowthCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Digital Twin', 'AI in Finance', 'AI in Healthcare', 'No-Code AI'],
+                    datasets: [{
+                        label: 'Projected Market Size by 2030 ($B)',
+                        data: [40, 190, 6.2, 25],
+                        backgroundColor: ['#F59E0B', '#FBBF24', '#FCD34D', '#FDE68A'],
+                        borderColor: '#D97706',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Key AI Market Growth Projections (USD Billions)',
+                            font: { size: 16 },
+                            color: '#4A4A4A'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.raw} Billion`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Market Size ($B)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 68) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if(link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                });
+            });
+
+        });
+    </script>
+
+
+<html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html></body></html>

@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html class="scroll-smooth" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Architecting Datasets in a Data-Scarce World</title>
-    <!-- Chosen Palette: Calm Neutrals -->
-    <!-- Application Structure Plan: The SPA is designed as a guided journey through modern data engineering, structured into four thematic sections: Weak Supervision, Active Learning, Synthetic Generation (OT), and a final interactive 'Unified Framework'. This structure transforms the three separate reports into a single, cohesive narrative that follows the logical workflow of building a dataset from scratch: first, label what you have (WS); second, refine efficiently (AL); third, create what you're missing (OT/Synthetic); and finally, decide on the right strategy. This user-centric flow is more intuitive than simply summarizing each report and is designed to teach the concepts in a practical order. -->
-    <!-- Visualization & Content Choices:
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Architecting Datasets in a Data-Scarce World</title>
+<!-- Chosen Palette: Calm Neutrals -->
+<!-- Application Structure Plan: The SPA is designed as a guided journey through modern data engineering, structured into four thematic sections: Weak Supervision, Active Learning, Synthetic Generation (OT), and a final interactive 'Unified Framework'. This structure transforms the three separate reports into a single, cohesive narrative that follows the logical workflow of building a dataset from scratch: first, label what you have (WS); second, refine efficiently (AL); third, create what you're missing (OT/Synthetic); and finally, decide on the right strategy. This user-centric flow is more intuitive than simply summarizing each report and is designed to teach the concepts in a practical order. -->
+<!-- Visualization & Content Choices:
         - Report Info: WS Pipeline -> Goal: Organize -> Viz/Method: Animated HTML/CSS flowchart -> Interaction: Steps fade in sequentially to explain the process. Justification: Clearly visualizes the multi-stage nature of weak supervision. NO SVG/Mermaid.
         - Report Info: AL Query Strategies (Table 2) -> Goal: Compare -> Viz/Method: Interactive Dropdown + Text/Canvas -> Interaction: User selects a strategy family to see its principle and a simple visual. Justification: More engaging and digestible than a static table. Canvas used.
         - Report Info: OT for Augmentation -> Goal: Compare -> Viz/Method: Side-by-side Canvas diagrams -> Interaction: Visual shows OT barycenters respecting data manifold vs. naive interpolation. Justification: Illustrates the geometric advantage of OT in a clear, visual manner. Canvas used.
         - Report Info: Overall paradigm comparison (Table 1) -> Goal: Guide -> Viz/Method: Interactive Decision Framework -> Interaction: User answers questions to get a recommended workflow. Justification: Transforms a static comparison into a personalized, actionable tool.
     -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #212529; }
         .nav-link { transition: all 0.2s ease-in-out; border-bottom: 2px solid transparent; }
@@ -31,167 +31,154 @@
     </style>
 </head>
 <body class="antialiased">
-
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-
-        <header class="py-10 text-center">
-            <h1 class="text-4xl lg:text-5xl font-extrabold text-gray-800">Architecting Datasets Under Scarcity</h1>
-            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">A data-centric guide to building high-quality datasets when real-world data is unavailable or insufficient.</p>
-        </header>
-
-        <nav id="main-nav" class="sticky top-0 z-50 bg-[#f8f9fa]/90 backdrop-blur-lg border-b border-gray-200 flex justify-center space-x-4 md:space-x-8 py-3 mb-12">
-            <a href="#ws" class="nav-link font-semibold p-2">Weak Supervision</a>
-            <a href="#al" class="nav-link font-semibold p-2">Active Learning</a>
-            <a href="#ot" class="nav-link font-semibold p-2">Generative Methods (OT)</a>
-            <a href="#framework" class="nav-link font-semibold p-2">Unified Framework</a>
-        </nav>
-
-        <main id="main-content">
-
-            <section id="ws" class="content-section space-y-12">
-                <div>
-                    <h2 class="text-3xl font-bold text-center text-gray-800">I. Weak Supervision</h2>
-                    <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">When you have a large pool of unlabeled data, Weak Supervision (WS) is your starting point. It's a powerful technique for programmatically generating noisy labels at scale, transforming your domain expertise into a massive training set.</p>
-                </div>
-
-                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-                    <h3 class="text-2xl font-semibold text-center text-gray-700 mb-8">The Programmatic Labeling Pipeline</h3>
-                    <div class="space-y-4">
-                        <div class="flow-step flex items-center space-x-4">
-                            <div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">1</div>
-                            <div>
-                                <h4 class="font-semibold">Write Labeling Functions (LFs)</h4>
-                                <p class="text-gray-600">Encode domain knowledge as functions (e.g., using keywords, patterns, or LLM prompts) that vote on labels or abstain.</p>
-                            </div>
-                        </div>
-                        <div class="h-12 w-px bg-gray-300 ml-6"></div>
-                        <div class="flow-step flex items-center space-x-4">
-                            <div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">2</div>
-                             <div>
-                                <h4 class="font-semibold">Run Generative Label Model</h4>
-                                <p class="text-gray-600">This model analyzes the agreements and disagreements among LFs to estimate their accuracies and correlations—without any ground truth.</p>
-                            </div>
-                        </div>
-                         <div class="h-12 w-px bg-gray-300 ml-6"></div>
-                        <div class="flow-step flex items-center space-x-4">
-                            <div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">3</div>
-                            <div>
-                                <h4 class="font-semibold">Produce Probabilistic Labels</h4>
-                                <p class="text-gray-600">The output is a full training set with "soft" labels (e.g., 90% Class A, 10% Class B), capturing the model's confidence.</p>
-                            </div>
-                        </div>
-                         <div class="h-12 w-px bg-gray-300 ml-6"></div>
-                         <div class="flow-step flex items-center space-x-4">
-                            <div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">4</div>
-                            <div>
-                                <h4 class="font-semibold">Train Discriminative End Model</h4>
-                                <p class="text-gray-600">A powerful model (e.g., a Transformer) is trained on these probabilistic labels. It learns to generalize beyond the simple heuristics of the LFs, resulting in a robust, high-performance final model.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <section id="al" class="content-section space-y-12">
-                 <div>
-                    <h2 class="text-3xl font-bold text-center text-gray-800">II. Active Learning</h2>
-                    <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">Active Learning (AL) addresses the labeling bottleneck from a different angle. Instead of labeling more data noisily, AL helps you label less data intelligently, maximizing model improvement while minimizing human annotation cost.</p>
-                </div>
-                 <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-                    <h3 class="text-2xl font-semibold text-center text-gray-700 mb-2">The Query Strategy Explorer</h3>
-                    <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto">The "brain" of an active learner is its query strategy. Select a strategy family below to understand its core principle.</p>
-                    <div class="max-w-xl mx-auto">
-                         <select id="al-strategy-selector" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <option value="uncertainty">Uncertainty Sampling</option>
-                            <option value="qbc">Query-by-Committee (QBC)</option>
-                            <option value="diversity">Diversity Sampling</option>
-                        </select>
-                        <div id="al-strategy-display" class="mt-6 p-6 bg-gray-50 rounded-lg min-h-[150px]">
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="ot" class="content-section space-y-12">
-                 <div>
-                    <h2 class="text-3xl font-bold text-center text-gray-800">III. Generative Methods & Optimal Transport</h2>
-                    <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">When you need to fill gaps, cover edge cases, or simply create more data, generative methods are the solution. Optimal Transport (OT) provides a principled, geometric framework for creating high-fidelity synthetic data.</p>
-                </div>
-
-                 <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-                    <h3 class="text-2xl font-semibold text-center text-gray-700 mb-8">Principled Augmentation with OT</h3>
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
-                        <div class="text-center">
-                            <h4 class="font-semibold text-gray-600 mb-2">Naive Interpolation (e.g., Mixup)</h4>
-                            <div class="w-full h-48 bg-gray-100 rounded-lg"><canvas id="naive-interp-canvas"></canvas></div>
-                            <p class="text-sm text-gray-500 mt-2">Simply averaging data points can create unrealistic samples that fall "off" the true data manifold.</p>
-                        </div>
-                        <div class="text-center">
-                            <h4 class="font-semibold text-gray-600 mb-2">Wasserstein Barycenters (OT)</h4>
-                            <div class="w-full h-48 bg-gray-100 rounded-lg"><canvas id="ot-interp-canvas"></canvas></div>
-                            <p class="text-sm text-gray-500 mt-2">OT finds a geometric "average" that respects the data's structure, producing realistic, in-distribution samples.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-                     <h3 class="text-2xl font-semibold text-center text-gray-700 mb-8">The OT Data-Centric Toolkit</h3>
-                     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="interactive-card bg-gray-50 p-6 rounded-lg">
-                            <h4 class="font-bold text-indigo-700">WGANs</h4>
-                            <p class="text-sm text-gray-600 mt-2">Uses Wasserstein distance to stabilize GAN training, generating higher-quality synthetic data.</p>
-                        </div>
-                         <div class="interactive-card bg-gray-50 p-6 rounded-lg">
-                            <h4 class="font-bold text-indigo-700">Domain Adaptation</h4>
-                            <p class="text-sm text-gray-600 mt-2">Aligns data distributions from a source domain to a target domain, bridging the "domain gap".</p>
-                        </div>
-                        <div class="interactive-card bg-gray-50 p-6 rounded-lg">
-                            <h4 class="font-bold text-indigo-700">Coreset Selection</h4>
-                            <p class="text-sm text-gray-600 mt-2">Finds a small, representative subset of a large dataset for more efficient model training.</p>
-                        </div>
-                     </div>
-                </div>
-            </section>
-            
-            <section id="framework" class="content-section space-y-12">
-                 <div>
-                    <h2 class="text-3xl font-bold text-center text-gray-800">IV. The Unified Framework</h2>
-                    <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">These techniques are most powerful when combined. Use this interactive guide to determine the best data-building strategy for your specific needs.</p>
-                </div>
-                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 max-w-4xl mx-auto">
-                    <div class="space-y-6">
-                         <div>
-                            <label for="q1" class="font-semibold text-gray-700">1. What is your starting point?</label>
-                            <select id="q1" class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="unlabeled">Large pool of unlabeled data, no labels</option>
-                                <option value="small_labeled">Small set of high-quality labels, large unlabeled pool</option>
-                                <option value="no_data">Very little or no initial data</option>
-                            </select>
-                        </div>
-                         <div>
-                            <label for="q2" class="font-semibold text-gray-700">2. What is your primary bottleneck?</label>
-                            <select id="q2" class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="cost">Manual labeling is too expensive/slow</option>
-                                <option value="gaps">My data lacks diversity or has edge case gaps</option>
-                                <option value="performance">My model's performance on a small dataset is poor</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div id="recommendation-panel" class="mt-8 bg-indigo-50 p-6 rounded-lg border border-indigo-200">
-                         <h4 class="font-bold text-indigo-800 text-lg mb-2">Recommended Strategy:</h4>
-                         <div id="recommendation-content" class="text-gray-700 space-y-2">
-                            <p>Your recommended workflow will appear here...</p>
-                         </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="text-center py-10 mt-12 border-t text-gray-500 text-sm">
-            <p>Interactive Report Synthesized from Research on Data-Centric AI</p>
-        </footer>
-    </div>
-
+<div class="container mx-auto px-4 sm:px-6 lg:px-8">
+<header class="py-10 text-center">
+<h1 class="text-4xl lg:text-5xl font-extrabold text-gray-800">Architecting Datasets Under Scarcity</h1>
+<p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">A data-centric guide to building high-quality datasets when real-world data is unavailable or insufficient.</p>
+</header>
+<nav class="sticky top-0 z-50 bg-[#f8f9fa]/90 backdrop-blur-lg border-b border-gray-200 flex justify-center space-x-4 md:space-x-8 py-3 mb-12" id="main-nav">
+<a class="nav-link font-semibold p-2" href="#ws">Weak Supervision</a>
+<a class="nav-link font-semibold p-2" href="#al">Active Learning</a>
+<a class="nav-link font-semibold p-2" href="#ot">Generative Methods (OT)</a>
+<a class="nav-link font-semibold p-2" href="#framework">Unified Framework</a>
+</nav>
+<main id="main-content">
+<section class="content-section space-y-12" id="ws">
+<div>
+<h2 class="text-3xl font-bold text-center text-gray-800">I. Weak Supervision</h2>
+<p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">When you have a large pool of unlabeled data, Weak Supervision (WS) is your starting point. It's a powerful technique for programmatically generating noisy labels at scale, transforming your domain expertise into a massive training set.</p>
+</div>
+<div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+<h3 class="text-2xl font-semibold text-center text-gray-700 mb-8">The Programmatic Labeling Pipeline</h3>
+<div class="space-y-4">
+<div class="flow-step flex items-center space-x-4">
+<div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">1</div>
+<div>
+<h4 class="font-semibold">Write Labeling Functions (LFs)</h4>
+<p class="text-gray-600">Encode domain knowledge as functions (e.g., using keywords, patterns, or <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> prompts) that vote on labels or abstain.</p>
+</div>
+</div>
+<div class="h-12 w-px bg-gray-300 ml-6"></div>
+<div class="flow-step flex items-center space-x-4">
+<div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">2</div>
+<div>
+<h4 class="font-semibold">Run Generative Label Model</h4>
+<p class="text-gray-600">This model analyzes the agreements and disagreements among LFs to estimate their accuracies and correlations—without any ground truth.</p>
+</div>
+</div>
+<div class="h-12 w-px bg-gray-300 ml-6"></div>
+<div class="flow-step flex items-center space-x-4">
+<div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">3</div>
+<div>
+<h4 class="font-semibold">Produce Probabilistic Labels</h4>
+<p class="text-gray-600">The output is a full training set with "soft" labels (e.g., 90% Class A, 10% Class B), capturing the model's confidence.</p>
+</div>
+</div>
+<div class="h-12 w-px bg-gray-300 ml-6"></div>
+<div class="flow-step flex items-center space-x-4">
+<div class="flex-shrink-0 bg-indigo-100 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg">4</div>
+<div>
+<h4 class="font-semibold">Train Discriminative End Model</h4>
+<p class="text-gray-600">A powerful model (e.g., a Transformer) is trained on these probabilistic labels. It learns to generalize beyond the simple heuristics of the LFs, resulting in a robust, high-performance final model.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="content-section space-y-12" id="al">
+<div>
+<h2 class="text-3xl font-bold text-center text-gray-800">II. Active Learning</h2>
+<p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">Active Learning (AL) addresses the labeling bottleneck from a different angle. Instead of labeling more data noisily, AL helps you label less data intelligently, maximizing model improvement while minimizing human annotation cost.</p>
+</div>
+<div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+<h3 class="text-2xl font-semibold text-center text-gray-700 mb-2">The Query Strategy Explorer</h3>
+<p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto">The "brain" of an active learner is its query strategy. Select a strategy family below to understand its core principle.</p>
+<div class="max-w-xl mx-auto">
+<select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="al-strategy-selector">
+<option value="uncertainty">Uncertainty Sampling</option>
+<option value="qbc">Query-by-Committee (QBC)</option>
+<option value="diversity">Diversity Sampling</option>
+</select>
+<div class="mt-6 p-6 bg-gray-50 rounded-lg min-h-[150px]" id="al-strategy-display">
+</div>
+</div>
+</div>
+</section>
+<section class="content-section space-y-12" id="ot">
+<div>
+<h2 class="text-3xl font-bold text-center text-gray-800">III. Generative Methods &amp; Optimal Transport</h2>
+<p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">When you need to fill gaps, cover edge cases, or simply create more data, generative methods are the solution. Optimal Transport (OT) provides a principled, geometric framework for creating high-fidelity synthetic data.</p>
+</div>
+<div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+<h3 class="text-2xl font-semibold text-center text-gray-700 mb-8">Principled Augmentation with OT</h3>
+<div class="grid md:grid-cols-2 gap-8 items-center">
+<div class="text-center">
+<h4 class="font-semibold text-gray-600 mb-2">Naive Interpolation (e.g., Mixup)</h4>
+<div class="w-full h-48 bg-gray-100 rounded-lg"><canvas id="naive-interp-canvas"></canvas></div>
+<p class="text-sm text-gray-500 mt-2">Simply averaging data points can create unrealistic samples that fall "off" the true data manifold.</p>
+</div>
+<div class="text-center">
+<h4 class="font-semibold text-gray-600 mb-2">Wasserstein Barycenters (OT)</h4>
+<div class="w-full h-48 bg-gray-100 rounded-lg"><canvas id="ot-interp-canvas"></canvas></div>
+<p class="text-sm text-gray-500 mt-2">OT finds a geometric "average" that respects the data's structure, producing realistic, in-distribution samples.</p>
+</div>
+</div>
+</div>
+<div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+<h3 class="text-2xl font-semibold text-center text-gray-700 mb-8">The OT Data-Centric Toolkit</h3>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="interactive-card bg-gray-50 p-6 rounded-lg">
+<h4 class="font-bold text-indigo-700">WGANs</h4>
+<p class="text-sm text-gray-600 mt-2">Uses Wasserstein distance to stabilize GAN training, generating higher-quality synthetic data.</p>
+</div>
+<div class="interactive-card bg-gray-50 p-6 rounded-lg">
+<h4 class="font-bold text-indigo-700">Domain Adaptation</h4>
+<p class="text-sm text-gray-600 mt-2">Aligns data distributions from a source domain to a target domain, bridging the "domain gap".</p>
+</div>
+<div class="interactive-card bg-gray-50 p-6 rounded-lg">
+<h4 class="font-bold text-indigo-700">Coreset Selection</h4>
+<p class="text-sm text-gray-600 mt-2">Finds a small, representative subset of a large dataset for more efficient model training.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="content-section space-y-12" id="framework">
+<div>
+<h2 class="text-3xl font-bold text-center text-gray-800">IV. The Unified Framework</h2>
+<p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">These techniques are most powerful when combined. Use this interactive guide to determine the best data-building strategy for your specific needs.</p>
+</div>
+<div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 max-w-4xl mx-auto">
+<div class="space-y-6">
+<div>
+<label class="font-semibold text-gray-700" for="q1">1. What is your starting point?</label>
+<select class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="q1">
+<option value="unlabeled">Large pool of unlabeled data, no labels</option>
+<option value="small_labeled">Small set of high-quality labels, large unlabeled pool</option>
+<option value="no_data">Very little or no initial data</option>
+</select>
+</div>
+<div>
+<label class="font-semibold text-gray-700" for="q2">2. What is your primary bottleneck?</label>
+<select class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="q2">
+<option value="cost">Manual labeling is too expensive/slow</option>
+<option value="gaps">My data lacks diversity or has edge case gaps</option>
+<option value="performance">My model's performance on a small dataset is poor</option>
+</select>
+</div>
+</div>
+<div class="mt-8 bg-indigo-50 p-6 rounded-lg border border-indigo-200" id="recommendation-panel">
+<h4 class="font-bold text-indigo-800 text-lg mb-2">Recommended Strategy:</h4>
+<div class="text-gray-700 space-y-2" id="recommendation-content">
+<p>Your recommended workflow will appear here...</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="text-center py-10 mt-12 border-t text-gray-500 text-sm">
+<p>Interactive Report Synthesized from Research on Data-Centric AI</p>
+</footer>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -380,6 +367,5 @@ document.addEventListener('DOMContentLoaded', () => {
     navigateTo(window.location.hash || '#ws');
 });
 </script>
-
 </body>
 </html>

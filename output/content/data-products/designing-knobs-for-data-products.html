@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Defining and Designing Knobs for Dataknobs Data Products</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Flowchart Connector Styles */
+        .flow-line {
+            position: absolute;
+            width: 2px;
+            background-color: #cbd5e1;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- Mobile Header -->
+    <div class="lg:hidden bg-white border-b border-slate-200 p-4 sticky top-0 z-50 flex justify-between items-center">
+        <h1 class="font-bold text-slate-900 truncate">Dataknobs Design Guide</h1>
+        <button class="text-slate-600 hover:text-brand-600" id="menu-toggle">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <div class="flex min-h-screen">
+
+        <!-- Sidebar Navigation -->
+        <aside class="fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto" id="sidebar">
+            <div class="p-6">
+                <div class="flex items-center space-x-2 mb-8">
+                    <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold">D</div>
+                    <span class="text-xl font-bold text-slate-900 tracking-tight">Dataknobs</span>
+                </div>
+
+                <nav class="space-y-1">
+                    <a class="nav-item block px-3 py-2 text-sm font-medium rounded-md text-brand-700 bg-brand-50 hover:bg-brand-50 hover:text-brand-700" href="#executive-summary">Executive Summary</a>
+                    <a class="nav-item block px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:bg-slate-50 hover:text-slate-900" href="#definition">Definition &amp; Roles</a>
+                    <a class="nav-item block px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:bg-slate-50 hover:text-slate-900" href="#taxonomy">Taxonomy of Knobs</a>
+                    <div class="pl-4 space-y-1">
+                        <button class="block w-full text-left px-3 py-1 text-xs text-slate-500 hover:text-brand-600" onclick="switchTab('data')">Data Artifacts</button>
+                        <button class="block w-full text-left px-3 py-1 text-xs text-slate-500 hover:text-brand-600" onclick="switchTab('code')">Code Artifacts</button>
+                        <button class="block w-full text-left px-3 py-1 text-xs text-slate-500 hover:text-brand-600" onclick="switchTab('ai')">AI/Model Artifacts</button>
+                    </div>
+                    <a class="nav-item block px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:bg-slate-50 hover:text-slate-900" href="#comparison">Comparison Table</a>
+                    <a class="nav-item block px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:bg-slate-50 hover:text-slate-900" href="#discovery">Discovery Heuristics</a>
+                    <a class="nav-item block px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:bg-slate-50 hover:text-slate-900" href="#selection">Selection Flows</a>
+                    <a class="nav-item block px-3 py-2 text-sm font-medium text-slate-600 rounded-md hover:bg-slate-50 hover:text-slate-900" href="#operations">Operating Safely</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 lg:ml-72 p-6 lg:p-12 max-w-5xl mx-auto">
+            
+            <!-- Executive Summary -->
+            <section class="mb-16" id="executive-summary">
+                <div class="mb-6">
+                    <span class="inline-flex items-center rounded-full bg-brand-100 px-3 py-1 text-xs font-medium text-brand-700 ring-1 ring-inset ring-brand-700/10">Technical Report</span>
+                </div>
+                <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 mb-6">Defining and Designing Knobs for Dataknobs Data Products</h1>
+                <p class="text-lg text-slate-600 leading-relaxed mb-6">
+                    “Knobs” are the <span class="font-semibold text-slate-900">intentional control surface</span> of a data product. A mature knob is not merely a variable; it is a controlled intervention point with telemetry, constraints, access control, auditability, lineage, and rollback.
+                </p>
+                <div class="bg-white border-l-4 border-brand-500 shadow-sm p-6 rounded-r-lg">
+                    <p class="italic text-slate-700">
+                        This framing aligns with modern practice in feature flag standards (OpenFeature), observability standards (OpenTelemetry), and production release safety patterns (canarying).
+                    </p>
+                </div>
+            </section>
+
+            <hr class="border-slate-200 mb-16"/>
+
+            <!-- Definition & Roles -->
+            <section class="mb-16 scroll-mt-20" id="definition">
+                <h2 class="text-3xl font-bold text-slate-900 mb-8">What is a Knob?</h2>
+                <p class="mb-8 text-slate-600">A first-class, named control parameter that can be set intentionally, changes observable behavior in a documented way, is measurable end-to-end, and is fully governed.</p>
+                
+                <h3 class="text-xl font-bold text-slate-900 mb-6">Core Roles</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Card 1 -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mb-4">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">Influencing Outputs</h4>
+                        <p class="text-sm text-slate-600">Altering inclusion criteria, ranking weights, thresholds, prompts, or decoding settings to shift results.</p>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600 mb-4">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">Enabling Experimentation</h4>
+                        <p class="text-sm text-slate-600">Formalizing "what changed" as an explicit treatment variable for A/B tests and causal learning.</p>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 mb-4">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">Diagnostics &amp; RCA</h4>
+                        <p class="text-sm text-slate-600">Isolating sensitivity and failure modes to determine if an issue is data, algorithmic, or context-based.</p>
+                    </div>
+                    <!-- Card 4 -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-red-600 mb-4">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">Governance &amp; Risk</h4>
+                        <p class="text-sm text-slate-600">Tangible mechanisms to enact controls, such as least-privilege access, audit logging, and rollback.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Taxonomy Interactive Section -->
+            <section class="mb-16 scroll-mt-20" id="taxonomy">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Taxonomy of Knob Types</h2>
+                <p class="text-slate-600 mb-8">This taxonomy is artifact-derived: it identifies knobs by the domain objects you inspect and control.</p>
+
+                <!-- Tabs -->
+                <div class="border-b border-slate-200 mb-8">
+                    <nav aria-label="Tabs" class="-mb-px flex space-x-8">
+                        <button class="tab-btn border-brand-500 text-brand-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-data" onclick="switchTab('data')">
+                            <i class="fas fa-database mr-2"></i>Data Artifacts
+                        </button>
+                        <button class="tab-btn border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-code" onclick="switchTab('code')">
+                            <i class="fas fa-code mr-2"></i>Code Artifacts
+                        </button>
+                        <button class="tab-btn border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-ai" onclick="switchTab('ai')">
+                            <i class="fas fa-brain mr-2"></i>AI/Model Artifacts
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Tab Content: Data -->
+                <div class="tab-content grid gap-6" id="content-data">
+                    <!-- Knob Card -->
+                    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Data Scope &amp; Cohort Definition</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> Controls which records are eligible (filters, segments, time windows).</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> High leverage on output composition; bias profile risk.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Access control, audit logs, lineage of cohort spec.</div>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded text-blue-800 text-xs font-mono">Example: "Only include transactions in last 30 days"</div>
+                        </div>
+                    </div>
+                    <!-- Knob Card -->
+                    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Data Representation &amp; Aggregation</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> Summarization, granularity, windowing, deduplication strategies.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> Medium-to-high; changes signal-to-noise and ranking outputs.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Version representation specs; lineage at feature level.</div>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded text-blue-800 text-xs font-mono">Example: "Use 7-day vs 28-day rolling window"</div>
+                        </div>
+                    </div>
+                     <!-- Knob Card -->
+                     <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Data Integrity &amp; Quality Gates</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> Thresholds that determine if inputs are "good enough" (nulls, drift).</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> Indirect but critical; prevents silent degradation.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Audit event logging; treat gate changes as controlled changes.</div>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded text-blue-800 text-xs font-mono">Example: "Block if null_rate &gt; 0.5%"</div>
+                        </div>
+                    </div>
+                     <!-- Knob Card -->
+                     <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Data Semantics &amp; Label Definition</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> Controls the meaning of "truth" or "success" (attribution windows).</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> Very high; redefines optimization objective.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Controlled change management; lineage from label spec.</div>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded text-blue-800 text-xs font-mono">Example: "Conversion within 7 days vs 30 days"</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Code -->
+                <div class="tab-content hidden grid gap-6" id="content-code">
+                    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Feature Flags &amp; Rollouts</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> Binary/multivariate toggles for release, experiment, or ops.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> High but scoped via targeting rules.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Audit flag changes; restrict targeting access.</div>
+                            </div>
+                            <div class="bg-purple-50 p-3 rounded text-purple-800 text-xs font-mono">Example: "Rollout to 10% of users"</div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Algorithmic Thresholds</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> Parameters in logic: weights, scoring coefficients, cutoffs.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> Medium-to-high; can cause sharp regime changes.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Treat as policy levers; require approval and audit.</div>
+                            </div>
+                            <div class="bg-purple-50 p-3 rounded text-purple-800 text-xs font-mono">Example: "Fraud score ≥ 0.97 blocks transaction"</div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Operational Resilience</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> Timeouts, retries, circuit breakers, degradation modes.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> Indirect; affects latency/cost tradeoffs and correctness.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Restricted access for emergency controls; strong logging.</div>
+                            </div>
+                            <div class="bg-purple-50 p-3 rounded text-purple-800 text-xs font-mono">Example: "Fail open vs fail closed"</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: AI -->
+                <div class="tab-content hidden grid gap-6" id="content-ai">
+                    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Model Selection &amp; Routing</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> Choosing model versions, checkpoints, or fallback routes.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> High; instant change in quality, latency, and cost.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Approval gates; auditable lineage via registries.</div>
+                            </div>
+                            <div class="bg-indigo-50 p-3 rounded text-indigo-800 text-xs font-mono">Example: "Route premium users to GPT-4"</div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Prompt &amp; Context Construction</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> System instructions, retrieval filters, chunking, context length.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> Very high; context quality drives factuality.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Access control; lineage to retrieval corpus versions.</div>
+                            </div>
+                            <div class="bg-indigo-50 p-3 rounded text-indigo-800 text-xs font-mono">Example: "Filter retrieval to trusted sources only"</div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Decoding &amp; Sampling</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> Temperature, top_p, max tokens, stop strings.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> High on style/diversity; changes variance strongly.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Treat as experimentation knobs for creative tasks.</div>
+                            </div>
+                            <div class="bg-indigo-50 p-3 rounded text-indigo-800 text-xs font-mono">Example: "Use temperature=0.2 for determinism"</div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h3 class="font-bold text-lg text-slate-900">Safety &amp; Policy Guardrails</h3>
+                        </div>
+                        <div class="p-6 text-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div><span class="font-semibold text-slate-700 block mb-1">Definition</span> Refusal thresholds, PII filtering, tool allowances.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Impact</span> Critical for risk; may increase refusals.</div>
+                                <div><span class="font-semibold text-slate-700 block mb-1">Governance</span> Strongest controls; immutable audit logs.</div>
+                            </div>
+                            <div class="bg-indigo-50 p-3 rounded text-indigo-800 text-xs font-mono">Example: "Block PII in prompts"</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Comparison Table -->
+            <section class="mb-16 scroll-mt-20" id="comparison">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Comparison Matrix</h2>
+                <div class="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
+                    <table class="min-w-full divide-y divide-slate-200 text-sm">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-900">Knob Type</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-900">Observability</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-900">Risk Level</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-900">Governance</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 bg-white">
+                            <tr>
+                                <td class="px-6 py-4 font-medium text-slate-900">Data Scope</td>
+                                <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Medium</span></td>
+                                <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                                <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-medium text-slate-900">Data Quality Gates</td>
+                                <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                                <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Medium</span></td>
+                                <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-medium text-slate-900">Feature Flags</td>
+                                <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                                <td class="px-6 py-4"><span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-medium">Med-High</span></td>
+                                <td class="px-6 py-4"><span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-medium">Med-High</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-medium text-slate-900">Model Selection</td>
+                                <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                                <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                                <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                            </tr>
+                             <tr>
+                                <td class="px-6 py-4 font-medium text-slate-900">Safety Guardrails</td>
+                                <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                                <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                                <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">High</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Discovery Heuristics -->
+            <section class="mb-16 scroll-mt-20" id="discovery">
+                 <h2 class="text-3xl font-bold text-slate-900 mb-6">Discovery Heuristics</h2>
+                 <p class="mb-6 text-slate-600">How to identify candidate knobs in your system.</p>
+                 
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-slate-900 mb-3 text-lg border-b border-slate-100 pb-2">From Data</h3>
+                        <ul class="space-y-3 text-sm text-slate-600">
+                            <li class="flex items-start"><i class="fas fa-check text-brand-500 mt-1 mr-2"></i><span><strong>Sensitivity:</strong> Features that drive errors or have nonlinear effects.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-brand-500 mt-1 mr-2"></i><span><strong>Causal Inference:</strong> Variables that act as actionable treatments, not just attributes.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-brand-500 mt-1 mr-2"></i><span><strong>Drift:</strong> Fields with frequent drift need gating or fallback triggers.</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-slate-900 mb-3 text-lg border-b border-slate-100 pb-2">From Code</h3>
+                        <ul class="space-y-3 text-sm text-slate-600">
+                            <li class="flex items-start"><i class="fas fa-check text-brand-500 mt-1 mr-2"></i><span><strong>Magic Numbers:</strong> Hard-coded thresholds that encode business policy.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-brand-500 mt-1 mr-2"></i><span><strong>Feature Flags:</strong> Existing toggles that need formal lifecycle management.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-brand-500 mt-1 mr-2"></i><span><strong>Observability:</strong> Areas where ops teams frequently wish for controls during incidents.</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-slate-900 mb-3 text-lg border-b border-slate-100 pb-2">From Models</h3>
+                        <ul class="space-y-3 text-sm text-slate-600">
+                            <li class="flex items-start"><i class="fas fa-check text-brand-500 mt-1 mr-2"></i><span><strong>API Params:</strong> Temperature, top_p, and generation strategies.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-brand-500 mt-1 mr-2"></i><span><strong>Prompts:</strong> System instructions and tool definitions.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-brand-500 mt-1 mr-2"></i><span><strong>RAG:</strong> Retrieval chunk size, K-nearest neighbors, and filters.</span></li>
+                        </ul>
+                    </div>
+                 </div>
+            </section>
+
+            <!-- Selection Flows -->
+            <section class="mb-16 scroll-mt-20" id="selection">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Selection Flows</h2>
+                <p class="mb-8 text-slate-600">Deciding whether a knob is for <span class="font-bold text-brand-600">Governance</span> (safety) or <span class="font-bold text-green-600">Experimentation</span> (learning).</p>
+
+                <!-- Visual Decision Tree: Data Domain -->
+                <div class="mb-12">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 bg-slate-100 inline-block px-3 py-1 rounded">Data Domain Logic</h3>
+                    <div class="flex flex-col space-y-4 relative">
+                        <div class="absolute left-6 top-6 bottom-6 w-0.5 bg-slate-200 -z-10"></div>
+                        
+                        <!-- Step 1 -->
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 border-4 border-white flex items-center justify-center shrink-0 text-slate-500 font-bold z-10">1</div>
+                            <div class="ml-6 bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex-1">
+                                <p class="font-medium text-slate-900">Does it redefine cohort/scope or labels?</p>
+                                <div class="mt-2 text-sm text-slate-600">
+                                    <span class="text-green-600 font-bold">Yes →</span> Classify as <span class="bg-red-100 text-red-800 px-1 rounded font-medium">Governance-first</span> (Requires approvals, lineage, rollback)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 border-4 border-white flex items-center justify-center shrink-0 text-slate-500 font-bold z-10">2</div>
+                            <div class="ml-6 bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex-1">
+                                <p class="font-medium text-slate-900">Is there recurring data incidents or drift?</p>
+                                <div class="mt-2 text-sm text-slate-600">
+                                    <span class="text-green-600 font-bold">Yes →</span> Classify as <span class="bg-orange-100 text-orange-800 px-1 rounded font-medium">Hybrid</span> (Gate + staged rollout)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 border-4 border-white flex items-center justify-center shrink-0 text-slate-500 font-bold z-10">3</div>
+                            <div class="ml-6 bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex-1">
+                                <p class="font-medium text-slate-900">Is output sensitivity high and measurable?</p>
+                                <div class="mt-2 text-sm text-slate-600">
+                                    <span class="text-green-600 font-bold">Yes →</span> Classify as <span class="bg-blue-100 text-blue-800 px-1 rounded font-medium">Experimentation-first</span> (A/B test or offline eval)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Decision Tree: AI Domain -->
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 bg-slate-100 inline-block px-3 py-1 rounded">AI Domain Logic</h3>
+                    <div class="flex flex-col space-y-4 relative">
+                        <div class="absolute left-6 top-6 bottom-6 w-0.5 bg-slate-200 -z-10"></div>
+                        
+                        <!-- Step 1 -->
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 border-4 border-white flex items-center justify-center shrink-0 text-slate-500 font-bold z-10">1</div>
+                            <div class="ml-6 bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex-1">
+                                <p class="font-medium text-slate-900">Does it affect safety or sensitive data?</p>
+                                <div class="mt-2 text-sm text-slate-600">
+                                    <span class="text-green-600 font-bold">Yes →</span> Classify as <span class="bg-red-100 text-red-800 px-1 rounded font-medium">Governance-first</span> (Policy-as-code + Strict Audit)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 border-4 border-white flex items-center justify-center shrink-0 text-slate-500 font-bold z-10">2</div>
+                            <div class="ml-6 bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex-1">
+                                <p class="font-medium text-slate-900">Does it change model version/routing?</p>
+                                <div class="mt-2 text-sm text-slate-600">
+                                    <span class="text-green-600 font-bold">Yes →</span> Classify as <span class="bg-orange-100 text-orange-800 px-1 rounded font-medium">Hybrid</span> (Registry + Canary)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 border-4 border-white flex items-center justify-center shrink-0 text-slate-500 font-bold z-10">3</div>
+                            <div class="ml-6 bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex-1">
+                                <p class="font-medium text-slate-900">Is it decoding or prompt tuning?</p>
+                                <div class="mt-2 text-sm text-slate-600">
+                                    <span class="text-green-600 font-bold">Yes →</span> Classify as <span class="bg-blue-100 text-blue-800 px-1 rounded font-medium">Experimentation-first</span> (Offline eval + A/B)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Operating Safely -->
+            <section class="mb-24 scroll-mt-20" id="operations">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Operating Safely</h2>
+                <div class="bg-slate-900 text-white rounded-xl p-8 shadow-lg">
+                    <h3 class="text-xl font-bold mb-4">The "Knob Maturity" Rubric</h3>
+                    <p class="text-slate-300 mb-6">A knob is production-grade only when it satisfies these four pillars:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-brand-400 font-bold mb-2 text-lg">1. Definition</h4>
+                            <p class="text-sm text-slate-300">Has a name, intent, valid range, default value, and defined ownership ("who can change it").</p>
+                        </div>
+                        <div>
+                            <h4 class="text-brand-400 font-bold mb-2 text-lg">2. Measurement</h4>
+                            <p class="text-sm text-slate-300">Telemetry records effective values and links them to outputs (Traces/Metrics/Logs).</p>
+                        </div>
+                        <div>
+                            <h4 class="text-brand-400 font-bold mb-2 text-lg">3. Safety</h4>
+                            <p class="text-sm text-slate-300">Staged rollout (canary/flags), clear rollback path, and documented failure modes.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-brand-400 font-bold mb-2 text-lg">4. Governance</h4>
+                            <p class="text-sm text-slate-300">Access control (least privilege), audit logging, and lineage to artifacts/runs.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/ai-assistants/tutorials.html">AI Assistant AI Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Sidebar Toggle for Mobile
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', () => {
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+
+        // Close sidebar when clicking outside (on mobile)
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth < 1024) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sidebar.classList.add('-translate-x-full');
+                }
+            }
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active style from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-brand-500', 'text-brand-600');
+                btn.classList.add('border-transparent', 'text-slate-500');
+            });
+
+            // Show selected content
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+
+            // Add active style to selected button
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            activeBtn.classList.remove('border-transparent', 'text-slate-500');
+            activeBtn.classList.add('border-brand-500', 'text-brand-600');
+        }
+
+        // Add 'active' class to sidebar links on scroll
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-item');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('bg-brand-50', 'text-brand-700');
+                link.classList.add('text-slate-600');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('bg-brand-50', 'text-brand-700');
+                    link.classList.remove('text-slate-600');
+                }
+            });
+        });
+    </script>
+
+</body></html>

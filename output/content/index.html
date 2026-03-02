@@ -174,10 +174,23 @@ j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; 
 <a class="text-gray-600 hover:text-indigo-600 transition duration-150 font-medium" href="https://www.dataknobs.com/agent-ai/">AgentAI</a>
 <a class="text-white bg-indigo-600 hover:bg-indigo-700 px-5 py-2 rounded-full transition duration-150 font-medium shadow-md" href="https://www.dataknobs.com/search.html">Search</a>
 </nav>
-<!-- Mobile Menu Button (Simple SVG for visual completeness) -->
-<button class="md:hidden text-gray-700 hover:text-indigo-600 p-2 rounded-lg transition duration-150">
+<!-- Mobile Menu Button -->
+<button aria-controls="mobileMenu" aria-expanded="false" class="md:hidden text-gray-700 hover:text-indigo-600 p-2 rounded-lg transition duration-150" id="mobileMenuButton">
 <svg class="w-6 h-6" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><line x1="3" x2="21" y1="12" y2="12"></line><line x1="3" x2="21" y1="6" y2="6"></line><line x1="3" x2="21" y1="18" y2="18"></line></svg>
 </button>
+</div>
+<!-- Mobile Menu Panel -->
+<div class="md:hidden hidden border-t border-gray-100 bg-white" id="mobileMenu">
+<nav class="px-4 py-3 flex flex-col space-y-2">
+<a class="text-gray-700 hover:text-indigo-600 transition duration-150 font-medium py-2" href="#philosophy">Philosophy</a>
+<a class="text-gray-700 hover:text-indigo-600 transition duration-150 font-medium py-2" href="#capabilities">Capabilities</a>
+<a class="text-gray-700 hover:text-indigo-600 transition duration-150 font-medium py-2" href="https://www.dataknobs.com/use-cases/" rel="noopener" target="_blank">Use Cases</a>
+<a class="text-gray-700 hover:text-indigo-600 transition duration-150 font-medium py-2" href="https://www.dataknobs.com/customers/" rel="noopener" target="_blank">Customers</a>
+<a class="text-gray-700 hover:text-indigo-600 transition duration-150 font-medium py-2" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI</a>
+<a class="text-gray-700 hover:text-indigo-600 transition duration-150 font-medium py-2" href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a>
+<a class="text-gray-700 hover:text-indigo-600 transition duration-150 font-medium py-2" href="https://www.dataknobs.com/agent-ai/">AgentAI</a>
+<a class="mt-2 text-center text-white bg-indigo-600 hover:bg-indigo-700 px-5 py-3 rounded-full transition duration-150 font-medium shadow-md" href="https://www.dataknobs.com/search.html">Search</a>
+</nav>
 </div>
 </header>
 <main>
@@ -746,5 +759,43 @@ j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; 
         // Start the slideshow after the page loads
         window.onload = showSlides;
 
+    </script>
+<!-- Mobile menu toggle -->
+<script>
+      (function () {
+        const btn = document.getElementById('mobileMenuButton');
+        const menu = document.getElementById('mobileMenu');
+        if (!btn || !menu) return;
+
+        const closeMenu = () => {
+          menu.classList.add('hidden');
+          btn.setAttribute('aria-expanded', 'false');
+        };
+
+        const openMenu = () => {
+          menu.classList.remove('hidden');
+          btn.setAttribute('aria-expanded', 'true');
+        };
+
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = btn.getAttribute('aria-expanded') === 'true';
+          isOpen ? closeMenu() : openMenu();
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+          if (menu.classList.contains('hidden')) return;
+          if (!menu.contains(e.target) && e.target !== btn) closeMenu();
+        });
+
+        // Close when a menu link is clicked
+        menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+
+        // Close when resizing to desktop breakpoint
+        window.addEventListener('resize', () => {
+          if (window.matchMedia('(min-width: 768px)').matches) closeMenu();
+        });
+      })();
     </script>
 </body></html>

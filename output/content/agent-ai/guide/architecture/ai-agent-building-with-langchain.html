@@ -327,6 +327,74 @@ sql_agent_executor.invoke({"input": "Which artist has the most albums?"})</code>
 </div>
 </div>
 </section>
+</main>
+</div>
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebarNav = document.getElementById('sidebar-nav');
+            const mobileNav = document.getElementById('mobile-nav');
+            const contentSections = document.querySelectorAll('.content-section');
+            const navLinks = document.querySelectorAll('#sidebar-nav .nav-link');
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+                
+                const activeLink = document.querySelector(`.nav-link[data-target="${targetId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+
+                if (mobileNav.value !== targetId) {
+                    mobileNav.value = targetId;
+                }
+            }
+
+            if (sidebarNav) {
+                sidebarNav.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (e.target.matches('.nav-link')) {
+                        const targetId = e.target.getAttribute('data-target');
+                        showSection(targetId);
+                    }
+                });
+            }
+
+            if (mobileNav) {
+                mobileNav.addEventListener('change', function (e) {
+                    showSection(e.target.value);
+                });
+            }
+
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const targetId = this.getAttribute('data-clipboard-target');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const textToCopy = targetElement.innerText;
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            this.textContent = 'Copied!';
+                            setTimeout(() => {
+                                this.textContent = 'Copy';
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy text: ', err);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 <footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -404,72 +472,4 @@ sql_agent_executor.invoke({"input": "Which artist has the most albums?"})</code>
 </div>
 </div>
 </div>
-</footer></main>
-</div>
-<script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebarNav = document.getElementById('sidebar-nav');
-            const mobileNav = document.getElementById('mobile-nav');
-            const contentSections = document.querySelectorAll('.content-section');
-            const navLinks = document.querySelectorAll('#sidebar-nav .nav-link');
-
-            function showSection(targetId) {
-                contentSections.forEach(section => {
-                    section.classList.remove('active');
-                });
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                });
-
-                const targetSection = document.getElementById(targetId);
-                if (targetSection) {
-                    targetSection.classList.add('active');
-                }
-                
-                const activeLink = document.querySelector(`.nav-link[data-target="${targetId}"]`);
-                if (activeLink) {
-                    activeLink.classList.add('active');
-                }
-
-                if (mobileNav.value !== targetId) {
-                    mobileNav.value = targetId;
-                }
-            }
-
-            if (sidebarNav) {
-                sidebarNav.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    if (e.target.matches('.nav-link')) {
-                        const targetId = e.target.getAttribute('data-target');
-                        showSection(targetId);
-                    }
-                });
-            }
-
-            if (mobileNav) {
-                mobileNav.addEventListener('change', function (e) {
-                    showSection(e.target.value);
-                });
-            }
-
-            const copyButtons = document.querySelectorAll('.copy-btn');
-            copyButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const targetId = this.getAttribute('data-clipboard-target');
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        const textToCopy = targetElement.innerText;
-                        navigator.clipboard.writeText(textToCopy).then(() => {
-                            this.textContent = 'Copied!';
-                            setTimeout(() => {
-                                this.textContent = 'Copy';
-                            }, 2000);
-                        }).catch(err => {
-                            console.error('Failed to copy text: ', err);
-                        });
-                    }
-                });
-            });
-        });
-    </script>
-</body></html>
+</footer></body></html>

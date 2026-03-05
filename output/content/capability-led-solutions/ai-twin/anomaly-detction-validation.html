@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    
+    <!-- Meta Tags -->
+    <title>Validating Unsupervised Time-Series Anomaly Detection in Industry 4.0</title>
+    <meta content="A comprehensive guide on validating unsupervised time-series anomaly detection models in Industry 4.0, covering evaluation approaches, metrics, visualization, and tools." name="description"/>
+    <meta content="anomaly detection, time-series, unsupervised learning, industry 4.0, predictive maintenance, model validation, machine learning, data science, evaluation metrics" name="keywords"/>
+    
+    <!-- OpenGraph (og:) Tags -->
+    <meta content="Validating Unsupervised Time-Series Anomaly Detection in Industry 4.0" property="og:title"/>
+    <meta content="A comprehensive guide on validating unsupervised time-series anomaly detection models in Industry 4.0, covering evaluation approaches, metrics, visualization, and tools." property="og:description"/>
+    <meta content="article" property="og:type"/>
+    <meta content="https://www.example.com/validating-unsupervised-anomaly-detection" property="og:url"/>
+    <!-- Using a placeholder image for OG/Twitter cards -->
+    <meta content="https://placehold.co/1200x630/007bff/FFFFFF?text=Industry+4.0+Anomaly+Detection" property="og:image"/>
+    <meta content="Conceptual image for Industry 4.0 and data analysis" property="og:image:alt"/>
+    
+    <!-- Twitter Card Tags -->
+    <meta content="summary_large_image" name="twitter:card"/>
+    <meta content="Validating Unsupervised Time-Series Anomaly Detection in Industry 4.0" name="twitter:title"/>
+    <meta content="A comprehensive guide on validating unsupervised time-series anomaly detection models in Industry 4.0, covering evaluation approaches, metrics, visualization, and tools." name="twitter:description"/>
+    <meta content="https://placehold.co/1200x600/007bff/FFFFFF?text=Industry+4.0+Anomaly+Detection" name="twitter:image"/>
+    
+    <!-- JSON-LD (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Validating Unsupervised Time-Series Anomaly Detection in Industry 4.0",
+      "description": "This guide outlines best practices for evaluating unsupervised time-series anomaly detection models, including common evaluation approaches, specialized methods for time-series anomalies, suitable metrics (especially with limited ground truth), visualization techniques, and popular tools.",
+      "image": "https://placehold.co/1200x630/007bff/FFFFFF?text=Industry+4.0+Anomaly+Detection",
+      "datePublished": "2025-11-05",
+      "author": {
+        "@type": "Organization",
+        "name": "Industry 4.0 Insights"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Industry 4.0 Insights",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://placehold.co/600x60/333333/FFFFFF?text=Org+Logo"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js and Annotation Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+    <style>
+        /* Use Inter font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styles for accordion icon */
+        .accordion-toggle svg {
+            transition: transform 0.2s ease-in-out;
+        }
+        .accordion-toggle.open svg {
+            transform: rotate(180deg);
+        }
+        /* Add scroll margin for smooth anchor linking */
+        section[id] {
+            scroll-margin-top: 4rem; /* Adjust as needed */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 leading-relaxed">
+
+    <!-- Header -->
+    <header class="py-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <h1 class="text-3xl md:text-5xl font-bold text-blue-600 dark:text-blue-400">Validating Unsupervised Time-Series Anomaly Detection in Industry 4.0</h1>
+            <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">A best-practice guide to evaluation, metrics, visualization, and tooling for predictive maintenance.</p>
+        </div>
+    </header>
+
+    <!-- Main Content with Sidebar -->
+    <div class="container mx-auto px-6 max-w-6xl mt-12">
+        <div class="grid grid-cols-1 lg:grid-cols-4 lg:gap-12">
+
+            <!-- Sticky Sidebar (Table of Contents) -->
+            <aside class="hidden lg:block lg:col-span-1">
+                <div class="sticky top-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Table of Contents</h3>
+                    <nav>
+                        <ul class="space-y-3">
+                            <li><a class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:underline" href="#section-approaches">Evaluation Approaches</a></li>
+                            <li><a class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:underline" href="#section-methods">Detection Methods</a></li>
+                            <li><a class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:underline" href="#section-metrics">Performance Metrics</a></li>
+                            <li><a class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:underline" href="#section-visualization">Visualization Techniques</a></li>
+                            <li><a class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:underline" href="#section-tools">Tools &amp; Libraries</a></li>
+                            <li><a class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:underline" href="#section-conclusion">Conclusion</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Article Content -->
+            <main class="lg:col-span-3">
+                <article class="prose prose-lg dark:prose-invert max-w-none">
+                    
+                    <p class="text-lg leading-relaxed">Industry 4.0 predictive maintenance relies on unsupervised anomaly detection to catch equipment faults before failures occur. Validating these models is challenging because true anomalies (e.g. machine failures) are rare and often unlabeled. This guide outlines best practices for evaluating such models, including common evaluation approaches, specialized methods for time-series anomalies, suitable metrics (especially with limited ground truth), visualization techniques, and popular tools.</p>
+
+                    <section class="mb-12" id="section-approaches">
+                        <h2 class="text-3xl font-semibold mb-6 border-b border-gray-300 dark:border-gray-700 pb-3">Common Evaluation Approaches</h2>
+                        <div class="space-y-6">
+                            <h3 class="text-2xl font-semibold">Synthetic Anomalies</h3>
+                            <p>Inject artificial anomalies into normal time-series data to serve as proxy ground truth. For example, Microsoft improved its SR-CNN model by training with synthetically generated anomalies. By adding simulated spikes, out-of-range values, or pattern deviations, one can compute precision/recall on these known inserts as a benchmark for model performance. Synthetic anomaly injection has been found to be an effective surrogate for evaluating model robustness.</p>
+
+                            <h3 class="text-2xl font-semibold">Domain Expert Feedback</h3>
+                            <p>Leverage human experts to validate model outputs. Detected anomalies can be reviewed by maintenance engineers to confirm if they represent true issues. In a real-world study on compressors, researchers consulted domain experts to ensure flagged anomalies were practical and relevant. Validation through domain expertise helps guarantee that the model’s alerts are actionable in industrial settings. This human-in-the-loop approach often refines the anomaly criteria or thresholds based on what experts consider a true fault.</p>
+
+                            <h3 class="text-2xl font-semibold">Historical Event Validation</h3>
+                            <p>If maintenance logs or failure records exist, use them as approximate ground truth. For instance, align detected anomalies with known breakdown events or alarm logs. Even if exact labels are absent, a good model should flag unusual behavior near the times equipment required unscheduled maintenance. This can be combined with early detection evaluation – rewarding models that catch precursors to a failure slightly in advance (as in the Numenta Anomaly Benchmark scoring strategy).</p>
+
+                            <h3 class="text-2xl font-semibold">Statistical Thresholding</h3>
+                            <p>In absence of any labels, define anomalies by statistical extremes and validate those definitions. For example, one can set anomaly thresholds at the 95th percentile of sensor readings and then verify with experts if exceeding that threshold indeed correlates with abnormal machine behavior. This provides a baseline rule that unsupervised models should beat.</p>
+
+                            <h3 class="text-2xl font-semibold">Cross-Model Agreement</h3>
+                            <p>As a heuristic, run multiple anomaly detection algorithms and see where they concur. If different unsupervised methods (e.g. one based on reconstruction error and another on cluster distance) flag the same time periods, those are likely true anomalies. Disagreements can indicate model-specific false alarms.</p>
+                        </div>
+                    </section>
+
+                    <section class="mb-12" id="section-methods">
+                        <h2 class="text-3xl font-semibold mb-6 border-b border-gray-300 dark:border-gray-700 pb-3">Time-Series Anomaly Detection Methods</h2>
+                        <div class="space-y-6">
+                            <h3 class="text-2xl font-semibold">Forecasting-Based Detection</h3>
+                            <p>Train a time-series forecasting model on normal behavior, then flag anomalies when the actual value deviates significantly from the prediction. For example, an ARIMA or LSTM model can predict sensor readings, and any point outside a confidence interval of the forecast is an outlier. This approach naturally handles seasonality or trends.</p>
+
+                            <h3 class="text-2xl font-semibold">Reconstruction-Based Detection</h3>
+                            <p>Use autoencoders or similar networks to learn compressed representations of normal sequence patterns and then reconstruct the input. Anomalies are detected when reconstruction error is high, indicating the pattern was unusual. For example, LSTM autoencoders (or variational autoencoders like LSTM-VAE) are trained on historical normal sensor data, and segments with large reconstruction loss are flagged.</p>
+
+                            <h3 class="text-2xl font-semibold">Distance/Clustering-Based Detection</h3>
+                            <p>These methods define anomalies by distance from learned clusters or nearest neighbors. Techniques like one-class SVM, isolation forests, Local Outlier Factor (LOF), or the Matrix Profile fall in this category. For instance, a one-class SVM can be trained on normal data from multiple sensors to carve out a boundary in high-dimensional space, and points outside that boundary are anomalies.</p>
+
+                            <h3 class="text-2xl font-semibold">Ensemble and Hybrid Frameworks</h3>
+                            <p>In practice, combinations of methods may work best. Frameworks like the Numenta Anomaly Benchmark (NAB) provide a collection of time-series datasets with labeled anomalies and a scoring system that rewards early detection and penalizes false alarms. Researchers have also developed unified evaluation frameworks: for example, Carrasco et al. (2021) propose treating anomalies as intervals (not just points) and introduce a “Preceding Window ROC” curve to evaluate how early a detection occurs.</p>
+                        </div>
+                    </section>
+
+                    <section class="mb-12" id="section-metrics">
+                        <h2 class="text-3xl font-semibold mb-6 border-b border-gray-300 dark:border-gray-700 pb-3">Performance Metrics for Validation</h2>
+                        <div class="space-y-6">
+                            <h3 class="text-2xl font-semibold">Precision and Recall</h3>
+                            <p>These remain fundamental. High precision is critical in industry (false alarms can erode trust) and high recall is needed to avoid missing true failures. In practice, <strong>adjusted definitions</strong> of precision/recall are used for time series. If an anomaly spans multiple timestamps, detecting <strong>any</strong> point in that window is counted as a true positive for the whole event. This <strong>point-adjustment</strong> ensures a model isn’t overly penalized.</p>
+
+                            <h3 class="text-2xl font-semibold">F1 Score and PR AUC</h3>
+                            <p>The <strong>F1 score</strong> (harmonic mean of precision and recall) provides a single summary of accuracy. Because anomalies are usually rare, the <strong>Precision-Recall AUC (PR AUC)</strong> is more informative than ROC AUC. A high PR AUC indicates the model can achieve high recall without sharply dropping precision.</p>
+
+                            <h3 class="text-2xl font-semibold">Timing Metrics (Detection Delay)</h3>
+                            <p>In predictive maintenance, <strong>when</strong> an anomaly is detected matters. Metrics like <strong>Mean Time to Detect (MTTD)</strong> measure the average delay between the true onset of an anomaly event and the model’s alarm. Early detection is rewarded. Some evaluation schemes use a tolerance window: if an algorithm raises an alert slightly before or after the actual event time, it’s still counted as a correct detection.</p>
+
+                            <h3 class="text-2xl font-semibold">Unsupervised Evaluation (No Ground Truth)</h3>
+                            <p>When no labels exist at all, more abstract validation metrics or heuristics are used, such as <strong>Mass-Volume (MV) &amp; Excess-Mass (EM) Curves</strong> or <strong>Heuristic Anomaly Characterization</strong> (e.g., checking distance from the mean or frequency of anomalies).</p>
+                        </div>
+                    </section>
+
+                    <section class="mb-12" id="section-visualization">
+                        <h2 class="text-3xl font-semibold mb-6 border-b border-gray-300 dark:border-gray-700 pb-3">Visualization Techniques for Validation</h2>
+                        
+                        <div class="space-y-6">
+                            <p>Visual diagnostics are indispensable in validating anomaly detectors, especially to communicate results to engineers and domain experts.</p>
+
+                            <!-- Interactive Chart Placeholder -->
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 my-8">
+                                <canvas id="anomalyChart"></canvas>
+                                <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-3">
+                                    <strong>Interactive Chart:</strong> Hover over the data points. The blue line is the simulated "Sensor Reading," and the red line is the "Anomaly Score," which spikes at anomalies.
+                                </p>
+                            </div>
+
+                            <h3 class="text-2xl font-semibold">Time-Series Plots with Anomaly Markers</h3>
+                            <p>The simplest and most powerful validation tool is plotting the time series and overlaying anomalies. This allows a human to immediately see if anomalies correspond to noticeable deviations – e.g. a spike in vibration amplitude or a sudden drop in pressure. </p>
+
+                            <h3 class="text-2xl font-semibold">Anomaly Score Trends</h3>
+                            <p>Alongside the raw signal, plot the anomaly score or model residual as a separate time-series, as shown in the chart above. It shows how the model’s score evolves – ideally, it stays low during normal operation and spikes during anomalies. Visualizing the score helps in choosing a threshold.</p>
+
+                            <h3 class="text-2xl font-semibold">Dimensionality Reduction (t-SNE/UMAP)</h3>
+                            <p>For high-dimensional time-series (e.g. multiple sensors), you can project the data into 2D space using techniques like <strong>t-SNE</strong> or <strong>UMAP</strong>. By coloring the projected points by whether they were flagged as anomalies, you can often see clusters or separation. An effective model will cause anomalies to cluster away from the main mass of normal points.</p>
+
+                            <h3 class="text-2xl font-semibold">Interactive Dashboards</h3>
+                            <p>In Industry 4.0 use cases, teams often build dashboards where time-series data is plotted in real-time with anomaly indicators. Tools like Grafana, Plotly Dash, or proprietary IoT platforms allow zooming, filtering, and drilling down into the time-series around anomalies.</p>
+                        </div>
+                    </section>
+
+                    <section class="mb-12" id="section-tools">
+                        <h2 class="text-3xl font-semibold mb-6 border-b border-gray-300 dark:border-gray-700 pb-3">Tools and Libraries</h2>
+                        
+                        <div class="space-y-4">
+                            <!-- Accordion Item 1 -->
+                            <div>
+                                <button class="accordion-toggle flex justify-between items-center w-full p-5 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none transition-colors">
+                                    <span class="text-xl font-semibold text-blue-600 dark:text-blue-400">Salesforce Merlion</span>
+                                    <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                </button>
+                                <div class="accordion-content hidden p-5 border border-t-0 border-gray-200 dark:border-gray-700 rounded-b-lg">
+                                    <p><strong>Merlion</strong> is an open-source Python library for time-series intelligence. It provides a unified interface to many anomaly detection models (classic and deep learning), plus a toolkit for evaluation. Merlion comes with built-in datasets like the Numenta Anomaly Benchmark and functions to calculate precision, recall, F1, and mean time to detect. This framework is well-suited to Industry 4.0 needs since it supports multivariate data and has modules for anomaly explanation.</p>
+                                </div>
+                            </div>
+
+                            <!-- Accordion Item 2 -->
+                            <div>
+                                <button class="accordion-toggle flex justify-between items-center w-full p-5 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none transition-colors">
+                                    <span class="text-xl font-semibold text-blue-600 dark:text-blue-400">PyOD (Python Outlier Detection)</span>
+                                    <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                </button>
+                                <div class="accordion-content hidden p-5 border border-t-0 border-gray-200 dark:border-gray-700 rounded-b-lg">
+                                    <p><strong>PyOD</strong> is a general-purpose library for detecting outliers/anomalies in data. While not specific to time series, it includes 40+ algorithms (e.g., Isolation Forest, One-Class SVM, LOF, Autoencoders) under a common API. For time-series, one can apply PyOD methods on features extracted from windows. It’s a great way to benchmark multiple algorithms quickly.</p>
+                                </div>
+                            </div>
+
+                            <!-- Accordion Item 3 -->
+                            <div>
+                                <button class="accordion-toggle flex justify-between items-center w-full p-5 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none transition-colors">
+                                    <span class="text-xl font-semibold text-blue-600 dark:text-blue-400">DeepSVDD</span>
+                                    <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                </button>
+                                <div class="accordion-content hidden p-5 border border-t-0 border-gray-200 dark:border-gray-700 rounded-b-lg">
+                                    <p><strong>Deep Support Vector Data Description (Deep SVDD)</strong> is a deep learning approach to one-class anomaly detection. It learns a neural network that maps data into a latent space where it tries to enclose the normal data in a small hypersphere; anomalies are points mapped far from the center. It has been adapted to time-series by using temporal networks (like RNNs or CNNs). It is an unsupervised, end-to-end method that is useful when you have abundant normal data.</p>
+                                </div>
+                            </div>
+
+                            <!-- Accordion Item 4 -->
+                            <div>
+                                <button class="accordion-toggle flex justify-between items-center w-full p-5 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none transition-colors">
+                                    <span class="text-xl font-semibold text-blue-600 dark:text-blue-400">Other Notable Tools</span>
+                                    <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                </button>
+                                <div class="accordion-content hidden p-5 border border-t-0 border-gray-200 dark:border-gray-700 rounded-b-lg">
+                                    <ul class="list-disc pl-5 space-y-2">
+                                        <li><strong>Numenta NAB Toolkit:</strong> Provides a dataset, scoring framework, and reference implementations. Useful for benchmarking detection delay.</li>
+                                        <li><strong>TODS (Turnkey Anomaly Detection System):</strong> An open-source project that offers a modular pipeline to build and combine detectors.</li>
+                                        <li><strong>ADTK (Anomaly Detection Toolkit):</strong> A Python package focusing on rule-based and classical statistical methods for simpler anomalies.</li>
+                                        <li><strong>Georgian’s PyOATS:</strong> A newer toolkit that wraps many models with easy thresholding and evaluation.</li>
+                                        <li><strong>Deep Learning Frameworks:</strong> Standalone code in TensorFlow/PyTorch for cutting-edge methods (e.g., Transformer or GAN-based detectors).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="mb-12" id="section-conclusion">
+                        <h2 class="text-3xl font-semibold mb-6 border-b border-gray-300 dark:border-gray-700 pb-3">Conclusion</h2>
+                        <div class="space-y-6">
+                            <p>Validating unsupervised anomaly detectors in predictive maintenance is a multi-faceted process. It involves simulating realistic faults, harnessing expert knowledge, and using appropriate metrics that account for time-series behavior and rare-event nature. The goal is not only to achieve good precision/recall on paper, but to ensure the model’s alerts would translate into real-world preventive actions.</p>
+                            <p>In an Industry 4.0 context, these validated models become the cornerstone of predictive maintenance, enabling condition-based interventions that save cost and improve safety. Remember that validation is not a one-time task: as more data (and possibly some true failure examples) become available, continuously re-evaluate and update the model. With careful validation, unsupervised detectors can reliably spot the “needle in a haystack” – those subtle early warning signs of equipment trouble – empowering proactive maintenance in smart factories.</p>
+                        </div>
+                    </section>
+                </article>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <html><head></head><body><footer class="bg-gray-800 text-gray-300">
+  <div class="container mx-auto px-6 py-12 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+        <ul class="space-y-2">
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/ai-assistants/tutorials.html">AI Assistant AI Tutorial</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/guide.html">Data Product Guide</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/tutorial.html">Data Product Tutorial</a></li>
+          <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+		  <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+
+          
+        </ul>
+      </div>
+
+      <div>
+        <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+        <div class="space-y-2">
+          <p>Redmond<br/>WA, USA</p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+          </p>
+          <p>
+            <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+      <p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+      
+      <div class="flex space-x-4 mt-4 sm:mt-0">
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+          <span class="sr-only">Facebook</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+          <span class="sr-only">Twitter</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+        </a>
+        <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+          <span class="sr-only">LinkedIn</span>
+          <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer></body></html>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Accordion Logic ---
+            const accordions = document.querySelectorAll('.accordion-toggle');
+            accordions.forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const isOpen = button.classList.contains('open');
+
+                    // Close all other accordions
+                    // accordions.forEach(btn => {
+                    //     if (btn !== button) {
+                    //         btn.classList.remove('open');
+                    //         btn.nextElementSibling.classList.add('hidden');
+                    //     }
+                    // });
+
+                    // Toggle the clicked one
+                    if (isOpen) {
+                        button.classList.remove('open');
+                        content.classList.add('hidden');
+                    } else {
+                        button.classList.add('open');
+                        content.classList.remove('hidden');
+                    }
+                });
+            });
+
+            // --- Chart.js Logic ---
+            if (document.getElementById('anomalyChart')) {
+                const ctx = document.getElementById('anomalyChart').getContext('2d');
+                
+                // 1. Generate Sample Data
+                const labels = [];
+                const sensorData = [];
+                const anomalyScore = [];
+                const anomalyThreshold = 0.8;
+
+                for (let i = 0; i < 100; i++) {
+                    labels.push(`t-${100 - i}`);
+                    
+                    // Base signal (sine wave + noise)
+                    let baseSignal = Math.sin(i / 5) * 10 + 50;
+                    baseSignal += (Math.random() - 0.5) * 2; // noise
+                    
+                    let score = Math.random() * 0.2; // Base anomaly score (low noise)
+
+                    // Inject anomalies
+                    if (i > 30 && i < 35) {
+                        // Anomaly 1 (a sudden dip)
+                        baseSignal -= 15;
+                        score = 0.8 + Math.random() * 0.2; // High score
+                    } else if (i > 70 && i < 73) {
+                        // Anomaly 2 (a high spike)
+                        baseSignal += 20;
+                        score = 0.9 + Math.random() * 0.1; // Very high score
+                    }
+
+                    sensorData.push(baseSignal.toFixed(2));
+                    anomalyScore.push(score.toFixed(2));
+                }
+
+                // 2. Create the Chart
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Sensor Reading',
+                                data: sensorData,
+                                borderColor: 'rgb(59, 130, 246)',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderWidth: 2,
+                                pointRadius: 1,
+                                tension: 0.1,
+                                yAxisID: 'y',
+                                fill: true,
+                            },
+                            {
+                                label: 'Anomaly Score',
+                                data: anomalyScore,
+                                borderColor: 'rgb(239, 68, 68)',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderWidth: 2,
+                                pointRadius: 1,
+                                tension: 0.1,
+                                yAxisID: 'y1',
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Simulated Time-Series Anomaly Detection',
+                                font: {
+                                    size: 16
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += context.parsed.y;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            },
+                            annotation: {
+                                annotations: {
+                                    thresholdLine: {
+                                        type: 'line',
+                                        yScaleID: 'y1',
+                                        yMin: anomalyThreshold,
+                                        yMax: anomalyThreshold,
+                                        borderColor: 'rgb(255, 99, 132)',
+                                        borderWidth: 2,
+                                        borderDash: [6, 6],
+                                        label: {
+                                            content: `Anomaly Threshold (${anomalyThreshold})`,
+                                            enabled: true,
+                                            position: 'start',
+                                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                                            font: {
+                                                size: 10
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Time (steps)'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Sensor Value'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Anomaly Score'
+                                },
+                                min: 0,
+                                max: 1.1,
+                                // Hide grid lines for the secondary axis to keep it clean
+                                grid: {
+                                    drawOnChartArea: false, 
+                                }
+                            }
+                        }
+                    },
+                    // Register the annotation plugin
+                    plugins: [ChartDataLabels, ChartAnnotation],
+                });
+            }
+        });
+    </script>
+
+
+</body></html>

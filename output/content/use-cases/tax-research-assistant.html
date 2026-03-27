@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tax Research Assistant - DataKnobs</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --purple: #7c3aed;
+    --purple-dark: #5b21b6;
+    --indigo: #4f46e5;
+    --bg: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --muted-2: #64748b;
+    --line: rgba(148, 163, 184, 0.24);
+    --line-strong: #e2e8f0;
+    --soft: #f8fafc;
+    --shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 30px 90px rgba(15, 23, 42, 0.14);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.05), transparent 28%),
+      radial-gradient(circle at 100% 20%, rgba(79, 70, 229, 0.05), transparent 24%),
+      linear-gradient(180deg, #ffffff 0%, #fcfbff 100%);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { width: min(1240px, calc(100% - 40px)); margin: 0 auto; }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 100; backdrop-filter: blur(14px);
+    background: rgba(255,255,255,0.72); border-bottom: 1px solid rgba(226,232,240,0.8);
+  }
+  .site-header-inner { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:16px 0; }
+  .brand { display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:-0.04em; font-size:1.05rem; text-decoration:none; color:var(--text); }
+  .brand-mark { width:34px; height:34px; border-radius:12px; background:linear-gradient(135deg,var(--purple),var(--indigo)); box-shadow:0 12px 28px rgba(124,58,237,0.28); position:relative; }
+  .brand-mark::before,.brand-mark::after { content:""; position:absolute; border-radius:999px; background:rgba(255,255,255,0.95); }
+  .brand-mark::before { width:14px; height:14px; top:6px; left:10px; }
+  .brand-mark::after { width:6px; height:6px; right:7px; bottom:7px; }
+  .brand span { color: var(--purple); }
+  .top-nav { display:flex; align-items:center; gap:24px; }
+  .top-nav a { text-decoration:none; color:var(--muted); font-size:0.95rem; font-weight:600; }
+  .top-nav a:hover { color:var(--purple); }
+  .nav-cta { padding:11px 16px; border-radius:12px; background:linear-gradient(135deg,var(--purple),var(--indigo)); color:white !important; box-shadow:0 14px 32px rgba(79,70,229,0.2); }
+
+  .product-strip { border-bottom:1px solid rgba(226,232,240,0.8); background:rgba(255,255,255,0.6); }
+  .product-strip-inner { display:flex; gap:10px; padding:14px 0; overflow-x:auto; scrollbar-width:thin; }
+  .product-chip { white-space:nowrap; text-decoration:none; color:var(--muted); border:1px solid var(--line); background:rgba(255,255,255,0.88); border-radius:999px; padding:10px 14px; font-size:0.9rem; font-weight:700; box-shadow:var(--shadow); }
+  .product-chip:hover,.product-chip.active { color:var(--purple); border-color:rgba(124,58,237,0.24); background:linear-gradient(135deg,#faf5ff,#eef2ff); }
+
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:13px 18px; border-radius:12px; font-weight:700; text-decoration:none; transition:all .25s ease;
+  }
+  .btn-primary { background:white; color:var(--purple-dark); box-shadow:0 12px 30px rgba(15,23,42,.16); }
+  .btn-primary:hover { transform:translateY(-2px); background:#f8fafc; }
+  .btn-secondary { border:1px solid rgba(255,255,255,.28); color:white; background:rgba(255,255,255,.08); }
+  .btn-secondary:hover { transform:translateY(-2px); background:rgba(255,255,255,.14); }
+  .btn-outline { border:1px solid var(--line-strong); color:var(--text); background:white; }
+  .btn-outline:hover { transform:translateY(-2px); border-color:#c4b5fd; }
+
+  .hero {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 42%, #4f46e5 100%);
+    color:white; position:relative; overflow:hidden;
+  }
+  .hero:before {
+    content:""; position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(255,255,255,.18), transparent 24%),
+      radial-gradient(circle at 88% 18%, rgba(255,255,255,.10), transparent 22%),
+      radial-gradient(circle at 70% 80%, rgba(255,255,255,.09), transparent 25%);
+    pointer-events:none;
+  }
+  .hero-grid {
+    position:relative; z-index:1; display:grid; grid-template-columns:1.05fr 0.95fr;
+    gap:48px; align-items:center; padding:88px 0 84px;
+  }
+  .eyebrow {
+    display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.22);
+    background:rgba(255,255,255,.10); padding:9px 14px; border-radius:999px; font-size:13px; font-weight:700;
+  }
+  h1 {
+    margin:22px 0 0; font-size:clamp(2.7rem, 5vw, 4.8rem); line-height:1.02; letter-spacing:-0.04em; max-width:760px;
+  }
+  .hero p.lead { margin-top:24px; max-width:660px; font-size:1.1rem; color:rgba(255,255,255,.9); }
+  .hero-cta { display:flex; gap:14px; flex-wrap:wrap; margin-top:30px; }
+  .hero-points { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:36px; }
+  .point {
+    padding:16px; border-radius:16px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.10); backdrop-filter:blur(8px);
+  }
+  .point strong { display:block; font-size:.95rem; }
+  .point span { display:block; margin-top:4px; color:rgba(255,255,255,.82); font-size:.92rem; }
+
+  .product-shell {
+    background:rgba(255,255,255,.98); border-radius:28px; padding:24px; color:var(--text);
+    box-shadow:0 28px 80px rgba(15,23,42,.22); animation:floatIn .8s ease forwards; opacity:0; transform:translateY(16px) scale(.985);
+  }
+  .shell-top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; }
+  .shell-top small { color:#64748b; display:block; }
+  .shell-top strong { font-size:1.05rem; }
+  .pill { padding:8px 12px; border-radius:999px; background:#f3e8ff; color:var(--purple); font-size:12px; font-weight:800; }
+  .score-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
+  .score-card { border:1px solid var(--line-strong); border-radius:18px; padding:16px; background:white; }
+  .score-card small { color:#64748b; display:block; }
+  .score-value { font-size:1.4rem; font-weight:800; letter-spacing:-0.04em; margin-top:6px; }
+  .score-note { color:#475569; font-size:.9rem; }
+  .insight-card { border:1px solid var(--line-strong); border-radius:18px; padding:16px; background:linear-gradient(180deg, #ffffff 0%, #faf7ff 100%); margin-top:12px; }
+  .insight-list { margin:12px 0 0; padding-left:18px; color:var(--muted); }
+
+  .section { padding:84px 0; }
+  .section.alt { background:var(--soft); }
+  .label { color:var(--purple); font-size:13px; text-transform:uppercase; letter-spacing:.14em; font-weight:800; }
+  h2 { margin:10px 0 0; font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.08; letter-spacing:-0.04em; }
+  .sub { margin-top:16px; max-width:760px; color:var(--muted); font-size:1.03rem; }
+
+  .feature-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:34px; }
+  .feature-card {
+    background:white; border:1px solid var(--line-strong); border-radius:22px; padding:22px; transition:all .25s ease;
+  }
+  .feature-card:hover { transform:translateY(-6px); box-shadow:0 18px 40px rgba(15,23,42,.08); border-color:#c4b5fd; }
+  .icon {
+    width:50px; height:50px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, #7c3aed, #4f46e5); color:white; font-weight:800; font-size:1rem;
+  }
+  .feature-card h3 { margin:16px 0 8px; font-size:1.1rem; }
+  .feature-card p { margin:0; color:var(--muted); }
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:34px; }
+  .panel { background:white; border:1px solid var(--line-strong); border-radius:24px; padding:26px; }
+  .panel h3 { margin:8px 0 10px; font-size:1.25rem; }
+  .panel p { color:var(--muted); margin:0 0 14px; }
+  .panel ul { margin:0; padding-left:18px; color:var(--muted); }
+  .panel li + li { margin-top:8px; }
+
+  .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:34px; }
+  .step { background:white; border:1px solid var(--line-strong); border-radius:22px; padding:22px; }
+  .step-num {
+    width:34px; height:34px; border-radius:999px; background:#ede9fe; color:var(--purple);
+    display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:.95rem;
+  }
+  .step h3 { margin:14px 0 8px; }
+  .step p { color:var(--muted); margin:0; }
+
+  .quote {
+    margin-top:34px; background:linear-gradient(135deg, #7c3aed, #4f46e5); color:white; border-radius:28px; padding:34px;
+  }
+  .quote p { color:rgba(255,255,255,.92); font-size:1.08rem; margin:10px 0 0; }
+
+  .cta-section { padding:84px 0 96px; }
+  .cta-box {
+    border-radius:30px; background:linear-gradient(135deg, #faf5ff 0%, #eef2ff 100%);
+    border:1px solid #ddd6fe; padding:42px; text-align:center; box-shadow:var(--shadow-lg);
+  }
+  .cta-box p { color:var(--muted); max-width:760px; margin:16px auto 0; }
+  .cta-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:24px; }
+
+  .site-footer {
+    margin-top: 80px; border-top: 1px solid rgba(226,232,240,0.8); background: linear-gradient(180deg, rgba(250,247,255,0.7), rgba(255,255,255,0.95));
+  }
+  .site-footer-inner { display:grid; grid-template-columns:1.2fr 0.8fr 0.8fr 0.8fr; gap:24px; padding:48px 0 28px; }
+  .footer-brand p,.footer-col p { color:var(--muted); line-height:1.7; margin:12px 0 0; font-size:.95rem; }
+  .footer-col h4 { margin:0; font-size:.95rem; letter-spacing:-.02em; }
+  .footer-links { display:grid; gap:10px; margin-top:14px; }
+  .footer-links a { text-decoration:none; color:var(--muted); font-size:.92rem; }
+  .footer-links a:hover { color:var(--purple); }
+  .footer-bottom { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:18px 0 28px; border-top:1px solid rgba(226,232,240,0.8); color:var(--muted-2); font-size:.9rem; }
+
+  @keyframes floatIn { to { opacity:1; transform:translateY(0) scale(1); } }
+  @media (max-width: 1080px) {
+    .hero-grid, .two-col { grid-template-columns:1fr; }
+    .feature-grid, .steps, .site-footer-inner { grid-template-columns:repeat(2,1fr); }
+  }
+  @media (max-width: 760px) {
+    .top-nav a:not(.nav-cta) { display:none; }
+    .container { width:min(1240px, calc(100% - 28px)); }
+    .hero-grid { padding:72px 0 70px; gap:28px; }
+    .hero-points, .score-row, .feature-grid, .steps, .site-footer-inner { grid-template-columns:1fr; }
+    h1 { font-size:2.7rem; }
+    .product-shell, .cta-box { padding:22px; }
+    .footer-bottom { flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-mark"></div>
+        <div>Data<span>Knobs</span></div>
+      </a>
+      <nav class="top-nav">
+        <a href="index.html">Platform</a>
+        <a href="index.html#products">Products</a>
+        <a href="index.html#usecases">Use Cases</a>
+        <a href="index.html#platform">KreateBots</a>
+        <a class="nav-cta" href="#contact">Book a Demo</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="product-strip">
+    <div class="container product-strip-inner">
+      <a class="product-chip" href="stocks-assistant.html">Stocks Assistant</a>
+      <a class="product-chip" href="stocks-portfolio-agent.html">Stocks Portfolio AI Agent</a>
+      <a class="product-chip active" href="tax-research-assistant.html">Tax Research Assistant</a>
+      <a class="product-chip" href="financial-planner-ai-assistant.html">Financial Planner AI Assistant</a>
+      <a class="product-chip" href="complaint-management-ai.html">Complaint Management AI</a>
+      <a class="product-chip" href="regulatory-ai-agent.html">Regulatory AI Agent</a>
+      <a class="product-chip" href="ecommerce-analysis-agent.html">E-commerce Analysis Agent</a>
+      <a class="product-chip" href="applicable-laws-ai-agent.html">Applicable Laws AI Agent</a>
+      <a class="product-chip" href="dsar-ai-assistant.html">DSAR AI Assistant</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">Tax Research Assistant • AI for CPA and tax workflows</div>
+        <h1>The intelligent tax workflow layer for research, intake, and personalized guidance.</h1>
+        <p class="lead">
+          Tax Research Assistant combines document intelligence, profile-driven LLM workflows, and optional retrieval-augmented generation to help firms collect facts, analyze tax situations, and deliver more precise answers at scale.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#features">Explore Features</a>
+          <a class="btn btn-secondary" href="#contact">Request Demo</a>
+        </div>
+        <div class="hero-points">
+          <div class="point">
+            <strong>Profile-aware analysis</strong>
+            <span>LLM calls adapt based on user facts, tax profile, and CPA-defined questions.</span>
+          </div>
+          <div class="point">
+            <strong>Document-to-JSON pipeline</strong>
+            <span>Ingest varied tax and financial documents and convert them into structured data.</span>
+          </div>
+          <div class="point">
+            <strong>Optional RAG layer</strong>
+            <span>Ground broad or custom knowledge queries with your firm’s own tax content.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-shell">
+        <div class="shell-top">
+          <div>
+            <small>Live Workflow Snapshot</small>
+            <strong>Intake → Research → Personalized Response</strong>
+          </div>
+          <div class="pill">CPA Ready</div>
+        </div>
+
+        <div class="score-row">
+          <div class="score-card">
+            <small>User Profile</small>
+            <div class="score-value">Complete</div>
+            <div class="score-note">Household, entity, income, and filing context captured</div>
+          </div>
+          <div class="score-card">
+            <small>Documents Parsed</small>
+            <div class="score-value">12</div>
+            <div class="score-note">W-2, 1099, K-1, statements, and uploaded tax records</div>
+          </div>
+          <div class="score-card">
+            <small>Knowledge Mode</small>
+            <div class="score-value">RAG + LLM</div>
+            <div class="score-note">Uses custom sources when the question is broad or nuanced</div>
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <small style="color:#64748b; font-weight:700;">AI Workflow Preview</small>
+          <ul class="insight-list">
+            <li>CPA defines the intake questions needed for this client scenario.</li>
+            <li>User answers are combined with extracted document JSON and profile context.</li>
+            <li>LLM prompts and tool calls are dynamically selected based on the user’s tax profile.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="label">Core Features</div>
+      <h2>Built for tax research, client intake, and tailored advisory workflows.</h2>
+      <p class="sub">
+        Go beyond a generic chatbot with a system that collects the right facts, structures the right documents, and routes the right reasoning path for each taxpayer or business profile.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card"><div class="icon">01</div><h3>CPA-defined intake questions</h3><p>CPAs can specify the exact list of questions the assistant should ask to gather facts needed for a given return, planning scenario, or research issue.</p></div>
+        <div class="feature-card"><div class="icon">02</div><h3>Profile-driven LLM workflow</h3><p>The system uses the user’s profile, answers, and documents to decide which LLM calls, prompts, and reasoning paths to invoke.</p></div>
+        <div class="feature-card"><div class="icon">03</div><h3>Document ingestion and JSON extraction</h3><p>Ingest a variety of tax and financial documents and convert them into normalized JSON for downstream reasoning and compliance workflows.</p></div>
+        <div class="feature-card"><div class="icon">04</div><h3>Broad tax research support</h3><p>Handle broad and open-ended tax questions while preserving context from the user’s facts and supporting materials.</p></div>
+        <div class="feature-card"><div class="icon">05</div><h3>Optional RAG layer</h3><p>Use retrieval-augmented generation to ground answers in custom tax guidance, internal knowledge, or reference content when broader context is needed.</p></div>
+        <div class="feature-card"><div class="icon">06</div><h3>Reusable workflow engine</h3><p>Support intake, tax research, and guided planning flows across individuals, entities, and specialized advisory use cases.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="how-it-works">
+    <div class="container">
+      <div class="label">How It Works</div>
+      <h2>Collect facts, structure documents, and route the right tax reasoning flow.</h2>
+      <p class="sub">
+        Tax Research Assistant creates a workflow layer between client inputs, tax documents, and LLM-powered analysis.
+      </p>
+
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><h3>Gather the right inputs</h3><p>Start with CPA-defined questions, user profile data, and uploaded tax or financial documents to collect complete context.</p></div>
+        <div class="step"><div class="step-num">2</div><h3>Convert documents into structured JSON</h3><p>Extract key tax-relevant data from source documents and normalize it into machine-usable JSON for downstream analysis.</p></div>
+        <div class="step"><div class="step-num">3</div><h3>Run profile-aware research flows</h3><p>Select the right LLM prompts, tools, and optional retrieval layer based on the user’s facts, entity type, and research need.</p></div>
+      </div>
+
+      <div class="quote">
+        <div class="label" style="color:#ddd6fe;">Why it matters</div>
+        <h3 style="margin:10px 0 0; font-size:1.8rem;">Better tax answers start with better facts.</h3>
+        <p>Instead of treating tax research like a one-shot prompt, the platform first builds context through guided intake, structured document extraction, and user-specific workflow routing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="workflow">
+    <div class="container">
+      <div class="label">CPA Workflow</div>
+      <h2>Let practitioners define the questions. Let AI manage the flow.</h2>
+      <p class="sub">
+        The platform supports a guided tax workflow where the CPA decides what needs to be asked, and the system adapts the research process based on the answers.
+      </p>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="label">Question Framework</div>
+          <h3>CPA-controlled intake logic</h3>
+          <p>Practitioners can create a question list tailored to a client scenario, planning issue, or compliance workflow.</p>
+          <ul>
+            <li>Define required intake questions by use case</li>
+            <li>Capture missing facts before research begins</li>
+            <li>Use answers to refine the next reasoning step</li>
+            <li>Support consistent workflows across staff and clients</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="label">Personalized LLM Routing</div>
+          <h3>Different users, different tax paths</h3>
+          <p>The assistant can vary LLM calls and prompt strategy depending on the taxpayer profile and document context.</p>
+          <ul>
+            <li>Individual vs business taxpayer routing</li>
+            <li>Income-source aware analysis</li>
+            <li>Entity- and filing-context sensitivity</li>
+            <li>Response generation based on facts, not generic assumptions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="rag">
+    <div class="container">
+      <div class="label">Optional Retrieval Layer</div>
+      <h2>Add RAG when the knowledge base needs to go beyond the prompt.</h2>
+      <p class="sub">
+        For broad questions, custom firm knowledge, or domain-specific interpretation, the platform can use a retrieval-augmented generation layer to ground answers in curated sources.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card"><div class="icon">R1</div><h3>Custom knowledge grounding</h3><p>Bring in internal tax research notes, firm guidance, FAQs, or curated reference content to enrich the assistant’s answers.</p></div>
+        <div class="feature-card"><div class="icon">R2</div><h3>Useful for broad questions</h3><p>When the user asks something wide-ranging or nuanced, retrieval helps supply richer and more targeted context than prompts alone.</p></div>
+        <div class="feature-card"><div class="icon">R3</div><h3>Flexible architecture</h3><p>Use the RAG layer only where it adds value, while keeping simpler profile-based workflows fast and lightweight.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section" id="contact">
+    <div class="container">
+      <div class="cta-box">
+        <div class="label">Get Started</div>
+        <h2>Turn tax research into a structured, intelligent workflow.</h2>
+        <p>
+          Tax Research Assistant helps firms collect the right facts, extract structured data from documents, and generate more personalized tax guidance through profile-aware LLM workflows and optional retrieval grounding.
+        </p>
+        <div class="cta-actions">
+          <a class="btn btn-primary" href="#">Request Demo</a>
+          <a class="btn btn-outline" href="#features">See Features</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/ai-assistants/tutorials.html">AI Assistant AI Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/guide.html">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/tutorial.html">Data Product Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+<p>
+</p>
+<p>
+</p>
+</div>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/cto/">GenAI for CTO and IT</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/chief-compliance-officer/">GenAI for Compliance Officer</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+
+
+</body></html>

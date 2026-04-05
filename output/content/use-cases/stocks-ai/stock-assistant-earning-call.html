@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Stocks Assistant: Interactive Explainer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed as a narrative journey, mirroring the tool's workflow. It starts with the user's problem (dense transcripts), introduces the tool as a solution, and then walks through an interactive, step-by-step demonstration of the analysis process. This structure was chosen over a static feature list to make the tool's value tangible and easy to grasp. The user flows from raw data input to high-level, actionable insights like the Momentum Score, creating a compelling story of transformation. Key interactions include toggling through generated content (Summary, Insights, FAQ) and exploring the historical data that builds the final score, enhancing user engagement and understanding. -->
+    <!-- Visualization & Content Choices: Report Info: Core features of Stocks Assistant. -> Goal: Explain the tool's process and value. -> Viz/Presentation Method: An interactive multi-stage panel. Key metrics are shown in cards, generated text in tabs, and historical performance in a bar chart leading to a final score. -> Interaction: Users click through stages, switch tabs to view different AI outputs, and hover over the chart for details. -> Justification: This multi-faceted approach breaks down a complex AI process into digestible, interactive steps. The bar chart (Chart.js) is the best choice for comparing discrete quarterly performance data (beat/miss), directly feeding into the final Momentum Score, which is presented as a clear, impactful number. -> Library/Method: Vanilla JS for interactivity and state management, Chart.js for the historical performance chart. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #1a202c;
+        }
+        .tab-btn.active {
+            border-color: #34D399;
+            color: #34D399;
+            font-weight: 600;
+        }
+        .beat {
+            color: #10B981;
+        }
+        .miss {
+            color: #EF4444;
+        }
+        .meet {
+            color: #6B7280;
+        }
+        .momentum-score-circle {
+            transition: background-color 0.5s ease, transform 0.3s ease;
+        }
+    </style>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
+		(function (w, d, s, l, i) {
+			w[l] = w[l] || []; w[l].push({
+				'gtm.start':
+					new Date().getTime(), event: 'gtm.js'
+			}); var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --></head>
+<body class="antialiased">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight">Stocks Assistant</h1>
+            <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Transforming dense earnings call transcripts into actionable investment intelligence.</p>
+        </header>
+
+        <main>
+            <section class="bg-white rounded-2xl shadow-lg p-6 md:p-10" id="workflow">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-gray-800">From Transcript to Insight in Seconds</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Follow our AI-powered analysis process. We take a lengthy earnings call and distill it into the key metrics and insights you need to make informed decisions.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+                    <div class="lg:col-span-2">
+                        <div class="sticky top-8">
+                            <div class="bg-gray-50 p-4 rounded-lg h-96 overflow-auto shadow-inner">
+                                <h3 class="font-bold text-gray-700 mb-2">Sample Earnings Call Transcript (Excerpt)</h3>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    <strong>Operator:</strong> Good day, and thank you for standing by. Welcome to the InnovateCorp Q3 2025 Earnings Conference Call... <br/><br/>
+                                    <strong>CEO John Doe:</strong> Thank you all for joining. We are thrilled to report another quarter of exceptional growth. Our strategic initiatives in the AI-driven analytics space have yielded significant results, ahead of schedule. Total revenue for the quarter was $1.2 billion, a 20% increase year-over-year. Our flagship product, 'Synergy AI', saw a 50% increase in enterprise subscriptions, which was the primary driver of this outperformance. We successfully expanded our market share in the APAC region by 150 basis points. Our GAAP earnings per share came in at $1.55. Looking ahead, we are raising our full-year revenue guidance to $4.8 billion from $4.5 billion, reflecting our confidence in the current demand environment. However, we do anticipate some margin compression in Q4 due to increased R&amp;D investments in our next-generation platform... <br/><br/>
+                                    <strong>Analyst Jane Smith:</strong> John, can you provide more color on the margin outlook for Q4? What level of compression are you anticipating? <br/><br/>
+                                    <strong>CFO Emily White:</strong> Hi Jane, thanks for the question. We expect about a 50 basis point compression sequentially. This is a strategic reinvestment to accelerate our long-term growth and solidify our market leadership...
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-span-3">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center lg:text-left">AI Analysis &amp; Output</h3>
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 rounded-lg p-6 shadow-sm">
+                                <h4 class="text-lg font-semibold flex items-center"><span class="text-green-500 mr-3">●</span> Key Financial Metrics</h4>
+                                <p class="text-sm text-gray-500 mb-4 ml-7">The AI instantly extracts and compares headline numbers against analyst estimates.</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="bg-white p-4 rounded-lg border">
+                                        <p class="text-sm text-gray-500">Revenue</p>
+                                        <p class="text-2xl font-bold text-gray-800">$1.2B</p>
+                                        <div class="flex items-center mt-1">
+                                            <span class="text-xs font-semibold beat bg-green-100 px-2 py-1 rounded-full">BEAT</span>
+                                            <p class="text-xs text-gray-500 ml-2">vs $1.15B est.</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white p-4 rounded-lg border">
+                                        <p class="text-sm text-gray-500">EPS</p>
+                                        <p class="text-2xl font-bold text-gray-800">$1.55</p>
+                                        <div class="flex items-center mt-1">
+                                            <span class="text-xs font-semibold beat bg-green-100 px-2 py-1 rounded-full">BEAT</span>
+                                            <p class="text-xs text-gray-500 ml-2">vs $1.50 est.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-6 shadow-sm">
+                                <h4 class="text-lg font-semibold flex items-center"><span class="text-blue-500 mr-3">●</span> AI-Generated Intelligence</h4>
+                                <p class="text-sm text-gray-500 mb-4 ml-7">The transcript is processed to generate concise, easy-to-digest content.</p>
+                                <div>
+                                    <div class="border-b border-gray-200 mb-4">
+                                        <nav aria-label="Tabs" class="-mb-px flex space-x-6">
+                                            <button class="tab-btn active whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm" data-tab="summary">Summary</button>
+                                            <button class="tab-btn whitespace-nowrap py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="insights">Key Insights</button>
+                                            <button class="tab-btn whitespace-nowrap py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="faq">Generated FAQ</button>
+                                        </nav>
+                                    </div>
+                                    <div class="text-sm text-gray-700 leading-relaxed min-h-[150px]" id="tab-content">
+                                        <div id="summary-content">InnovateCorp reported a strong Q3 2025, beating both revenue and EPS estimates. Growth was primarily driven by a 50% increase in subscriptions for its 'Synergy AI' product and market share expansion in the APAC region. The company raised its full-year revenue guidance but cautioned about a slight margin compression in Q4 due to increased R&amp;D spending.</div>
+                                        <div class="hidden" id="insights-content">
+                                            <ul class="list-disc pl-5 space-y-2">
+                                                <li><strong>Positive:</strong> Revenue and EPS beat expectations, signaling strong operational performance.</li>
+                                                <li><strong>Positive:</strong> Full-year revenue guidance was raised, indicating management confidence.</li>
+                                                <li><strong>Key Driver:</strong> The 'Synergy AI' product is the core growth engine, with subscriptions up 50%.</li>
+                                                <li><strong>Neutral/Risk:</strong> Anticipated margin compression in Q4 from higher R&amp;D investment could impact short-term profitability but is framed as a long-term growth driver.</li>
+                                            </ul>
+                                        </div>
+                                        <div class="hidden" id="faq-content">
+                                            <div class="space-y-3">
+                                                <p><strong>Q: What drove the strong revenue growth this quarter?</strong><br/>A: Revenue growth was driven by a 50% increase in enterprise subscriptions for the 'Synergy AI' product and expansion in the APAC region.</p>
+                                                <p><strong>Q: Did the company meet its earnings expectations?</strong><br/>A: Yes, the company beat EPS estimates, reporting $1.55 vs an estimate of $1.50.</p>
+                                                <p><strong>Q: What is the company's outlook for the next quarter?</strong><br/>A: The company raised its full-year revenue guidance but expects a 50 basis point margin compression in Q4 due to R&amp;D investments.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-6 shadow-sm">
+                                 <h4 class="text-lg font-semibold flex items-center"><span class="text-purple-500 mr-3">●</span> Earnings Momentum Score</h4>
+                                <p class="text-sm text-gray-500 mb-4 ml-7">We analyze the last three quarters of earnings performance to generate a single, powerful momentum score.</p>
+                                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                                    <div class="w-full md:w-1/2 flex justify-center items-center">
+                                        <div class="momentum-score-circle w-36 h-36 rounded-full flex flex-col justify-center items-center bg-green-100 shadow-inner" id="momentum-score-circle">
+                                            <span class="text-4xl font-bold text-green-700" id="momentum-score">75</span>
+                                            <span class="text-sm font-medium text-green-600">Out of 100</span>
+                                        </div>
+                                    </div>
+                                    <div class="w-full md:w-1/2">
+                                        <div class="chart-container relative h-48 w-full max-w-sm mx-auto">
+                                            <canvas id="momentumChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/ai-assistants/tutorials.html">AI Assistant AI Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/guide.html">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/tutorial.html">Data Product Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+<p>
+</p>
+<p>
+</p>
+</div>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/cto/">GenAI for CTO and IT</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/chief-compliance-officer/">GenAI for Compliance Officer</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const tabContents = {
+                summary: document.getElementById('summary-content'),
+                insights: document.getElementById('insights-content'),
+                faq: document.getElementById('faq-content'),
+            };
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    Object.values(tabContents).forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    if(tabContents[tabName]) {
+                        tabContents[tabName].classList.remove('hidden');
+                    }
+                });
+            });
+
+            const quarterlyData = [
+                { quarter: 'Q1 2025', revenue: 'miss', eps: 'miss' },
+                { quarter: 'Q2 2025', revenue: 'meet', eps: 'beat' },
+                { quarter: 'Q3 2025', revenue: 'beat', eps: 'beat' },
+            ];
+
+            const scoreMap = { 'beat': 2, 'meet': 1, 'miss': -1 };
+            const colorMap = { 'beat': 'rgba(16, 185, 129, 0.7)', 'meet': 'rgba(107, 114, 128, 0.7)', 'miss': 'rgba(239, 68, 68, 0.7)' };
+            const hoverColorMap = { 'beat': 'rgba(16, 185, 129, 1)', 'meet': 'rgba(107, 114, 128, 1)', 'miss': 'rgba(239, 68, 68, 1)' };
+            
+            let rawScore = 0;
+            quarterlyData.forEach(q => {
+                rawScore += scoreMap[q.revenue];
+                rawScore += scoreMap[q.eps];
+            });
+
+            const maxScore = quarterlyData.length * (scoreMap['beat'] * 2); 
+            const minScore = quarterlyData.length * (scoreMap['miss'] * 2);
+            const momentumScore = Math.round(((rawScore - minScore) / (maxScore - minScore)) * 100);
+
+            const scoreEl = document.getElementById('momentum-score');
+            const scoreCircleEl = document.getElementById('momentum-score-circle');
+            
+            scoreEl.textContent = momentumScore;
+            
+            if (momentumScore >= 66) {
+                scoreCircleEl.classList.add('bg-green-100');
+                scoreEl.classList.add('text-green-700');
+                scoreEl.nextElementSibling.classList.add('text-green-600');
+            } else if (momentumScore >= 33) {
+                scoreCircleEl.classList.add('bg-yellow-100');
+                scoreEl.classList.add('text-yellow-700');
+                scoreEl.nextElementSibling.classList.add('text-yellow-600');
+            } else {
+                scoreCircleEl.classList.add('bg-red-100');
+                scoreEl.classList.add('text-red-700');
+                scoreEl.nextElementSibling.classList.add('text-red-600');
+            }
+
+
+            const ctx = document.getElementById('momentumChart').getContext('2d');
+            const momentumChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: quarterlyData.map(q => q.quarter),
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: quarterlyData.map(q => scoreMap[q.revenue]),
+                            backgroundColor: quarterlyData.map(q => colorMap[q.revenue]),
+                            borderColor: quarterlyData.map(q => hoverColorMap[q.revenue]),
+                            borderWidth: 1,
+                            hoverBackgroundColor: quarterlyData.map(q => hoverColorMap[q.revenue]),
+                        },
+                        {
+                            label: 'EPS',
+                            data: quarterlyData.map(q => scoreMap[q.eps]),
+                            backgroundColor: quarterlyData.map(q => colorMap[q.eps]),
+                            borderColor: quarterlyData.map(q => hoverColorMap[q.eps]),
+                            borderWidth: 1,
+                            hoverBackgroundColor: quarterlyData.map(q => hoverColorMap[q.eps]),
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 2) return 'Beat';
+                                    if (value === 1) return 'Meet';
+                                    if (value === -1) return 'Miss';
+                                    return '';
+                                },
+                                font: { size: 10 }
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        },
+                        x: {
+                           ticks: { font: { size: 10 } },
+                           grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.dataset.label || '';
+                                    const value = context.parsed.y;
+                                    let status = '';
+                                    if (value === 2) status = 'Beat';
+                                    if (value === 1) status = 'Meet';
+                                    if (value === -1) status = 'Miss';
+                                    return `${label}: ${status}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+
+</body></html>

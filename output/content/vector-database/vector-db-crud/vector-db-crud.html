@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html class="scroll-smooth" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Vector Database CRUD Operations Explained</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<style>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Vector Database CRUD Operations Explained</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #ffffff; /* White */
@@ -75,152 +75,159 @@
 					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
 		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --></head>
 <body>
-<!-- Header -->
-<header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 border-b border-slate-200">
-<nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-<div class="text-xl font-bold tracking-tighter text-slate-900">
-<span class="gradient-text">Vector DB CRUD Explained</span>
-</div>
-<div class="hidden md:flex items-center space-x-6 text-slate-700">
-<a class="hover:text-violet-500 transition-colors" href="#architecture">Architecture</a>
-<a class="hover:text-violet-500 transition-colors" href="#crud">CRUD Deep Dive</a>
-<a class="hover:text-violet-500 transition-colors" href="#maintenance">Maintenance</a>
-<a class="hover:text-violet-500 transition-colors" href="#comparison">Comparison</a>
-<a class="hover:text-violet-500 transition-colors" href="#examples">Code Examples</a>
-</div>
-</nav>
-</header>
-<!-- Main Content -->
-<main>
-<!-- Hero Section -->
-<section class="py-20 md:py-24 bg-white">
-<div class="container mx-auto px-6 text-center">
-<h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
+
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 border-b border-slate-200">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold tracking-tighter text-slate-900">
+                <span class="gradient-text">Vector DB CRUD Explained</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-6 text-slate-700">
+                <a class="hover:text-violet-500 transition-colors" href="#architecture">Architecture</a>
+                <a class="hover:text-violet-500 transition-colors" href="#crud">CRUD Deep Dive</a>
+                <a class="hover:text-violet-500 transition-colors" href="#maintenance">Maintenance</a>
+                <a class="hover:text-violet-500 transition-colors" href="#comparison">Comparison</a>
+                <a class="hover:text-violet-500 transition-colors" href="#examples">Code Examples</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="py-20 md:py-24 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
                     The Data Lifecycle in High-Dimensional Space
                 </h1>
-<p class="text-lg md:text-xl text-slate-600 max-w-4xl mx-auto">
+                <p class="text-lg md:text-xl text-slate-600 max-w-4xl mx-auto">
                     A comprehensive analysis of Create, Read, Update, and Delete (CRUD) operations in vector databases and their architectural imperatives.
                 </p>
-</div>
-</section>
-<!-- Section 1: Architectural Imperatives -->
-<section class="py-20 bg-slate-50" id="architecture">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Architectural Imperatives: The Primacy of the Read Path</h2>
-<p class="text-slate-600 mt-2 max-w-3xl mx-auto"><a href="https://www.dataknobs.com/vector-database/">Vector database</a> architecture is overwhelmingly optimized for one primary function: the rapid retrieval of semantically similar vectors from a massive dataset.</p>
-</div>
-<div class="grid md:grid-cols-2 gap-12 items-center">
-<div class="feature-card bg-white">
-<h3 class="text-2xl font-bold text-slate-800 mb-4">The Challenge of Exact Search</h3>
-<p>A brute-force k-Nearest Neighbors (kNN) search, which compares a query vector to every other vector, is computationally infeasible at scale. The linear complexity, O(n), makes it too slow for real-time applications involving millions or billions of items.</p>
-</div>
-<div class="feature-card bg-white">
-<h3 class="text-2xl font-bold text-slate-800 mb-4">The Solution: Approximate Nearest Neighbor (ANN) Search</h3>
-<p>Vector databases use specialized indexing structures to enable Approximate Nearest Neighbor (ANN) search. This approach trades a small, often negligible, amount of accuracy (recall) for an exponential gain in search speed, making real-time semantic search possible.</p>
-</div>
-</div>
-<div class="max-w-4xl mx-auto mt-16">
-<h3 class="text-2xl font-bold text-slate-800 mb-6 text-center">The HNSW Index: The Industry Standard</h3>
-<p class="text-center">The Hierarchical Navigable Small World (HNSW) algorithm has become the de facto standard for ANN indexing. It organizes vectors into a multi-layered proximity graph where nodes are vectors and edges represent similarity. A search starts at the top "expressway" layer and greedily navigates closer to the query, descending to denser layers to refine the search. This intricate structure is the key to its speed but also the source of its resistance to modification.</p>
-</div>
-</div>
-</section>
-<!-- Section 2: CRUD Operations Deep Dive -->
-<section class="py-20 bg-white" id="crud">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">A Deep Dive into Vector DB CRUD Operations</h2>
-</div>
-<div class="space-y-16">
-<!-- Create -->
-<div class="grid md:grid-cols-2 gap-8 items-center">
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">Create: The Ingestion and Indexing Pipeline</h3>
-<p class="mb-4">The Create operation is a multi-stage process involving two key steps: <strong>Vectorization</strong>, where raw data is converted into a vector embedding by a machine learning model, and <strong>Indexing</strong>, where the vector and its metadata are stored and added to the ANN index.</p>
-<p>Many databases use an <code>upsert</code> operation, which combines "update" and "insert." If a vector's ID exists, it's updated; if not, it's created. For optimal throughput, it's crucial to batch these operations, sending hundreds or thousands of vectors in a single request.</p>
-</div>
-<div class="feature-card"><img alt="Diagram of vectorization and indexing pipeline" class="rounded-lg" src="https://storage.googleapis.com/gweb-a-drive-images/b440406822c7003c271e843152433e38.png"/></div>
-</div>
-<!-- Read -->
-<div class="grid md:grid-cols-2 gap-8 items-center">
-<div class="feature-card"><img alt="Diagram of a hybrid search query" class="rounded-lg" src="https://storage.googleapis.com/gweb-a-drive-images/594e9f546682705f42654922116da197.png"/></div>
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">Read: Similarity Search and Hybrid Filtering</h3>
-<p class="mb-4">The Read operation is the core function of a vector database. It begins by vectorizing the user's query with the same embedding model used for the stored data. The database then performs an ANN search to find the "closest" vectors based on a chosen distance metric like <strong>Cosine Similarity</strong> or <strong>Euclidean Distance</strong>.</p>
-<p>The true power lies in <strong>hybrid search</strong>, which combines this semantic search with structured metadata filtering, allowing for highly specific and contextually relevant queries (e.g., "find similar products where price &lt; $100").</p>
-</div>
-</div>
-<!-- Update & Delete -->
-<div class="grid md:grid-cols-2 gap-8 items-center">
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">Update &amp; Delete: The High Cost of Mutability</h3>
-<p class="mb-4">Direct, in-place updates of vectors are rare and computationally expensive. Instead, an <strong>Update</strong> is almost always implemented as a logical <strong>"delete-then-insert"</strong> operation.</p>
-<p>Similarly, a <strong>Delete</strong> is typically a "soft delete" or <strong>"tombstoning"</strong>. The vector is not physically removed but is marked for deletion. This creates "holes" in the HNSW graph, degrading index navigability and performance over time. The actual removal happens during later maintenance processes.</p>
-</div>
-<div class="feature-card"><img alt="Diagram showing a soft delete creating a hole in an HNSW graph" class="rounded-lg" src="https://storage.googleapis.com/gweb-a-drive-images/e1f57ab5549008ac631481b212f45cd8.png"/></div>
-</div>
-</div>
-</div>
-</section>
-<!-- Section 3: Maintenance -->
-<section class="py-20 bg-slate-50" id="maintenance">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Maintaining a Healthy Index</h2>
-<p class="text-slate-600 mt-2 max-w-3xl mx-auto">To counteract the performance degradation caused by data churn, vector databases rely on crucial background maintenance processes.</p>
-</div>
-<div class="grid md:grid-cols-2 gap-12">
-<div class="feature-card bg-white">
-<h3 class="text-2xl font-bold text-slate-800 mb-4">Compaction</h3>
-<p>Compaction is the process of tidying up the index. It physically purges soft-deleted vectors, reclaiming storage space and removing query-time filtering overhead. It also merges small data fragments into larger, more efficient ones.</p>
-</div>
-<div class="feature-card bg-white">
-<h3 class="text-2xl font-bold text-slate-800 mb-4">Re-indexing</h3>
-<p>Re-indexing involves rebuilding all or part of the ANN index to ensure it is optimally structured based on the current data. This process restores query latency and recall to peak levels but can be computationally expensive and time-consuming.</p>
-</div>
-</div>
-<p class="text-center mt-12 max-w-2xl mx-auto">These asynchronous processes mean vector databases operate on an <strong>eventual consistency</strong> model. There is an inherent delay between when a change is made and when it is fully reflected across the optimized index.</p>
-</div>
-</section>
-<!-- Section 4: Comparative Framework -->
-<section class="py-20 bg-white" id="comparison">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Comparative Framework: CRUD Across Paradigms</h2>
-</div>
-<div class="table-container bg-white rounded-lg border border-slate-200 shadow-sm">
-<table class="w-full text-sm md:text-base">
-<thead>
-<tr>
-<th>Feature</th>
-<th>Vector Database</th>
-<th>SQL Database</th>
-<th>NoSQL Database</th>
-</tr>
-</thead>
-<tbody>
-<tr><td><strong>Primary Data Unit</strong></td><td>High-dimensional vector</td><td>Row within a table</td><td>Document, Key-Value Pair, etc.</td></tr>
-<tr><td><strong>Read Mechanism</strong></td><td>Probabilistic ANN search</td><td>Deterministic SELECT queries</td><td>Key-based lookups, field queries</td></tr>
-<tr><td><strong>Update Mechanism</strong></td><td>Complex "delete-then-insert"</td><td>Efficient in-place UPDATE</td><td>In-place updates are common</td></tr>
-<tr><td><strong>Delete Mechanism</strong></td><td>Complex "soft deletes" (tombstoning)</td><td>Atomic DELETE statement</td><td>Deferred or immediate deletes</td></tr>
-<tr><td><strong>Consistency Model</strong></td><td>Eventual Consistency (BASE)</td><td>Strong Consistency (ACID)</td><td>Eventual Consistency (BASE) is common</td></tr>
-<tr><td><strong>Primary Use Case</strong></td><td>AI/ML applications, semantic search</td><td>Transactional systems, systems of record</td><td>Big data, high scalability applications</td></tr>
-</tbody>
-</table>
-</div>
-</div>
-</section>
-<!-- Section 5: Code Examples -->
-<section class="py-20 bg-slate-50" id="examples">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Practical Implementations: Code Examples</h2>
-</div>
-<div class="space-y-12">
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">Pinecone</h3>
-<pre><code class="language-python">
+            </div>
+        </section>
+
+        <!-- Section 1: Architectural Imperatives -->
+        <section class="py-20 bg-slate-50" id="architecture">
+            <div class="container mx-auto px-6">
+                <div class="section-header">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Architectural Imperatives: The Primacy of the Read Path</h2>
+                    <p class="text-slate-600 mt-2 max-w-3xl mx-auto">Vector database architecture is overwhelmingly optimized for one primary function: the rapid retrieval of semantically similar vectors from a massive dataset.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="feature-card bg-white">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">The Challenge of Exact Search</h3>
+                        <p>A brute-force k-Nearest Neighbors (kNN) search, which compares a query vector to every other vector, is computationally infeasible at scale. The linear complexity, O(n), makes it too slow for real-time applications involving millions or billions of items.</p>
+                    </div>
+                    <div class="feature-card bg-white">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">The Solution: Approximate Nearest Neighbor (ANN) Search</h3>
+                        <p>Vector databases use specialized indexing structures to enable Approximate Nearest Neighbor (ANN) search. This approach trades a small, often negligible, amount of accuracy (recall) for an exponential gain in search speed, making real-time semantic search possible.</p>
+                    </div>
+                </div>
+                <div class="max-w-4xl mx-auto mt-16">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-6 text-center">The HNSW Index: The Industry Standard</h3>
+                    <p class="text-center">The Hierarchical Navigable Small World (HNSW) algorithm has become the de facto standard for ANN indexing. It organizes vectors into a multi-layered proximity graph where nodes are vectors and edges represent similarity. A search starts at the top "expressway" layer and greedily navigates closer to the query, descending to denser layers to refine the search. This intricate structure is the key to its speed but also the source of its resistance to modification.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: CRUD Operations Deep Dive -->
+        <section class="py-20 bg-white" id="crud">
+            <div class="container mx-auto px-6">
+                <div class="section-header">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">A Deep Dive into Vector DB CRUD Operations</h2>
+                </div>
+                <div class="space-y-16">
+                    <!-- Create -->
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4">Create: The Ingestion and Indexing Pipeline</h3>
+                            <p class="mb-4">The Create operation is a multi-stage process involving two key steps: <strong>Vectorization</strong>, where raw data is converted into a vector embedding by a machine learning model, and <strong>Indexing</strong>, where the vector and its metadata are stored and added to the ANN index.</p>
+                            <p>Many databases use an <code>upsert</code> operation, which combines "update" and "insert." If a vector's ID exists, it's updated; if not, it's created. For optimal throughput, it's crucial to batch these operations, sending hundreds or thousands of vectors in a single request.</p>
+                        </div>
+                        <div class="feature-card"><img alt="Diagram of vectorization and indexing pipeline" class="rounded-lg" src="https://storage.googleapis.com/gweb-a-drive-images/b440406822c7003c271e843152433e38.png"/></div>
+                    </div>
+                    <!-- Read -->
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div class="feature-card"><img alt="Diagram of a hybrid search query" class="rounded-lg" src="https://storage.googleapis.com/gweb-a-drive-images/594e9f546682705f42654922116da197.png"/></div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4">Read: Similarity Search and Hybrid Filtering</h3>
+                            <p class="mb-4">The Read operation is the core function of a vector database. It begins by vectorizing the user's query with the same embedding model used for the stored data. The database then performs an ANN search to find the "closest" vectors based on a chosen distance metric like <strong>Cosine Similarity</strong> or <strong>Euclidean Distance</strong>.</p>
+                            <p>The true power lies in <strong>hybrid search</strong>, which combines this semantic search with structured metadata filtering, allowing for highly specific and contextually relevant queries (e.g., "find similar products where price &lt; $100").</p>
+                        </div>
+                    </div>
+                    <!-- Update & Delete -->
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4">Update &amp; Delete: The High Cost of Mutability</h3>
+                            <p class="mb-4">Direct, in-place updates of vectors are rare and computationally expensive. Instead, an <strong>Update</strong> is almost always implemented as a logical <strong>"delete-then-insert"</strong> operation.</p>
+                            <p>Similarly, a <strong>Delete</strong> is typically a "soft delete" or <strong>"tombstoning"</strong>. The vector is not physically removed but is marked for deletion. This creates "holes" in the HNSW graph, degrading index navigability and performance over time. The actual removal happens during later maintenance processes.</p>
+                        </div>
+                         <div class="feature-card"><img alt="Diagram showing a soft delete creating a hole in an HNSW graph" class="rounded-lg" src="https://storage.googleapis.com/gweb-a-drive-images/e1f57ab5549008ac631481b212f45cd8.png"/></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Maintenance -->
+        <section class="py-20 bg-slate-50" id="maintenance">
+            <div class="container mx-auto px-6">
+                <div class="section-header">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Maintaining a Healthy Index</h2>
+                    <p class="text-slate-600 mt-2 max-w-3xl mx-auto">To counteract the performance degradation caused by data churn, vector databases rely on crucial background maintenance processes.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div class="feature-card bg-white">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Compaction</h3>
+                        <p>Compaction is the process of tidying up the index. It physically purges soft-deleted vectors, reclaiming storage space and removing query-time filtering overhead. It also merges small data fragments into larger, more efficient ones.</p>
+                    </div>
+                    <div class="feature-card bg-white">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Re-indexing</h3>
+                        <p>Re-indexing involves rebuilding all or part of the ANN index to ensure it is optimally structured based on the current data. This process restores query latency and recall to peak levels but can be computationally expensive and time-consuming.</p>
+                    </div>
+                </div>
+                <p class="text-center mt-12 max-w-2xl mx-auto">These asynchronous processes mean vector databases operate on an <strong>eventual consistency</strong> model. There is an inherent delay between when a change is made and when it is fully reflected across the optimized index.</p>
+            </div>
+        </section>
+        
+        <!-- Section 4: Comparative Framework -->
+        <section class="py-20 bg-white" id="comparison">
+            <div class="container mx-auto px-6">
+                <div class="section-header">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Comparative Framework: CRUD Across Paradigms</h2>
+                </div>
+                <div class="table-container bg-white rounded-lg border border-slate-200 shadow-sm">
+                    <table class="w-full text-sm md:text-base">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Vector Database</th>
+                                <th>SQL Database</th>
+                                <th>NoSQL Database</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Primary Data Unit</strong></td><td>High-dimensional vector</td><td>Row within a table</td><td>Document, Key-Value Pair, etc.</td></tr>
+                            <tr><td><strong>Read Mechanism</strong></td><td>Probabilistic ANN search</td><td>Deterministic SELECT queries</td><td>Key-based lookups, field queries</td></tr>
+                            <tr><td><strong>Update Mechanism</strong></td><td>Complex "delete-then-insert"</td><td>Efficient in-place UPDATE</td><td>In-place updates are common</td></tr>
+                            <tr><td><strong>Delete Mechanism</strong></td><td>Complex "soft deletes" (tombstoning)</td><td>Atomic DELETE statement</td><td>Deferred or immediate deletes</td></tr>
+                            <tr><td><strong>Consistency Model</strong></td><td>Eventual Consistency (BASE)</td><td>Strong Consistency (ACID)</td><td>Eventual Consistency (BASE) is common</td></tr>
+                            <tr><td><strong>Primary Use Case</strong></td><td>AI/ML applications, semantic search</td><td>Transactional systems, systems of record</td><td>Big data, high scalability applications</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Code Examples -->
+        <section class="py-20 bg-slate-50" id="examples">
+            <div class="container mx-auto px-6">
+                <div class="section-header">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Practical Implementations: Code Examples</h2>
+                </div>
+                <div class="space-y-12">
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Pinecone</h3>
+                        <pre><code class="language-python">
 # Assumes 'index' is an initialized Pinecone index object
 # Create/Update
 index.upsert(
@@ -232,10 +239,10 @@ query_results = index.query(vector=[0.1, ..., 0.9], top_k=5, filter={"genre": {"
 # Delete
 index.delete(ids=["vec1"], namespace="example-namespace")
                         </code></pre>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">Weaviate</h3>
-<pre><code class="language-python">
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Weaviate</h3>
+                        <pre><code class="language-python">
 # Assumes 'collection' is an initialized Weaviate collection object
 # Create
 with collection.batch.dynamic() as batch:
@@ -247,10 +254,10 @@ collection.data.update(uuid="a1b2c3d4-...", properties={"answer": "A molecule...
 # Delete
 collection.data.delete_by_id(uuid="a1b2c3d4-...")
                         </code></pre>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">Milvus</h3>
-<pre><code class="language-python">
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Milvus</h3>
+                        <pre><code class="language-python">
 # Assumes 'client' is an initialized MilvusClient
 # Create
 client.insert(collection_name="demo_collection", data=[{"id": 1, "vector": [...], "text": "..."}])
@@ -259,10 +266,10 @@ search_results = client.search(collection_name="demo_collection", data=[[...]], 
 # Delete
 client.delete(collection_name="demo_collection", ids=[1])
                         </code></pre>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">ChromaDB</h3>
-<pre><code class="language-python">
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">ChromaDB</h3>
+                        <pre><code class="language-python">
 # Assumes 'collection' is an initialized ChromaDB collection object
 # Create/Update
 collection.upsert(documents=["A new document."], metadatas=[{"source": "c"}], ids=["id1"])
@@ -271,13 +278,15 @@ query_results = collection.query(query_texts=["A query"], n_results=1, where={"s
 # Delete
 collection.delete(ids=["id1"])
                         </code></pre>
-</div>
-</div>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="bg-gray-800 text-gray-300">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 <div>
@@ -366,4 +375,6 @@ collection.delete(ids=["id1"])
 </div>
 </div>
 </footer>
+
+
 </body></html>

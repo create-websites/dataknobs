@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Google TPUs vs NVIDIA &amp; AMD GPUs  2026 Deep-Dive Comparison</title>
+<!-- ── SEO Meta ──────────────────────────────────────────────── -->
+<meta content="Comprehensive 2026 guide comparing Google TPUs (v5e, v6e Trillium, Ironwood, TPU 8t/8i) against NVIDIA H100/H200/B200 and AMD MI300X/MI325X  covering architecture, performance, software ecosystems, pricing, and workload recommendations." name="description"/>
+<meta content="Google TPU, NVIDIA GPU, AMD GPU, TPU vs GPU, AI accelerator comparison, TPU v6e Trillium, TPU7x Ironwood, TPU 8t, TPU 8i, H100, H200, B200, MI300X, MI325X, machine learning hardware, deep learning accelerators, JAX XLA, CUDA, ROCm, MLPerf, AI infrastructure 2026" name="keywords"/>
+<meta content="AI Hardware Research" name="author"/>
+<meta content="index, follow" name="robots"/>
+<link href="https://example.com/tpu-vs-gpu-comparison-2026" rel="canonical"/>
+<!-- ── Open Graph ─────────────────────────────────────────────── -->
+<meta content="article" property="og:type"/>
+<meta content="Google TPUs vs NVIDIA &amp; AMD GPUs  2026 Deep-Dive" property="og:title"/>
+<meta content="Which AI accelerator wins in 2026? A rigorous comparison of Google TPUs, NVIDIA Hopper/Blackwell, and AMD CDNA  covering architecture, benchmarks, pricing, and workload fit." property="og:description"/>
+<meta content="https://example.com/tpu-vs-gpu-comparison-2026" property="og:url"/>
+<meta content="https://example.com/og-tpu-gpu-2026.jpg" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="AI Hardware Insights" property="og:site_name"/>
+<meta content="2026-04-23T00:00:00Z" property="article:published_time"/>
+<meta content="Technology" property="article:section"/>
+<meta content="AI Accelerators" property="article:tag"/>
+<meta content="Google TPU" property="article:tag"/>
+<meta content="NVIDIA GPU" property="article:tag"/>
+<meta content="AMD GPU" property="article:tag"/>
+<!-- ── Twitter Card ──────────────────────────────────────────── -->
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Google TPUs vs NVIDIA &amp; AMD GPUs  2026 Deep-Dive" name="twitter:title"/>
+<meta content="Architecture, benchmarks, pricing, and workload guidance for TPU v6e Trillium, Ironwood, TPU 8t/8i, H200, B200, MI300X, and MI325X." name="twitter:description"/>
+<meta content="https://example.com/og-tpu-gpu-2026.jpg" name="twitter:image"/>
+<!-- ── JSON-LD Structured Data ───────────────────────────────── -->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Google TPUs versus Modern NVIDIA and AMD GPUs: 2026 Deep-Dive Comparison",
+    "description": "Comprehensive 2026 educational guide comparing Google TPUs against NVIDIA and AMD GPU accelerators, covering architecture, performance, software ecosystems, pricing, and workload-based recommendations.",
+    "datePublished": "2026-04-23",
+    "dateModified": "2026-04-23",
+    "author": { "@type": "Organization", "name": "AI Hardware Insights" },
+    "publisher": { "@type": "Organization", "name": "AI Hardware Insights" },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://example.com/tpu-vs-gpu-comparison-2026" },
+    "keywords": "Google TPU, NVIDIA GPU, AMD GPU, AI accelerator, MLPerf, CUDA, ROCm, JAX, XLA",
+    "articleSection": "AI Hardware",
+    "educationalLevel": "Expert",
+    "learningResourceType": "Technical Report",
+    "inLanguage": "en-US"
+  }
+  </script>
+<!-- ── FAQPage Schema ─────────────────────────────────────────── -->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Should I choose Google TPUs or NVIDIA GPUs for LLM training?",
+        "acceptedAnswer": { "@type": "Answer", "text": "For very large-scale frontier pretraining with willingness to standardize on JAX/XLA, Google TPUs (v5p, Ironwood, or upcoming TPU 8t) are compelling. For minimum developer friction, maximum PyTorch compatibility, and broadest inference tooling, NVIDIA remains the strongest default." }
+      },
+      {
+        "@type": "Question",
+        "name": "Which accelerator has the most HBM memory in 2026?",
+        "acceptedAnswer": { "@type": "Answer", "text": "As of 2026, Google TPU 8i leads with 288 GB HBM per chip, followed by AMD MI325X at 256 GB. NVIDIA B200 offers 180 GB per GPU." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is TorchTPU production-ready in 2026?",
+        "acceptedAnswer": { "@type": "Answer", "text": "TorchTPU was announced in preview in April 2026. PyTorch/XLA remains the more mature TPU path for production workloads." }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Google Cloud TPU pricing compare to NVIDIA GPU pricing?",
+        "acceptedAnswer": { "@type": "Answer", "text": "On Google Cloud, TPU v6e Trillium costs $2.70/chip-hour. An 8-chip slice totals ~$21.60/hr, versus $41.60/hr for an 8xH100 A3 High VM or $59.36/hr for an 8xH200 A3 Ultra VM." }
+      }
+    ]
+  }
+  </script>
+<!-- ── Fonts (matching index.html) ───────────────────────────── -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- ── Tailwind CDN ───────────────────────────────────────────── -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+
+    .hero-bg {
+      background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 25%, #6d28d9 50%, #7c3aed 75%, #4338ca 100%);
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px);
+    }
+
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(109,40,217,0.12);
+    }
+
+    .table-scroll { overflow-x: auto; }
+
+    .timeline-track {
+      position: absolute;
+      left: 11px; top: 6px; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, #7c3aed, #a78bfa, transparent);
+    }
+  </style>
+</head>
+<body class="antialiased bg-white text-slate-900">
+<!-- ══════════════════════ HEADER ══════════════════════ -->
+<header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+<div class="mx-auto max-w-7xl px-6 py-4 lg:px-8">
+<div class="flex items-center justify-between">
+<a aria-label="Home" class="flex items-center gap-3" href="#">
+<div class="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
+<svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-lg font-bold tracking-tight text-slate-900">AI Hardware <span class="text-violet-600">Insights</span></span>
+</a>
+<nav aria-label="Primary navigation" class="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
+<a class="transition hover:text-violet-700" href="#summary">Summary</a>
+<a class="transition hover:text-violet-700" href="#architecture">Architecture</a>
+<a class="transition hover:text-violet-700" href="#performance">Performance</a>
+<a class="transition hover:text-violet-700" href="#software">Software</a>
+<a class="transition hover:text-violet-700" href="#pricing">Pricing</a>
+<a class="rounded-full bg-violet-600 px-5 py-2.5 text-white shadow-sm transition hover:bg-violet-700" href="#recommendations">
+          Recommendations
+        </a>
+</nav>
+<button aria-expanded="false" aria-label="Open main menu" class="inline-flex items-center justify-center rounded-xl border border-slate-200 p-2 text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 md:hidden" id="mobile-menu-button">
+<svg class="h-6 w-6" fill="none" id="menu-open-icon" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<svg class="hidden h-6 w-6" fill="none" id="menu-close-icon" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<nav aria-label="Mobile navigation" class="hidden border-t border-slate-200 pt-4 md:hidden" id="mobile-menu">
+<div class="flex flex-col gap-2 text-sm font-medium text-slate-700">
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="#summary">Summary</a>
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="#architecture">Architecture</a>
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="#performance">Performance</a>
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="#software">Software</a>
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="#pricing">Pricing</a>
+<a class="mt-2 rounded-full bg-violet-600 px-5 py-3 text-center text-white shadow-sm transition hover:bg-violet-700" href="#recommendations">Recommendations</a>
+</div>
+</nav>
+</div>
+</header>
+<main>
+<!-- ══════════════════════ HERO ══════════════════════ -->
+<section class="hero-bg relative overflow-hidden text-white">
+<div class="relative mx-auto grid max-w-7xl gap-14 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-28">
+<div class="flex flex-col justify-center">
+<div class="mb-6 inline-flex w-fit items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-violet-100 backdrop-blur">
+        Updated April 2026 · Source-backed deep dive
+      </div>
+<h1 class="max-w-4xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+        Google TPUs vs <span class="text-violet-200">NVIDIA &amp; AMD GPUs</span>
+</h1>
+<p class="mt-6 max-w-2xl text-lg leading-8 text-violet-50/90">
+        A rigorous 2026 comparison of AI accelerator platforms  architecture, benchmarks, software ecosystems, cloud pricing, and workload-driven procurement guidance for teams choosing between TPUs, NVIDIA, and AMD.
+      </p>
+<div class="mt-8 flex flex-col gap-4 sm:flex-row">
+<a class="rounded-full bg-white px-6 py-3 text-center text-sm font-semibold text-violet-800 shadow-lg transition hover:scale-[1.02]" href="#recommendations">
+          See Recommendations
+        </a>
+<a class="rounded-full border border-white/30 bg-white/10 px-6 py-3 text-center text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15" href="#architecture">
+          Explore Architecture
+        </a>
+</div>
+<div class="mt-10 grid gap-4 sm:grid-cols-3">
+<div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/90 backdrop-blur">Google TPUs</div>
+<div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/90 backdrop-blur">NVIDIA Hopper &amp; Blackwell</div>
+<div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/90 backdrop-blur">AMD CDNA3</div>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -inset-4 rounded-[2rem] bg-violet-400/25 blur-3xl"></div>
+<div class="glass relative overflow-hidden rounded-[2rem] border border-white/15 p-6 shadow-2xl">
+<div class="rounded-[1.5rem] bg-white p-5 text-slate-900 shadow-xl">
+<div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+<p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Platforms Compared</p>
+<p class="mt-2 text-lg font-semibold">Datacenter AI Accelerators · 2026</p>
+<div class="mt-4 flex flex-wrap gap-2 text-sm text-slate-600">
+<span class="rounded-full border border-fuchsia-200 bg-fuchsia-50 px-3 py-1 text-fuchsia-700">TPU v5e · v5p</span>
+<span class="rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-violet-700">v6e Trillium</span>
+<span class="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-indigo-700">Ironwood · 8t · 8i</span>
+<span class="rounded-full border border-slate-200 bg-white px-3 py-1">H100 · H200 · B200</span>
+<span class="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-orange-700">MI300X · MI325X</span>
+</div>
+</div>
+<div class="my-5 flex items-center justify-center">
+<div class="rounded-full bg-gradient-to-r from-fuchsia-600 via-violet-600 to-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-lg">
+              Decision Framework
+            </div>
+</div>
+<div class="grid gap-4 md:grid-cols-3">
+<div class="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm text-center">
+<p class="text-sm font-semibold text-fuchsia-700">Training</p>
+<p class="mt-1 text-xs text-slate-500">Scale &amp; cost</p>
+</div>
+<div class="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm text-center">
+<p class="text-sm font-semibold text-violet-700">Inference</p>
+<p class="mt-1 text-xs text-slate-500">Latency &amp; throughput</p>
+</div>
+<div class="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm text-center">
+<p class="text-sm font-semibold text-indigo-700">Software</p>
+<p class="mt-1 text-xs text-slate-500">Ecosystem fit</p>
+</div>
+</div>
+<div class="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+<p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Output</p>
+<p class="mt-2 text-lg font-semibold text-slate-900">Workload-matched accelerator choice</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ══════════════════════ SUMMARY ══════════════════════ -->
+<section class="bg-white" id="summary">
+<div class="mx-auto grid max-w-7xl gap-8 px-6 py-16 lg:grid-cols-2 lg:px-8">
+<div class="rounded-[2rem] border border-slate-200 bg-slate-50 p-8 shadow-sm">
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-rose-500">The Challenge</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900">No single accelerator wins every workload.</h2>
+<ul class="mt-6 space-y-4 text-slate-600">
+<li class="flex gap-3"><span class="mt-1 text-rose-500">•</span><span>Training and inference reward fundamentally different hardware traits.</span></li>
+<li class="flex gap-3"><span class="mt-1 text-rose-500">•</span><span>Software stack lock-in can cost more than hardware price differences.</span></li>
+<li class="flex gap-3"><span class="mt-1 text-rose-500">•</span><span>MLPerf doesn't yet cover all platforms symmetrically in 2026.</span></li>
+<li class="flex gap-3"><span class="mt-1 text-rose-500">•</span><span>TPU 8t/8i are newly announced  no mature cross-vendor benchmarks yet.</span></li>
+</ul>
+</div>
+<div class="rounded-[2rem] border border-violet-100 bg-violet-50 p-8 shadow-sm">
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">The Answer</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900">Match hardware to your workload, stack, and team.</h2>
+<ul class="mt-6 space-y-4 text-slate-700">
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span><strong>Google TPUs</strong>  best for large-scale training and Google-stack workloads.</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span><strong>NVIDIA GPUs</strong>  broadest ecosystem, lowest migration friction, safest default.</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span><strong>AMD GPUs</strong>  memory-capacity leader with an improving open stack.</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span>Operational fit and staff expertise frequently outweigh peak silicon specs.</span></li>
+</ul>
+</div>
+</div>
+</section>
+<!-- ══════════════════════ TIMELINE ══════════════════════ -->
+<section class="border-y border-slate-200 bg-gradient-to-b from-slate-50 to-white">
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+<div class="max-w-3xl">
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Timeline</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Platform progression shapes the 2026 landscape.</h2>
+<p class="mt-4 text-lg text-slate-600">Accelerator choice in 2026 is shaped as much by software-stack maturity and availability timing as by raw silicon specs.</p>
+</div>
+<div class="mt-12 relative pl-8">
+<div class="timeline-track"></div>
+<div class="space-y-8">
+<div class="relative">
+<div class="absolute -left-8 top-1.5 h-4 w-4 rounded-full border-2 border-white bg-violet-600 shadow"></div>
+<p class="text-xs font-semibold uppercase tracking-[0.2em] text-violet-600 mb-1">2023</p>
+<div class="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm max-w-2xl">
+<p class="font-semibold text-slate-900">TPU v4 ISCA paper published</p>
+<p class="mt-1 text-sm text-slate-600">Established benchmark for performance/watt gains (2.7× vs v3) and reconfigurable optical interconnects at scale.</p>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-8 top-1.5 h-4 w-4 rounded-full border-2 border-white bg-violet-600 shadow"></div>
+<p class="text-xs font-semibold uppercase tracking-[0.2em] text-violet-600 mb-1">2024</p>
+<div class="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm max-w-2xl">
+<p class="font-semibold text-slate-900">Trillium first public training benchmarks · AMD MI300X cloud deployments</p>
+<p class="mt-1 text-sm text-slate-600">MLPerf 4.1: Trillium delivers 1.8× better perf/dollar vs v5p, 99% scaling efficiency. AMD MI300X enters mainstream cloud with 192 GB HBM.</p>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-8 top-1.5 h-4 w-4 rounded-full border-2 border-white bg-violet-600 shadow"></div>
+<p class="text-xs font-semibold uppercase tracking-[0.2em] text-violet-600 mb-1">2025</p>
+<div class="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm max-w-2xl">
+<p class="font-semibold text-slate-900">Ironwood GA · H200 wide deployment · AMD MI325X (256 GB)</p>
+<p class="mt-1 text-sm text-slate-600">TPU7x Ironwood reaches GA. Google Cloud publishes H200 &amp; B200 MLPerf inference results. AMD MI325X raises memory bar to 256 GB HBM3E.</p>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-8 top-1.5 h-4 w-4 rounded-full border-2 border-white bg-fuchsia-600 shadow ring-4 ring-fuchsia-100"></div>
+<p class="text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-600 mb-1">April 2026 · Now</p>
+<div class="rounded-[1.5rem] border border-fuchsia-200 bg-fuchsia-50 p-5 shadow-sm max-w-2xl">
+<p class="font-semibold text-slate-900">TorchTPU preview · TPU 8t &amp; TPU 8i announced (April 22, 2026)</p>
+<p class="mt-1 text-sm text-slate-600">Native PyTorch on TPU enters preview. TPU 8t purpose-built for training (12.6 PFLOPS FP4, 216 GB). TPU 8i purpose-built for reasoning/serving (10.1 PFLOPS FP4, 288 GB, Boardfly topology).</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ══════════════════════ ARCHITECTURE ══════════════════════ -->
+<section class="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="architecture">
+<div class="max-w-3xl">
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Architecture</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">One platform. Three hardware families. Complete tradeoffs.</h2>
+<p class="mt-4 text-lg text-slate-600">
+      TPUs are AI ASICs designed around matrix execution, HBM, and pod-level interconnects. GPUs are programmable parallel processors  their generality is both their strength and a source of efficiency overhead relative to domain-specific silicon.
+    </p>
+</div>
+<!-- Without / Middle / With  exact DataKnobs differentiation pattern -->
+<div class="mt-12 grid gap-6 md:grid-cols-3">
+<div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+<h3 class="text-xl font-semibold">GPU System Model</h3>
+<p class="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">NVIDIA / AMD</p>
+<ul class="mt-5 space-y-3 text-slate-600 text-sm">
+<li>SM / CU + Tensor &amp; Matrix Cores</li>
+<li>Registers &amp; Shared / L1 Cache</li>
+<li>L2 / Last-Level Cache</li>
+<li>HBM (device memory)</li>
+<li>NVLink / Infinity Fabric</li>
+<li>InfiniBand / Ethernet</li>
+</ul>
+</div>
+<div class="rounded-[2rem] border border-violet-200 bg-violet-600 p-8 text-white shadow-sm">
+<h3 class="text-xl font-semibold">TPU System Model</h3>
+<p class="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-violet-200">Google Cloud</p>
+<ul class="mt-5 space-y-3 text-violet-50 text-sm">
+<li>TensorCore / MXU (matrix)</li>
+<li>SparseCore (v5p, v6e, 8t)</li>
+<li>On-chip SRAM / VMEM</li>
+<li>HBM (compiler-managed, XLA)</li>
+<li>ICI (Inter-Chip Interconnect)</li>
+<li>OCS / Virgo / Boardfly</li>
+</ul>
+</div>
+<div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+<h3 class="text-xl font-semibold">Key Design Split</h3>
+<p class="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">What it means</p>
+<ul class="mt-5 space-y-3 text-slate-600 text-sm">
+<li>TPU pods = cohesive supercomputers</li>
+<li>GPU clusters = assembled flexible nodes</li>
+<li>TPU efficiency relies on XLA compiler</li>
+<li>GPU efficiency relies on software stack</li>
+<li>TPU 8t/8i: training vs. serving split</li>
+<li>B200 spends watts on generality</li>
+</ul>
+</div>
+</div>
+<!-- Platform table -->
+<h3 class="mt-16 text-2xl font-semibold tracking-tight text-slate-900">Representative Platform Specifications</h3>
+<div class="mt-6 table-scroll rounded-[1.5rem] border border-slate-200 shadow-sm">
+<table class="min-w-full text-sm">
+<thead class="bg-slate-50 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+<tr>
+<th class="px-5 py-4 text-left">Platform</th>
+<th class="px-5 py-4 text-left">Chip</th>
+<th class="px-5 py-4 text-left">HBM</th>
+<th class="px-5 py-4 text-left">Peak BW</th>
+<th class="px-5 py-4 text-left">Scale-Up Interconnect</th>
+<th class="px-5 py-4 text-left">Max Pod Scale</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50">
+<td class="px-5 py-4"><span class="inline-flex rounded-full bg-fuchsia-50 px-2.5 py-1 text-xs font-semibold text-fuchsia-700">Google TPU</span></td>
+<td class="px-5 py-4 font-medium text-slate-900">v5e</td>
+<td class="px-5 py-4 text-slate-600">16 GB</td>
+<td class="px-5 py-4 text-slate-600">800 GiB/s</td>
+<td class="px-5 py-4 text-slate-600">ICI</td>
+<td class="px-5 py-4 text-slate-600">256-chip slice</td>
+</tr>
+<tr class="hover:bg-slate-50">
+<td class="px-5 py-4"><span class="inline-flex rounded-full bg-fuchsia-50 px-2.5 py-1 text-xs font-semibold text-fuchsia-700">Google TPU</span></td>
+<td class="px-5 py-4 font-medium text-slate-900">v6e Trillium</td>
+<td class="px-5 py-4 text-slate-600">32 GB</td>
+<td class="px-5 py-4 text-slate-600">1,638 GiB/s</td>
+<td class="px-5 py-4 text-slate-600">ICI 800 GB/s</td>
+<td class="px-5 py-4 text-slate-600">256-chip 2D-torus</td>
+</tr>
+<tr class="hover:bg-slate-50">
+<td class="px-5 py-4"><span class="inline-flex rounded-full bg-fuchsia-50 px-2.5 py-1 text-xs font-semibold text-fuchsia-700">Google TPU</span></td>
+<td class="px-5 py-4 font-medium text-slate-900">v5p</td>
+<td class="px-5 py-4 text-slate-600">95 GiB</td>
+<td class="px-5 py-4 text-slate-600">2,575 GiB/s</td>
+<td class="px-5 py-4 text-slate-600">ICI 1,200 GB/s</td>
+<td class="px-5 py-4 text-slate-600">3D torus · 6,144 chips</td>
+</tr>
+<tr class="hover:bg-slate-50">
+<td class="px-5 py-4"><span class="inline-flex rounded-full bg-fuchsia-50 px-2.5 py-1 text-xs font-semibold text-fuchsia-700">Google TPU</span></td>
+<td class="px-5 py-4 font-medium text-slate-900">TPU7x Ironwood</td>
+<td class="px-5 py-4 text-slate-600">192 GiB HBM3E</td>
+<td class="px-5 py-4 text-slate-600">7,380 GiB/s</td>
+<td class="px-5 py-4 text-slate-600">ICI 1,200 GB/s</td>
+<td class="px-5 py-4 text-slate-600">9,216-chip pod</td>
+</tr>
+<tr class="hover:bg-fuchsia-50/40 bg-fuchsia-50/20">
+<td class="px-5 py-4"><span class="inline-flex rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold text-fuchsia-800">NEW · TPU 8t</span></td>
+<td class="px-5 py-4 font-medium text-slate-900">TPU 8t</td>
+<td class="px-5 py-4 text-slate-600">216 GB + 128 MB SRAM</td>
+<td class="px-5 py-4 text-slate-600">6,528 GB/s</td>
+<td class="px-5 py-4 text-slate-600">Torus + Virgo</td>
+<td class="px-5 py-4 text-slate-600">9,600-chip; 134K+ via Virgo</td>
+</tr>
+<tr class="hover:bg-fuchsia-50/40 bg-fuchsia-50/20">
+<td class="px-5 py-4"><span class="inline-flex rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold text-fuchsia-800">NEW · TPU 8i</span></td>
+<td class="px-5 py-4 font-medium text-slate-900">TPU 8i</td>
+<td class="px-5 py-4 text-slate-600">288 GB + 384 MB SRAM</td>
+<td class="px-5 py-4 text-slate-600">8,601 GB/s</td>
+<td class="px-5 py-4 text-slate-600">Boardfly</td>
+<td class="px-5 py-4 text-slate-600">1,024 active chips/pod</td>
+</tr>
+<tr class="hover:bg-slate-50">
+<td class="px-5 py-4"><span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">NVIDIA GPU</span></td>
+<td class="px-5 py-4 font-medium text-slate-900">H200</td>
+<td class="px-5 py-4 text-slate-600">141 GB HBM3e</td>
+<td class="px-5 py-4 text-slate-600">4.8 TB/s</td>
+<td class="px-5 py-4 text-slate-600">NVLink 900 GB/s+</td>
+<td class="px-5 py-4 text-slate-600">8-GPU HGX node</td>
+</tr>
+<tr class="hover:bg-slate-50">
+<td class="px-5 py-4"><span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">NVIDIA GPU</span></td>
+<td class="px-5 py-4 font-medium text-slate-900">HGX B200</td>
+<td class="px-5 py-4 text-slate-600">180 GB / GPU</td>
+<td class="px-5 py-4 text-slate-600">62 TB/s (8-GPU)</td>
+<td class="px-5 py-4 text-slate-600">5th-gen NVLink/NVSwitch</td>
+<td class="px-5 py-4 text-slate-600">8-GPU HGX node</td>
+</tr>
+<tr class="hover:bg-slate-50">
+<td class="px-5 py-4"><span class="inline-flex rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700">AMD GPU</span></td>
+<td class="px-5 py-4 font-medium text-slate-900">MI300X</td>
+<td class="px-5 py-4 text-slate-600">192 GB HBM3</td>
+<td class="px-5 py-4 text-slate-600">5.3 TB/s</td>
+<td class="px-5 py-4 text-slate-600">7× Infinity Fabric</td>
+<td class="px-5 py-4 text-slate-600">8-GPU OAM node</td>
+</tr>
+<tr class="hover:bg-slate-50">
+<td class="px-5 py-4"><span class="inline-flex rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700">AMD GPU</span></td>
+<td class="px-5 py-4 font-medium text-slate-900">MI325X</td>
+<td class="px-5 py-4 text-slate-600">256 GB HBM3E</td>
+<td class="px-5 py-4 text-slate-600">6.0 TB/s</td>
+<td class="px-5 py-4 text-slate-600">7× Infinity Fabric</td>
+<td class="px-5 py-4 text-slate-600">8-GPU OAM node</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- ══════════════════════ PEAK SPECS ══════════════════════ -->
+<section class="border-y border-slate-200 bg-gradient-to-b from-violet-50 to-white">
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+<div class="mx-auto max-w-4xl text-center">
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Published Peak Specs</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Official vendor figures  no invented numbers.</h2>
+<p class="mt-5 text-lg leading-8 text-slate-600">
+        TPU figures emphasize BF16/FP8/FP4 in line with Google's public framing. Where standalone FLOP tables were absent in official sources, no figures are invented.
+      </p>
+</div>
+<div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+<div class="card-hover rounded-[2rem] border border-fuchsia-100 bg-white p-6 shadow-sm">
+<span class="inline-flex rounded-full bg-fuchsia-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-fuchsia-700">TPU v6e Trillium</span>
+<p class="mt-5 text-3xl font-bold text-slate-900">918 <span class="text-base font-semibold text-slate-400">TFLOPS</span></p>
+<p class="text-sm text-slate-500 mb-3">BF16</p>
+<p class="text-sm text-slate-600">32 GB HBM · 1,638 GiB/s</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-violet-100 bg-white p-6 shadow-sm">
+<span class="inline-flex rounded-full bg-violet-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-violet-700">TPU7x Ironwood</span>
+<p class="mt-5 text-3xl font-bold text-slate-900">2,307 <span class="text-base font-semibold text-slate-400">TFLOPS</span></p>
+<p class="text-sm text-slate-500 mb-3">BF16</p>
+<p class="text-sm text-slate-600">192 GiB HBM3E · 7,380 GiB/s</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-fuchsia-200 bg-fuchsia-50 p-6 shadow-sm">
+<span class="inline-flex rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-fuchsia-800">TPU 8t · NEW</span>
+<p class="mt-5 text-3xl font-bold text-slate-900">12.6 <span class="text-base font-semibold text-slate-400">PFLOPS</span></p>
+<p class="text-sm text-slate-500 mb-3">FP4</p>
+<p class="text-sm text-slate-600">216 GB HBM · 6,528 GB/s</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-fuchsia-200 bg-fuchsia-50 p-6 shadow-sm">
+<span class="inline-flex rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-fuchsia-800">TPU 8i · NEW</span>
+<p class="mt-5 text-3xl font-bold text-slate-900">10.1 <span class="text-base font-semibold text-slate-400">PFLOPS</span></p>
+<p class="text-sm text-slate-500 mb-3">FP4</p>
+<p class="text-sm text-slate-600">288 GB HBM · 8,601 GB/s</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">NVIDIA H200</span>
+<p class="mt-5 text-3xl font-bold text-slate-900">&gt;32 <span class="text-base font-semibold text-slate-400">PFLOPS</span></p>
+<p class="text-sm text-slate-500 mb-3">FP8 · 8-GPU HGX</p>
+<p class="text-sm text-slate-600">141 GB HBM3e · 4.8 TB/s</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">HGX B200</span>
+<p class="mt-5 text-3xl font-bold text-slate-900">144 <span class="text-base font-semibold text-slate-400">PFLOPS</span></p>
+<p class="text-sm text-slate-500 mb-3">FP4 · 8-GPU total</p>
+<p class="text-sm text-slate-600">180 GB/GPU · 62 TB/s total</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-orange-100 bg-white p-6 shadow-sm">
+<span class="inline-flex rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-orange-700">AMD MI300X</span>
+<p class="mt-5 text-3xl font-bold text-slate-900">1,307 <span class="text-base font-semibold text-slate-400">TFLOPS</span></p>
+<p class="text-sm text-slate-500 mb-3">BF16</p>
+<p class="text-sm text-slate-600">192 GB HBM3 · 5.3 TB/s</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-orange-100 bg-white p-6 shadow-sm">
+<span class="inline-flex rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-orange-700">AMD MI325X</span>
+<p class="mt-5 text-3xl font-bold text-slate-900">1,307 <span class="text-base font-semibold text-slate-400">TFLOPS</span></p>
+<p class="text-sm text-slate-500 mb-3">BF16</p>
+<p class="text-sm text-slate-600">256 GB HBM3E · 6.0 TB/s</p>
+</div>
+</div>
+</div>
+</section>
+<!-- ══════════════════════ PERFORMANCE ══════════════════════ -->
+<section class="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="performance">
+<div class="max-w-3xl">
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Performance</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Built for real-world AI performance benchmarks.</h2>
+</div>
+<div class="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+<div class="card-hover rounded-[2rem] border border-fuchsia-100 bg-white p-7 shadow-sm">
+<div class="inline-flex rounded-full bg-fuchsia-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-700">Training Scale</div>
+<h3 class="mt-5 text-xl font-semibold text-slate-900">TPU 8t: 1M+ chips in one cluster</h3>
+<p class="mt-4 leading-7 text-slate-600">v5p scales to 6,144 chips (18,432 with Multislice). Ironwood reaches 9,216-chip pods. TPU 8t targets &gt;1M chips in a single training cluster via JAX + Pathways, with Virgo linking 134K+ chips non-blocking.</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-violet-100 bg-white p-7 shadow-sm">
+<div class="inline-flex rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700">MLPerf Training</div>
+<h3 class="mt-5 text-xl font-semibold text-slate-900">Trillium: 1.8× better $/perf vs v5p</h3>
+<p class="mt-4 leading-7 text-slate-600">MLPerf Training 4.1: 99% scaling efficiency. AMD MI300X showed Llama 2 70B LoRA at 29.6 min (1 node) to 10.9 min (4 nodes)  confirming ROCm/MI300X is real and scaling.</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-indigo-100 bg-white p-7 shadow-sm">
+<div class="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">Inference Throughput</div>
+<h3 class="mt-5 text-xl font-semibold text-slate-900">1,703 tokens/s on Llama 3.1 405B</h3>
+<p class="mt-4 leading-7 text-slate-600">JetStream + Pathways on Trillium. Trillium exceeded v5e by 2.9× for Llama 2 70B. Disaggregated serving improved time-to-first-token by 7× and token-generation by nearly 3×.</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm">
+<div class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">NVIDIA H200</div>
+<h3 class="mt-5 text-xl font-semibold text-slate-900">1.9× Llama 2 70B vs. H100</h3>
+<p class="mt-4 leading-7 text-slate-600">H200's 141 GB HBM3e positions it for large <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> inference. Google Cloud's A3 Ultra (8× H200) achieved results comparable to NVIDIA's peak GPU MLPerf Inference v5.0 submissions.</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-fuchsia-100 bg-fuchsia-50 p-7 shadow-sm">
+<div class="inline-flex rounded-full bg-fuchsia-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-800">TPU 8i · Reasoning</div>
+<h3 class="mt-5 text-xl font-semibold text-slate-900">5× lower collective latency</h3>
+<p class="mt-4 leading-7 text-slate-600">Collectives Acceleration Engine: 5× lower on-chip collective latency. Boardfly topology: up to 50% less all-to-all latency, network diameter shrinks from 16 to 7 hops at 1,024-chip scale.</p>
+</div>
+<div class="card-hover rounded-[2rem] border border-emerald-100 bg-white p-7 shadow-sm">
+<div class="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Energy Efficiency</div>
+<h3 class="mt-5 text-xl font-semibold text-slate-900">TPU 8t/8i: 2× perf/watt vs. Ironwood</h3>
+<p class="mt-4 leading-7 text-slate-600">TPU v4 achieved 2.7× perf/watt vs. v3 and was 1.2–1.7× faster than A100. All three vendors now operate in the 750–1,000 W TBP range at the high end  but spend those watts differently.</p>
+</div>
+</div>
+</section>
+<!-- ══════════════════════ SOFTWARE ══════════════════════ -->
+<section class="border-y border-slate-200 bg-slate-50" id="software">
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+<div class="max-w-3xl">
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Software Ecosystem</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">If you value ease of development under uncertainty, this section decides the purchase.</h2>
+</div>
+<div class="mt-10 grid gap-5 sm:grid-cols-2">
+<div class="rounded-[2rem] border border-rose-100 bg-rose-50 p-7">
+<div class="mb-3 inline-flex items-center gap-2 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-rose-700">
+<svg fill="none" height="12" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="12"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          The Reality
+        </div>
+<p class="text-xl font-semibold text-slate-900 leading-snug">CUDA's "mental cache" is deep and sticky.</p>
+<p class="mt-3 text-sm leading-7 text-slate-600">Enterprise teams have years of CUDA assumptions baked into model code, profiling workflows, and deployment pipelines. CUDA, cuDNN, NCCL, TensorRT, and Nsight form the most mature AI software stack in existence. Migration friction is real and often dominates total cost of ownership.</p>
+</div>
+<div class="rounded-[2rem] border border-violet-100 bg-violet-50 p-7">
+<div class="mb-3 inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-violet-700">
+<svg fill="none" height="12" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="12"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          The Shift
+        </div>
+<p class="text-xl font-semibold text-slate-900 leading-snug">TPU and AMD gaps are narrowing fast.</p>
+<p class="mt-3 text-sm leading-7 text-slate-600">TorchTPU (April 2026) enables Eager First PyTorch on TPUs. AMD ROCm now supports PyTorch, TensorFlow, Triton, JAX, and ONNX Runtime with RCCL, ROCProfiler, and ROCm Profiler. Both are promising  but neither yet matches CUDA's operational depth for enterprise production.</p>
+</div>
+</div>
+<div class="mt-10 grid gap-6 lg:grid-cols-3">
+<div class="card-hover rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+<div class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">NVIDIA · CUDA Stack</div>
+<div class="mt-5 inline-block rounded-2xl bg-gradient-to-r from-slate-600 to-slate-800 px-3 py-1 text-xs font-semibold text-white">Most mature &amp; broadly compatible</div>
+<ul class="mt-6 space-y-3 text-slate-600">
+<li class="flex gap-3"><span class="mt-1 text-slate-500">•</span><span>CUDA + cuDNN + NCCL + TensorRT</span></li>
+<li class="flex gap-3"><span class="mt-1 text-slate-500">•</span><span>Nsight Systems / Compute profiling</span></li>
+<li class="flex gap-3"><span class="mt-1 text-slate-500">•</span><span>Widest third-party library support</span></li>
+<li class="flex gap-3"><span class="mt-1 text-slate-500">•</span><span>Lowest migration risk for PyTorch teams</span></li>
+</ul>
+</div>
+<div class="card-hover rounded-[2rem] border border-orange-100 bg-white p-8 shadow-sm">
+<div class="inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-orange-700">AMD · ROCm Stack</div>
+<div class="mt-5 inline-block rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 px-3 py-1 text-xs font-semibold text-white">Substantially improved, open stack</div>
+<ul class="mt-6 space-y-3 text-slate-600">
+<li class="flex gap-3"><span class="mt-1 text-orange-500">•</span><span>PyTorch, TensorFlow, Triton, JAX, ONNX</span></li>
+<li class="flex gap-3"><span class="mt-1 text-orange-500">•</span><span>RCCL for collectives; ROCProfiler suite</span></li>
+<li class="flex gap-3"><span class="mt-1 text-orange-500">•</span><span>ROCm Compute &amp; Systems Profiler</span></li>
+<li class="flex gap-3"><span class="mt-1 text-orange-500">•</span><span>Open-source; improving quickly</span></li>
+</ul>
+</div>
+<div class="card-hover rounded-[2rem] border border-violet-100 bg-white p-8 shadow-sm">
+<div class="inline-flex rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700">Google TPU · JAX + TorchTPU</div>
+<div class="mt-5 inline-block rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-3 py-1 text-xs font-semibold text-white">Two paths: established &amp; emerging</div>
+<ul class="mt-6 space-y-3 text-slate-600">
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span>JAX / XLA / Pathways / MaxText (mature)</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span>TorchTPU "Eager First" (April 2026 preview)</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span>XProf / TensorBoard TPU profiling</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span>PyTorch/XLA remains most mature path</span></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- ══════════════════════ PRICING ══════════════════════ -->
+<section class="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="pricing">
+<div class="max-w-3xl">
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Cloud Pricing &amp; TCO</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">A clear, structured path to understanding accelerator economics.</h2>
+<p class="mt-4 text-lg text-slate-600">TPU prices are on-demand per chip-hour. GPU prices are Dynamic Workload Scheduler calendar-mode VM-hour prices for 8-GPU nodes. Different commercial modes  use as directional anchors, not final quotes.</p>
+</div>
+<div class="mt-12 grid gap-6 lg:grid-cols-2">
+<div class="overflow-hidden rounded-[2rem] border border-violet-100 bg-white shadow-sm">
+<div class="border-b border-violet-100 bg-violet-50 px-7 py-5">
+<p class="text-xs font-semibold uppercase tracking-[0.25em] text-violet-600">Google Cloud TPU  per chip, on-demand</p>
+</div>
+<div class="divide-y divide-slate-100">
+<div class="flex items-center justify-between px-7 py-4">
+<div><p class="font-medium text-slate-900">TPU v5e</p><p class="text-xs text-slate-500">us-central1</p></div>
+<p class="font-semibold text-fuchsia-700">$1.20 / chip-hr</p>
+</div>
+<div class="flex items-center justify-between px-7 py-4 bg-violet-50/40">
+<div><p class="font-medium text-slate-900">TPU v6e Trillium</p><p class="text-xs text-slate-500">us-east1 · <span class="text-emerald-600 font-semibold">best price-performance</span></p></div>
+<p class="font-semibold text-fuchsia-700">$2.70 / chip-hr</p>
+</div>
+<div class="flex items-center justify-between px-7 py-4">
+<div><p class="font-medium text-slate-900">TPU v5p</p><p class="text-xs text-slate-500">us-east1 / us-east5</p></div>
+<p class="font-semibold text-fuchsia-700">$4.20 / chip-hr</p>
+</div>
+<div class="flex items-center justify-between px-7 py-4">
+<div><p class="font-medium text-slate-900">TPU7x Ironwood</p><p class="text-xs text-slate-500">us-central1 · premium large-scale</p></div>
+<p class="font-semibold text-fuchsia-700">$12.00 / chip-hr</p>
+</div>
+<div class="px-7 py-4 bg-emerald-50/60">
+<p class="text-sm text-slate-600">8-chip Trillium ≈ <strong class="text-slate-900">$21.60/hr</strong>  vs $41.60/hr for 8×H100</p>
+</div>
+</div>
+</div>
+<div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+<div class="border-b border-slate-200 bg-slate-50 px-7 py-5">
+<p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-600">Google Cloud GPU VMs  per VM (8 GPUs), calendar mode</p>
+</div>
+<div class="divide-y divide-slate-100">
+<div class="flex items-center justify-between px-7 py-4">
+<div><p class="font-medium text-slate-900">A3 High  8× H100</p><p class="text-xs text-slate-500">calendar mode</p></div>
+<p class="font-semibold text-slate-700">$41.60 / VM-hr</p>
+</div>
+<div class="flex items-center justify-between px-7 py-4">
+<div><p class="font-medium text-slate-900">A3 Mega  8× H100</p><p class="text-xs text-slate-500">calendar mode</p></div>
+<p class="font-semibold text-slate-700">$44.00 / VM-hr</p>
+</div>
+<div class="flex items-center justify-between px-7 py-4">
+<div><p class="font-medium text-slate-900">A3 Ultra  8× H200</p><p class="text-xs text-slate-500">calendar mode</p></div>
+<p class="font-semibold text-slate-700">$59.36 / VM-hr</p>
+</div>
+<div class="flex items-center justify-between px-7 py-4">
+<div><p class="font-medium text-slate-900">A4  8× B200</p><p class="text-xs text-slate-500">calendar mode · <span class="text-rose-600 font-semibold">substantial premium</span></p></div>
+<p class="font-semibold text-slate-700">$90.22 / VM-hr</p>
+</div>
+<div class="px-7 py-4 bg-slate-50/60">
+<p class="text-sm text-slate-600">B200 premium pays off only when Blackwell-class throughput is actually consumed</p>
+</div>
+</div>
+</div>
+</div>
+<h3 class="mt-14 text-2xl font-semibold tracking-tight text-slate-900">Illustrative Annual Cloud Cost Scenarios</h3>
+<p class="mt-2 text-sm text-slate-600">Computed directly from official public hourly prices. Excludes storage, networking, and reservation discounts. Directional only.</p>
+<div class="mt-6 table-scroll rounded-[1.5rem] border border-slate-200 shadow-sm">
+<table class="min-w-full text-sm">
+<thead class="bg-slate-50 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+<tr>
+<th class="px-5 py-4 text-left">Scenario</th>
+<th class="px-5 py-4 text-right">TPU v5e</th>
+<th class="px-5 py-4 text-right">TPU v6e</th>
+<th class="px-5 py-4 text-right">TPU v5p</th>
+<th class="px-5 py-4 text-right">Ironwood</th>
+<th class="px-5 py-4 text-right">8×H100</th>
+<th class="px-5 py-4 text-right">8×H200</th>
+<th class="px-5 py-4 text-right">8×B200</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50">
+<td class="px-5 py-4 font-medium text-slate-700">8 accelerators · 1 year</td>
+<td class="px-5 py-4 text-right font-semibold text-emerald-700">$84k</td>
+<td class="px-5 py-4 text-right text-slate-700">$189k</td>
+<td class="px-5 py-4 text-right text-slate-700">$294k</td>
+<td class="px-5 py-4 text-right text-slate-700">$841k</td>
+<td class="px-5 py-4 text-right text-slate-700">$364k</td>
+<td class="px-5 py-4 text-right text-slate-700">$520k</td>
+<td class="px-5 py-4 text-right font-semibold text-rose-600">$790k</td>
+</tr>
+<tr class="hover:bg-slate-50">
+<td class="px-5 py-4 font-medium text-slate-700">256 accelerators · 6 weeks</td>
+<td class="px-5 py-4 text-right font-semibold text-emerald-700">$310k</td>
+<td class="px-5 py-4 text-right text-slate-700">$697k</td>
+<td class="px-5 py-4 text-right text-slate-700">$1.08M</td>
+<td class="px-5 py-4 text-right text-slate-700">$3.10M</td>
+<td class="px-5 py-4 text-right text-slate-700">$1.34M</td>
+<td class="px-5 py-4 text-right text-slate-700">$1.91M</td>
+<td class="px-5 py-4 text-right font-semibold text-rose-600">$2.91M</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- ══════════════════════ RECOMMENDATIONS ══════════════════════ -->
+<section class="border-y border-slate-200 bg-gradient-to-b from-violet-50 to-white" id="recommendations">
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+<div class="mx-auto max-w-4xl text-center">
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Workload Recommendations</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+        A clear path from raw workload to the right hardware  no guesswork.
+      </h2>
+<p class="mt-5 text-lg leading-8 text-slate-600">
+        This matrix weights operational fit almost as heavily as silicon capability. In real projects, migration risk and team expertise determine total cost and calendar time as much as FLOP counts do.
+      </p>
+</div>
+<div class="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+<div class="card-hover rounded-[2rem] border border-fuchsia-100 bg-white p-8 shadow-sm">
+<div class="inline-flex rounded-full bg-fuchsia-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-700">Frontier Pretraining</div>
+<div class="mt-5 inline-block rounded-2xl bg-gradient-to-r from-fuchsia-500 to-violet-600 px-3 py-1 text-xs font-semibold text-white">TPU v5p · Ironwood · TPU 8t</div>
+<ul class="mt-6 space-y-3 text-slate-600">
+<li class="flex gap-3"><span class="mt-1 text-fuchsia-700">•</span><span>Pod-scale ICI/OCS eliminates communication bottlenecks at scale</span></li>
+<li class="flex gap-3"><span class="mt-1 text-fuchsia-700">•</span><span>Up to 1M+ chips in one cluster via JAX + Pathways</span></li>
+<li class="flex gap-3"><span class="mt-1 text-fuchsia-700">•</span><span>Requires willingness to standardize on JAX/XLA</span></li>
+</ul>
+</div>
+<div class="card-hover rounded-[2rem] border border-violet-100 bg-white p-8 shadow-sm">
+<div class="inline-flex rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700">Mainstream Training / Fine-tuning</div>
+<div class="mt-5 inline-block rounded-2xl bg-gradient-to-r from-violet-500 to-indigo-600 px-3 py-1 text-xs font-semibold text-white">Trillium (cost) · H100 (portability)</div>
+<ul class="mt-6 space-y-3 text-slate-600">
+<li class="flex gap-3"><span class="mt-1 text-violet-700">•</span><span>Trillium: ~$21.60/hr for 8 chips vs $41.60 for 8×H100</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-700">•</span><span>H100: universal enterprise baseline, easiest portability</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-700">•</span><span>Choose based on team's framework comfort level</span></li>
+</ul>
+</div>
+<div class="card-hover rounded-[2rem] border border-indigo-100 bg-white p-8 shadow-sm">
+<div class="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">Large-Memory Training / Inference</div>
+<div class="mt-5 inline-block rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 px-3 py-1 text-xs font-semibold text-white">AMD MI300X · MI325X</div>
+<ul class="mt-6 space-y-3 text-slate-600">
+<li class="flex gap-3"><span class="mt-1 text-indigo-700">•</span><span>192 GB (MI300X) and 256 GB (MI325X)  memory-capacity leaders</span></li>
+<li class="flex gap-3"><span class="mt-1 text-indigo-700">•</span><span>Valuable for large models, adapters, memory-bound inference</span></li>
+<li class="flex gap-3"><span class="mt-1 text-indigo-700">•</span><span>Requires more ecosystem qualification than CUDA</span></li>
+</ul>
+</div>
+<div class="card-hover rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+<div class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Production Inference (today)</div>
+<div class="mt-5 inline-block rounded-2xl bg-gradient-to-r from-slate-600 to-slate-800 px-3 py-1 text-xs font-semibold text-white">NVIDIA H200 / B200</div>
+<ul class="mt-6 space-y-3 text-slate-600">
+<li class="flex gap-3"><span class="mt-1 text-slate-600">•</span><span>Deepest production inference tooling: TensorRT, vLLM, Triton</span></li>
+<li class="flex gap-3"><span class="mt-1 text-slate-600">•</span><span>H200: 1.9× Llama 2 70B vs H100, 141 GB memory</span></li>
+<li class="flex gap-3"><span class="mt-1 text-slate-600">•</span><span>Watch TPU 8i  purpose-built for this as it matures</span></li>
+</ul>
+</div>
+<div class="card-hover rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+<div class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Mixed Research + Enterprise</div>
+<div class="mt-5 inline-block rounded-2xl bg-gradient-to-r from-slate-600 to-slate-800 px-3 py-1 text-xs font-semibold text-white">NVIDIA (safest default)</div>
+<ul class="mt-6 space-y-3 text-slate-600">
+<li class="flex gap-3"><span class="mt-1 text-slate-600">•</span><span>Broadest framework, library, and custom kernel support</span></li>
+<li class="flex gap-3"><span class="mt-1 text-slate-600">•</span><span>Most predictable developer experience for PyTorch teams</span></li>
+<li class="flex gap-3"><span class="mt-1 text-slate-600">•</span><span>Lowest migration risk for mixed research/production estates</span></li>
+</ul>
+</div>
+<div class="card-hover rounded-[2rem] border border-fuchsia-100 bg-fuchsia-50 p-8 shadow-sm">
+<div class="inline-flex rounded-full bg-fuchsia-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-800">Embedding / Recommendation</div>
+<div class="mt-5 inline-block rounded-2xl bg-gradient-to-r from-fuchsia-500 to-violet-600 px-3 py-1 text-xs font-semibold text-white">Google TPUs (SparseCore)</div>
+<ul class="mt-6 space-y-3 text-slate-600">
+<li class="flex gap-3"><span class="mt-1 text-fuchsia-700">•</span><span>SparseCore on v5p, v6e, Ironwood, TPU 8t  purpose-built for sparse embedding</span></li>
+<li class="flex gap-3"><span class="mt-1 text-fuchsia-700">•</span><span>Google-specific system co-design most valuable here</span></li>
+<li class="flex gap-3"><span class="mt-1 text-fuchsia-700">•</span><span>XLA/JAX integration maximizes SparseCore efficiency</span></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- ══════════════════════ CTA + LIMITATIONS ══════════════════════ -->
+<section class="mx-auto max-w-7xl px-6 pb-20 lg:px-8 lg:pb-24">
+<div class="mt-16 overflow-hidden rounded-[2rem] border border-violet-100 bg-gradient-to-r from-violet-50 via-white to-indigo-50 p-8 shadow-sm sm:p-10 lg:p-12">
+<div class="grid gap-10 lg:grid-cols-[1.3fr_0.9fr] lg:items-start">
+<div>
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Open Questions &amp; Limitations</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Validate on your actual workload before committing capital.</h2>
+<ul class="mt-6 space-y-4 text-slate-700">
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span><strong>No exact workload specified</strong>  all recommendations are workload-category guidance, not workload-specific benchmarks.</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span><strong>TPU 8t / 8i newly announced</strong>  announced April 22, 2026, not yet covered by mature cross-vendor benchmarks.</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span><strong>MLPerf not fully symmetric</strong>  no single benchmark yet covers all current TPU, Hopper, Blackwell, and AMD CDNA configurations in the same scenario.</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span><strong>Public hardware prices opaque</strong>  buyers procure through negotiated channels. Cloud prices are more reliable anchors than street price speculation.</span></li>
+<li class="flex gap-3"><span class="mt-1 text-violet-600">•</span><span><strong>Strong TPU inference evidence is vendor-run</strong>  valuable Google-run benchmarks, but not equivalent to vendor-neutral MLPerf submissions.</span></li>
+</ul>
+</div>
+<div class="rounded-[2rem] border border-violet-100 bg-white p-8 shadow-sm" id="sources">
+<h3 class="text-2xl font-semibold text-slate-900">Primary Sources</h3>
+<p class="mt-4 leading-7 text-slate-600">All data comes from official vendor documentation, datasheets, and academic papers. No secondary estimates invented.</p>
+<div class="mt-6 flex flex-col gap-3">
+<a class="rounded-full border border-violet-100 bg-violet-50 px-4 py-2 text-sm font-medium text-violet-700 hover:bg-violet-100 transition text-center" href="https://docs.cloud.google.com/tpu/docs/v6e" rel="noopener" target="_blank">Google Cloud TPU v6e Docs</a>
+<a class="rounded-full border border-violet-100 bg-violet-50 px-4 py-2 text-sm font-medium text-violet-700 hover:bg-violet-100 transition text-center" href="https://cloud.google.com/blog/products/compute/tpu-8t-and-tpu-8i-technical-deep-dive" rel="noopener" target="_blank">TPU 8t &amp; 8i Technical Deep Dive</a>
+<a class="rounded-full border border-violet-100 bg-violet-50 px-4 py-2 text-sm font-medium text-violet-700 hover:bg-violet-100 transition text-center" href="https://cloud.google.com/tpu/pricing" rel="noopener" target="_blank">Google Cloud TPU Pricing</a>
+<a class="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition text-center" href="https://www.nvidia.com/en-us/data-center/h200/" rel="noopener" target="_blank">NVIDIA H200 Product Page</a>
+<a class="rounded-full border border-orange-100 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 hover:bg-orange-100 transition text-center" href="https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-data-sheet.pdf" rel="noopener" target="_blank">AMD MI300X Datasheet</a>
+<a class="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition text-center" href="https://arxiv.org/abs/2304.01433" rel="noopener" target="_blank">TPU v4 Paper (arXiv)</a>
+<a class="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition text-center" href="https://mlcommons.org/benchmarks/training/" rel="noopener" target="_blank">MLCommons Training Benchmarks</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- ══════════════════════ FOOTER ══════════════════════ -->
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/ai-assistants/tutorials.html">AI Assistant AI Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-guide.html">Agent AI Engineering Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/guide.html">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/tutorial.html">Data Product Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+<p>
+</p>
+<p>
+</p>
+</div>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/cto/">GenAI for CTO and IT</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/chief-compliance-officer/">GenAI for Compliance Officer</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/embeddings/embeddings-tutorial.html">Embeddings Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-quality-tutorial.html">Data Quality Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-tutorial.html">Data Lineage Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/ai-twin/ai-twin-for-industrial-systems.html">AI Twin for Industrial Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/predictive-maintenance/predictive-maintenance-with-ai-for-cnc-machines.html">AI Predictive Maintenance -Dataknobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/use-cases/agent-ai-use-cases-for-real-impact.html">Agent AI Use Cases For Real Impact</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-exec-deck.html">Agent Engineering Exec Deck</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-guide.html">Agent Engineering Guide</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+  const btn = document.getElementById('mobile-menu-button');
+  const menu = document.getElementById('mobile-menu');
+  const openIcon = document.getElementById('menu-open-icon');
+  const closeIcon = document.getElementById('menu-close-icon');
+
+  if (btn && menu) {
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      menu.classList.toggle('hidden', expanded);
+      btn.setAttribute('aria-expanded', String(!expanded));
+      openIcon.classList.toggle('hidden', !expanded);
+      closeIcon.classList.toggle('hidden', expanded);
+    });
+    menu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        menu.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+        openIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      });
+    });
+  }
+</script>
+</body></html>

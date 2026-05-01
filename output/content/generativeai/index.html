@@ -1,337 +1,203 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <meta content="Explore the Generative AI landscape: Implementation strategies (LLM API vs RAG), model modalities, the evolution to Agentic AI, and mitigation of key challenges." name="description"/>
-    <meta content="Generative AI, GenAI, LLM, RAG, Agentic AI, AI Implementation, AI Risks, Machine Learning, Interactive Report" name="keywords"/>
-    <title>Generative AI: Landscape &amp; Evolution</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* Chosen Palette: Warm Neutrals & Calming Accents */
-        /* Background: #FDFCF8 (Cream) */
-        /* Primary Text: #1F2937 (Gray-800) */
-        /* Secondary Text: #4B5563 (Gray-600) */
-        /* Accents: #6366F1 (Indigo - Tech), #10B981 (Emerald - Success), #F59E0B (Amber - Caution) */
-
-        body {
-            background-color: #FDFCF8;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: #1F2937;
-        }
-
-        .tab-active {
-            border-bottom: 2px solid #6366F1;
-            color: #6366F1;
-            font-weight: 600;
-        }
-
-        .tab-inactive {
-            color: #6B7280;
-            border-bottom: 2px solid transparent;
-        }
-
-        .tab-inactive:hover {
-            color: #374151;
-            border-bottom: 2px solid #E5E7EB;
-        }
-
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
-        }
-        
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
-        }
-
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Utility for hiding sections */
-        .hidden-section {
-            display: none;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-    <!-- Application Structure Plan: 
-         1. Header: Title and brief intro.
-         2. Navigation: Tabs for the four main logic sections derived from the report: 
-            - Implementation Strategies (Industry use, APIs vs Models)
-            - Model Modalities (Types of models)
-            - The Agentic Shift (Evolution)
-            - Risk & Mitigation (Challenges)
-         3. Dynamic Content Area: 
-            - Section 1: Uses a Radar Chart to compare strategies (Cost vs Control vs Complexity) and clickable cards for details.
-            - Section 2: Dashboard style with a Doughnut chart for modality usage and dynamic text updates.
-            - Section 3: A vertical step-flow for evolution with a Line chart showing complexity growth.
-            - Section 4: Interactive split view where hovering a risk highlights the mitigation, paired with a Bar chart.
-         4. Why this structure? It breaks dense technical info into digestible, thematic chunks. Users can jump to what interests them (e.g., "How do I build it?" vs "What are the risks?").
-    -->
-    <!-- Visualization & Content Choices:
-         - Radar Chart (Implementation): Best for comparing multi-variate trade-offs (Cost, Control, Speed) of different AI adoption strategies.
-         - Doughnut Chart (Modalities): Visually distinguishes the different media types (Text, Audio, Video) as parts of the GenAI whole.
-         - Line Chart (Evolution): Illustrates the trajectory and increasing autonomy/complexity over time from Chatbots to Agents.
-         - Bar Chart (Risks): Quantifies the theoretical impact of risks vs the effectiveness of mitigations (before/after scenario).
-         - Interaction: Click-to-filter and Hover-to-reveal reduce cognitive load, revealing detail only when requested.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-
-		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
-		(function (w, d, s, l, i) {
-			w[l] = w[l] || []; w[l].push({
-				'gtm.start':
-					new Date().getTime(), event: 'gtm.js'
-			}); var f = d.getElementsByTagName(s)[0],
-				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --></head>
-<body class="min-h-screen flex flex-col">
-
-    <!-- Header -->
-    <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Generative AI Landscape</h1>
-                    <p class="text-sm text-gray-500">From Industry Implementation to Agentic Evolution</p>
-                </div>
-                <div class="hidden md:block text-xs text-gray-400">
-                    Interactive Report
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
-    <nav class="bg-white border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div aria-label="Tabs" class="flex space-x-8 overflow-x-auto">
-                <button class="tab-active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-implementation" onclick="switchTab('implementation')">
-                    Implementation Strategies
-                </button>
-                <button class="tab-inactive whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-modalities" onclick="switchTab('modalities')">
-                    Model Modalities
-                </button>
-                <button class="tab-inactive whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-evolution" onclick="switchTab('evolution')">
-                    Evolution to Agents
-                </button>
-                <button class="tab-inactive whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" id="tab-challenges" onclick="switchTab('challenges')">
-                    Challenges &amp; Mitigation
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content Area -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-
-        <!-- SECTION 1: IMPLEMENTATION STRATEGIES -->
-        <section class="fade-in space-y-8" id="implementation">
-            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-md">
-                <h2 class="text-lg font-semibold text-indigo-900">Deploying Generative AI in Industry</h2>
-                <p class="text-indigo-700 text-sm mt-1">
-                    Organizations face a spectrum of choices when adopting GenAI. This section explores the trade-offs between consuming ready-made APIs, customizing via RAG, or building proprietary models from scratch. Select a card below to see details.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Left: Interactive List -->
-                <div class="space-y-4">
-                    <h3 class="text-gray-900 font-medium mb-2">Select a Strategy:</h3>
-                    <div class="space-y-3" id="strategy-list">
-                        <!-- Strategy Cards populated by JS -->
-                    </div>
-                </div>
-
-                <!-- Right: Visualization & Details -->
-                <div class="flex flex-col space-y-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-gray-900 font-bold text-center mb-4">Trade-off Analysis</h3>
-                        <div class="chart-container">
-                            <canvas id="strategyRadarChart"></canvas>
-                        </div>
-                        <p class="text-xs text-center text-gray-400 mt-2">Comparison of Cost, Control, and Complexity</p>
-                    </div>
-                    
-                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-indigo-500" id="strategy-detail-panel">
-                        <h4 class="text-lg font-bold text-gray-900" id="detail-title">Select a strategy...</h4>
-                        <p class="text-gray-600 mt-2 text-sm" id="detail-desc">Click on a strategy on the left to see specific implementation details, pros, and cons.</p>
-                        <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-4 text-sm" id="detail-metrics">
-                            <!-- Metrics injected here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 2: MODEL MODALITIES -->
-        <section class="hidden-section fade-in space-y-8" id="modalities">
-            <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-md">
-                <h2 class="text-lg font-semibold text-emerald-900">Types of Generative Models</h2>
-                <p class="text-emerald-700 text-sm mt-1">
-                    GenAI is not just text. It encompasses images, audio, video, and more. Explore the different modalities below to understand their applications and maturity.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left: Donut Chart -->
-                <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 class="text-gray-900 font-bold text-center mb-4">Market Maturity Estimate</h3>
-                    <div class="chart-container">
-                        <canvas id="modalityDonutChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Right: Interactive Grid -->
-                <div class="lg:col-span-2">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="modality-grid">
-                        <!-- Modality Cards injected by JS -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Detail Banner -->
-            <div class="bg-gray-800 text-white p-6 rounded-xl shadow-lg mt-6 hidden" id="modality-banner">
-                <div class="flex items-start space-x-4">
-                    <div class="text-4xl" id="banner-icon"></div>
-                    <div>
-                        <h3 class="text-xl font-bold" id="banner-title"></h3>
-                        <p class="text-gray-300 mt-1 text-sm" id="banner-desc"></p>
-                        <div class="mt-3">
-                            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Key Use Cases:</span>
-                            <div class="flex flex-wrap gap-2 mt-2" id="banner-tags"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 3: EVOLUTION TO AGENTS -->
-        <section class="hidden-section fade-in space-y-8" id="evolution">
-            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-md">
-                <h2 class="text-lg font-semibold text-amber-900">From GenAI to Agentic AI</h2>
-                <p class="text-amber-700 text-sm mt-1">
-                    The technology is shifting from passive "Question &amp; Answer" models to autonomous "Agents" that can reason, plan, and execute tasks using tools.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Timeline/Steps -->
-                <div class="lg:col-span-1 space-y-6 relative">
-                    <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-                    
-                    <!-- Step 1 -->
-                    <div class="relative pl-10 cursor-pointer group" onclick="updateEvolution(0)">
-                        <div class="absolute left-1.5 top-1.5 w-5 h-5 bg-white border-2 border-gray-400 rounded-full group-hover:border-amber-500 z-10"></div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group-hover:border-amber-500 transition-colors">
-                            <h4 class="font-bold text-gray-900">1. Foundation Models</h4>
-                            <p class="text-xs text-gray-500">Passive generation based on prompts.</p>
-                        </div>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="relative pl-10 cursor-pointer group" onclick="updateEvolution(1)">
-                        <div class="absolute left-1.5 top-1.5 w-5 h-5 bg-white border-2 border-gray-400 rounded-full group-hover:border-amber-500 z-10"></div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group-hover:border-amber-500 transition-colors">
-                            <h4 class="font-bold text-gray-900">2. RAG &amp; Embedding</h4>
-                            <p class="text-xs text-gray-500">Connecting models to live, private data.</p>
-                        </div>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div class="relative pl-10 cursor-pointer group" onclick="updateEvolution(2)">
-                        <div class="absolute left-1.5 top-1.5 w-5 h-5 bg-white border-2 border-gray-400 rounded-full group-hover:border-amber-500 z-10"></div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group-hover:border-amber-500 transition-colors">
-                            <h4 class="font-bold text-gray-900">3. Agentic AI</h4>
-                            <p class="text-xs text-gray-500">Reasoning loops, tool use, and autonomy.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Main Display Area -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Chart -->
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                        <div class="chart-container">
-                            <canvas id="evolutionLineChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <!-- Dynamic Info Box -->
-                    <div class="bg-amber-50 p-6 rounded-xl border border-amber-100" id="evolution-info">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2" id="evo-title">Select a Stage</h3>
-                        <p class="text-gray-700" id="evo-desc">Click on the timeline steps to understand how AI capabilities are expanding.</p>
-                        <div class="mt-4 flex gap-2" id="evo-badges"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 4: CHALLENGES & MITIGATION -->
-        <section class="hidden-section fade-in space-y-8" id="challenges">
-            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md">
-                <h2 class="text-lg font-semibold text-red-900">Navigating Challenges</h2>
-                <p class="text-red-700 text-sm mt-1">
-                    Deployment is not without risk. Understanding challenges like hallucinations and bias is crucial to implementing effective mitigation strategies.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Challenges List -->
-                <div class="space-y-4">
-                    <h3 class="font-bold text-gray-700">Key Challenges (Hover to Mitigate)</h3>
-                    <div class="space-y-3" id="challenge-list">
-                        <!-- Injected via JS -->
-                    </div>
-                </div>
-
-                <!-- Mitigation & Chart -->
-                <div class="space-y-6">
-                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-gray-300 min-h-[150px] transition-all duration-300" id="mitigation-panel">
-                        <h4 class="text-sm uppercase tracking-wide text-gray-400 font-bold mb-1">Mitigation Strategy</h4>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2" id="mit-title">Hover over a challenge</h3>
-                        <p class="text-gray-600 text-sm" id="mit-desc">Discover how to solve these problems.</p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                        <h4 class="text-sm font-bold text-center text-gray-700 mb-2">Impact of Mitigation</h4>
-                        <div class="chart-container">
-                            <canvas id="riskBarChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-300">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Model Guide Library | DataKnobs</title>
+<meta content="Explore practical AI model decision guides from DataKnobs covering leading provider, domain-specific, country-specific, and AI implementation guides." name="description"/>
+<meta content="DataKnobs, AI model guides, LLM comparison, OpenAI models, Claude models, Gemini models, Llama models, Mistral models, Qwen models, Grok models, Sarvam AI" name="keywords"/>
+<meta content="DataKnobs" name="author"/>
+<meta content="index, follow" name="robots"/>
+<link href="https://www.dataknobs.com/generativeai/model-guides/" rel="canonical"/>
+<link href="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/favicon.ico" rel="icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<meta content="website" property="og:type"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="AI Model Guide Library | DataKnobs" property="og:title"/>
+<meta content="Explore DataKnobs practical decision guides for model families, domain-specific models, country-specific models, and AI implementation patterns." property="og:description"/>
+<meta content="https://www.dataknobs.com/generativeai/model-guides/" property="og:url"/>
+<meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="AI Model Guide Library | DataKnobs" name="twitter:title"/>
+<meta content="Explore practical AI model, domain model, and AI implementation guides from DataKnobs." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" name="twitter:image"/>
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "AI Model Guide Library",
+    "description": "Download practical AI model decision guides from DataKnobs covering leading LLM and multimodal model providers.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "DataKnobs",
+      "url": "https://www.dataknobs.com/",
+      "logo": "https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg"
+    },
+    "hasPart": [
+      {"@type":"DigitalDocument","name":"OpenAI Models Guide","encodingFormat":"text/html","url":"openai-model/"},
+      {"@type":"DigitalDocument","name":"Anthropic Claude Models Guide","encodingFormat":"text/html","url":"anthropic-models/"},
+      {"@type":"DigitalDocument","name":"Google Gemini Models Guide","encodingFormat":"text/html","url":"gemini-models/"},
+      {"@type":"DigitalDocument","name":"Meta AI Models Guide","encodingFormat":"text/html","url":"meta-models/"},
+      {"@type":"DigitalDocument","name":"Mistral Models Guide","encodingFormat":"text/html","url":"mistral-models/"},
+      {"@type":"DigitalDocument","name":"Alibaba Qwen Models Guide","encodingFormat":"text/html","url":"alibaba-models/"},
+      {"@type":"DigitalDocument","name":"xAI Grok Models Guide","encodingFormat":"text/html","url":"xai-models/"},
+      {"@type":"DigitalDocument","name":"Sarvam AI Models Guide","encodingFormat":"text/html","url":"sarvam-models/"}
+    ]
+  }
+  </script>
+<style>
+    body { font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .hero-bg { background: radial-gradient(circle at 20% 20%, rgba(216,180,254,.35), transparent 28%), radial-gradient(circle at 80% 0%, rgba(99,102,241,.35), transparent 30%), linear-gradient(135deg, #4c1d95 0%, #6d28d9 48%, #312e81 100%); }
+    .glass { background: rgba(255,255,255,.12); backdrop-filter: blur(18px); }
+    .card-hover { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(88,28,135,.16); border-color: #c4b5fd; }
+  </style>
+</head>
+<body class="antialiased bg-white text-slate-900">
+<header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+<div class="mx-auto max-w-7xl px-6 py-4 lg:px-8">
+<div class="flex items-center justify-between">
+<a aria-label="DataKnobs Home" class="flex items-center gap-3" href="https://www.dataknobs.com/">
+<img alt="DataKnobs logo" class="h-12 w-auto sm:h-14" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"/>
+</a>
+<nav aria-label="Primary navigation" class="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
+<a class="transition hover:text-violet-700" href="#guides">Model Families</a>
+<a class="transition hover:text-violet-700" href="#domain-models">Domain Models</a>
+<a class="transition hover:text-violet-700" href="#country-models">Country Models</a>
+<a class="transition hover:text-violet-700" href="#ai-practice-guides">AI Guides</a>
+<a class="transition hover:text-violet-700" href="#contact">Contact</a>
+<a class="rounded-full bg-violet-600 px-5 py-2.5 text-white shadow-sm transition hover:bg-violet-700" href="#guides">Browse Guides</a>
+</nav>
+</div>
+</div>
+</header>
+<main>
+<section class="hero-bg relative overflow-hidden text-white">
+<div class="relative mx-auto grid max-w-7xl gap-14 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-28">
+<div class="flex flex-col justify-center">
+<div class="mb-6 inline-flex w-fit items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-violet-100 backdrop-blur">AI Model Decision Guides</div>
+<h1 class="max-w-4xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl lg:text-6xl">Explore practical guides for choosing the <span class="text-violet-200">right AI model</span></h1>
+<p class="mt-6 max-w-2xl text-lg leading-8 text-violet-50/90">A curated DataKnobs library for product leaders, engineers, and AI teams evaluating provider models, domain-tuned models, country-specific models, and implementation patterns such as RAG, prompt engineering, context engineering, and multimodal AI.</p>
+<div class="mt-8 flex flex-col gap-4 sm:flex-row">
+<a class="rounded-full bg-white px-6 py-3 text-center text-sm font-semibold text-violet-800 shadow-lg transition hover:scale-[1.02]" href="#guides">Browse Guides</a>
+<a class="rounded-full border border-white/30 bg-white/10 px-6 py-3 text-center text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15" href="https://www.dataknobs.com/generativeai/10-llms/">Explore LLM Content</a>
+</div>
+<div class="mt-10 grid gap-4 sm:grid-cols-3">
+<div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/90 backdrop-blur">19 AI Guides</div>
+<div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/90 backdrop-blur">Model Selection</div>
+<div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/90 backdrop-blur">Enterprise AI Planning</div>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -inset-4 rounded-[2rem] bg-violet-400/25 blur-3xl"></div>
+<div class="glass relative overflow-hidden rounded-[2rem] border border-white/15 p-6 shadow-2xl">
+<div class="rounded-[1.5rem] bg-white p-5 text-slate-900 shadow-xl">
+<p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Decision workflow</p>
+<h2 class="mt-4 text-2xl font-semibold leading-tight text-slate-950">Compare models by the questions that actually affect production.</h2>
+<div class="mt-6 space-y-3">
+<div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+<p class="text-sm font-semibold text-slate-900">1. Match the task</p>
+<p class="mt-1 text-sm leading-6 text-slate-600">Reasoning, coding, document analysis, multimodal search, voice, translation, or on-device AI.</p>
+</div>
+<div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+<p class="text-sm font-semibold text-slate-900">2. Check operating constraints</p>
+<p class="mt-1 text-sm leading-6 text-slate-600">Latency, context length, cost, data residency, governance, and deployment flexibility.</p>
+</div>
+<div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+<p class="text-sm font-semibold text-slate-900">3. Pick a path to production</p>
+<p class="mt-1 text-sm leading-6 text-slate-700">Use the guide pages to move from shortlist to pilot architecture and rollout plan.</p>
+</div>
+</div> </div>
+</div>
+</div>
+</div>
+</section>
+<section class="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="guides">
+<div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+<div>
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Model Family Guides</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Start with the major AI model families</h2>
+</div>
+<p class="text-lg leading-8 text-slate-600">Use this section when you are comparing general-purpose LLMs, multimodal models, coding models, reasoning models, voice capabilities, or open-weight deployment options.</p>
+</div>
+<div class="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">All-round AI</div><h3 class="mt-5 text-2xl font-semibold">OpenAI Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Compare GPT, reasoning, multimodal, and lightweight model options for product and enterprise use.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/openai-model/">Explore OpenAI</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700">Reasoning</div><h3 class="mt-5 text-2xl font-semibold">Claude Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Evaluate Claude Opus, Sonnet, and Haiku tiers for quality, balance, speed, and enterprise workflows.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/anthropic-models/">Explore Claude</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">Enterprise</div><h3 class="mt-5 text-2xl font-semibold">Gemini Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Review Gemini model choices for cloud AI, multimodal use cases, long context, and on-device workflows.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/gemini-models/">Explore Gemini</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">Open Source</div><h3 class="mt-5 text-2xl font-semibold">Meta AI Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Understand Llama, vision, segmentation, and <a href="https://www.dataknobs.com/generativeai/">generative AI</a> options for open and custom deployments.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/meta-models/">Explore Meta AI</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-orange-700">Efficient AI</div><h3 class="mt-5 text-2xl font-semibold">Mistral Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Compare Mistral Large, Small, Codestral, Mixtral, NeMo, and Pixtral options.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/mistral-models/">Explore Mistral</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Qwen</div><h3 class="mt-5 text-2xl font-semibold">Alibaba Qwen Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Review Qwen language, coding, math, vision, and audio models for global AI applications.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/alibaba-models/">Explore Qwen</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-700">Real-time</div><h3 class="mt-5 text-2xl font-semibold">xAI Grok Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Explore Grok model options for reasoning, vision, real-time apps, and production APIs.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/xai-models/">Explore Grok</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-rose-700">Indic AI</div><h3 class="mt-5 text-2xl font-semibold">Sarvam AI Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Review Indic LLMs, speech recognition, TTS, translation, and API choices.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/sarvam-models/">Explore Sarvam</a></article>
+</div>
+</section>
+<section class="border-y border-slate-200 bg-slate-50" id="domain-models">
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+<div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end"><div><p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Domain-Specific Models</p><h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Choose models built for specialized industries</h2></div><p class="text-lg leading-8 text-slate-600">These guides are useful when generic <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> performance is not enough and your use case needs domain vocabulary, specialized evaluation, or industry-specific data patterns.</p></div>
+<div class="mt-12 grid gap-6 md:grid-cols-3">
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Healthcare</div><h3 class="mt-5 text-2xl font-semibold">BioMistral Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Explore biomedical and healthcare-focused model choices for clinical, research, and life-sciences workflows.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/biomistral-models/">Explore BioMistral</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700">Finance</div><h3 class="mt-5 text-2xl font-semibold">Bloomberg Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Review finance-oriented models for market research, filings, financial language, and enterprise analytics.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/bloomberge-models/">Explore Bloomberg</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Financial AI</div><h3 class="mt-5 text-2xl font-semibold">FinGPT Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Compare financial LLM approaches for sentiment, risk, research, reports, and quantitative workflows.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/fingpt-models/">Explore FinGPT</a></article>
+</div>
+</div>
+</section>
+<section class="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="country-models">
+<div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end"><div><p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Country-Specific Models</p><h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Find models shaped by local language and regional needs</h2></div><p class="text-lg leading-8 text-slate-600">Use these resources when your AI roadmap depends on local languages, regional policy context, sovereign AI priorities, or market-specific deployment needs.</p></div>
+<div class="mt-12 grid gap-6 md:grid-cols-2">
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-red-700">Switzerland</div><h3 class="mt-5 text-2xl font-semibold">Apertus Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Explore Apertus model guidance for regional, multilingual, and sovereign AI planning.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/apertus-models/">Explore Apertus</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-orange-700">India</div><h3 class="mt-5 text-2xl font-semibold">Krutrim Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Review India-focused model options for Indic languages, local use cases, and production AI apps.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/krutrim-models/">Explore Krutrim</a></article>
+</div>
+</section>
+<section class="border-y border-slate-200 bg-gradient-to-b from-violet-50 to-white" id="ai-practice-guides">
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+<div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end"><div><p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">AI Practice Guides</p><h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Learn the patterns behind successful AI systems</h2></div><p class="text-lg leading-8 text-slate-600">These guide pages help teams move beyond model selection into implementation patterns, evaluation planning, and production-ready AI architecture.</p></div>
+<div class="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-lime-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-lime-700">Efficient AI</div><h3 class="mt-5 text-2xl font-semibold">Small Language Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Use SLMs for lower-latency, cost-efficient, private, or task-specific AI deployments.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/slm-slides/">View SLM Guide</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">Core Concepts</div><h3 class="mt-5 text-2xl font-semibold">Foundation Models</h3><p class="mt-3 text-sm leading-7 text-slate-600">Understand the model layer behind modern generative AI products and enterprise AI platforms.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/foundation-models/">View Foundation Models</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">Knowledge AI</div><h3 class="mt-5 text-2xl font-semibold">RAG Slides</h3><p class="mt-3 text-sm leading-7 text-slate-600">Plan retrieval-augmented generation systems that connect LLMs with trusted enterprise content.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/rag-slides/">View RAG Slides</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-purple-700">AI Architecture</div><h3 class="mt-5 text-2xl font-semibold">Context Engineering</h3><p class="mt-3 text-sm leading-7 text-slate-600">Design context layers, memory, tools, retrieval, and guardrails for reliable AI applications.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/context-engineering-slides/">View Context Engineering</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-fuchsia-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-700">Prompting</div><h3 class="mt-5 text-2xl font-semibold">Prompt Engineering</h3><p class="mt-3 text-sm leading-7 text-slate-600">Improve instructions, examples, output formats, and evaluation loops for better AI responses.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/prompt-engineering-slides/">View Prompt Engineering</a></article>
+<article class="card-hover rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"><div class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">Multimodal</div><h3 class="mt-5 text-2xl font-semibold">Multimodal AI</h3><p class="mt-3 text-sm leading-7 text-slate-600">Explore AI systems that combine text, images, documents, audio, video, and structured data.</p><a class="mt-6 inline-flex w-full justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700" href="https://www.dataknobs.com/generativeai/model-tutorial/multimodal-slides/">View Multimodal Guide</a></article>
+</div>
+</div>
+</section>
+<section class="border-y border-slate-200 bg-gradient-to-b from-violet-50 to-white" id="compare">
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+<div class="mx-auto max-w-4xl text-center">
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">How to use these model details</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Make AI model decisions faster</h2>
+<p class="mt-6 text-lg leading-8 text-slate-600">Use these guides during model evaluation, prototype planning, architecture review, vendor comparison, and AI roadmap conversations.</p>
+</div>
+<div class="mt-12 grid gap-6 md:grid-cols-3">
+<div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm"><h3 class="text-xl font-semibold">Pick by use case</h3><p class="mt-4 leading-7 text-slate-600">Start with task type: reasoning, coding, document analysis, real-time chat, voice, translation, image understanding, or self-hosting.</p></div>
+<div class="rounded-[2rem] border border-violet-200 bg-violet-600 p-8 text-white shadow-sm"><h3 class="text-xl font-semibold">Balance trade-offs</h3><p class="mt-4 leading-7 text-violet-50">Compare quality, latency, cost, context length, modality, governance, and deployment flexibility.</p></div>
+<div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm"><h3 class="text-xl font-semibold">Move to production</h3><p class="mt-4 leading-7 text-slate-600">Use DataKnobs to turn model experiments into governed workflows, AI assistants, and decision-ready <a href="https://www.dataknobs.com/data-products/">data products</a>.</p></div>
+</div>
+</div>
+</section>
+<section class="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="contact">
+<div class="overflow-hidden rounded-[2rem] border border-violet-100 bg-gradient-to-r from-violet-50 via-white to-indigo-50 p-8 shadow-sm sm:p-10 lg:p-12">
+<div class="grid gap-10 lg:grid-cols-[1.3fr_0.9fr] lg:items-center">
+<div>
+<p class="text-sm font-semibold uppercase tracking-[0.25em] text-violet-600">Need help choosing?</p>
+<h2 class="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">DataKnobs helps teams select, build, govern, and optimize AI systems.</h2>
+<p class="mt-6 leading-8 text-slate-700">We can help you choose the right model family, design the data product architecture, and move from prototype to production using Kreate, Kontrols, and Knobs.</p>
+</div>
+<div class="rounded-[2rem] border border-violet-100 bg-white p-8 shadow-sm">
+<h3 class="text-2xl font-semibold text-slate-900">Build with DataKnobs</h3>
+<p class="mt-4 leading-7 text-slate-600">Turn AI model selection into a production-ready data product strategy.</p>
+<div class="mt-8 flex flex-col gap-4">
+<a class="rounded-full bg-violet-600 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-violet-700" href="mailto:contact@dataknobs.com">Talk to an Expert</a>
+<a class="rounded-full border border-slate-200 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-900 transition hover:bg-slate-50" href="https://www.dataknobs.com/use-cases/">View Use Cases</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 <div>
@@ -341,7 +207,9 @@
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
 </ul>
 </div>
 <div>
@@ -350,6 +218,9 @@
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
 </ul>
 </div>
@@ -357,12 +228,19 @@
 <h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
 <ul class="space-y-2">
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/ai-assistants/tutorials.html">AI Assistant AI Tutorial</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-guide.html">Agent AI Engineering Slides</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/guide.html">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/tutorial.html">Data Product Tutorial</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-models/">LLM Models List </a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/8-tpu-gpu/google-tpus-vs-nvidia-amd-gpus.html">GPU vs TPU</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/pdf-slides/anthropic-models/">Anthropic models</a></li>
 </ul>
 </div>
 <div>
@@ -375,7 +253,23 @@
 <p>
 <a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
 </p>
+<p>
+</p>
+<p>
+</p>
 </div>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/cto/">GenAI for CTO and IT</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/chief-compliance-officer/">GenAI for Compliance Officer</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/embeddings/embeddings-tutorial.html">Embeddings Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-quality-tutorial.html">Data Quality Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-tutorial.html">Data Lineage Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/ai-twin/ai-twin-for-industrial-systems.html">AI Twin for Industrial Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/predictive-maintenance/predictive-maintenance-with-ai-for-cnc-machines.html">AI Predictive Maintenance -Dataknobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/use-cases/agent-ai-use-cases-for-real-impact.html">Agent AI Use Cases For Real Impact</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-exec-deck.html">Agent Engineering Exec Deck</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-guide.html">Agent Engineering Guide</a></li>
+</ul>
 </div>
 </div>
 <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
@@ -403,475 +297,4 @@
 </div>
 </div>
 </footer>
-
-    <!-- JavaScript Logic -->
-    <script>
-        // --- DATA STORE ---
-        const strategies = [
-            {
-                id: 'llm-api',
-                title: 'LLM API (Closed)',
-                desc: 'Using models like GPT-4 or Claude via API. Fastest time to market but creates dependency.',
-                metrics: { cost: 30, control: 20, complexity: 10, performance: 90, privacy: 40 },
-                details: 'Pay-per-token model. Minimal infrastructure management. Data leaves your VPC.',
-                pros: ['Instant Access', 'State-of-the-Art Logic'],
-                cons: ['Data Privacy Concerns', 'Vendor Lock-in']
-            },
-            {
-                id: 'open-model',
-                title: 'Open Models (Self-Hosted)',
-                desc: 'Hosting Llama 3 or Mistral on your own GPU infrastructure.',
-                metrics: { cost: 60, control: 80, complexity: 70, performance: 75, privacy: 100 },
-                details: 'Requires GPU provisioning. Full data sovereignty. Maintenance overhead is significant.',
-                pros: ['100% Data Privacy', 'No Token Costs'],
-                cons: ['High Infrastructure Cost', 'Maintenance Burden']
-            },
-            {
-                id: 'rag',
-                title: 'RAG (Retrieval Augmented Gen)',
-                desc: 'Enhancing generic models with specific company data via vector search.',
-                metrics: { cost: 50, control: 70, complexity: 60, performance: 85, privacy: 70 },
-                details: 'Connects LLM to Vector DB. Reduces hallucinations. Grounded in your facts.',
-                pros: ['Up-to-date Knowledge', 'Reduces Hallucination'],
-                cons: ['Retrieval Latency', 'Context Window Limits']
-            },
-            {
-                id: 'finetuning',
-                title: 'Fine-Tuning',
-                desc: 'Retraining weights of a model on a specific niche dataset.',
-                metrics: { cost: 80, control: 90, complexity: 85, performance: 95, privacy: 90 },
-                details: 'Teaches the model "style" or "jargon". Does not necessarily teach new facts.',
-                pros: ['Domain Specificity', 'Consistent Formatting'],
-                cons: ['Risk of Catastrophic Forgetting', 'Expensive compute']
-            },
-            {
-                id: 'scratch',
-                title: 'Building from Scratch',
-                desc: 'Training a proprietary foundation model from raw data.',
-                metrics: { cost: 100, control: 100, complexity: 100, performance: 100, privacy: 100 },
-                details: 'Only for tech giants or extreme use cases. Requires massive compute and data.',
-                pros: ['Ultimate IP Ownership', 'Perfect Fit'],
-                cons: ['Millions of Dollars', 'Months of Training']
-            }
-        ];
-
-        const modalities = [
-            { 
-                type: 'Language', 
-                icon: '📝', 
-                share: 45, 
-                desc: 'Text generation, summarization, and translation.',
-                tags: ['Chatbots', 'Coding', 'Marketing Copy'] 
-            },
-            { 
-                type: 'Image', 
-                icon: '🖼️', 
-                share: 25, 
-                desc: 'Creating visual assets from text prompts.',
-                tags: ['Design', 'Advertising', 'Game Assets'] 
-            },
-            { 
-                type: 'Audio', 
-                icon: '🎤', 
-                share: 15, 
-                desc: 'Voice cloning, text-to-speech, and music generation.',
-                tags: ['Dubbing', 'Podcasts', 'Accessibility'] 
-            },
-            { 
-                type: 'Video', 
-                icon: '🎥', 
-                share: 10, 
-                desc: 'Generating short clips or editing existing footage.',
-                tags: ['Social Media', 'Education', 'Simulation'] 
-            },
-            { 
-                type: '3D/Code/Bio', 
-                icon: '🧬', 
-                share: 5, 
-                desc: 'Specialized models for objects, protein folding, etc.',
-                tags: ['Pharma', 'Gaming', 'Research'] 
-            }
-        ];
-
-        const evolutionSteps = [
-            {
-                title: 'Foundation Models',
-                desc: 'The era of "Prompt & Pray". Models are static engines. Users must provide all context in the prompt manually. Capabilities are limited to what was in the training data.',
-                complexity: 20,
-                autonomy: 10,
-                tags: ['ChatGPT Launch', 'Zero-shot', 'Static']
-            },
-            {
-                title: 'RAG & Context',
-                desc: 'Models gain "eyes" into enterprise data. The system retrieves relevant documents before generating an answer. This grounds the AI in reality and private knowledge.',
-                complexity: 50,
-                autonomy: 30,
-                tags: ['Vector DBs', 'Embeddings', 'Search']
-            },
-            {
-                title: 'Agentic AI',
-                desc: 'Models gain "hands". Agents can plan multi-step workflows, use external tools (calculators, APIs, web browsers), and reflect on their own output to correct errors.',
-                complexity: 90,
-                autonomy: 85,
-                tags: ['Function Calling', 'Reasoning Loops', 'Multi-Agent']
-            }
-        ];
-
-        const challenges = [
-            {
-                id: 'hallucination',
-                title: 'Hallucinations',
-                text: 'Models confidently stating falsehoods.',
-                mitigation: 'RAG (Retrieval Augmented Generation) & Grounding',
-                mitigationDesc: 'Force the model to cite sources from a trusted database. Limit the creativity temperature.',
-                riskScore: 90,
-                mitigatedScore: 20,
-                color: 'border-l-rose-500'
-            },
-            {
-                id: 'bias',
-                title: 'Bias & Toxicity',
-                text: 'Outputting prejudiced or harmful content.',
-                mitigation: 'RLHF & Curated Datasets',
-                mitigationDesc: 'Reinforcement Learning from Human Feedback aligns model behavior with safety guidelines.',
-                riskScore: 70,
-                mitigatedScore: 15,
-                color: 'border-l-orange-500'
-            },
-            {
-                id: 'security',
-                title: 'Data Security',
-                text: 'Leaking private data into public models.',
-                mitigation: 'Private Instances & Governance',
-                mitigationDesc: 'Use enterprise agreements (Zero Data Retention) or self-host open source models.',
-                riskScore: 85,
-                mitigatedScore: 5,
-                color: 'border-l-yellow-500'
-            },
-            {
-                id: 'cost',
-                title: 'Cost/Latency',
-                text: 'Inference costs scaling uncontrollably.',
-                mitigation: 'Small Language Models (SLMs)',
-                mitigationDesc: 'Use specialized, smaller models (e.g., Llama-7B) for specific tasks instead of GPT-4.',
-                riskScore: 60,
-                mitigatedScore: 25,
-                color: 'border-l-blue-500'
-            }
-        ];
-
-        // --- CHART INSTANCES ---
-        let radarChart, donutChart, lineChart, barChart;
-
-        // --- INIT ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initImplementationSection();
-            initModalitiesSection();
-            initEvolutionSection();
-            initChallengesSection();
-            
-            // Render first chart initially
-            renderRadarChart(strategies[0]);
-        });
-
-        // --- NAVIGATION ---
-        function switchTab(tabId) {
-            // Update Tab Styles
-            ['implementation', 'modalities', 'evolution', 'challenges'].forEach(id => {
-                const btn = document.getElementById(`tab-${id}`);
-                const section = document.getElementById(id);
-                
-                if (id === tabId) {
-                    btn.classList.remove('tab-inactive');
-                    btn.classList.add('tab-active');
-                    section.classList.remove('hidden-section');
-                    // Trigger chart resize/render when tab becomes visible
-                    if (id === 'implementation' && radarChart) radarChart.resize();
-                    if (id === 'modalities' && !donutChart) renderDonutChart();
-                    if (id === 'evolution' && !lineChart) renderLineChart();
-                    if (id === 'challenges' && !barChart) renderBarChart(null);
-                } else {
-                    btn.classList.remove('tab-active');
-                    btn.classList.add('tab-inactive');
-                    section.classList.add('hidden-section');
-                }
-            });
-        }
-
-        // --- SECTION 1: IMPLEMENTATION ---
-        function initImplementationSection() {
-            const list = document.getElementById('strategy-list');
-            strategies.forEach((s, index) => {
-                const btn = document.createElement('div');
-                btn.className = `p-4 bg-white border border-gray-200 rounded-lg cursor-pointer card-hover flex justify-between items-center ${index === 0 ? 'ring-2 ring-indigo-500' : ''}`;
-                btn.innerHTML = `<span class="font-medium text-gray-800">${s.title}</span> <span class="text-gray-400 text-lg">›</span>`;
-                btn.onclick = () => selectStrategy(s, btn);
-                list.appendChild(btn);
-            });
-            selectStrategy(strategies[0], list.children[0]);
-        }
-
-        function selectStrategy(strategy, element) {
-            // Highlight list item
-            const list = document.getElementById('strategy-list');
-            Array.from(list.children).forEach(c => c.classList.remove('ring-2', 'ring-indigo-500'));
-            element.classList.add('ring-2', 'ring-indigo-500');
-
-            // Update Text Details
-            document.getElementById('detail-title').innerText = strategy.title;
-            document.getElementById('detail-desc').innerText = strategy.details;
-
-            const metricsDiv = document.getElementById('detail-metrics');
-            metricsDiv.innerHTML = `
-                <div>
-                    <h5 class="font-bold text-emerald-600 mb-1">Pros</h5>
-                    <ul class="list-disc list-inside text-gray-600 space-y-1">
-                        ${strategy.pros.map(p => `<li>${p}</li>`).join('')}
-                    </ul>
-                </div>
-                <div>
-                    <h5 class="font-bold text-rose-600 mb-1">Cons</h5>
-                    <ul class="list-disc list-inside text-gray-600 space-y-1">
-                        ${strategy.cons.map(c => `<li>${c}</li>`).join('')}
-                    </ul>
-                </div>
-            `;
-
-            // Update Chart
-            updateRadarChart(strategy);
-        }
-
-        function renderRadarChart(data) {
-            const ctx = document.getElementById('strategyRadarChart').getContext('2d');
-            radarChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Cost (High=Bad)', 'Control', 'Complexity', 'Performance', 'Privacy'],
-                    datasets: [{
-                        label: data.title,
-                        data: Object.values(data.metrics),
-                        fill: true,
-                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                        borderColor: 'rgb(99, 102, 241)',
-                        pointBackgroundColor: 'rgb(99, 102, 241)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgb(99, 102, 241)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: { color: '#E5E7EB' },
-                            grid: { color: '#E5E7EB' },
-                            suggestedMin: 0,
-                            suggestedMax: 100,
-                            ticks: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-
-        function updateRadarChart(data) {
-            if (!radarChart) return;
-            radarChart.data.datasets[0].label = data.title;
-            radarChart.data.datasets[0].data = Object.values(data.metrics);
-            radarChart.update();
-        }
-
-        // --- SECTION 2: MODALITIES ---
-        function initModalitiesSection() {
-            const grid = document.getElementById('modality-grid');
-            modalities.forEach(m => {
-                const card = document.createElement('div');
-                card.className = 'bg-white p-4 rounded-xl border border-gray-200 card-hover cursor-pointer group';
-                card.onclick = () => showModalityDetails(m);
-                card.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <span class="text-3xl bg-gray-50 p-2 rounded-full">${m.icon}</span>
-                        <div>
-                            <h4 class="font-bold text-gray-800 group-hover:text-emerald-600 transition-colors">${m.type}</h4>
-                            <p class="text-xs text-gray-500">Maturity: ${m.share > 20 ? 'High' : 'Emerging'}</p>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function renderDonutChart() {
-            const ctx = document.getElementById('modalityDonutChart').getContext('2d');
-            donutChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: modalities.map(m => m.type),
-                    datasets: [{
-                        data: modalities.map(m => m.share),
-                        backgroundColor: [
-                            '#10B981', // Emerald
-                            '#3B82F6', // Blue
-                            '#F59E0B', // Amber
-                            '#EF4444', // Red
-                            '#8B5CF6'  // Purple
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    }
-                }
-            });
-        }
-
-        function showModalityDetails(modality) {
-            const banner = document.getElementById('modality-banner');
-            banner.classList.remove('hidden');
-            banner.classList.add('fade-in');
-            
-            document.getElementById('banner-icon').innerText = modality.icon;
-            document.getElementById('banner-title').innerText = modality.type + ' Models';
-            document.getElementById('banner-desc').innerText = modality.desc;
-            
-            const tagsContainer = document.getElementById('banner-tags');
-            tagsContainer.innerHTML = modality.tags.map(t => 
-                `<span class="bg-white/20 px-2 py-1 rounded text-xs text-white">${t}</span>`
-            ).join('');
-        }
-
-        // --- SECTION 3: EVOLUTION ---
-        function initEvolutionSection() {
-            // Initialize with first step
-            updateEvolution(0);
-        }
-
-        function updateEvolution(index) {
-            const step = evolutionSteps[index];
-            document.getElementById('evo-title').innerText = step.title;
-            document.getElementById('evo-desc').innerText = step.desc;
-            document.getElementById('evo-badges').innerHTML = step.tags.map(t => 
-                `<span class="bg-amber-200 text-amber-900 px-2 py-1 rounded text-xs font-bold">${t}</span>`
-            ).join('');
-
-            // Highlight Step UI would go here (simplified by onclick logic)
-
-            if (lineChart) {
-                // Highlight point on chart
-                const colors = ['#E5E7EB', '#E5E7EB', '#E5E7EB'];
-                colors[index] = '#F59E0B'; // Amber
-                lineChart.data.datasets[0].pointBackgroundColor = colors;
-                lineChart.data.datasets[0].pointRadius = [5, 5, 5];
-                lineChart.data.datasets[0].pointRadius[index] = 10;
-                lineChart.update();
-            }
-        }
-
-        function renderLineChart() {
-            const ctx = document.getElementById('evolutionLineChart').getContext('2d');
-            lineChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: evolutionSteps.map(s => s.title),
-                    datasets: [{
-                        label: 'Autonomy Level',
-                        data: evolutionSteps.map(s => s.autonomy),
-                        borderColor: '#F59E0B',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.3,
-                        fill: true,
-                        pointBackgroundColor: ['#F59E0B', '#E5E7EB', '#E5E7EB'],
-                        pointRadius: [10, 5, 5]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            max: 100,
-                            title: { display: true, text: 'Autonomy & Complexity (%)' }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-
-        // --- SECTION 4: CHALLENGES ---
-        function initChallengesSection() {
-            const list = document.getElementById('challenge-list');
-            challenges.forEach(c => {
-                const item = document.createElement('div');
-                item.className = `p-4 bg-white border-l-4 ${c.color} shadow-sm rounded-r-md cursor-pointer hover:bg-gray-50 transition-colors`;
-                item.innerHTML = `
-                    <div class="flex justify-between">
-                        <span class="font-bold text-gray-800">${c.title}</span>
-                        <span class="text-xs text-gray-400">Hover for fix</span>
-                    </div>
-                    <p class="text-sm text-gray-500 mt-1">${c.text}</p>
-                `;
-                item.onmouseenter = () => showMitigation(c);
-                list.appendChild(item);
-            });
-        }
-
-        function showMitigation(challenge) {
-            const panel = document.getElementById('mitigation-panel');
-            // Change border color dynamically
-            panel.className = `bg-white p-6 rounded-xl shadow-md border-t-4 ${challenge.color.replace('border-l-', 'border-t-')} min-h-[150px] transition-all duration-300`;
-            
-            document.getElementById('mit-title').innerText = challenge.mitigation;
-            document.getElementById('mit-desc').innerText = challenge.mitigationDesc;
-
-            updateBarChart(challenge);
-        }
-
-        function renderBarChart(initialData) {
-            const ctx = document.getElementById('riskBarChart').getContext('2d');
-            barChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Initial Risk', 'Residual Risk (After Mitigation)'],
-                    datasets: [{
-                        label: 'Risk Score (0-100)',
-                        data: [0, 0], // Init empty
-                        backgroundColor: ['#EF4444', '#10B981'],
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, max: 100 }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-
-        function updateBarChart(challenge) {
-            if (!barChart) {
-                renderBarChart();
-            }
-            barChart.data.datasets[0].data = [challenge.riskScore, challenge.mitigatedScore];
-            barChart.update();
-        }
-
-    </script>
-
 </body></html>

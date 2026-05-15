@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Large Language Models (LLMs) :: A Complete Guide | DataKnobs</title>
+<!-- SEO -->
+<meta content="A complete visual guide to Large Language Models (LLMs): how they work, transformer architecture, training with RLHF, tokenization, fine-tuning, RAG, prompt engineering, LLM applications, and leading models like GPT-4, Claude, Gemini, and Llama. 11 illustrated slides with deep explanations." name="description"/>
+<meta content="large language models, LLM guide, what is LLM, transformer architecture, LLM training, RLHF, tokenization, fine-tuning LLM, RAG retrieval augmented generation, LLM applications, GPT-4, Claude, Gemini, Llama, prompt engineering, LLM explained, generative AI, neural networks, attention mechanism, LLM 101, DataKnobs" name="keywords"/>
+<meta content="DataKnobs" name="author"/>
+<meta content="index, follow" name="robots"/>
+<meta content="Large Language Models (LLMs) :: Complete Visual Guide" property="og:title"/>
+<meta content="11-slide visual guide to LLMs: architecture, training, RAG, fine-tuning, and real-world applications. By DataKnobs." property="og:description"/>
+<meta content="website" property="og:type"/>
+<meta content="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-2.png" property="og:image"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&amp;family=Instrument+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    :root {
+      --cream:    #f5f0e8;
+      --cream2:   #ede8dc;
+      --cream3:   #e4ddd0;
+      --ink:      #1a1410;
+      --ink2:     #2d2620;
+      --ink3:     #3d3530;
+      --muted:    #7a6f64;
+      --faint:    #b0a698;
+      --rule:     #d5cec4;
+      --cobalt:   #1a4a8a;
+      --cobalt-l: #e8eef8;
+      --terra:    #c04a1a;
+      --terra-l:  #f8eee8;
+      --sage:     #2a6644;
+      --sage-l:   #e8f4ec;
+      --gold:     #8a6a1a;
+      --gold-l:   #f8f0dc;
+      --serif:    'Fraunces', Georgia, serif;
+      --sans:     'Instrument Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--cream);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER STRIP ── */
+    .masthead {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 0 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+
+    .masthead-left { color: rgba(245,240,232,0.5); }
+    .masthead-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      color: rgba(245,240,232,0.5);
+    }
+
+    .masthead-brand { color: var(--cream); font-weight: 700; }
+
+    /* ── HERO ── */
+    .hero {
+      border-bottom: 2px solid var(--ink);
+      padding: 0 3rem;
+    }
+
+    .hero-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      padding: 3.5rem 0 1.5rem;
+      gap: 2rem;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 2rem;
+    }
+
+    .issue-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--terra);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .issue-tag::before {
+      content: '';
+      display: inline-block;
+      width: 18px; height: 2px;
+      background: var(--terra);
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(3.5rem, 7vw, 7rem);
+      font-weight: 900;
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+
+    h1 em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--ink3);
+    }
+
+    .hero-right {
+      text-align: right;
+      padding-bottom: 0.5rem;
+    }
+
+    .slide-count-big {
+      font-family: var(--serif);
+      font-size: 5rem;
+      font-weight: 900;
+      color: var(--cream3);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .slide-count-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    .hero-bottom {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 3rem;
+      padding-bottom: 2.5rem;
+    }
+
+    .hero-desc {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 300;
+      line-height: 1.65;
+      color: var(--ink2);
+      font-style: italic;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      justify-content: flex-end;
+    }
+
+    .hero-tag-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .hero-tag-item::before {
+      content: '::';
+      color: var(--faint);
+    }
+
+    /* ── NAV TABS ── */
+    .chapter-nav {
+      background: var(--cream2);
+      border-bottom: 1px solid var(--rule);
+      padding: 0 3rem;
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+      gap: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .chapter-nav::-webkit-scrollbar { display: none; }
+
+    .ch-link {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.85rem 1.1rem;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: color 0.18s, border-color 0.18s;
+    }
+
+    .ch-link:hover { color: var(--terra); border-color: var(--terra); }
+
+    /* ── TWO-COLUMN LAYOUT ── */
+    .page-body {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 0;
+    }
+
+    .main-col {
+      border-right: 1px solid var(--rule);
+      padding: 3rem;
+    }
+
+    .side-col {
+      padding: 3rem 2rem;
+    }
+
+    /* ── SECTION HEADS ── */
+    .section-rule {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .sr-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .sr-line { flex: 1; height: 1px; background: var(--rule); }
+    .sr-num {
+      font-family: var(--serif);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--faint);
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    .lead-text {
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--ink2);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .body-text {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    /* ── INTERACTIVE SLIDESHOW ── */
+    .slideshow-wrap {
+      margin-bottom: 3rem;
+    }
+
+    .slide-viewer {
+      position: relative;
+      background: var(--ink);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--ink);
+      cursor: zoom-in;
+      margin-bottom: 0.75rem;
+    }
+
+    .slide-viewer img {
+      width: 100%;
+      display: block;
+      transition: opacity 0.3s ease;
+    }
+    .slide-viewer img.fade { opacity: 0; }
+
+    .slide-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 1.25rem 1.5rem 1rem;
+      background: linear-gradient(transparent, rgba(15,10,5,0.7));
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .so-num {
+      font-family: var(--serif);
+      font-size: 2rem;
+      font-weight: 900;
+      color: rgba(245,240,232,0.2);
+      line-height: 1;
+    }
+
+    .so-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: rgba(245,240,232,0.75);
+      text-align: right;
+      max-width: 240px;
+    }
+
+    /* Slide controls */
+    .slide-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .sc-btn {
+      width: 32px; height: 32px;
+      background: var(--ink);
+      border: none;
+      color: var(--cream);
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s;
+    }
+    .sc-btn:hover { background: var(--terra); }
+
+    .sc-counter {
+      font-family: var(--serif);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.04em;
+      min-width: 48px;
+      text-align: center;
+    }
+
+    .sc-spacer { flex: 1; }
+
+    .sc-hint {
+      font-size: 0.62rem;
+      color: var(--faint);
+      letter-spacing: 0.06em;
+      font-style: italic;
+    }
+
+    /* Thumbnails :: 6-up grid */
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 5px;
+    }
+
+    .tg-item {
+      aspect-ratio: 16/9;
+      border-radius: 3px;
+      overflow: hidden;
+      background: var(--ink);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .tg-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0.55;
+      transition: opacity 0.15s;
+    }
+
+    .tg-item:hover img, .tg-item.active img { opacity: 1; }
+    .tg-item.active { border-color: var(--terra); }
+    .tg-item:hover:not(.active) { transform: translateY(-1px); }
+
+    /* ── CONCEPT CARDS (sidebar) ── */
+    .side-col h3 {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.25rem;
+    }
+
+    .concept-card {
+      background: var(--cream2);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 1.1rem;
+      margin-bottom: 0.85rem;
+      position: relative;
+    }
+
+    .cc-accent {
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      border-radius: 4px 0 0 4px;
+    }
+
+    .concept-card h4 {
+      font-family: var(--sans);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.35rem;
+      padding-left: 0.6rem;
+    }
+
+    .concept-card p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+      padding-left: 0.6rem;
+    }
+
+    /* ── FULL-WIDTH CHAPTERS ── */
+    .chapters {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 3rem 5rem;
+    }
+
+    .chapter-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .chapter-full {
+      margin-bottom: 1.5rem;
+    }
+
+    .chapter-card {
+      background: var(--cream2);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .chapter-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    .chapter-card img {
+      width: 100%;
+      display: block;
+    }
+
+    .chapter-card-body {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-top: 1px solid var(--rule);
+    }
+
+    .cc-slide-num {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--cream3);
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .cc-info h4 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin-bottom: 0.15rem;
+    }
+
+    .cc-info p { font-size: 0.72rem; color: var(--muted); line-height: 1.45; }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 3.5rem 3rem;
+    }
+
+    .stats-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      divide: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .stat-item {
+      padding: 0 2rem;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+    }
+    .stat-item:first-child { padding-left: 0; }
+    .stat-item:last-child { border-right: none; padding-right: 0; }
+
+    .si-num {
+      font-family: var(--serif);
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+      color: var(--cream);
+    }
+
+    .si-num span { color: var(--terra); }
+
+    .si-label {
+      font-size: 0.72rem;
+      color: rgba(245,240,232,0.45);
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    /* ── TIMELINE ── */
+    .timeline-section {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 4rem 3rem;
+      border-top: 2px solid var(--ink);
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0.5rem;
+      width: 1px;
+      height: 100%;
+      background: var(--rule);
+    }
+
+    .tl-item {
+      position: relative;
+      padding-bottom: 2rem;
+      padding-left: 1.5rem;
+    }
+
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -1.55rem;
+      top: 0.3rem;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--ink);
+      border: 2px solid var(--cream);
+      outline: 1px solid var(--rule);
+    }
+
+    .tl-year {
+      font-family: var(--serif);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--terra);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.2rem;
+    }
+
+    .tl-item h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.3rem;
+    }
+
+    .tl-item p { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,10,5,0.95);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .lightbox.open { display: flex; }
+
+    .lb-inner {
+      position: relative;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    .lb-inner img {
+      width: 100%;
+      display: block;
+      border-radius: 4px;
+    }
+
+    .lb-close {
+      position: fixed;
+      top: 1.5rem; right: 1.5rem;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: rgba(245,240,232,0.1);
+      border: none;
+      color: var(--cream);
+      cursor: pointer;
+      font-size: 1rem;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s;
+    }
+    .lb-close:hover { background: var(--terra); }
+
+    .lb-nav-btn {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(245,240,232,0.08);
+      border: none;
+      color: var(--cream);
+      cursor: pointer;
+      font-size: 1rem;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s;
+    }
+    .lb-nav-btn:hover { background: var(--terra); }
+    .lb-nav-btn.prev { left: -54px; }
+    .lb-nav-btn.next { right: -54px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      color: rgba(245,240,232,0.35);
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+    }
+
+    footer a { color: rgba(245,240,232,0.55); text-decoration: none; }
+    footer a:hover { color: var(--cream); }
+
+    .footer-logo {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1080px) {
+      .page-body { grid-template-columns: 1fr; }
+      .main-col { border-right: none; border-bottom: 1px solid var(--rule); }
+      .side-col { padding: 2rem 3rem; }
+      .thumb-grid { grid-template-columns: repeat(6, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .masthead, .hero, .chapter-nav { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .main-col, .side-col, .chapters, .timeline-section, .stats-row { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .hero-top { grid-template-columns: 1fr; }
+      .hero-bottom { grid-template-columns: 1fr; gap: 1.5rem; }
+      h1 { font-size: 3rem; }
+      .chapter-pair { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: 1fr 1fr; gap: 2rem; }
+      .stat-item { border-right: none; padding: 0; }
+      .thumb-grid { grid-template-columns: repeat(4, 1fr); }
+      footer { flex-direction: column; gap: 0.75rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<!-- MASTHEAD -->
+<div class="masthead">
+<span class="masthead-left">DataKnobs · AI Education Series · Vol. 3</span>
+<div class="masthead-right">
+<span class="masthead-brand">DataKnobs</span>
+<span>kreatewebsites.com</span>
+</div>
+</div>
+<!-- HERO -->
+<header class="hero">
+<div class="hero-top">
+<div>
+<div class="issue-tag">LLM Series · Complete Guide</div>
+<h1>Large<br/><em>Language</em><br/>Models</h1>
+</div>
+<div class="hero-right">
+<div class="slide-count-big">11</div>
+<div class="slide-count-label">Illustrated Slides</div>
+</div>
+</div>
+<div class="hero-bottom">
+<p class="hero-desc">
+      A visual journey through how large language models think, learn, and speak ::
+      from transformer attention to fine-tuning, RAG pipelines, and the leading models
+      reshaping how humans interact with technology.
+    </p>
+<div class="hero-tags">
+<span class="hero-tag-item">Transformer Architecture</span>
+<span class="hero-tag-item">Training &amp; RLHF</span>
+<span class="hero-tag-item">Tokenization</span>
+<span class="hero-tag-item">Fine-tuning &amp; RAG</span>
+<span class="hero-tag-item">LLM Applications</span>
+</div>
+</div>
+</header>
+<!-- CHAPTER NAV -->
+<nav aria-label="Page sections" class="chapter-nav">
+<a class="ch-link" href="#viewer">Slide Deck</a>
+<a class="ch-link" href="#what-is-llm">What Is an LLM</a>
+<a class="ch-link" href="#architecture">Architecture</a>
+<a class="ch-link" href="#training">Training</a>
+<a class="ch-link" href="#applications">Applications</a>
+<a class="ch-link" href="#timeline">Timeline</a>
+<a class="ch-link" href="#gallery">All Slides</a>
+</nav>
+<!-- MAIN BODY: 2-col -->
+<div class="page-body" id="viewer">
+<!-- MAIN COLUMN -->
+<main class="main-col">
+<!-- SLIDESHOW -->
+<section class="slideshow-wrap">
+<div class="section-rule">
+<span class="sr-label">Interactive Deck</span>
+<div class="sr-line"></div>
+<span class="sr-num">11 slides</span>
+</div>
+<div class="slide-controls">
+<button class="sc-btn" onclick="move(-1)">←</button>
+<span class="sc-counter" id="counter">1 / 11</span>
+<button class="sc-btn" onclick="move(1)">→</button>
+<div class="sc-spacer"></div>
+<span class="sc-hint">← → keys to navigate</span>
+</div>
+<div class="slide-viewer" onclick="openLb(current)">
+<picture id="mainPic">
+<img alt="Large Language Models :: Slide 2" id="mainImg" loading="eager" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-2.png"/>
+</picture>
+<div class="slide-overlay">
+<span class="so-num" id="soNum">02</span>
+<span class="so-title" id="soTitle">Introduction to LLMs</span>
+</div>
+</div>
+<div class="thumb-grid" id="thumbGrid"></div>
+</section>
+<!-- WHAT IS LLM -->
+<section id="what-is-llm" style="margin-bottom:3rem;">
+<div class="section-rule">
+<span class="sr-label">Chapter 1</span>
+<div class="sr-line"></div>
+</div>
+<h2>What Is a Large Language Model?</h2>
+<p class="lead-text">
+        At its core, a <a href="https://www.dataknobs.com/generativeai/10-llms/">Large Language Model</a> is a neural network trained on massive amounts of text
+        to predict what comes next in a sequence :: yet from this simple objective emerges
+        remarkable intelligence.
+      </p>
+<p class="body-text">
+        LLMs are built on the transformer architecture and trained on billions to trillions of text
+        tokens drawn from the internet, books, code repositories, and scientific literature. The
+        "large" refers to the sheer scale: modern frontier models contain hundreds of billions of
+        learnable parameters :: the adjustable weights that encode linguistic patterns, factual
+        knowledge, and reasoning capabilities simultaneously.
+      </p>
+<p class="body-text">
+        Unlike earlier recurrent neural networks that processed sequences token by token, transformers
+        process entire sequences in parallel using a mechanism called self-attention :: enabling both
+        dramatically faster training on GPUs and richer long-range understanding of context. This
+        architectural leap, combined with scale and sophisticated training techniques, produced models
+        capable of writing code, analyzing legal contracts, passing medical exams, and conversing
+        fluently across dozens of languages.
+      </p>
+</section>
+<!-- ARCHITECTURE -->
+<section id="architecture" style="margin-bottom:3rem;">
+<div class="section-rule">
+<span class="sr-label">Chapter 2</span>
+<div class="sr-line"></div>
+</div>
+<h2>Transformer Architecture</h2>
+<p class="lead-text">
+        The "attention is all you need" revolution: how transformers use self-attention to weigh
+        every word against every other word, capturing meaning across vast distances in text.
+      </p>
+<p class="body-text">
+        Every modern LLM is built on the transformer architecture, introduced by Google researchers
+        in 2017. The key innovation is multi-head self-attention: for each token in a sequence, the
+        model learns to attend to all other tokens with varying degrees of relevance :: allowing it to
+        resolve pronoun references, track subject-object relationships, and understand nuance across
+        thousands of tokens of context.
+      </p>
+<p class="body-text">
+        Stacked transformer blocks :: each containing attention layers and feed-forward networks ::
+        build increasingly abstract representations. Early layers capture syntax and surface patterns;
+        deeper layers encode semantics, world knowledge, and complex reasoning patterns. GPT-4,
+        Claude, and Gemini all use decoder-only transformer variants, while some models use the
+        full encoder-decoder design for tasks like translation.
+      </p>
+</section>
+<!-- TRAINING -->
+<section id="training" style="margin-bottom:3rem;">
+<div class="section-rule">
+<span class="sr-label">Chapter 3</span>
+<div class="sr-line"></div>
+</div>
+<h2>Training: From Text to Intelligence</h2>
+<p class="lead-text">
+        Three phases transform raw compute and data into a helpful, safe, and capable assistant ::
+        pretraining, supervised fine-tuning, and reinforcement learning from human feedback.
+      </p>
+<p class="body-text">
+<strong>Phase 1 :: Pretraining:</strong> The model predicts the next token across trillions
+        of examples. This demands thousands of GPUs running for months and produces a "base model"
+        that understands language deeply but has no particular goal or alignment.
+      </p>
+<p class="body-text">
+<strong>Phase 2 :: Supervised Fine-Tuning (SFT):</strong> The base model is fine-tuned on
+        high-quality human-written demonstrations of desired behavior :: transforming it from a raw
+        language predictor into a capable instruction-following assistant.
+      </p>
+<p class="body-text">
+<strong>Phase 3 :: RLHF:</strong> Reinforcement Learning from Human Feedback uses human
+        preferences to train a reward model, which then guides the LLM via PPO to produce outputs
+        that humans rate as more helpful, accurate, and harmless :: producing the polished models
+        users interact with today.
+      </p>
+</section>
+</main>
+<!-- SIDEBAR -->
+<aside class="side-col">
+<div style="position: sticky; top: 48px; padding-top: 1rem;">
+<div class="section-rule" style="margin-bottom:1.25rem;">
+<span class="sr-label">Key Concepts</span>
+<div class="sr-line"></div>
+</div>
+<div class="concept-card">
+<div class="cc-accent" style="background:var(--cobalt);"></div>
+<h4>Tokenization</h4>
+<p>LLMs don't read words :: they read tokens. A token is roughly ¾ of a word. "ChatGPT" becomes 3 tokens. The vocabulary is typically 50,000–100,000 subword units learned from training data.</p>
+</div>
+<div class="concept-card">
+<div class="cc-accent" style="background:var(--terra);"></div>
+<h4>Self-Attention</h4>
+<p>For each token, the model computes queries (Q), keys (K), and values (V) :: then weighs how much each other token should influence the representation. This runs in parallel across all tokens.</p>
+</div>
+<div class="concept-card">
+<div class="cc-accent" style="background:var(--sage);"></div>
+<h4>Context Window</h4>
+<p>The maximum number of tokens an LLM can "see" at once. GPT-4 supports 128K; Claude supports up to 200K. Longer windows enable document-level reasoning but increase compute cost quadratically.</p>
+</div>
+<div class="concept-card">
+<div class="cc-accent" style="background:var(--gold);"></div>
+<h4>Temperature &amp; Sampling</h4>
+<p>Temperature controls randomness. At 0, the model always picks the most probable next token (deterministic). At 1+, it samples more freely :: producing more creative but less reliable outputs.</p>
+</div>
+<div class="concept-card">
+<div class="cc-accent" style="background:var(--cobalt);"></div>
+<h4>RAG (Retrieval-Augmented Generation)</h4>
+<p>Instead of relying only on training knowledge, RAG retrieves relevant documents from a vector database at inference time and injects them into the context :: grounding responses in current, specific data.</p>
+</div>
+<div class="concept-card">
+<div class="cc-accent" style="background:var(--terra);"></div>
+<h4>Fine-Tuning</h4>
+<p>Adapting a pretrained model to a specific domain or task by continuing training on a smaller, curated dataset. Cheaper and faster than training from scratch :: and often achieves better task-specific performance.</p>
+</div>
+<div class="concept-card">
+<div class="cc-accent" style="background:var(--sage);"></div>
+<h4>Emergent Capabilities</h4>
+<p>Abilities that appear unpredictably once models cross certain scale thresholds :: like multi-step reasoning, code generation, and few-shot learning :: that smaller models lack entirely.</p>
+</div>
+</div>
+</aside>
+</div><!-- /page-body -->
+<!-- STATS ROW -->
+<div class="stats-row">
+<div class="stats-inner">
+<div class="stat-item">
+<div class="si-num">1<span>T+</span></div>
+<div class="si-label">tokens in a typical frontier model's training corpus</div>
+</div>
+<div class="stat-item">
+<div class="si-num">200<span>K</span></div>
+<div class="si-label">token context window in Claude :: ~150,000 words</div>
+</div>
+<div class="stat-item">
+<div class="si-num">3<span>×</span></div>
+<div class="si-label">key training phases: pretrain → SFT → RLHF</div>
+</div>
+<div class="stat-item">
+<div class="si-num">∞</div>
+<div class="si-label">applications: code, law, medicine, science, creative work</div>
+</div>
+</div>
+</div>
+<!-- GALLERY :: all slides -->
+<section class="chapters" id="gallery">
+<div class="section-rule" style="margin-bottom:2rem;">
+<span class="sr-label">All Slides</span>
+<div class="sr-line"></div>
+<span class="sr-num">Slides 2–12</span>
+</div>
+<!-- Row 1: slides 2–5 (indices 0-3) -->
+<div class="chapter-pair">
+<div class="chapter-card" onclick="jumpTo(0)">
+<img alt="LLM Slides :: Slide 2" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-2.png"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">02</span>
+<div class="cc-info">
+<h4>Introduction to LLMs</h4>
+<p>What large language models are and why they matter</p>
+</div>
+</div>
+</div>
+<div class="chapter-card" onclick="jumpTo(1)">
+<img alt="LLM Slides :: Slide 3" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-3.png"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">03</span>
+<div class="cc-info">
+<h4>How LLMs Work</h4>
+<p>Next-token prediction and the statistical language model</p>
+</div>
+</div>
+</div>
+</div>
+<div class="chapter-pair">
+<div class="chapter-card" onclick="jumpTo(2)">
+<img alt="LLM Slides :: Slide 4" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-4.png"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">04</span>
+<div class="cc-info">
+<h4>Transformer Architecture</h4>
+<p>Attention mechanisms, encoder-decoder design</p>
+</div>
+</div>
+</div>
+<div class="chapter-card" onclick="jumpTo(3)">
+<img alt="LLM Slides :: Slide 5" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-5.png"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">05</span>
+<div class="cc-info">
+<h4>Tokenization</h4>
+<p>How text is broken into tokens before model processing</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Row: slides 6–7 -->
+<div class="chapter-pair">
+<div class="chapter-card" onclick="jumpTo(4)">
+<img alt="LLM Slides :: Slide 6" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-6.png"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">06</span>
+<div class="cc-info">
+<h4>Training Pipeline</h4>
+<p>Pretraining on internet-scale data with GPU clusters</p>
+</div>
+</div>
+</div>
+<div class="chapter-card" onclick="jumpTo(5)">
+<img alt="LLM Slides :: Slide 7" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-7.png"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">07</span>
+<div class="cc-info">
+<h4>RLHF &amp; Alignment</h4>
+<p>Reinforcement learning from human feedback for safer models</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Row: slides 8–9 -->
+<div class="chapter-pair">
+<div class="chapter-card" onclick="jumpTo(6)">
+<img alt="LLM Slides :: Slide 8" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-8.png"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">08</span>
+<div class="cc-info">
+<h4>Fine-Tuning &amp; Adaptation</h4>
+<p>Customizing models for specific domains and tasks</p>
+</div>
+</div>
+</div>
+<div class="chapter-card" onclick="jumpTo(7)">
+<img alt="LLM Slides :: Slide 9" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-9.png"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">09</span>
+<div class="cc-info">
+<h4>Prompt Engineering</h4>
+<p>Crafting effective inputs for optimal LLM performance</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Row: slides 10–11 -->
+<div class="chapter-pair">
+<div class="chapter-card" onclick="jumpTo(8)">
+<img alt="LLM Slides :: Slide 10" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-10.png"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">10</span>
+<div class="cc-info">
+<h4>RAG :: Retrieval-Augmented Generation</h4>
+<p>Grounding LLM responses in live, external knowledge bases</p>
+</div>
+</div>
+</div>
+<div class="chapter-card" onclick="jumpTo(9)">
+<img alt="LLM Slides :: Slide 11" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-11.png"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">11</span>
+<div class="cc-info">
+<h4>LLM Applications</h4>
+<p>Real-world use cases across industries and disciplines</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Slide 12 full-width -->
+<div class="chapter-full">
+<div class="chapter-card" onclick="jumpTo(10)">
+<img alt="LLM Slides :: Slide 12" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-12.png" style="max-height:420px; object-fit:cover;"/>
+<div class="chapter-card-body">
+<span class="cc-slide-num">12</span>
+<div class="cc-info">
+<h4>Leading LLM Models &amp; What Comes Next</h4>
+<p>GPT-4, Claude, Gemini, Llama :: and the frontier of reasoning, multimodal, and agentic AI systems</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- TIMELINE -->
+<section class="timeline-section" id="timeline">
+<div class="section-rule" style="margin-bottom:2rem;">
+<span class="sr-label">History</span>
+<div class="sr-line"></div>
+<span class="sr-num">LLM Evolution</span>
+</div>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:3rem;">
+<div>
+<h2 style="margin-bottom:2rem;">The LLM<br/>Timeline</h2>
+<p class="lead-text">From a 2017 research paper to trillion-parameter multimodal reasoning machines in under a decade.</p>
+<p class="body-text">The pace of progress in large language models has been extraordinary :: compressing decades of expected progress into a few years, with each generation unlocking capabilities that the previous considered impossible.</p>
+</div>
+<div class="timeline" id="applications">
+<div class="tl-item">
+<div class="tl-year">2017</div>
+<h4>Transformer :: "Attention Is All You Need"</h4>
+<p>Google Brain's seminal paper introduced the transformer architecture, replacing recurrent networks and making large-scale parallelizable training possible.</p>
+</div>
+<div class="tl-item">
+<div class="tl-year">2018–2019</div>
+<h4>BERT &amp; GPT-2 :: The Pretraining Era</h4>
+<p>Google's BERT showed bidirectional pretraining; OpenAI's GPT-2 demonstrated that scale alone produced emergent capabilities considered "too dangerous to release."</p>
+</div>
+<div class="tl-item">
+<div class="tl-year">2020</div>
+<h4>GPT-3 :: 175 Billion Parameters</h4>
+<p>Few-shot learning emerged as a genuine capability. GPT-3 could write code, translate languages, and answer questions it was never explicitly trained for.</p>
+</div>
+<div class="tl-item">
+<div class="tl-year">2022</div>
+<h4>ChatGPT &amp; the RLHF Revolution</h4>
+<p>InstructGPT introduced RLHF, making models genuinely helpful. ChatGPT reached 100 million users in two months :: the fastest product adoption in history.</p>
+</div>
+<div class="tl-item">
+<div class="tl-year">2023–2024</div>
+<h4>Multimodal, Open-Source &amp; Reasoning</h4>
+<p>GPT-4, Claude 2, Gemini Ultra, and Llama 2/3 brought vision, longer context, and open-weight releases. OpenAI o1 introduced chain-of-thought reasoning at inference time.</p>
+</div>
+<div class="tl-item">
+<div class="tl-year">2025–2026</div>
+<h4>Agentic AI &amp; Frontier Competition</h4>
+<p>Claude Opus 4.6, GPT-5, Gemini 3 Pro, and Grok 4 compete on autonomous computer use, multi-step reasoning, and real-time multimodal interaction across industries.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lb" onclick="lbBg(event)">
+<button class="lb-close" onclick="closeLb()">✕</button>
+<div class="lb-inner">
+<button class="lb-nav-btn prev" onclick="lbMove(-1);event.stopPropagation()">←</button>
+<img alt="LLM Slide" id="lbImg" src=""/>
+<button class="lb-nav-btn next" onclick="lbMove(1);event.stopPropagation()">→</button>
+</div>
+</div>
+<!-- FOOTER -->
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/ai-assistants/tutorials.html">AI Assistant AI Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-engineering-guide.html">Agent AI Engineering Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/">Agentic AI Course</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/guide.html">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/tutorial.html">Data Product Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-models/">LLM Models List </a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/8-tpu-gpu/google-tpus-vs-nvidia-amd-gpus.html">GPU vs TPU</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/pdf-slides/anthropic-models/">Anthropic models</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+<p>
+</p>
+<p>
+</p>
+</div>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/cto/">GenAI for CTO and IT</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/chief-compliance-officer/">GenAI for Compliance Officer</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/embeddings/embeddings-tutorial.html">Embeddings Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-quality-tutorial.html">Data Quality Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-tutorial.html">Data Lineage Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/ai-twin/ai-twin-for-industrial-systems.html">AI Twin for Industrial Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/predictive-maintenance/predictive-maintenance-with-ai-for-cnc-machines.html">AI Predictive Maintenance -Dataknobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/use-cases/agent-ai-use-cases-for-real-impact.html">Agent AI Use Cases For Real Impact</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-exec-deck.html">Agent Engineering Exec Deck</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-guide.html">Agent Engineering Guide</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+  const TOTAL = 11;
+  const SLIDE_NUMS = [2,3,4,5,6,7,8,9,10,11,12];
+  const BASE = 'https://storage.googleapis.com/generate-slides/llm-slides/images/Slide600/Slide-';
+
+  const TITLES = [
+    'Introduction to LLMs',
+    'How LLMs Work',
+    'Transformer Architecture',
+    'Tokenization',
+    'Training Pipeline',
+    'RLHF & Alignment',
+    'Fine-Tuning & Adaptation',
+    'Prompt Engineering',
+    'RAG :: Retrieval-Augmented Generation',
+    'LLM Applications',
+    'Leading Models & What Comes Next'
+  ];
+
+  let current = 0;
+  let lbCurrent = 0;
+
+  function imgUrl(idx) {
+    return BASE + SLIDE_NUMS[idx] + '.png';
+  }
+
+  // Build thumbnails
+  const grid = document.getElementById('thumbGrid');
+  for (let i = 0; i < TOTAL; i++) {
+    const item = document.createElement('div');
+    item.className = 'tg-item' + (i === 0 ? ' active' : '');
+    item.innerHTML = `<img src="${imgUrl(i)}" alt="Slide ${SLIDE_NUMS[i]}" loading="lazy" />`;
+    item.addEventListener('click', () => goTo(i));
+    grid.appendChild(item);
+  }
+
+  function goTo(idx) {
+    current = idx;
+    const img = document.getElementById('mainImg');
+    img.classList.add('fade');
+    setTimeout(() => {
+      img.src = imgUrl(idx);
+      img.alt = `Large Language Models :: Slide ${SLIDE_NUMS[idx]}: ${TITLES[idx]}`;
+      img.classList.remove('fade');
+    }, 250);
+    document.getElementById('counter').textContent = `${idx + 1} / ${TOTAL}`;
+    document.getElementById('soNum').textContent = String(SLIDE_NUMS[idx]).padStart(2, '0');
+    document.getElementById('soTitle').textContent = TITLES[idx];
+    document.querySelectorAll('.tg-item').forEach((t, i) => t.classList.toggle('active', i === idx));
+  }
+
+  function move(dir) {
+    goTo((current + dir + TOTAL) % TOTAL);
+  }
+
+  function jumpTo(idx) {
+    goTo(idx);
+    document.getElementById('viewer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Lightbox
+  function openLb(idx) {
+    lbCurrent = idx;
+    document.getElementById('lbImg').src = imgUrl(idx);
+    document.getElementById('lb').classList.add('open');
+  }
+
+  function lbMove(dir) {
+    lbCurrent = (lbCurrent + dir + TOTAL) % TOTAL;
+    document.getElementById('lbImg').src = imgUrl(lbCurrent);
+  }
+
+  function lbBg(e) {
+    if (e.target === document.getElementById('lb')) closeLb();
+  }
+
+  function closeLb() {
+    document.getElementById('lb').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', e => {
+    const lb = document.getElementById('lb');
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft')  lb.classList.contains('open') ? lbMove(-1) : move(-1);
+    if (e.key === 'ArrowRight') lb.classList.contains('open') ? lbMove(1)  : move(1);
+  });
+
+  // Gallery cards also open lightbox
+  document.querySelectorAll('.chapter-card').forEach((card, i) => {
+    card.addEventListener('click', () => openLb(i));
+  });
+</script>
+</body></html>

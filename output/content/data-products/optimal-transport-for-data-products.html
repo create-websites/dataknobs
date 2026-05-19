@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Complete guide to Optimal Transport in data products: Wasserstein metrics, Sinkhorn algorithms, domain adaptation, generative modeling, and fairness. Learn scalable OT methods for production ML systems." name="description"/>
+<meta content="optimal transport, Wasserstein distance, Sinkhorn algorithm, domain adaptation, generative models, fairness, distribution shift detection, earth mover distance, Gromov-Wasserstein, machine learning" name="keywords"/>
+<meta content="Optimal Transport in Data Products" name="author"/>
+<meta content="Optimal Transport in Data Products: Principles, Algorithms &amp; Applications" property="og:title"/>
+<meta content="A rigorous survey of optimal transport foundations, algorithms, scalable approximations, and real-world applications in domain adaptation, fairness, generative modeling, and more." property="og:description"/>
+<meta content="article" property="og:type"/>
+<title>Optimal Transport Guide | Wasserstein Metrics &amp; Data Products</title>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a1628;
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --accent: #ec4899;
+            --accent-warm: #f97316;
+            --accent-cool: #06b6d4;
+            --success: #059669;
+            --warning: #d97706;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-light: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-light);
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--accent-cool) 100%);
+            color: white;
+            padding: 90px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -15%;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: rgba(236, 72, 153, 0.12);
+            z-index: 0;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: 5%;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: rgba(249, 115, 22, 0.08);
+            z-index: 0;
+        }
+
+        .header-content {
+            max-width: 1150px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 25px;
+            letter-spacing: -1.5px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.4em;
+            opacity: 0.95;
+            max-width: 900px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .meta {
+            margin-top: 30px;
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            font-size: 0.95em;
+        }
+
+        .meta-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        /* NAVIGATION */
+        nav {
+            background: var(--bg-white);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            max-width: 1150px;
+            margin: 0 auto;
+            gap: 40px;
+            overflow-x: auto;
+            padding: 0;
+        }
+
+        nav li {
+            flex-shrink: 0;
+        }
+
+        nav a {
+            display: block;
+            padding: 16px 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.92em;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+            border-bottom-color: var(--accent);
+        }
+
+        /* MAIN CONTAINER */
+        main {
+            max-width: 1050px;
+            margin: 80px auto;
+            padding: 0 20px;
+        }
+
+        section {
+            margin-bottom: 100px;
+        }
+
+        section h2 {
+            font-size: 2.6em;
+            font-weight: 800;
+            margin-bottom: 40px;
+            color: var(--primary-dark);
+            padding-bottom: 20px;
+            border-bottom: 5px solid var(--accent);
+            display: inline-block;
+            letter-spacing: -0.8px;
+        }
+
+        section h3 {
+            font-size: 1.6em;
+            font-weight: 700;
+            margin: 45px 0 25px 0;
+            color: var(--primary);
+        }
+
+        section p {
+            font-size: 1.08em;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.9;
+        }
+
+        /* CONCEPT CARDS */
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .concept-card {
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-light);
+            border-left: 6px solid var(--accent);
+        }
+
+        .concept-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .concept-card.algorithm {
+            border-left-color: var(--primary-light);
+        }
+
+        .concept-card.application {
+            border-left-color: var(--accent-warm);
+        }
+
+        .concept-card.theory {
+            border-left-color: var(--accent-cool);
+        }
+
+        .concept-card h4 {
+            font-size: 1.35em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+
+        .concept-card p {
+            font-size: 0.98em;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .concept-card ul {
+            margin: 15px 0 0 20px;
+            color: var(--text-secondary);
+        }
+
+        .concept-card li {
+            margin-bottom: 10px;
+            font-size: 0.97em;
+        }
+
+        /* FORMULA BOX */
+        .formula-box {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.08), rgba(236, 72, 153, 0.08));
+            border-left: 5px solid var(--primary);
+            padding: 28px;
+            border-radius: 12px;
+            margin: 35px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        .formula-box strong {
+            color: var(--primary);
+            font-size: 0.95em;
+        }
+
+        .formula-box code {
+            color: var(--accent);
+            background: rgba(0, 0, 0, 0.03);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* COMPARISON TABLE */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 45px 0;
+            background: var(--bg-white);
+            border-radius: 16px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+        }
+
+        th {
+            padding: 20px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.94em;
+        }
+
+        tbody tr:hover {
+            background: rgba(30, 58, 138, 0.03);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* USE CASE FLOW */
+        .use-case {
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .use-case-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+        }
+
+        .use-case-section {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .use-case-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .use-case-label {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .use-case-content {
+            color: var(--text-secondary);
+            font-size: 0.98em;
+            line-height: 1.8;
+        }
+
+        /* HIGHLIGHTS */
+        .highlight {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(236, 72, 153, 0.05));
+            border-left: 5px solid var(--accent-cool);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 35px 0;
+            border: 1px solid var(--border);
+        }
+
+        .highlight strong {
+            color: var(--primary);
+        }
+
+        /* COMPLEXITY CHART */
+        .complexity-visual {
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 35px;
+            margin: 40px 0;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .complexity-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .complexity-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .complexity-label {
+            width: 150px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 0.95em;
+        }
+
+        .complexity-bar {
+            flex: 1;
+            height: 28px;
+            background: linear-gradient(90deg, var(--primary-light), var(--accent));
+            border-radius: 8px;
+            position: relative;
+            margin: 0 20px;
+        }
+
+        .complexity-text {
+            width: 100px;
+            text-align: right;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            background: var(--accent-cool);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-right: 8px;
+            margin-bottom: 10px;
+        }
+
+        .badge.primary {
+            background: var(--primary);
+        }
+
+        .badge.warm {
+            background: var(--accent-warm);
+        }
+
+        .badge.success {
+            background: var(--success);
+        }
+
+        /* CODE BLOCK */
+        .code-block {
+            background: var(--primary-dark);
+            color: #e0e0e0;
+            padding: 25px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin: 30px 0;
+        }
+
+        .code-block code {
+            color: #66d9ef;
+        }
+
+        /* BEST PRACTICES */
+        .practices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 45px 0;
+        }
+
+        .practice-item {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border-light);
+            border-left: 4px solid var(--success);
+        }
+
+        .practice-item.pitfall {
+            border-left-color: var(--warning);
+        }
+
+        .practice-item h4 {
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+        }
+
+        .practice-item p {
+            font-size: 0.97em;
+            color: var(--text-secondary);
+        }
+
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            padding: 70px 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 70px 0;
+        }
+
+        .cta-section h2 {
+            color: white;
+            border-bottom-color: var(--accent-cool);
+            margin-bottom: 25px;
+        }
+
+        .cta-section p {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.15em;
+            max-width: 700px;
+            margin: 25px auto;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--primary-dark);
+            color: white;
+            padding: 70px 20px;
+            text-align: center;
+            margin-top: 120px;
+        }
+
+        footer p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+            font-size: 0.96em;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+            margin-top: 35px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--accent-cool);
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.4em;
+            }
+
+            section h2 {
+                font-size: 1.8em;
+            }
+
+            nav ul {
+                gap: 20px;
+            }
+
+            .meta {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            header {
+                padding: 50px 20px;
+            }
+
+            .complexity-label,
+            .complexity-text {
+                width: auto;
+                font-size: 0.85em;
+            }
+
+            .complexity-bar {
+                margin: 0 10px;
+            }
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .concept-card {
+            animation: fadeInUp 0.7s ease-out;
+        }
+    </style>
+</head>
+<body>
+<!-- HEADER -->
+<header>
+<div class="header-content">
+<h1>Optimal Transport in Data Products</h1>
+<p class="subtitle">From Wasserstein Metrics to Production Systems: A Rigorous Framework for Distribution Matching, Domain Adaptation, Fairness, and Generative Modeling</p>
+<div class="meta">
+<span class="meta-badge">🎯 Domain Adaptation</span>
+<span class="meta-badge">📊 Distribution Shift Detection</span>
+<span class="meta-badge">⚖️ Fairness &amp; Debiasing</span>
+<span class="meta-badge">🔄 Generative Modeling</span>
+</div>
+</div>
+</header>
+<!-- NAVIGATION -->
+<nav>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#foundations">Foundations</a></li>
+<li><a href="#algorithms">Algorithms</a></li>
+<li><a href="#scalability">Scalability</a></li>
+<li><a href="#applications">Applications</a></li>
+<li><a href="#tools">Tools &amp; Libraries</a></li>
+<li><a href="#deployment">Deployment</a></li>
+<li><a href="#practices">Best Practices</a></li>
+</ul>
+</nav>
+<!-- MAIN CONTENT -->
+<main>
+<!-- OVERVIEW SECTION -->
+<section id="overview">
+<h2>What is Optimal Transport?</h2>
+<p>Optimal transport (OT) provides a mathematically principled framework for comparing and mapping probability distributions by minimizing the "earth-mover" cost of transforming one distribution into another. At its core, OT asks: what is the cheapest way to transport a pile of earth from one location to another?</p>
+<p>In modern <a href="https://www.dataknobs.com/data-products/">data products</a>, optimal transport::especially its Wasserstein metric and variants::has emerged as a versatile tool for domain adaptation, distribution shift detection, generative modeling, fairness, data summarization, and anomaly detection. Unlike traditional divergences (KL, JS), Wasserstein gracefully handles disjoint supports and is differentiable with respect to distribution parameters, making it ideal for machine learning.</p>
+<div class="highlight">
+<strong>Key advantage:</strong> Wasserstein distances quantify distributional differences even when support sets don't overlap, making them superior to KL divergence for measuring dataset shift in production systems.
+            </div>
+<h3>Why Optimal Transport Matters</h3>
+<div class="concepts-grid">
+<div class="concept-card theory">
+<h4>Mathematically Sound</h4>
+<p>OT is grounded in convex optimization and differential geometry, providing principled solutions to distribution matching problems.</p>
+</div>
+<div class="concept-card theory">
+<h4>Differentiable Losses</h4>
+<p>Wasserstein distances are differentiable w.r.t. distribution parameters, enabling gradient-based learning (GANs, domain adaptation).</p>
+</div>
+<div class="concept-card theory">
+<h4>Handles Disjoint Supports</h4>
+<p>Unlike KL/JS divergence, OT gracefully handles distributions with non-overlapping support::critical for real-world distribution shifts.</p>
+</div>
+<div class="concept-card theory">
+<h4>Scalable Approximations</h4>
+<p>Entropic regularization, sliced projections, and GPU-accelerated solvers enable OT for millions of points in production.</p>
+</div>
+</div>
+</section>
+<!-- FOUNDATIONS SECTION -->
+<section id="foundations">
+<h2>OT Foundations: From Monge to Kantorovich</h2>
+<p>The classical optimal transport problem has two main formulations, each with distinct advantages and computational properties.</p>
+<div class="concepts-grid">
+<div class="concept-card algorithm">
+<h4>Monge Formulation</h4>
+<p><strong>Objective:</strong> Find a deterministic transport map T that pushes source distribution to target.</p>
+<p><strong>Limitation:</strong> Often has no solution or is extremely hard to compute. Not always feasible for discrete distributions.</p>
+</div>
+<div class="concept-card algorithm">
+<h4>Kantorovich Formulation</h4>
+<p><strong>Objective:</strong> Find a coupling (joint distribution) γ that minimizes total transport cost.</p>
+<p><strong>Advantage:</strong> Always has a solution. Reduces to a linear program::solvable exactly or approximately.</p>
+</div>
+<div class="concept-card algorithm">
+<h4>Wasserstein Distance</h4>
+<p><strong>Definition:</strong> The p-Wasserstein distance W_p(μ,ν) is the p-th root of the minimum expected ground cost under a coupling.</p>
+<p><strong>Property:</strong> Intuitively measures minimum work to move one distribution to another.</p>
+</div>
+</div>
+<h3>Key Concepts</h3>
+<p>The Kantorovich problem for discrete distributions is formulated as a linear program:</p>
+<div class="formula-box">
+<strong>minimize</strong> Σ<sub>ij</sub> M<sub>ij</sub> γ<sub>ij</sub><br/>
+<strong>subject to:</strong> Σ<sub>j</sub> γ<sub>ij</sub> = a<sub>i</sub>  and  Σ<sub>i</sub> γ<sub>ij</sub> = b<sub>j</sub><br/>
+                γ<sub>ij</sub> ≥ 0<br/><br/>
+                where M<sub>ij</sub> is the ground cost of moving mass from bin i to j, and γ is the coupling matrix.
+            </div>
+<h3>Extensions &amp; Variants</h3>
+<div class="concepts-grid">
+<div class="concept-card theory">
+<h4>Entropic Regularization</h4>
+<p>Adds negative entropy term to cost: minimizes total cost - ε·H(γ). Makes problem strictly convex, solvable efficiently by Sinkhorn algorithm (~O(n²)).</p>
+</div>
+<div class="concept-card theory">
+<h4>Unbalanced OT</h4>
+<p>Relaxes equal-mass constraint. Adds penalties for marginal deviations using KL divergence. Handles label shift and partial matching.</p>
+</div>
+<div class="concept-card theory">
+<h4>Gromov-Wasserstein (GW)</h4>
+<p>Compares metric spaces rather than distributions. Finds coupling aligning relational geometry. Useful for graph matching and cross-domain alignment.</p>
+</div>
+<div class="concept-card theory">
+<h4>Sliced-Wasserstein (SW)</h4>
+<p>Projects data onto random 1D lines, computes 1D Wasserstein (~O(n log n)), averages. Trade-off: faster but approximate.</p>
+</div>
+</div>
+</section>
+<!-- ALGORITHMS SECTION -->
+<section id="algorithms">
+<h2>OT Algorithms &amp; Computational Complexity</h2>
+<p>Different algorithms trade off accuracy for speed and scalability. Choose based on your dataset size, latency requirements, and precision needs.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Time Complexity</th>
+<th>Memory</th>
+<th>Approximation</th>
+<th>Scalability</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Exact OT (LP)</strong></td>
+<td>O(n³log n)</td>
+<td>O(n²)</td>
+<td>Exact</td>
+<td>Small (n ~1k)</td>
+<td>Validation, benchmarking</td>
+</tr>
+<tr>
+<td><strong>Sinkhorn (Entropic)</strong></td>
+<td>~O(n²)</td>
+<td>O(n²)</td>
+<td>ε-approximate</td>
+<td>Medium-Large (GPU)</td>
+<td>ML training, GANs, DA</td>
+</tr>
+<tr>
+<td><strong>Greenkhorn</strong></td>
+<td>~O(n²)</td>
+<td>O(n²)</td>
+<td>Same as Sinkhorn</td>
+<td>Medium-Large</td>
+<td>Large problems, faster convergence</td>
+</tr>
+<tr>
+<td><strong>Sliced-Wasserstein (SW)</strong></td>
+<td>O(L n log n)</td>
+<td>O(n)</td>
+<td>Monte Carlo</td>
+<td>Very Large</td>
+<td>High-dim, generative models</td>
+</tr>
+<tr>
+<td><strong>Gromov-Wasserstein</strong></td>
+<td>~O(n³) per iter</td>
+<td>O(n⁴) naive</td>
+<td>Approximate</td>
+<td>Small graphs</td>
+<td>Graph matching, structure alignment</td>
+</tr>
+<tr>
+<td><strong>Stochastic (Mini-batch)</strong></td>
+<td>~O(b²) per batch</td>
+<td>O(b²)</td>
+<td>Biased estimate</td>
+<td>Very Large streams</td>
+<td>Online OT, continual learning</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Algorithm Details</h3>
+<div class="concepts-grid">
+<div class="concept-card algorithm">
+<h4>Sinkhorn-Knopp</h4>
+<p>Iteratively scales rows/columns of coupling matrix. Each iteration is O(n²) (matrix–vector multiply). Converges in tens to hundreds of iterations on GPU. Main issue: numerical stability at small ε::use log-domain or ε-scaling.</p>
+</div>
+<div class="concept-card algorithm">
+<h4>Greenkhorn</h4>
+<p>Greedy variant: updates one row/column per iteration. Often faster in practice than Sinkhorn for large n. Similar complexity but better convergence heuristics.</p>
+</div>
+<div class="concept-card algorithm">
+<h4>Linear OT Maps</h4>
+<p>For Gaussian distributions, closed-form solution exists (O(d³) in dimension). Parametric and non-iterative::extremely fast. Limited to special structure.</p>
+</div>
+<div class="concept-card algorithm">
+<h4>Stochastic &amp; Mini-batch</h4>
+<p>Operate on random minibatches (O(b²) per batch). Biased estimator of global OT but efficient for streaming and online learning. GPU-friendly.</p>
+</div>
+</div>
+</section>
+<!-- SCALABILITY SECTION -->
+<section id="scalability">
+<h2>Scalable Approximations for Large-Scale Data</h2>
+<p>Handling millions of points requires clever approximations and GPU optimization. Here are the main strategies:</p>
+<div class="complexity-visual">
+<div class="complexity-item">
+<div class="complexity-label">Exact OT</div>
+<div class="complexity-bar" style="width: 100%;"></div>
+<div class="complexity-text">O(n³ log n)</div>
+</div>
+<div class="complexity-item">
+<div class="complexity-label">Sinkhorn GPU</div>
+<div class="complexity-bar" style="width: 30%;"></div>
+<div class="complexity-text">~O(n²)</div>
+</div>
+<div class="complexity-item">
+<div class="complexity-label">Sliced-Wasserstein</div>
+<div class="complexity-bar" style="width: 15%;"></div>
+<div class="complexity-text">O(L n log n)</div>
+</div>
+<div class="complexity-item">
+<div class="complexity-label">Mini-batch</div>
+<div class="complexity-bar" style="width: 8%;"></div>
+<div class="complexity-text">~O(b²)</div>
+</div>
+</div>
+<div class="concepts-grid">
+<div class="concept-card application">
+<h4>GPU-Accelerated Sinkhorn</h4>
+<p><strong>Libraries:</strong> GeomLoss (PyTorch), OTT-JAX.<br/><strong>Approach:</strong> Exploit GPU parallelism and clever memory layouts. Handle millions of points via mini-batching.<br/><strong>Result:</strong> Near O(n²) with constant factors, feasible for n &gt; 100k.</p>
+</div>
+<div class="concept-card application">
+<h4>Slicing &amp; Projections</h4>
+<p><strong>Method:</strong> Project onto random 1D lines; compute 1D Wasserstein (~O(n log n)); average L projections.<br/><strong>Trade-off:</strong> Lower accuracy but scales to very large n. Parallelizable across projections.</p>
+</div>
+<div class="concept-card application">
+<h4>Multi-Scale OT</h4>
+<p><strong>Approach:</strong> Hierarchical clustering or grid coarsening. Solve OT at coarse level, refine. Reduces n in cost matrices.<br/><strong>Result:</strong> Near-linear runtime in practice.</p>
+</div>
+<div class="concept-card application">
+<h4>Low-Rank Factorization</h4>
+<p><strong>Idea:</strong> Exploit data structure (Gaussians, manifolds). Compute OT in reduced representation.<br/><strong>Example:</strong> Between Gaussians, closed-form O(d³); convolutional Wasserstein on grids.</p>
+</div>
+</div>
+<h3>GPU/TPU Considerations</h3>
+<p>For production deployment:</p>
+<ul style="margin-left: 20px; color: var(--text-secondary); font-size: 1.05em; line-height: 1.9;">
+<li><strong>Memory:</strong> Sinkhorn still needs O(n²) for kernel matrix. For n &gt; 10⁶, use mini-batching or slicing.</li>
+<li><strong>Throughput:</strong> GPU can handle millions of points per second with batching. Typical batch size: 100–1000.</li>
+<li><strong>Latency:</strong> Single batch OT: ~10–100ms on modern GPU. Acceptable for most applications.</li>
+<li><strong>Cost:</strong> GPU hours can be significant for large-scale OT. Optimize via approximate methods and caching.</li>
+</ul>
+</section>
+<!-- APPLICATIONS SECTION -->
+<section id="applications">
+<h2>Real-World Applications in Data Products</h2>
+<p>Optimal transport solves critical challenges across diverse domains. Here are the major applications:</p>
+<!-- DOMAIN ADAPTATION -->
+<div class="use-case">
+<div class="use-case-title">🎯 Domain Adaptation (Distribution Transfer)</div>
+<div class="use-case-section">
+<div class="use-case-label">Problem</div>
+<div class="use-case-content">Model trained on source domain (e.g., synthetic data) performs poorly on target domain (real data) due to distribution shift.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Why OT Fits</div>
+<div class="use-case-content">OT directly measures source-target feature discrepancy. Optimal coupling γ* tells how to transport/re-weight source samples to match target geometry. Can then use transported features with original labels to train target model.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Algorithms</div>
+<div class="use-case-content">Sinkhorn-regularized OT (fast, differentiable). Joint Distribution OT (JDOT) matches feature-label pairs. Deep OT integrates into neural networks (DeepJDOT). For label shift, unbalanced OT handles different class priors.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Scalability</div>
+<div class="use-case-content">Moderate. Sinkhorn on mini-batches (100–500 samples). Per-batch complexity: ~O(b²). GPU support accelerates training.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Evaluation</div>
+<div class="use-case-content">Target task accuracy (F1, AUC). Measure ℋ-divergence between domains. OT distance before/after alignment.</div>
+</div>
+</div>
+<!-- DRIFT DETECTION -->
+<div class="use-case">
+<div class="use-case-title">📊 Dataset Shift Detection</div>
+<div class="use-case-section">
+<div class="use-case-label">Problem</div>
+<div class="use-case-content">Detect when data distribution changes over time to trigger retraining or raise alerts (e.g., seasonal shifts, adversarial drift).</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Why OT Fits</div>
+<div class="use-case-content">Wasserstein distance quantifies shift more sensitively than KL divergence, especially when support changes. Compute W(P_old, P_new) between data windows. Large distance = drift.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Algorithms</div>
+<div class="use-case-content">Sinkhorn distance between histograms. Sliced-Wasserstein for fast drift statistics in high-D. Unbalanced OT allows different sample counts. Online stochastic Sinkhorn for streaming.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Scalability &amp; Latency</div>
+<div class="use-case-content">Per-check: ~O(n²) for Sinkhorn (or O(n log n) for SW). Run hourly/daily. Memory footprint: low if using histograms or sketches.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Evaluation</div>
+<div class="use-case-content">OT distance itself, normalized. Set thresholds via statistical tests. Compare to Kolmogorov–Smirnov (1D) or MMD (multivariate).</div>
+</div>
+</div>
+<!-- GENERATIVE MODELING -->
+<div class="use-case">
+<div class="use-case-title">🔄 Generative Modeling (GANs, VAEs)</div>
+<div class="use-case-section">
+<div class="use-case-label">Problem</div>
+<div class="use-case-content">Learn to generate data (images, embeddings) matching target distribution.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Why OT Fits</div>
+<div class="use-case-content">Wasserstein distance provides a well-behaved loss correlating with sample quality. In Wasserstein GANs (WGAN), Wasserstein distance avoids vanishing gradients::critical for GAN training.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Algorithms</div>
+<div class="use-case-content"><strong>WGAN:</strong> Replace JS divergence with approximate W₁ via 1-Lipschitz critic. <strong>Sinkhorn Loss:</strong> Differentiable Sinkhorn as training objective. <strong>Flow-based OT:</strong> Normalizing flows minimizing OT cost.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Scalability</div>
+<div class="use-case-content">Stochastic SGD training. Each batch: ~O(b²) for Sinkhorn (b ~256). GPU essential.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Metrics</div>
+<div class="use-case-content">Inception Score, Fréchet Inception Distance (FID), KL divergence. Monitor Sinkhorn loss convergence.</div>
+</div>
+</div>
+<!-- FAIRNESS -->
+<div class="use-case">
+<div class="use-case-title">⚖️ Fairness &amp; Debiasing</div>
+<div class="use-case-section">
+<div class="use-case-label">Problem</div>
+<div class="use-case-content">Ensure ML predictions are fair across sensitive groups (gender, race). Demographic parity requires equal outcome distributions across groups.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Why OT Fits</div>
+<div class="use-case-content">OT can align distributions across groups. Transport output distribution of one group to match another with minimal distortion. Provides distributional fairness guarantees.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Algorithms</div>
+<div class="use-case-content">Multi-marginal OT to align k sensitive groups. "Fair OT" finds common target distribution; each group transported to minimize distance. Unbalanced OT handles unequal group sizes.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Scalability</div>
+<div class="use-case-content">Typically offline during training or post-processing. Not real-time. Many groups: solve pairwise OT. Practical complexity manageable.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Evaluation</div>
+<div class="use-case-content">Standard fairness metrics (demographic parity gap, equalized odds). Model accuracy trade-off. OT distance to common barycenter.</div>
+</div>
+</div>
+<!-- DATA SUMMARIZATION -->
+<div class="use-case">
+<div class="use-case-title">📦 Data Summarization &amp; Coresets</div>
+<div class="use-case-section">
+<div class="use-case-label">Problem</div>
+<div class="use-case-content">Summarize large dataset by small weighted subset (coreset) preserving distributional properties.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Why OT Fits</div>
+<div class="use-case-content">Choose synthetic points {x̃ᵢ} with weights wᵢ minimizing W(P_original, Σᵢ wᵢ δ_x̃ᵢ). Ensures coreset distribution approximates full data.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Algorithms</div>
+<div class="use-case-content">Optimize coreset locations via gradient descent on Wasserstein loss. "Fair Wasserstein Coresets" add fairness constraints. Sinkhorn computes gradients.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Scalability</div>
+<div class="use-case-content">Coreset size m small (~50–100). OT between m and n: O(mn) per iteration. Approximate OT or n-subsampling reduces cost.</div>
+</div>
+<div class="use-case-section">
+<div class="use-case-label">Evaluation</div>
+<div class="use-case-content">Compare model performance trained on coreset vs. full data. Distribution closeness via W or other divergence.</div>
+</div>
+</div>
+<!-- OTHER APPLICATIONS -->
+<div class="concepts-grid">
+<div class="concept-card application">
+<h4>Anomaly Detection</h4>
+<p>Flag novel samples by measuring their OT distance from training data. High W distance indicates anomaly. Sliced-Wasserstein for fast, high-D detection.</p>
+</div>
+<div class="concept-card application">
+<h4>Data Augmentation</h4>
+<p>Generate realistic augmentations by transporting samples within their class manifold using OT maps. Balance rare classes via synthetic points.</p>
+</div>
+<div class="concept-card application">
+<h4>Metric Learning</h4>
+<p>Learn embeddings with OT-based loss. Maximize OT distance between class-conditional distributions. Emerging application; less standard tooling.</p>
+</div>
+<div class="concept-card application">
+<h4>Privacy-Preserving Release</h4>
+<p>Generate synthetic data matching original distribution via OT barycenter. Release only synthetic samples to obscure individuals. Combine with differential privacy.</p>
+</div>
+</div>
+</section>
+<!-- TOOLS SECTION -->
+<section id="tools">
+<h2>Production Tools &amp; Libraries</h2>
+<p>Several libraries enable production-ready OT implementation. Choose based on language, performance, and integration needs.</p>
+<div class="concepts-grid">
+<div class="concept-card">
+<h4>POT (Python Optimal Transport)</h4>
+<p><strong>Language:</strong> Python (NumPy).<br/><strong>Features:</strong> EMD, Sinkhorn, GW, unbalanced OT, domain adaptation, barycenters.<br/><strong>Pros:</strong> Comprehensive, well-documented.<br/><strong>Cons:</strong> CPU-only by default; slow for large n.</p>
+</div>
+<div class="concept-card">
+<h4>OTT (JAX)</h4>
+<p><strong>Language:</strong> JAX (Google).<br/><strong>Features:</strong> GPU/TPU-accelerated Sinkhorn, barycenters, auto-diff.<br/><strong>Pros:</strong> GPU/TPU support, JAX integration, scalable.<br/><strong>Cons:</strong> JAX ecosystem learning curve.</p>
+</div>
+<div class="concept-card">
+<h4>GeomLoss (PyTorch)</h4>
+<p><strong>Language:</strong> PyTorch/CUDA.<br/><strong>Features:</strong> GPU-optimized Sinkhorn, point cloud losses (Wasserstein, MMD).<br/><strong>Pros:</strong> Handles millions of points, CUDA kernel efficiency.<br/><strong>Cons:</strong> PyTorch-specific.</p>
+</div>
+<div class="concept-card">
+<h4>Transport (R)</h4>
+<p><strong>Language:</strong> R.<br/><strong>Features:</strong> Classic OT methods for statisticians.<br/><strong>Pros:</strong> Integrates with R ecosystem.<br/><strong>Cons:</strong> Limited to classical methods.</p>
+</div>
+</div>
+<h3>Code Example: Computing Wasserstein Distance</h3>
+<div class="code-block">
+import ot
+import numpy as np
+
+# Sample two distributions
+X = np.random.randn(1000, 10)  # source
+Y = np.random.randn(1000, 10)  # target
+
+# Create uniform weights
+a = np.ones(len(X)) / len(X)
+b = np.ones(len(Y)) / len(Y)
+
+# Compute cost matrix (Euclidean distance)
+M = ot.dist(X, Y)
+
+# Exact Wasserstein distance
+W_exact = ot.emd2(a, b, M)
+
+# Sinkhorn (fast approximation)
+W_sink = ot.sinkhorn2(a, b, M, reg=0.01)
+
+print(f"Exact: {W_exact:.4f}, Sinkhorn: {W_sink:.4f}")
+            </div>
+<h3>Deployment Patterns</h3>
+<div class="concepts-grid">
+<div class="concept-card">
+<h4>Batch Processing</h4>
+<p>Precompute OT alignments offline (e.g. domain adaptation pipelines). Wrap libraries in Docker for scalability.</p>
+</div>
+<div class="concept-card">
+<h4>Microservices</h4>
+<p>Expose OT computations via REST API. Cost matrix building + Sinkhorn solver. Enable easy integration into larger systems.</p>
+</div>
+<div class="concept-card">
+<h4>Distributed</h4>
+<p>For very large data: Spark with approximate OT (random projections). Split data and merge distances. Cost optimization critical.</p>
+</div>
+<div class="concept-card">
+<h4>In-Memory Caching</h4>
+<p>Pre-compute and cache common transport plans. If data repeats, reuse cached plans. Significant speedup for repeated queries.</p>
+</div>
+</div>
+</section>
+<!-- DEPLOYMENT SECTION -->
+<section id="deployment">
+<h2>Deployment Considerations</h2>
+<p>Taking optimal transport to production requires attention to performance, monitoring, and operational issues.</p>
+<div class="concepts-grid">
+<div class="concept-card">
+<h4>Memory Management</h4>
+<p>Sinkhorn needs O(n²) for kernel matrix. For n &gt; 10⁶, use mini-batching or slicing. Monitor GPU memory usage; set aggressive batch sizes if needed.</p>
+</div>
+<div class="concept-card">
+<h4>Numerical Stability</h4>
+<p>Entropic Sinkhorn can underflow/overflow for very small ε. Use log-domain implementations or ε-scaling variants. Libraries like OTT handle this automatically.</p>
+</div>
+<div class="concept-card">
+<h4>Latency &amp; Throughput</h4>
+<p>Single batch OT: ~10–100ms on modern GPU. Acceptable for most. For real-time: use fast approximations (SW, linear maps). Batch multiple queries when possible.</p>
+</div>
+<div class="concept-card">
+<h4>Cost Optimization</h4>
+<p>GPU hours can be expensive. Use approximate methods, cache plans, and warm-start Sinkhorn from previous iterations. Profile and optimize matrix operations.</p>
+</div>
+</div>
+</section>
+<!-- BEST PRACTICES SECTION -->
+<section id="practices">
+<h2>Best Practices, Pitfalls &amp; Monitoring</h2>
+<h3>Best Practices ✓</h3>
+<div class="practices">
+<div class="practice-item">
+<h4>Use Entropic Sinkhorn by Default</h4>
+<p>For most applications, entropic Sinkhorn balances speed and accuracy. Tune regularization parameter ε based on your latency/quality tradeoff.</p>
+</div>
+<div class="practice-item">
+<h4>Leverage GPU Libraries</h4>
+<p>Use GeomLoss (PyTorch) or OTT (JAX) for large-scale OT. Dedicated GPU kernels far outpace CPU implementations.</p>
+</div>
+<div class="practice-item">
+<h4>Warm-Start Sinkhorn</h4>
+<p>When solving similar OT problems repeatedly (e.g., domain adaptation on data batches), initialize from previous coupling. Significantly speeds up convergence.</p>
+</div>
+<div class="practice-item">
+<h4>Normalize Feature Scales</h4>
+<p>Pre-process features with consistent scaling/embedding. Ground cost (Euclidean distance) is only meaningful if scales match.</p>
+</div>
+<div class="practice-item">
+<h4>Validate with Hold-Out Distributions</h4>
+<p>Test OT solvers on synthetic data with known transport. Verify correctness before production deployment.</p>
+</div>
+<div class="practice-item">
+<h4>Balance Task Loss &amp; OT Loss</h4>
+<p>In domain adaptation, don't minimize OT alone::combine with task-specific loss. Over-aligning distributions can harm accuracy on target.</p>
+</div>
+</div>
+<h3>Common Pitfalls ⚠️</h3>
+<div class="practices">
+<div class="practice-item pitfall">
+<h4>Memory Blow-Up</h4>
+<p>Cost matrix M (size n²) dominates memory. For n &gt; 100k, standard Sinkhorn infeasible without approximations (slicing, mini-batching).</p>
+</div>
+<div class="practice-item pitfall">
+<h4>Numerical Instability</h4>
+<p>Small ε in Sinkhorn causes underflow/overflow. Always use stabilized log-domain solvers (ε-scaling). Monitor scaling factors.</p>
+</div>
+<div class="practice-item pitfall">
+<h4>Gromov-Wasserstein Complexity</h4>
+<p>GW is NP-hard with expensive iterative solutions (~O(n³) per iteration). Limit to small graphs/datasets. Sensitive to initialization.</p>
+</div>
+<div class="practice-item pitfall">
+<h4>Ignoring Fairness Trade-Offs</h4>
+<p>Minimizing OT for alignment can inadvertently degrade task performance or introduce new biases. Always validate downstream metrics.</p>
+</div>
+<div class="practice-item pitfall">
+<h4>Forgetting Validation Data</h4>
+<p>When using OT in training (e.g., domain adaptation), keep validation and test data separate. Compute OT only on training distribution.</p>
+</div>
+</div>
+<h3>Production Monitoring</h3>
+<p>In live systems, continuously track OT-based metrics:</p>
+<ul style="margin-left: 20px; color: var(--text-secondary); font-size: 1.05em; line-height: 1.9;">
+<li><strong>Dataset Shift:</strong> Monitor Wasserstein distance between training and live data. Rising trend indicates drift::trigger retraining.</li>
+<li><strong>Domain Adaptation Efficacy:</strong> Track target task accuracy after applying OT-based transfer. Ensure downstream performance improves.</li>
+<li><strong>Fairness Outcomes:</strong> Continuously audit protected-group outcomes (demographic parity difference, equalized odds) post-mitigation.</li>
+<li><strong>Solver Health:</strong> Log convergence rates, scaling factors, and numerical warnings. Alert if Sinkhorn diverges or behaves unexpectedly.</li>
+<li><strong>Latency:</strong> Monitor OT computation time per batch. Set SLAs and alert if degraded (may indicate memory pressure, queue depth, etc.).</li>
+</ul>
+</section>
+<!-- CTA -->
+<section class="cta-section">
+<h2>Ready to Deploy Optimal Transport?</h2>
+<p>Start with a pilot project using Sinkhorn-based domain adaptation or drift detection. Measure baseline performance, apply OT, and quantify improvements. The mathematical rigor and scalable algorithms make OT a powerful tool for modern data products::especially where distribution shift, fairness, or unseen data domains are concerns.</p>
+</section>
+</main>
+<!-- FOOTER -->
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/ai-assistants/tutorials.html">AI Assistant AI Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-engineering-guide.html">Agent AI Engineering Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/">Agentic AI Course</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/guide.html">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/tutorial.html">Data Product Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-models/">LLM Models List </a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/8-tpu-gpu/google-tpus-vs-nvidia-amd-gpus.html">GPU vs TPU</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/pdf-slides/anthropic-models/">Anthropic models</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+<p>
+</p>
+<p>
+</p>
+</div>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/cto/">GenAI for CTO and IT</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/chief-compliance-officer/">GenAI for Compliance Officer</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/embeddings/embeddings-tutorial.html">Embeddings Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-quality-tutorial.html">Data Quality Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-tutorial.html">Data Lineage Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/ai-twin/ai-twin-for-industrial-systems.html">AI Twin for Industrial Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/predictive-maintenance/predictive-maintenance-with-ai-for-cnc-machines.html">AI Predictive Maintenance -Dataknobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/use-cases/agent-ai-use-cases-for-real-impact.html">Agent AI Use Cases For Real Impact</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-exec-deck.html">Agent Engineering Exec Deck</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-guide.html">Agent Engineering Guide</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

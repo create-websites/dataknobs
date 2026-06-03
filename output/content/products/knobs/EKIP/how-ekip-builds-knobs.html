@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>How EKIP Defines &amp; Builds Knobs : From Hidden Settings to Governed, Optimized Controls | DataKnobs</title>
+<meta content="How the Enterprise Knob Intelligence Platform (EKIP) defines and builds knobs: discovering hidden controls, formalizing them into governed variables, instrumenting them against data products, prioritizing with Frontier Intelligence, and continuously optimizing them  powered by Information Geometry for Enterprise AI." name="description"/>
+<meta content="EKIP, build knobs, define knobs, knob discovery, knob lifecycle, knob instrumentation, Frontier Intelligence, Data Knob Intelligence, Information Geometry, closed-loop optimization, AI control plane, DataKnobs" name="keywords"/>
+<meta content="DataKnobs" name="author"/>
+<meta content="index, follow" name="robots"/>
+<link href="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/favicon.ico" rel="icon"/>
+<link href="https://www.dataknobs.com/how-ekip-builds-knobs.html" rel="canonical"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<meta content="article" property="og:type"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="How EKIP Defines &amp; Builds Knobs" property="og:title"/>
+<meta content="EKIP turns hidden, scattered settings into governed, instrumented, continuously-optimized knobs  powered by Information Geometry." property="og:description"/>
+<meta content="https://www.dataknobs.com/how-ekip-builds-knobs.html" property="og:url"/>
+<meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="How EKIP Defines &amp; Builds Knobs" name="twitter:title"/>
+<meta content="From hidden settings to governed, optimized controls." name="twitter:description"/>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "How EKIP Defines and Builds Knobs",
+  "description": "How the Enterprise Knob Intelligence Platform discovers, defines, instruments, prioritizes, and optimizes the knobs that drive enterprise outcomes.",
+  "author": { "@type": "Organization", "name": "DataKnobs" },
+  "publisher": { "@type": "Organization", "name": "DataKnobs" },
+  "mainEntityOfPage": "https://www.dataknobs.com/how-ekip-builds-knobs.html"
+}
+</script>
+
+<style>
+  :root{
+    --ink:#0f172a; --slate:#475569; --slate-2:#64748b; --line:#e2e8f0;
+    --violet:#7c3aed; --violet-2:#6d28d9; --indigo:#4f46e5;
+    --wash:#f8fafc; --wash-2:#f5f3ff; --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased;line-height:1.6;}
+  a{color:inherit;text-decoration:none;}
+  .dk-wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+
+  /* NAV */
+  .dk-nav{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .dk-nav-inner{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .dk-brand{font-weight:800;letter-spacing:-.02em;font-size:1.05rem;}
+  .dk-brand span{color:var(--violet);}
+  .dk-nav-links{display:flex;gap:22px;font-size:.92rem;font-weight:500;color:var(--slate);}
+  .dk-nav-links a:hover{color:var(--violet);}
+  .dk-nav-links a.active{color:var(--violet);font-weight:600;}
+  @media(max-width:760px){.dk-nav-links{display:none;}}
+
+  /* HERO */
+  .dk-hero{position:relative;overflow:hidden;background:
+     radial-gradient(900px 420px at 78% -10%, #ede9fe 0%, rgba(237,233,254,0) 60%),
+     radial-gradient(700px 360px at 0% 0%, #eef2ff 0%, rgba(238,242,255,0) 55%),
+     linear-gradient(180deg,#fff 0%, #fbfaff 100%);
+     border-bottom:1px solid var(--line);}
+  .dk-hero-inner{max-width:1080px;margin:0 auto;padding:84px 24px 72px;}
+  .dk-eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--violet);margin:0 0 18px;}
+  .dk-h1{font-size:clamp(2.2rem,5.2vw,3.5rem);line-height:1.06;letter-spacing:-.03em;font-weight:800;margin:0 0 22px;}
+  .dk-h1 em{font-style:normal;background:linear-gradient(90deg,var(--violet),var(--indigo));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .dk-lead{font-size:1.18rem;color:var(--slate);max-width:700px;margin:0 0 28px;}
+  .dk-pills{display:flex;flex-wrap:wrap;gap:10px;}
+  .dk-pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:600;color:var(--slate);box-shadow:0 1px 2px rgba(15,23,42,.04);}
+  .dk-pill b{color:var(--violet);}
+
+  /* SECTIONS */
+  section{padding:72px 0;}
+  .sec-wash{background:var(--wash);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .sec-violet{background:linear-gradient(180deg,#fff,var(--wash-2));border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .dk-title{font-size:clamp(1.7rem,3.6vw,2.4rem);letter-spacing:-.025em;font-weight:800;margin:0 0 16px;}
+  .dk-sub{font-size:1.08rem;color:var(--slate);max-width:740px;margin:0 0 8px;}
+
+  /* PROBLEM STRIP */
+  .dk-def{background:linear-gradient(135deg,#1e1b4b 0%,#4c1d95 55%,#5b21b6 100%);color:#fff;border-radius:28px;padding:44px 44px;box-shadow:0 24px 50px -24px rgba(76,29,149,.55);}
+  .dk-def .k{font-size:.78rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#c4b5fd;margin:0 0 16px;}
+  .dk-def p{font-size:clamp(1.25rem,2.5vw,1.6rem);line-height:1.45;font-weight:600;margin:0;letter-spacing:-.01em;}
+  .dk-def em{font-style:normal;color:#ddd6fe;}
+
+  /* FIGURE */
+  .dk-figure{margin-top:28px;background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:0 10px 30px -18px rgba(15,23,42,.25);}
+  .dk-figcap{text-align:center;font-size:.86rem;color:var(--slate-2);margin-top:14px;}
+
+  /* LIFECYCLE STAGES */
+  .dk-stage{display:grid;grid-template-columns:88px 1fr;gap:24px;align-items:start;padding:34px 0;border-top:1px solid var(--line);}
+  .dk-stage:first-of-type{border-top:0;}
+  .dk-stage .step{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--violet),var(--indigo));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;box-shadow:0 12px 24px -12px rgba(76,29,149,.6);}
+  .dk-stage h3{margin:2px 0 6px;font-size:1.3rem;letter-spacing:-.015em;}
+  .dk-stage .verb{font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--violet);}
+  .dk-stage p{margin:8px 0 0;color:var(--slate);font-size:1rem;max-width:680px;}
+  .dk-stage .out{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-size:.86rem;font-weight:600;color:var(--violet-2);background:var(--wash-2);border:1px solid #ddd6fe;border-radius:999px;padding:7px 14px;}
+  @media(max-width:620px){.dk-stage{grid-template-columns:1fr;gap:12px;}.dk-stage .step{width:54px;height:54px;font-size:1.2rem;}}
+
+  /* POWERED BY GRID */
+  .dk-grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px;}
+  @media(max-width:720px){.dk-grid2{grid-template-columns:1fr;}}
+  .dk-card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px;transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;}
+  .dk-card:hover{transform:translateY(-3px);box-shadow:0 18px 40px -24px rgba(76,29,149,.45);border-color:#c4b5fd;}
+  .dk-card .badge{display:inline-flex;padding:6px 12px;border-radius:999px;background:linear-gradient(135deg,var(--violet),var(--indigo));color:#fff;font-weight:700;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;}
+  .dk-card h4{margin:0 0 8px;font-size:1.22rem;letter-spacing:-.01em;}
+  .dk-card p{margin:0;color:var(--slate);font-size:.98rem;}
+
+  /* OPERATIONAL vs DATA KNOBS */
+  .dk-vs{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px;}
+  @media(max-width:720px){.dk-vs{grid-template-columns:1fr;}}
+  .dk-vs-card{border-radius:22px;padding:28px;border:1px solid var(--line);background:#fff;}
+  .dk-vs-card.alt{background:linear-gradient(135deg,#f5f3ff,#eef2ff);border-color:#c4b5fd;}
+  .dk-vs-card .tag{font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin:0 0 6px;color:var(--violet);}
+  .dk-vs-card h4{margin:0 0 14px;font-size:1.25rem;letter-spacing:-.015em;}
+  .dk-vs-card ul{margin:0;padding:0;list-style:none;}
+  .dk-vs-card li{padding:9px 0 9px 26px;position:relative;color:var(--slate);font-size:.97rem;border-top:1px dashed var(--line);}
+  .dk-vs-card li:first-child{border-top:0;}
+  .dk-vs-card li:before{content:"›";position:absolute;left:6px;color:var(--violet);font-weight:800;}
+
+  /* BEFORE / AFTER */
+  .dk-ba{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;margin-top:30px;}
+  @media(max-width:720px){.dk-ba{grid-template-columns:1fr;}.dk-ba .arrow{transform:rotate(90deg);justify-self:center;}}
+  .dk-ba-card{border-radius:22px;padding:26px;}
+  .dk-ba-card.before{background:#fff;border:1px solid var(--line);}
+  .dk-ba-card.after{background:linear-gradient(135deg,#1e1b4b,#4c1d95);color:#fff;box-shadow:0 20px 44px -24px rgba(76,29,149,.55);}
+  .dk-ba-card .lab{font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin:0 0 14px;}
+  .dk-ba-card.before .lab{color:var(--slate-2);}
+  .dk-ba-card.after .lab{color:#c4b5fd;}
+  .dk-ba-card ul{margin:0;padding-left:18px;}
+  .dk-ba-card.before li{color:var(--slate);margin:8px 0;}
+  .dk-ba-card.after li{color:#ede9fe;margin:8px 0;}
+  .dk-ba .arrow{font-size:1.8rem;color:var(--violet);font-weight:800;}
+
+  /* CROSS LINKS */
+  .dk-cross{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:30px;}
+  .dk-cross a{display:block;background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;}
+  .dk-cross a:hover{transform:translateY(-3px);box-shadow:0 18px 40px -24px rgba(76,29,149,.45);border-color:#c4b5fd;}
+  .dk-cross .kicker{font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--violet);}
+  .dk-cross h4{margin:8px 0 6px;font-size:1.12rem;letter-spacing:-.01em;}
+  .dk-cross p{margin:0;color:var(--slate);font-size:.93rem;}
+
+  /* CTA */
+  .dk-cta{background:linear-gradient(135deg,#1e1b4b,#4c1d95);color:#fff;border-radius:28px;padding:50px 44px;text-align:center;box-shadow:0 24px 50px -24px rgba(76,29,149,.55);}
+  .dk-cta h2{font-size:clamp(1.6rem,3.4vw,2.2rem);margin:0 0 12px;letter-spacing:-.02em;}
+  .dk-cta p{color:#ddd6fe;max-width:580px;margin:0 auto 26px;font-size:1.05rem;}
+  .dk-btn{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--violet-2);font-weight:700;padding:14px 26px;border-radius:999px;font-size:.98rem;transition:transform .15s ease;}
+  .dk-btn:hover{transform:translateY(-2px);}
+
+  /* FOOTER */
+  .dk-footer{background:#0b1020;color:#cbd5e1;padding:40px 0;}
+  .dk-footer-inner{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;}
+  .dk-footer nav{display:flex;flex-wrap:wrap;gap:20px;font-size:.9rem;}
+  .dk-footer nav a:hover{color:#fff;}
+  .dk-footer .copy{font-size:.86rem;color:#94a3b8;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="dk-nav">
+  <div class="dk-nav-inner">
+    <a class="dk-brand" href="https://www.dataknobs.com/">Data<span>Knobs</span></a>
+    <nav class="dk-nav-links">
+      <a href="data-flywheel.html">Data Flywheel</a>
+      <a href="data-products-for-flywheel.html">Data Products</a>
+      <a href="what-are-knobs.html">Knobs</a>
+      <a class="active" href="enterprise-knob-intelligence-platform.html">EKIP</a>
+      <a href="information-geometry-for-enterprise-ai.html">Information Geometry</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="dk-hero">
+  <div class="dk-hero-inner">
+    <p class="dk-eyebrow">EKIP in practice</p>
+    <h1 class="dk-h1">How EKIP <em>defines and builds</em> knobs</h1>
+    <p class="dk-lead">Most knobs are hidden  buried in code, scattered across configs, or implicit in business rules no one wrote down. The Enterprise Knob Intelligence Platform turns those raw, invisible settings into a governed, instrumented, continuously-optimized set of controls.</p>
+    <div class="dk-pills">
+      <span class="dk-pill"><b>Discover</b> the hidden ones</span>
+      <span class="dk-pill"><b>Define</b> them as real variables</span>
+      <span class="dk-pill"><b>Optimize</b> them continuously</span>
+    </div>
+  </div>
+</section>
+
+<!-- THE PROBLEM -->
+<section>
+  <div class="dk-wrap">
+    <p class="dk-eyebrow" style="color:var(--violet);">The starting point</p>
+    <div class="dk-def">
+      <p class="k">Before EKIP</p>
+      <p>You don't have a set of knobs. You have <em>thousands of implicit settings</em>  half of them undocumented, owned by different teams, set once and never revisited, with <em>no line connecting them to the outcomes they actually move</em>.</p>
+    </div>
+    <p class="dk-sub" style="margin-top:28px;">Building knobs isn't about adding sliders to a dashboard. It's about discovering which controls exist, formalizing them, connecting them to context and outcomes, and figuring out which ones deserve attention. EKIP runs that lifecycle end to end.</p>
+  </div>
+</section>
+
+<!-- LIFECYCLE DIAGRAM -->
+<section class="sec-wash">
+  <div class="dk-wrap">
+    <p class="dk-eyebrow">The knob lifecycle</p>
+    <h2 class="dk-title">From a raw system to a tuned knob  as a loop</h2>
+    <p class="dk-sub">EKIP doesn't stop at building a knob. Each optimized knob feeds learning back into discovery and prioritization, so the set of governed controls keeps growing and sharpening.</p>
+    <div class="dk-figure">
+      <svg aria-label="The EKIP knob lifecycle as a loop: Discover, Define, Instrument, Prioritize, Optimize, Govern, feeding back to Discover." role="img" viewBox="0 0 920 300" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gv2" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#7c3aed"></stop><stop offset="1" stop-color="#4f46e5"></stop>
+          </linearGradient>
+          <marker id="arr2" markerHeight="9" markerWidth="9" orient="auto" refX="6.5" refY="3">
+            <path d="M0,0 L7,3 L0,6 Z" fill="#7c3aed"></path>
+          </marker>
+        </defs>
+        <!-- six stage chips -->
+        <g fill="#fff" font-family="Inter" font-size="14" font-weight="700" text-anchor="middle">
+          <rect fill="url(#gv2)" height="60" rx="16" width="120" x="20" y="40"></rect><text x="80" y="76">Discover</text>
+          <rect fill="url(#gv2)" height="60" rx="16" width="120" x="180" y="40"></rect><text x="240" y="76">Define</text>
+          <rect fill="url(#gv2)" height="60" rx="16" width="120" x="340" y="40"></rect><text x="400" y="76">Instrument</text>
+          <rect fill="url(#gv2)" height="60" rx="16" width="120" x="500" y="40"></rect><text x="560" y="76">Prioritize</text>
+          <rect fill="url(#gv2)" height="60" rx="16" width="120" x="660" y="40"></rect><text x="720" y="76">Optimize</text>
+          <rect fill="#1e1b4b" height="60" rx="16" width="100" x="800" y="40"></rect><text x="850" y="76">Govern</text>
+        </g>
+        <!-- forward arrows -->
+        <g marker-end="url(#arr2)" stroke="#7c3aed" stroke-width="2.5">
+          <line x1="140" x2="176" y1="70" y2="70"></line>
+          <line x1="300" x2="336" y1="70" y2="70"></line>
+          <line x1="460" x2="496" y1="70" y2="70"></line>
+          <line x1="620" x2="656" y1="70" y2="70"></line>
+          <line x1="780" x2="796" y1="70" y2="70"></line>
+        </g>
+        <!-- feedback loop -->
+        <path d="M850 100 C 850 200, 80 210, 80 104" fill="none" marker-end="url(#arr2)" stroke="#94a3b8" stroke-dasharray="6 6" stroke-width="2"></path>
+        <text fill="#64748b" font-family="Inter" font-size="13" text-anchor="middle" x="465" y="232">what each knob teaches → sharper discovery &amp; prioritization next cycle</text>
+        <!-- powered by -->
+        <text fill="#7c3aed" font-family="Inter" font-size="12.5" font-weight="600" text-anchor="middle" x="465" y="272">Prioritize &amp; Optimize are powered by Frontier Intelligence + Information Geometry</text>
+      </svg>
+      <p class="dk-figcap">Six stages, run as a closed loop  not a one-time setup project.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STAGE DETAIL -->
+<section>
+  <div class="dk-wrap">
+    <p class="dk-eyebrow" style="color:var(--violet);">Stage by stage</p>
+    <h2 class="dk-title">What EKIP actually does at each step</h2>
+
+    <div class="dk-stage">
+      <div class="step">1</div>
+      <div>
+        <span class="verb">Discover</span>
+        <h3>Surface the knobs you didn't know you had</h3>
+        <p>EKIP maps your operational state space and scans systems, configs, business rules, and model parameters to surface candidate controls  including the implicit ones buried in code or tribal knowledge.</p>
+        <span class="out">Output → a catalog of candidate knobs</span>
+      </div>
+    </div>
+
+    <div class="dk-stage">
+      <div class="step">2</div>
+      <div>
+        <span class="verb">Define</span>
+        <h3>Turn each setting into a real, governed variable</h3>
+        <p>For every candidate, EKIP formalizes a definition: name, type, valid range, default, the outcome it maps to, and who owns it. An undocumented hard-coded value becomes an explicit, auditable knob.</p>
+        <span class="out">Output → a formal knob specification</span>
+      </div>
+    </div>
+
+    <div class="dk-stage">
+      <div class="step">3</div>
+      <div>
+        <span class="verb">Instrument</span>
+        <h3>Connect the knob to context and measurement</h3>
+        <p>EKIP wires each knob to the data products that give it context and to the metrics that capture its effect  so turning it produces an observable, attributable change rather than a guess.</p>
+        <span class="out">Output → a knob you can actually measure</span>
+      </div>
+    </div>
+
+    <div class="dk-stage">
+      <div class="step">4</div>
+      <div>
+        <span class="verb">Prioritize</span>
+        <h3>Find the knobs that actually matter</h3>
+        <p>Not every knob deserves attention. Using Frontier Intelligence and Information Geometry, EKIP identifies which knobs have real leverage and which operational regions are sparse, uncertain, or high-information  where tuning yields the most learning per sample.</p>
+        <span class="out">Output → a ranked tuning agenda</span>
+      </div>
+    </div>
+
+    <div class="dk-stage">
+      <div class="step">5</div>
+      <div>
+        <span class="verb">Optimize</span>
+        <h3>Tune continuously, sample-efficiently, in a closed loop</h3>
+        <p>EKIP moves each high-leverage knob toward its outcome, learning from every result and re-tuning as conditions shift  so values never silently drift out of alignment.</p>
+        <span class="out">Output → knobs that stay at their best setting</span>
+      </div>
+    </div>
+
+    <div class="dk-stage">
+      <div class="step">6</div>
+      <div>
+        <span class="verb">Govern</span>
+        <h3>Keep it safe, owned, and auditable</h3>
+        <p>Every knob carries guardrails: safe ranges, approval policies, ownership, and an audit trail of who changed what and why  so optimization never runs past the bounds the business sets.</p>
+        <span class="out">Output → controls you can trust in production</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POWERED BY -->
+<section class="sec-violet">
+  <div class="dk-wrap">
+    <p class="dk-eyebrow">What makes the hard steps work</p>
+    <h2 class="dk-title">How EKIP knows which knobs to build first</h2>
+    <p class="dk-sub">Discovery is easy to start and impossible to finish by brute force  there are too many candidates. EKIP's prioritization and optimization are powered by two ideas that tell it where to look and where to spend its next measurement.</p>
+    <div class="dk-grid2">
+      <div class="dk-card">
+        <span class="badge">Frontier Intelligence</span>
+        <h4>Spend effort where learning is highest</h4>
+        <p>EKIP targets the sparse, uncertain, and high-information regions of your operational space  the frontier  where a single well-chosen adjustment teaches the most and exposes the knobs that matter.</p>
+      </div>
+      <div class="dk-card">
+        <span class="badge">Information Geometry</span>
+        <h4>Measure the shape of the control space</h4>
+        <p>Information Geometry for Enterprise AI gives EKIP the math to understand how knobs relate, how sensitive outcomes are to each one, and how to reach a better setting in as few samples as possible.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OPERATIONAL vs DATA KNOBS -->
+<section>
+  <div class="dk-wrap">
+    <p class="dk-eyebrow" style="color:var(--violet);">Two kinds of knobs EKIP builds</p>
+    <h2 class="dk-title">It defines operational knobs <em>and</em> data knobs</h2>
+    <p class="dk-sub">Operational knobs steer what the system does today. Data knobs steer what the system <em>learns</em> next  they govern the data flywheel itself. EKIP builds both, and Data Knob Intelligence is what tells it where its own blind spots are.</p>
+    <div class="dk-vs">
+      <div class="dk-vs-card">
+        <p class="tag">Operational knobs</p>
+        <h4>Control what happens now</h4>
+        <ul>
+          <li>Fraud thresholds, pricing sensitivity, reorder points</li>
+          <li>Model confidence cutoffs and escalation triggers</li>
+          <li>Latency-vs-cost and retry/timeout settings</li>
+          <li>Tuned toward immediate business outcomes</li>
+        </ul>
+      </div>
+      <div class="dk-vs-card alt">
+        <p class="tag">Data knobs</p>
+        <h4>Control what the system learns</h4>
+        <ul>
+          <li>Which examples to collect, label, or prioritize</li>
+          <li>Where coverage is thin and blind spots are forming</li>
+          <li>How the data flywheel allocates scarce collection budget</li>
+          <li>Tuned toward learning efficiency and future capability</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section class="sec-wash">
+  <div class="dk-wrap">
+    <p class="dk-eyebrow">The shift</p>
+    <h2 class="dk-title">From implicit settings to intelligent controls</h2>
+    <div class="dk-ba">
+      <div class="dk-ba-card before">
+        <p class="lab">Without EKIP</p>
+        <ul>
+          <li>Knobs hidden in code and configs</li>
+          <li>No link from setting to outcome</li>
+          <li>Set once, then left to drift</li>
+          <li>No owner, no guardrails, no audit</li>
+          <li>Tuning is guesswork, one knob at a time</li>
+        </ul>
+      </div>
+      <div class="arrow">→</div>
+      <div class="dk-ba-card after">
+        <p class="lab">With EKIP</p>
+        <ul>
+          <li>A governed catalog of explicit knobs</li>
+          <li>Every knob traced to a measurable outcome</li>
+          <li>Continuous, closed-loop optimization</li>
+          <li>Ownership, safe ranges, full audit trail</li>
+          <li>Effort focused on the knobs that matter</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CROSS LINKS -->
+<section>
+  <div class="dk-wrap">
+    <p class="dk-eyebrow" style="color:var(--violet);">Related reading</p>
+    <h2 class="dk-title">Keep exploring</h2>
+    <div class="dk-cross">
+      <a href="what-are-knobs.html">
+        <span class="kicker">Foundations</span>
+        <h4>What are knobs?</h4>
+        <p>The controllable variables that drive enterprise outcomes  and what makes something a knob.</p>
+      </a>
+      <a href="knobs-for-data-flywheel.html">
+        <span class="kicker">The categories</span>
+        <h4>The five knob categories</h4>
+        <p>Operational levers, high-impact signals, configuration intelligence, optimization controls, decision variables.</p>
+      </a>
+      <a href="enterprise-knob-intelligence-platform.html">
+        <span class="kicker">The platform</span>
+        <h4>What is EKIP?</h4>
+        <p>The full definition, architecture, and category that DataKnobs is creating.</p>
+      </a>
+      <a href="information-geometry-for-enterprise-ai.html">
+        <span class="kicker">The math</span>
+        <h4>Information Geometry</h4>
+        <p>The technical foundation behind frontier discovery and sample-efficient tuning.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="dk-wrap">
+    <div class="dk-cta">
+      <h2>Build the knobs that run your enterprise</h2>
+      <p>EKIP discovers the controls hidden across your systems, defines them as governed variables, and keeps the ones that matter continuously tuned.</p>
+      <a class="dk-btn" href="https://www.dataknobs.com/">Explore DataKnobs →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-call-audit-ai-readiness.html">Ekip Call Audit Ai Readiness</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-call-audit-cio.html">Ekip Call Audit Cio</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">Ekip Dataset Coverage Approach</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-eval-selection-drift-knobs.html">Ekip Eval Selection Drift Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">How Ekip Builds Knobs</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Control AI with Knobs and EKIP</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+
+</body></html>

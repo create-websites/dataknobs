@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Planning and Reasoning | AI Agent Reasoning Patterns | DataKnobs</title>
+
+
+<meta content="A practical guide to agent planning and reasoning patterns including Chain-of-Thought, ReAct, Reflexion, Tree of Thoughts, Plan-and-Execute, ReWOO, planning strategies, and trade-offs for production AI agents." name="description"/>
+<meta content="agent planning, agent reasoning, AI agents, Chain-of-Thought, ReAct, Reflexion, Tree of Thoughts, Plan-and-Execute, ReWOO, agentic AI, DataKnobs" name="keywords"/>
+<meta content="Prashant Dhingra, DataKnobs" name="author"/>
+<meta content="index, follow" name="robots"/>
+<link href="https://www.dataknobs.com/agentic-ai/guide/6-ai-agent-planning-and-reasoning.html" rel="canonical"/>
+<meta content="article" property="og:type"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="Agent Planning and Reasoning | DataKnobs" property="og:title"/>
+<meta content="Explore the reasoning patterns that help AI agents plan, use tools, reflect, branch, recover, and act reliably." property="og:description"/>
+<meta content="https://www.dataknobs.com/agentic-ai/guide/6-ai-agent-planning-and-reasoning.html" property="og:url"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide1000/agent-planning-and-reasoning-1.png" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Agent Planning and Reasoning | DataKnobs" name="twitter:title"/>
+<meta content="A visual guide to Chain-of-Thought, ReAct, Reflexion, Tree of Thoughts, Plan-and-Execute and ReWOO." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide1000/agent-planning-and-reasoning-1.png" name="twitter:image"/>
+<meta content="Prashant Dhingra" name="citation_author"/>
+<meta content="Agent Planning and Reasoning" name="citation_title"/>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+
+<style>
+:root{--violet:#7c3aed;--violet-dark:#5b21b6;--indigo:#4f46e5;--purple-soft:#f5f3ff;--purple-soft-2:#ede9fe;--slate-950:#0f172a;--slate-800:#1e293b;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748b;--slate-300:#cbd5e1;--slate-200:#e2e8f0;--slate-100:#f1f5f9;--white:#fff;--rose:#e11d48;--amber:#d97706;--emerald:#059669;}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:Inter,Arial,sans-serif;color:var(--slate-800);background:#fff;line-height:1.7;-webkit-font-smoothing:antialiased}a{color:inherit}img{display:block;max-width:100%}.wrap{max-width:1180px;margin:0 auto;padding:0 28px}h1,h2,h3,h4,h5{color:var(--slate-950);line-height:1.18}section{padding:76px 0}.reveal{opacity:0;transform:translateY(16px);transition:.55s ease}.reveal.visible{opacity:1;transform:none}
+.topnav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--slate-200)}.topnav .row{max-width:1180px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{display:flex;align-items:center;text-decoration:none}.brand img{height:48px;width:auto}.navlinks{display:flex;align-items:center;gap:26px;list-style:none;font-size:13px;font-weight:600;color:var(--slate-600)}.navlinks a{text-decoration:none;padding:8px 0;position:relative}.navlinks a:hover,.navlinks a.active{color:var(--violet)}.navlinks a.active:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--violet);border-radius:2px}
+.breadcrumb{border-bottom:1px solid var(--slate-200);background:var(--slate-100);font-size:12px;color:var(--slate-500)}.breadcrumb .wrap{padding-top:9px;padding-bottom:9px}.breadcrumb a{text-decoration:none;color:var(--violet)}
+.hero{padding:0;background:linear-gradient(135deg,#4c1d95 0%,#6d28d9 48%,#4338ca 100%);color:white;position:relative;overflow:hidden}.hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,#000,transparent 90%)}.hero .wrap{position:relative;padding-top:80px;padding-bottom:74px}.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#ddd6fe;margin-bottom:20px}.eyebrow:before{content:"";width:28px;height:2px;background:#c4b5fd}.hero-title{font-size:clamp(2.7rem,6vw,5rem);max-width:850px;color:white;margin-bottom:24px;letter-spacing:-.04em}.hero-title em{font-style:normal;color:#ddd6fe}.hero-sub{font-size:1.12rem;color:#ede9fe;max-width:760px;margin-bottom:30px}.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:48px}.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:999px;padding:12px 22px;font-size:14px;font-weight:700;transition:.2s}.btn-solid{background:white;color:var(--violet-dark);border:1px solid white}.btn-solid:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(15,23,42,.2)}.btn-ghost{color:white;border:1px solid rgba(255,255,255,.34);background:rgba(255,255,255,.09)}.btn-ghost:hover{background:rgba(255,255,255,.16)}
+.path-frame{background:white;border:1px solid var(--slate-200);border-radius:24px;padding:14px;box-shadow:0 24px 70px rgba(15,23,42,.2);overflow:hidden}.hero .path-frame{background:rgba(255,255,255,.98)}.frame-label{display:block;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--slate-500);padding:4px 4px 12px}.frame-label b{color:var(--violet)}.path-frame.gold .frame-label b{color:var(--amber)}.path-frame.rose .frame-label b{color:var(--rose)}.path-frame img{width:100%;border-radius:14px;border:1px solid var(--slate-200)}
+.quick-answer{max-width:1020px;margin:64px auto 0;background:linear-gradient(135deg,var(--purple-soft),white);border:1px solid #ddd6fe;border-radius:26px;padding:30px 34px;box-shadow:0 14px 36px rgba(76,29,149,.08)}.qa-label,.section-kicker,.brief-kicker{display:block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--violet);margin-bottom:10px}.quick-answer p{font-size:1rem;color:var(--slate-700)}
+.branch{height:42px;display:flex;align-items:center;justify-content:center}.branch svg{opacity:.8}.section-head{max-width:770px;margin-bottom:42px}.section-title{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.03em;margin-bottom:14px}.section-lede{font-size:1.05rem;color:var(--slate-600)}
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:54px;align-items:center;padding:52px 0}.brief-row.reverse .brief-media{order:2}.brief-title{font-size:clamp(1.7rem,3vw,2.35rem);margin-bottom:16px}.brief-text p{font-size:1rem;color:var(--slate-600);margin-bottom:15px}.brief-text strong{color:var(--slate-900)}
+.approach-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:18px}.approach-card{background:white;border:1px solid var(--slate-200);border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(15,23,42,.05);transition:.2s}.approach-card:hover{transform:translateY(-4px);border-color:#c4b5fd}.approach-card .n{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--violet);margin-bottom:12px}.approach-card h5{font-size:1rem;margin-bottom:8px}.approach-card p{font-size:.85rem;color:var(--slate-600)}
+#patterns,#benchmarks,#faq{background:linear-gradient(to bottom,#fafafa,#fff)}.table-wrap{overflow-x:auto;background:white;border:1px solid var(--slate-200);border-radius:22px;box-shadow:0 12px 32px rgba(15,23,42,.05)}table{border-collapse:collapse;width:100%;min-width:720px}th,td{padding:15px 17px;text-align:left;border-bottom:1px solid var(--slate-200);font-size:.9rem}th{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-500);background:var(--slate-100)}td.dim{font-weight:700;color:var(--violet)}tr:last-child td{border-bottom:none}.tagpill{font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px}.tagpill.good{background:#ecfdf5;color:var(--emerald)}.tagpill.warn{background:#fff7ed;color:#c2410c}
+.faq-item{border-bottom:1px solid var(--slate-200)}.faq-q{width:100%;text-align:left;background:none;border:0;cursor:pointer;font:inherit;font-size:1.02rem;font-weight:700;color:var(--slate-900);padding:22px 0;display:flex;justify-content:space-between;gap:20px}.plus{color:var(--violet);font-size:1.35rem;transition:.2s}.faq-item.open .plus{transform:rotate(45deg)}.faq-a{max-height:0;overflow:hidden;transition:max-height .3s}.faq-a p{padding:0 0 22px;color:var(--slate-600);max-width:900px}
+.cta-band{padding:72px 0;background:linear-gradient(135deg,#312e81,#5b21b6 52%,#6d28d9);color:white}.cta-band .section-kicker{color:#ddd6fe}.cta-band .section-title{color:white;max-width:800px}.cta-band p{color:#ede9fe;max-width:700px;margin-bottom:24px}.cta-list{list-style:none;display:grid;gap:10px;color:#ede9fe;margin-bottom:28px}.cta-list li:before{content:"✓";display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-right:10px;border-radius:50%;background:rgba(255,255,255,.14);color:white;font-weight:800}.cta-band .btn-solid{background:white;color:var(--violet-dark)}.cta-band .btn-ghost{border-color:rgba(255,255,255,.35)}
+footer{background:#0f172a;color:#cbd5e1;border-top:1px solid #1e293b;padding:38px 0}.footer-grid{max-width:1180px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px}.footer-grid h4{color:white;font-size:.9rem;margin-bottom:10px}.footer-grid p,.footer-grid a{font-size:.82rem;color:#cbd5e1;text-decoration:none}.footer-links{display:grid;gap:7px}.footer-bottom{max-width:1180px;margin:24px auto 0;padding:20px 28px 0;border-top:1px solid #334155;font-size:.75rem;color:#94a3b8}
+@media(max-width:980px){.navlinks{display:none}.brief-row{grid-template-columns:1fr;gap:30px}.brief-row.reverse .brief-media{order:0}.approach-grid{grid-template-columns:repeat(2,1fr)}.footer-grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.wrap,.topnav .row{padding-left:18px;padding-right:18px}.brand img{height:40px}.hero .wrap{padding-top:58px;padding-bottom:52px}.hero-title{font-size:2.65rem}.quick-answer{padding:24px;margin-top:42px}.approach-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr}.hero-cta{flex-direction:column;align-items:stretch}.btn{width:100%}}@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<nav aria-label="Primary navigation" class="topnav">
+  <div class="row">
+    <a aria-label="DataKnobs home" class="brand" href="https://www.dataknobs.com/">
+      <img alt="DataKnobs logo" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"/>
+    </a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#patterns">Patterns</a></li>
+      <li><a href="#approaches">Planning Strategies</a></li>
+      <li><a href="#benchmarks">Trade-offs</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="breadcrumb"><div class="wrap"><a href="https://www.dataknobs.com/">Home</a> / <a href="https://www.dataknobs.com/agent-ai/">Agentic AI</a> / Agent Planning and Reasoning</div></div>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Reasoning Systems</span>
+    <h1 class="hero-title">How agents <em>think</em><br/>before they act.</h1>
+    <p class="hero-sub">Even a skilled model must have the ability to dissect a goal into smaller tasks, evaluate different strategies, and identify errors in execution. These reasoning patterns, such as Chain-of-Thought, ReAct, Reflexion, Tree of Thoughts, and Plan-and-Execute, are what enable agents to possess such capabilities.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#patterns">Explore the reasoning patterns →</a>
+      <a class="btn btn-ghost" href="#benchmarks">See how they compare</a>
+    </div>
+    <div class="path-frame reveal">
+      <span class="frame-label">SLIDE <b>01</b> — AGENT PLANNING &amp; REASONING</span>
+      <img alt="Cover slide: Agent Planning and Reasoning" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide1000/agent-planning-and-reasoning-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide600/agent-planning-and-reasoning-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide700/agent-planning-and-reasoning-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide1000/agent-planning-and-reasoning-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>Agent planning and reasoning</strong> The foundational layer consists of techniques that enable an AI agent to break down a goal, determine the next steps, and adjust course if necessary, rather than providing a single automatic response. <strong>Chain-of-Thought</strong> In addition, there are four active production patterns sitting on top of that. These patterns are currently being utilized. <strong>ReAct</strong> (interleave reasoning with tool actions), <strong>Reflexion</strong> (self-critique and retry), <strong>Tree of Thoughts</strong> (explore multiple reasoning paths, not just one), and <strong>Plan-and-Execute / ReWOO</strong> When committing to a full plan upfront, most production planners rely on one of five strategies: task decomposition, multi-plan selection, external module-aided planning, reflection and refinement, or memory-augmented planning.</p>
+  </div>
+</div>
+
+<div class="branch">
+  <svg height="40" viewBox="0 0 120 40" width="120"><path d="M10 20 H45" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path><circle cx="60" cy="20" fill="#6B3FA0" r="6"></circle><path d="M66 17 Q90 5 110 8" fill="none" stroke="#C99A3B" stroke-width="1.5"></path><path d="M66 23 Q90 35 110 32" fill="none" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 2 — THE REASONING ENGINE ══════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media path-frame">
+      <span class="frame-label">SLIDE <b>02</b> — THE REASONING ENGINE</span>
+      <img alt="Diagram of an agent's reasoning engine: planner, tool calling, and decision loop" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide600/agent-planning-and-reasoning-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide700/agent-planning-and-reasoning-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">What powers planning and acting</span>
+      <h3 class="brief-title">Two phases, one engine</h3>
+      <p>Beneath each agentic workflow lies a reasoning engine responsible for two tasks. <strong>Planning</strong> breaks down an open-ended objective into a series of smaller, manageable logical steps. <strong>Tool calling</strong> Every step is carefully validated, whether it involves fact-checking, querying, or utilizing an API, to ensure that the agent's subsequent decisions are based on concrete information rather than mere speculation.</p>
+      <p>On straightforward tasks, a detailed planning stage may not be needed. Instead, an agent can continuously evaluate and enhance a response without formal planning. Planning becomes essential for tasks with intricate decision-making processes, such as multiple viable strategies, interdependent steps, or a risk of errors.</p>
+    </div>
+  </div>
+</div>
+
+<div class="branch">
+  <svg height="40" viewBox="0 0 120 40" width="120"><path d="M10 20 H45" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path><circle cx="60" cy="20" fill="#6B3FA0" r="6"></circle><path d="M66 17 Q90 5 110 8" fill="none" stroke="#C99A3B" stroke-width="1.5"></path><path d="M66 23 Q90 35 110 32" fill="none" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 3 — CHAIN OF THOUGHT ══════════════════════════════════ -->
+<section id="patterns">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The foundational layer</span>
+      <h2 class="section-title">Every pattern here builds on one idea</h2>
+      <p class="section-lede">Chain-of-Thought serves as the foundational reasoning baseline. While subsequent patterns may incorporate action, reflection, branching, or upfront commitment, they do not supplant it.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media path-frame">
+        <span class="frame-label">SLIDE <b>03</b> — CHAIN-OF-THOUGHT (COT)</span>
+        <img alt="Chain-of-Thought reasoning: single-path step-by-step decomposition" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-3.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide600/agent-planning-and-reasoning-3.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide700/agent-planning-and-reasoning-3.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-3.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Single-path, step-by-step</span>
+        <h3 class="brief-title">Thinking out loud, one step at a time</h3>
+        <p>Chain-of-Thought prompting requires the model to display its step-by-step reasoning process leading to an answer, without skipping ahead. It solely relies on reasoning, breaking down the problem into a series of smaller logical steps with no outside assistance.</p>
+        <p>It significantly enhances multi-step reasoning and decomposition, explaining why it is a crucial component in nearly every advanced agent pattern instead of being substituted by other methods.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="branch">
+  <svg height="40" viewBox="0 0 120 40" width="120"><path d="M10 20 H45" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path><circle cx="60" cy="20" fill="#C99A3B" r="6"></circle><path d="M66 17 Q90 5 110 8" fill="none" stroke="#6B3FA0" stroke-width="1.5"></path><path d="M66 23 Q90 35 110 32" fill="none" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 4 — REACT ══════════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media path-frame gold">
+      <span class="frame-label">SLIDE <b>04</b> — REACT: REASON + ACT</span>
+      <img alt="ReAct pattern: interleaving Thought, Action, and Observation" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-4.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide600/agent-planning-and-reasoning-4.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide700/agent-planning-and-reasoning-4.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-4.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The default agent loop</span>
+      <h3 class="brief-title">Thought, Action, Observation — repeat</h3>
+      <p>ReAct connects logic to tool utilization by having the agent think, act, observe, and incorporate feedback in a continuous loop of Thought → Action → Observation until completion.</p>
+      <p>As each intermediate decision is documented, the entire trajectory is open to inspection and audit. This transparency is a key reason why ReAct has become the standard pattern in production agent frameworks: it combines adaptability with a logical trail that can be verified. However, its primary drawback is a tendency to get stuck in loops, where the same actions and thoughts are repeated without making any real advancement if the model cannot find a new perspective.</p>
+    </div>
+  </div>
+</div>
+
+<div class="branch">
+  <svg height="40" viewBox="0 0 120 40" width="120"><path d="M10 20 H45" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path><circle cx="60" cy="20" fill="#6B3FA0" r="6"></circle><path d="M66 17 Q90 5 110 8" fill="none" stroke="#C99A3B" stroke-width="1.5"></path><path d="M66 23 Q90 35 110 32" fill="none" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 5 — FIVE PLANNING APPROACHES ══════════════════════════ -->
+<section id="approaches">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Underneath every pattern</span>
+      <h2 class="section-title">Five planning strategies, one dedicated step</h2>
+      <p class="section-lede">The majority of agent architectures include a clear planning phase that utilizes one or more of these five strategies prior to carrying out any actions.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media path-frame">
+        <span class="frame-label">SLIDE <b>05</b> — FIVE PLANNING STRATEGIES</span>
+        <img alt="Five planning strategies for AI agents" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-5.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide600/agent-planning-and-reasoning-5.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide700/agent-planning-and-reasoning-5.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-5.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Pick a strategy on purpose</span>
+        <h3 class="brief-title">Different problems call for different planners</h3>
+        <p>Production planners often combine two or three of these strategies for more challenging tasks, as they are not mutually exclusive.</p>
+      </div>
+    </div>
+    <div class="approach-grid reveal">
+      <div class="approach-card"><div class="n">01</div><h5>Task decomposition</h5><p>Divide a goal into smaller, sequential tasks that can be addressed individually.</p></div>
+      <div class="approach-card"><div class="n">02</div><h5>Multi-plan selection</h5><p>Create multiple potential plans and select the most robust one prior to implementation.</p></div>
+      <div class="approach-card"><div class="n">03</div><h5>External module-aided</h5><p>Rely on a specialized planning module or solver in addition to the LLM.</p></div>
+      <div class="approach-card"><div class="n">04</div><h5>Reflection &amp; refinement</h5><p>Modify a plan during the course of action due to updated information or a discovered error.</p></div>
+      <div class="approach-card"><div class="n">05</div><h5>Memory-augmented</h5><p>Utilize past experiences to shape the development of the current plan.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="branch">
+  <svg height="40" viewBox="0 0 120 40" width="120"><path d="M10 20 H45" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path><circle cx="60" cy="20" fill="#B04B5A" r="6"></circle><path d="M66 17 Q90 5 110 8" fill="none" stroke="#6B3FA0" stroke-width="1.5"></path><path d="M66 23 Q90 35 110 32" fill="none" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 6 — REFLEXION ═════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media path-frame rose">
+      <span class="frame-label">SLIDE <b>06</b> — REFLEXION: SELF-REFLECTION</span>
+      <img alt="Reflexion pattern: self-critique and retry loop" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-6.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide600/agent-planning-and-reasoning-6.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide700/agent-planning-and-reasoning-6.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-6.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Learning from the last attempt</span>
+      <h3 class="brief-title">Fail, critique yourself, try again</h3>
+      <p>Reflexion enhances a reasoning pattern, such as ReAct, by incorporating a self-reflection loop. Following each attempt, the agent provides a verbal critique of errors made, such as hitting a dead end or making incorrect assumptions. This critique is carried forward into the next attempt, preventing the repetition of mistakes.</p>
+      <p>The benefits of using Reflexion in coding benchmarks are remarkable, as models have shown significant increases in pass rates that exceed their own baseline performance solely due to the reflection step, not a stronger underlying model.</p>
+    </div>
+  </div>
+</div>
+
+<div class="branch">
+  <svg height="40" viewBox="0 0 120 40" width="120"><path d="M10 20 H45" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path><circle cx="60" cy="20" fill="#6B3FA0" r="6"></circle><path d="M66 14 Q90 2 108 6" fill="none" stroke="#C99A3B" stroke-width="1.5"></path><path d="M66 20 H108" fill="none" stroke="#6B3FA0" stroke-width="1.5"></path><path d="M66 26 Q90 38 108 34" fill="none" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 7 — TREE OF THOUGHTS ══════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media path-frame">
+      <span class="frame-label">SLIDE <b>07</b> — TREE OF THOUGHTS (TOT)</span>
+      <img alt="Tree of Thoughts: multi-path reasoning exploring several branches" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-7.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide600/agent-planning-and-reasoning-7.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide700/agent-planning-and-reasoning-7.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-7.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Multi-path, not single-path</span>
+      <h3 class="brief-title">Explore several thoughts, keep the best</h3>
+      <p>Chain-of-Thoughts sticks to one path of reasoning, while Tree of Thoughts delves into multiple branches simultaneously, considering numerous potential next thoughts and eliminating unpromising ones to delve further into the remaining branches.</p>
+      <p>The extra compute required justifies its use in situations where correcting a wrong turn early on is costly, such as in puzzles, intricate planning scenarios, or any task where backtracking results in wasted time.</p>
+    </div>
+  </div>
+</div>
+
+<div class="branch">
+  <svg height="40" viewBox="0 0 120 40" width="120"><path d="M10 20 H45" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path><circle cx="60" cy="20" fill="#C99A3B" r="6"></circle><path d="M66 17 Q90 5 110 8" fill="none" stroke="#6B3FA0" stroke-width="1.5"></path><path d="M66 23 Q90 35 110 32" fill="none" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 8 — PLAN-AND-EXECUTE / REWOO ══════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media path-frame gold">
+      <span class="frame-label">SLIDE <b>08</b> — PLAN-AND-EXECUTE / REWOO</span>
+      <img alt="Plan-and-Execute and ReWOO: planning upfront instead of interleaved" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-8.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide600/agent-planning-and-reasoning-8.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide700/agent-planning-and-reasoning-8.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-8.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Commit to the plan, then run it</span>
+      <h3 class="brief-title">Plan once, execute without pausing</h3>
+      <p>ReWOO ('Reasoning WithOut Observation') differs from ReAct by planning the entire sequence of actions upfront and executing them without pausing to re-reason after each tool response, rather than interleaving thought and tool call at every step.</p>
+      <p>Breaking down the task into subtasks, executing them using real tools, and synthesizing the results into a final answer is the process followed by the planner, worker, and solver modules. While this approach can outperform ReAct on specific benchmarks and reduce the number of repeated tool calls, it comes with a downside. The fixed plan may struggle in situations where the environment lacks the expected context or when additional tools are introduced that were not accounted for in the initial plan.</p>
+    </div>
+  </div>
+</div>
+
+<div class="branch">
+  <svg height="40" viewBox="0 0 120 40" width="120"><path d="M10 20 H45" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path><circle cx="60" cy="20" fill="#6B3FA0" r="6"></circle><path d="M66 17 Q90 5 110 8" fill="none" stroke="#C99A3B" stroke-width="1.5"></path><path d="M66 23 Q90 35 110 32" fill="none" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 9 — BENCHMARK TRADE-OFFS ══════════════════════════════ -->
+<section id="benchmarks">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">How they actually stack up</span>
+      <h2 class="section-title">Every pattern trades something for something</h2>
+      <p class="section-lede">No one pattern excels in all areas - cost, reliability, and interpretability each have their own priorities.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media path-frame">
+        <span class="frame-label">SLIDE <b>09</b> — PATTERN TRADE-OFFS</span>
+        <img alt="Benchmark comparison of reasoning patterns: CoT, ReAct, Reflexion, ToT" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-9.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide600/agent-planning-and-reasoning-9.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide700/agent-planning-and-reasoning-9.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-9.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Reading the trade-off table</span>
+        <h3 class="brief-title">Pick based on the failure you fear most</h3>
+        <p>If you struggle with hallucinations during knowledge-heavy tasks, ReAct's reliance on real tool observations can be beneficial. If you tend to provide brittle one-shot answers for tasks with checkable outcomes, such as passing or failing code, Reflexion's self-critique loop may be worth the slight delay. If you are concerned about committing too early to a wrong approach, Tree of Thoughts' exploration of multiple branches can be valuable despite the increased computational requirements.</p>
+      </div>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Pattern</th><th>Core mechanism</th><th>Strength</th><th>Main cost or risk</th></tr></thead>
+        <tbody>
+          <tr><td class="dim">Chain-of-Thought</td><td>Single-path step-by-step reasoning</td><td><span class="tagpill good">Cheap, fast</span></td><td>No grounding, no correction</td></tr>
+          <tr><td class="dim">ReAct</td><td>Interleaved thought → action → observation</td><td><span class="tagpill good">Inspectable, grounded</span></td><td><span class="tagpill warn">Can loop without progress</span></td></tr>
+          <tr><td class="dim">Reflexion</td><td>Self-critique after each attempt</td><td><span class="tagpill good">Learns from failure</span></td><td>Extra latency per retry</td></tr>
+          <tr><td class="dim">Tree of Thoughts</td><td>Explore and prune multiple branches</td><td><span class="tagpill good">Avoids early wrong turns</span></td><td><span class="tagpill warn">Higher compute cost</span></td></tr>
+          <tr><td class="dim">Plan-and-Execute / ReWOO</td><td>Plan upfront, then execute without pausing</td><td><span class="tagpill good">Fewer redundant tool calls</span></td><td><span class="tagpill warn">Brittle to unplanned surprises</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="branch">
+  <svg height="40" viewBox="0 0 120 40" width="120"><path d="M10 20 H45" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path><circle cx="60" cy="20" fill="#6B3FA0" r="6"></circle><path d="M66 17 Q90 5 110 8" fill="none" stroke="#C99A3B" stroke-width="1.5"></path><path d="M66 23 Q90 35 110 32" fill="none" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 10 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media path-frame">
+      <span class="frame-label">SLIDE <b>10</b> — BRINGING IT TOGETHER</span>
+      <img alt="Summary: combining reasoning patterns in a Perception-Reasoning-Action-Reflection loop" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide1000/agent-planning-and-reasoning-10.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide600/agent-planning-and-reasoning-10.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide700/agent-planning-and-reasoning-10.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide900/agent-planning-and-reasoning-10.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-planning-and-reasoning/images/Slide1000/agent-planning-and-reasoning-10.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The patterns rarely work alone</span>
+      <h3 class="brief-title">One loop, several patterns nested inside</h3>
+      <p>These patterns often overlap, with production systems typically utilizing more than one. A popular pairing includes Reflexion and ReAct for adaptive, self-correcting behavior during lengthy tasks, or Plan-and-Execute with Tree of Thoughts for complex problems requiring both structure and flexibility.</p>
+      <p>The same fundamental loop guides them all: observe, think, act, and review before observing again. The key difference between a dependable agent and a flashy demo lies in the reasoning pattern chosen for each step in the loop.</p>
+    </div>
+  </div>
+</div>
+
+<div class="branch">
+  <svg height="40" viewBox="0 0 120 40" width="120"><path d="M10 20 H45" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path><circle cx="60" cy="20" fill="#6B3FA0" r="6"></circle><path d="M66 17 Q90 5 110 8" fill="none" stroke="#C99A3B" stroke-width="1.5"></path><path d="M66 23 Q90 35 110 32" fill="none" stroke="#C2B9D2" stroke-dasharray="3 3" stroke-width="1.5"></path></svg>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Agent planning &amp; reasoning FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">What is the difference between Chain-of-Thought and ReAct?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Chain-of-Thought relies solely on reasoning, while ReAct incorporates action into the process. The agent interchanges between reasoning and implementing a tool, observing the tangible outcome before proceeding to the next thought. This approach provides a more dependable foundation for reasoning than relying solely on the model's assumptions.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">When should you use Tree of Thoughts instead of Chain-of-Thought?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Opt for Tree of Thoughts in situations where a mistake early on can be difficult to rectify, such as puzzles, complex planning with dependencies, or problems with multiple viable solutions. This method requires more computational resources as it explores various branches, making it unsuitable for straightforward tasks where Chain-of-Thought is sufficient.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What does Reflexion actually add on top of ReAct?<span class="plus">+</span></button>
+        <div class="faq-a"><p>After a failed attempt, reflection prompts the agent to write out a self-critique, identifying what went wrong in their own words. This feedback is then used to inform future attempts, especially beneficial for tasks with measurable outcomes like passing or failing code tests.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why does ReAct sometimes get stuck in a loop?<span class="plus">+</span></button>
+        <div class="faq-a"><p>When the model relies on the same observation for each new thought, it can get stuck in a loop of regenerating similar thoughts and actions without moving forward. Adding a reflection step or hard step limit can help prevent this issue when using ReAct.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is ReWOO and how is it different from ReAct?<span class="plus">+</span></button>
+        <div class="faq-a"><p>ReWOO carefully maps out a series of actions in advance and follows through without pausing to reevaluate after each tool response, in contrast to ReAct which alternates between reasoning and action at every turn. While this approach minimizes unnecessary tool calls and can excel in certain tests, it is less adaptable to unexpected environmental changes that were not accounted for in the initial plan.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Do production agents use just one of these patterns?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Infrequently, production systems typically integrate various patterns such as Reflexion paired with ReAct for adaptive self-correction, or Plan-and-Execute mixed with Tree of Thoughts for long-term issues requiring both organization and exploration. These patterns serve as fundamental components within a larger perceive-reason-act-reflect loop, rather than being mutually exclusive alternatives.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to choose a reasoning pattern for your agent?</h2>
+    <p>Begin by identifying the failure mode that concerns you the most - whether it be hallucination, brittle one-shot answers, or early wrong turns - and allow that to dictate the pattern, rather than the other way around.</p>
+    <ul class="cta-list">
+      <li>A guide to help match a task's likelihood of failure with a suitable reasoning pattern.</li>
+      <li>A worked ReAct-plus-Reflexion example for long-running tasks</li>
+      <li>A benchmark checklist for evaluating your own agent's reasoning trace</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#benchmarks">Revisit the trade-off table →</a>
+      <a class="btn btn-ghost" href="#approaches">Back to the five approaches</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/agentic-ai-development-lifecycle.html">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for Controlling DataProducts and AI</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','patterns','approaches','benchmarks','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

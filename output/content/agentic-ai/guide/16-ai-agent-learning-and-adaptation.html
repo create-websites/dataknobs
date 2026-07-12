@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Learning and Adaptation: How AI Agents Improve | DataKnobs</title>
+
+<meta content="A practical guide to how AI agents improve from experience using memory-augmented learning, fine-tuning, reinforcement learning with verifiable rewards, consolidation, skill evolution and safeguards against catastrophic forgetting." name="description"/>
+<meta content="agent learning, agent adaptation, memory augmented learning, fine tuning, reinforcement learning, RLVR, catastrophic forgetting, consolidation, skill evolution, continual learning, DataKnobs" name="keywords"/>
+<meta content="Prashant Dhingra, DataKnobs" name="author"/>
+<meta content="index, follow, max-image-preview:large" name="robots"/>
+<link href="https://www.dataknobs.com/agent-ai/agent-learning-and-adaptation.html" rel="canonical"/>
+<meta content="article" property="og:type"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="Agent Learning and Adaptation: How AI Agents Improve" property="og:title"/>
+<meta content="Explore memory-based and weight-based adaptation, RLVR, consolidation, skill evolution and catastrophic-forgetting controls for AI agents." property="og:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png" property="og:image"/>
+<meta content="https://www.dataknobs.com/agent-ai/agent-learning-and-adaptation.html" property="og:url"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Agent Learning and Adaptation" name="twitter:title"/>
+<meta content="A DataKnobs guide to continual learning, consolidation and skill evolution for AI agents." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png" name="twitter:image"/>
+<meta content="Prashant Dhingra" name="citation_author"/>
+<meta content="Agent Learning and Adaptation: How AI Agents Improve" name="citation_title"/>
+<meta content="AI agent learning, adaptation, continual learning, RLVR, catastrophic forgetting, consolidation and skill evolution" name="ai-topic"/>
+
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --bg:#f8f7ff;
+  --surface:#ffffff;
+  --surface-soft:#f2efff;
+  --surface-deep:#ebe6ff;
+  --ink:#17122b;
+  --ink-soft:#6e6782;
+  --line:#ddd6f1;
+  --line-strong:#c8bdf0;
+  --purple:#6d4aff;
+  --purple-dark:#4d2fd0;
+  --purple-soft:#8f7bff;
+  --violet:#a855f7;
+  --green:#159a73;
+  --amber:#c9872d;
+  --red:#c94a67;
+  --shadow:0 18px 55px rgba(64,43,132,.12);
+  --font-display:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(circle at 8% 0%,rgba(143,123,255,.14),transparent 28rem),
+    linear-gradient(180deg,#fdfcff 0%,var(--bg) 100%);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.68;
+  -webkit-font-smoothing:antialiased
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+img{max-width:100%;display:block}
+a{color:var(--purple)}
+h1,h2,h3,h4,h5{font-family:var(--font-display);color:var(--ink);letter-spacing:-.025em}
+
+.topnav{
+  position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);
+  backdrop-filter:blur(18px);border-bottom:1px solid rgba(200,189,240,.82)
+}
+.topnav .row{
+  max-width:1180px;margin:0 auto;padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;height:72px
+}
+.brand{
+  font-family:var(--font-display);font-weight:800;font-size:15px;color:var(--ink);
+  text-decoration:none;display:flex;align-items:center;gap:10px;text-transform:none
+}
+.brand::before{
+  content:"DK";display:grid;place-items:center;width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--purple),var(--violet));color:#fff;font-size:11px;
+  letter-spacing:.05em;box-shadow:0 8px 20px rgba(109,74,255,.22)
+}
+.navlinks{display:flex;gap:24px;list-style:none;font-size:13px;font-weight:700}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:8px 0;transition:.2s}
+.navlinks a.active,.navlinks a:hover{color:var(--purple)}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:1px;height:2px;background:var(--purple);border-radius:3px}
+
+.hero{padding:82px 0 48px;position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(109,74,255,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(109,74,255,.05) 1px,transparent 1px);
+  background-size:48px 48px;mask-image:linear-gradient(to bottom,#000,transparent 82%)
+}
+.hero .wrap{position:relative}
+.eyebrow,.section-kicker,.qa-label,.frame-label,.brief-kicker{
+  font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.09em
+}
+.eyebrow{
+  font-size:12px;color:var(--purple);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;
+  border:1px solid var(--line);background:rgba(255,255,255,.85);border-radius:999px;padding:7px 12px
+}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 5px rgba(109,74,255,.12)}
+.hero-title{
+  font-size:clamp(2.6rem,6vw,4.8rem);line-height:1.02;margin-bottom:22px;
+  font-weight:800;max-width:920px;letter-spacing:-.04em
+}
+.hero-title em{
+  font-style:normal;background:linear-gradient(135deg,var(--purple),var(--violet));
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+.hero-sub{font-size:1.15rem;color:var(--ink-soft);max-width:760px;margin-bottom:32px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.btn{
+  font-size:14px;font-weight:800;padding:13px 22px;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;border-radius:12px;border:1px solid var(--line-strong);
+  transition:transform .2s,box-shadow .2s,background .2s
+}
+.btn:hover{transform:translateY(-2px)}
+.btn-solid{background:linear-gradient(135deg,var(--purple),var(--purple-soft));color:#fff;border-color:transparent;box-shadow:0 10px 28px rgba(109,74,255,.24)}
+.btn-solid:hover{box-shadow:0 14px 34px rgba(109,74,255,.32)}
+.btn-ghost{background:#fff;color:var(--ink)}
+.btn-ghost:hover{background:var(--surface-soft)}
+
+.ring-frame{
+  position:relative;background:var(--surface);border:1px solid var(--line);
+  padding:16px;border-radius:24px;box-shadow:var(--shadow);overflow:hidden
+}
+.ring-badge{display:flex;align-items:center;gap:10px;margin:0 2px 12px}
+.ring-icon{
+  width:24px;height:24px;border-radius:50%;border:1.5px solid var(--purple);
+  position:relative;flex-shrink:0;background:rgba(109,74,255,.05)
+}
+.ring-icon::before{content:"";position:absolute;inset:4px;border-radius:50%;border:1.5px solid var(--purple-soft)}
+.ring-icon::after{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--violet)}
+.frame-label{font-size:10.5px;color:var(--ink-soft)}
+.frame-label b{color:var(--purple)}
+.ring-frame img{border:1px solid var(--line);border-radius:16px}
+
+.quick-answer{
+  background:linear-gradient(135deg,#fff,var(--surface-soft));border:1px solid var(--line);
+  border-left:5px solid var(--purple);padding:30px 32px;margin:60px 0;max-width:980px;
+  border-radius:18px;box-shadow:0 14px 34px rgba(77,47,208,.08)
+}
+.quick-answer .qa-label{font-size:11px;color:var(--purple);margin-bottom:10px;display:block}
+.quick-answer p{font-size:1rem;color:var(--ink-soft)}
+.quick-answer strong{color:var(--ink)}
+
+.rings{height:56px;position:relative;display:flex;align-items:center;justify-content:center}
+.rings::before,.rings::after{content:"";flex:1;border-top:1px dashed var(--line-strong)}
+.rings svg{margin:0 14px;filter:drop-shadow(0 5px 10px rgba(64,43,132,.08))}
+.rings svg circle{stroke:var(--purple)!important}
+.rings svg circle:last-child{fill:var(--violet)!important;stroke:none!important}
+
+section{padding:64px 0}
+.section-head{max-width:760px;margin-bottom:42px}
+.section-kicker{font-size:12px;color:var(--purple);margin-bottom:12px}
+.section-title{font-size:clamp(1.9rem,3.4vw,2.7rem);margin-bottom:14px;font-weight:800}
+.section-lede{color:var(--ink-soft);font-size:1.03rem}
+
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:48px 0}
+.brief-row.reverse .brief-media{order:2}
+.brief-kicker{font-size:11px;color:var(--purple);margin-bottom:10px}
+.brief-title{font-size:1.85rem;margin-bottom:14px;font-weight:800}
+.brief-text p{font-size:.98rem;color:var(--ink-soft);margin-bottom:14px}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:11px;margin-top:10px}
+.brief-list li{
+  padding:14px 16px 14px 44px;position:relative;font-size:.94rem;color:var(--ink-soft);
+  border:1px solid var(--line);border-radius:14px;background:#fff
+}
+.brief-list li::before{
+  content:"✓";position:absolute;left:16px;top:14px;width:20px;height:20px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(109,74,255,.12);color:var(--purple);font-size:11px;font-weight:800
+}
+
+.paradigm-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;background:transparent;border:0
+}
+.paradigm-card{
+  background:#fff;padding:26px 24px;border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 10px 26px rgba(58,36,118,.07);transition:transform .2s,border-color .2s
+}
+.paradigm-card:hover{transform:translateY(-4px);border-color:var(--purple-soft)}
+.paradigm-card .k{font-family:var(--font-mono);font-size:11px;color:var(--purple);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
+.paradigm-card h5{font-size:1.25rem;margin-bottom:10px;font-weight:800}
+.paradigm-card p{font-size:.9rem;color:var(--ink-soft)}
+
+.table-wrap{
+  overflow-x:auto;border:1px solid var(--line);background:#fff;border-radius:18px;
+  box-shadow:0 10px 28px rgba(64,43,132,.07)
+}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9rem}
+th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--surface-soft)}
+td.dim{font-family:var(--font-mono);font-weight:600;color:var(--purple);font-size:.85rem}
+tr:last-child td{border-bottom:none}
+
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-q{
+  width:100%;text-align:left;background:none;border:none;cursor:pointer;
+  font-family:var(--font-display);font-size:1.05rem;color:var(--ink);
+  padding:22px 0;display:flex;justify-content:space-between;align-items:center;
+  gap:20px;font-weight:800
+}
+.faq-q .plus{font-family:var(--font-mono);color:var(--purple);transition:transform .25s;flex-shrink:0}
+.faq-item.open .plus{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.97rem;max-width:860px}
+
+.cta-band{
+  background:linear-gradient(135deg,#24134d 0%,#4c2caf 55%,#6d4aff 100%);
+  padding:72px 0;color:#fff;position:relative;overflow:hidden
+}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(255,255,255,.18),transparent 28rem)}
+.cta-band .wrap{position:relative}
+.cta-band .section-kicker{color:#d8d0ff}
+.cta-band .section-title{color:#fff}
+.cta-band p{color:#e8e3ff;max-width:620px;margin-bottom:26px}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-size:.9rem;color:#eeeaff}
+.cta-list li::before{content:"✓ ";color:#b8ffde;font-weight:800}
+.cta-band .btn-solid{background:#fff;color:var(--purple-dark);box-shadow:none}
+.cta-band .btn-ghost{border-color:rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.08)}
+
+footer{
+  background:#171126;color:#c9c2da;padding:38px 0;text-align:center;font-size:13px;
+  border-top:1px solid rgba(255,255,255,.08)
+}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:none}
+
+@media (max-width:900px){
+  .navlinks{display:none}
+  .brief-row{grid-template-columns:1fr;gap:30px}
+  .brief-row.reverse .brief-media{order:0}
+}
+@media (max-width:760px){
+  .paradigm-grid{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .wrap,.topnav .row{padding-left:18px;padding-right:18px}
+  .hero{padding-top:56px}
+  .hero-title{font-size:2.55rem}
+  .quick-answer{padding:24px 22px}
+}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  *{scroll-behavior:auto!important}
+}
+</style>
+
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="https://www.dataknobs.com/">DataKnobs · Agent Learning</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#paradigms">Paradigms</a></li>
+      <li><a href="#forgetting">Forgetting</a></li>
+      <li><a href="#skills">Skill Evolution</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Continual Improvement</span>
+    <h1 class="hero-title">Every run leaves<br/>a <em>ring</em> behind.</h1>
+    <p class="hero-sub">An agent that consistently repeats its initial action is not truly agentic; rather, it becomes a predetermined function with unnecessary complexities. The ability to learn and adapt allows an agent to improve significantly after multiple attempts, without requiring a complete reconstruction.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#paradigms">See the two paths to adaptation →</a>
+      <a class="btn btn-ghost" href="#forgetting">Learn about catastrophic forgetting</a>
+    </div>
+    <div class="ring-frame reveal">
+      <div class="ring-badge"><span class="ring-icon"></span><span class="frame-label">SLIDE <b>01</b> — AGENT LEARNING &amp; ADAPTATION</span></div>
+      <img alt="Cover slide: Agent Learning and Adaptation" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>Agent learning and adaptation</strong> An AI agent enhances its performance through experience rather than remaining static after deployment, achieved through two main avenues: <strong>memory-augmented learning</strong>, with the model remaining unchanged and previous experiences stored outside and accessed as needed, <strong>weight-based adaptation</strong>Both paths encounter the same fundamental challenge—updating the model's parameters with feedback through fine-tuning or on-policy reinforcement learning. <strong>plasticity versus retention</strong>An agent that easily adapts may suffer from catastrophic forgetting by losing knowledge it once had, whereas an agent that never updates fails to make any progress. The most resilient systems take inspiration from biology by periodically incorporating new information. <strong>consolidation</strong> — consolidating and incorporating recent experiences — to maintain equilibrium between both aspects.</p>
+  </div>
+</div>
+
+<div class="rings">
+  <svg height="52" viewBox="0 0 60 52" width="60"><circle cx="30" cy="26" fill="none" r="22" stroke="#B8B394" stroke-width="1"></circle><circle cx="30" cy="26" fill="none" r="15" stroke="#5C7A52" stroke-width="1.2"></circle><circle cx="30" cy="26" fill="none" r="8" stroke="#B8663E" stroke-width="1.4"></circle><circle cx="30" cy="26" fill="#C9A227" r="2.5"></circle></svg>
+</div>
+
+<!-- ═══ SLIDE 2 — THE AGENT LOOP ═════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media ring-frame">
+      <div class="ring-badge"><span class="ring-icon"></span><span class="frame-label">SLIDE <b>02</b> — THE AGENT LOOP</span></div>
+      <img alt="The agent loop: observation, reflection, learning, and iteration" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Where adaptation actually happens</span>
+      <h3 class="brief-title">Observe, reflect, learn, restart — with more than before</h3>
+      <p>Each adaptable agent follows a familiar cycle beneath its unique actions: outcomes are assessed against predetermined goals, a reflective phase evaluates progress towards the objective, and the gained knowledge is used to adjust strategies or decision-making processes as the cycle repeats.</p>
+      <p>It isn't the loop that determines an agent's adaptability; many agents go through a perceive-act cycle without improving. What truly counts is if the 'learning and iteration' phase leads to lasting change, rather than disregarding the lesson once the session is over.</p>
+    </div>
+  </div>
+</div>
+
+<div class="rings">
+  <svg height="52" viewBox="0 0 60 52" width="60"><circle cx="30" cy="26" fill="none" r="22" stroke="#B8B394" stroke-width="1"></circle><circle cx="30" cy="26" fill="none" r="15" stroke="#5C7A52" stroke-width="1.2"></circle><circle cx="30" cy="26" fill="none" r="8" stroke="#B8663E" stroke-width="1.4"></circle><circle cx="30" cy="26" fill="#C9A227" r="2.5"></circle></svg>
+</div>
+
+<!-- ═══ SLIDE 3 — TWO PATHS TO ADAPTATION ═══════════════════════════ -->
+<section id="paradigms">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Two fundamentally different mechanisms</span>
+      <h2 class="section-title">Change what the agent remembers, or change the model itself</h2>
+      <p class="section-lede">They are both considered learning, but vary in terms of cost, speed, and the type of improvement they offer.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media ring-frame">
+        <div class="ring-badge"><span class="ring-icon"></span><span class="frame-label">SLIDE <b>03</b> — MEMORY-AUGMENTED VS. WEIGHT-BASED ADAPTATION</span></div>
+        <img alt="Two adaptation paradigms: memory-augmented and weight-based learning" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-3.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-3.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-3.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-3.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Cheap and reversible, or deep and permanent</span>
+        <h3 class="brief-title">Neither one replaces the other</h3>
+        <p>Memory-augmented adaptation is quick, cost-effective, and reversible - removing the negative memory results in a return to original behavior. On the other hand, weight-based adaptation is slower and more costly, but it has the ability to extrapolate a lesson in ways that retrieval alone cannot, as it alters the model's fundamental reasoning rather than just its stored information.</p>
+      </div>
+    </div>
+    <div class="paradigm-grid reveal">
+      <div class="paradigm-card"><div class="k">Frozen weights</div><h5>Memory-augmented learning</h5><p>The model remains constant while task knowledge, examples, and past outcomes are stored externally and accessed during decision-making.</p></div>
+      <div class="paradigm-card"><div class="k">Updated weights</div><h5>Fine-tuning &amp; on-policy RL</h5><p>Feedback effectively adjusts the model's parameters by utilizing supervised fine-tuning, preference optimization, or reinforcement learning to strive for a measurable reward.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="rings">
+  <svg height="52" viewBox="0 0 60 52" width="60"><circle cx="30" cy="26" fill="none" r="22" stroke="#B8B394" stroke-width="1"></circle><circle cx="30" cy="26" fill="none" r="15" stroke="#5C7A52" stroke-width="1.2"></circle><circle cx="30" cy="26" fill="none" r="8" stroke="#B8663E" stroke-width="1.4"></circle><circle cx="30" cy="26" fill="#C9A227" r="2.5"></circle></svg>
+</div>
+
+<!-- ═══ SLIDE 4 — MEMORY-AUGMENTED LEARNING ══════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media ring-frame">
+      <div class="ring-badge"><span class="ring-icon"></span><span class="frame-label">SLIDE <b>04</b> — EPISODIC AND SEMANTIC MEMORY</span></div>
+      <img alt="Episodic and semantic memory for memory-augmented agent learning" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-4.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-4.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-4.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-4.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Learning without touching a single weight</span>
+      <h3 class="brief-title">Remembering the specific, and remembering the general</h3>
+      <p><strong>Episodic memory</strong> retains particular past instances - such as a task, a result, or feedback from a manager - and recalls them when faced with a similar circumstance. <strong>Semantic memory</strong> saves the condensed wisdom acquired from those instances — not just 'a single refund request,' rather 'refunds exceeding $500 require authorization from a manager.'</p>
+      <p>Reflective approaches involve agents being able to review supervised corrections, identify the underlying general rules, and save them for future reference, allowing for behavioral adaptation without the need for gradient updates.</p>
+    </div>
+  </div>
+</div>
+
+<div class="rings">
+  <svg height="52" viewBox="0 0 60 52" width="60"><circle cx="30" cy="26" fill="none" r="22" stroke="#B8B394" stroke-width="1"></circle><circle cx="30" cy="26" fill="none" r="15" stroke="#5C7A52" stroke-width="1.2"></circle><circle cx="30" cy="26" fill="none" r="8" stroke="#B8663E" stroke-width="1.4"></circle><circle cx="30" cy="26" fill="#C9A227" r="2.5"></circle></svg>
+</div>
+
+<!-- ═══ SLIDE 5 — SELF-REFLECTION & SELF-REFINEMENT ═════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media ring-frame">
+      <div class="ring-badge"><span class="ring-icon"></span><span class="frame-label">SLIDE <b>05</b> — SELF-REFLECTION &amp; SELF-REFINEMENT</span></div>
+      <img alt="Self-reflection and self-refinement: agents critiquing their own performance" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-5.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-5.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-5.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-5.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">A built-in critic, no external judge required</span>
+      <h3 class="brief-title">The agent as its own harshest reviewer</h3>
+      <p>Self-improvement involves the agent critiquing its own work and making changes in a continuous manner, utilizing its own feedback rather than relying on external cues. This process is a cost-effective way to enhance performance as it requires no extra data or reward system, only a careful review with a critical perspective.</p>
+      <p>A more ambitious approach focuses on policy-level operations rather than single-response refinement: the agent evaluates its overall strategy based on numerous past episodes and adjusts the strategy itself, moving towards true learning in problem-solving approaches rather than just correcting individual outputs.</p>
+    </div>
+  </div>
+</div>
+
+<div class="rings">
+  <svg height="52" viewBox="0 0 60 52" width="60"><circle cx="30" cy="26" fill="none" r="22" stroke="#B8B394" stroke-width="1"></circle><circle cx="30" cy="26" fill="none" r="15" stroke="#5C7A52" stroke-width="1.2"></circle><circle cx="30" cy="26" fill="none" r="8" stroke="#B8663E" stroke-width="1.4"></circle><circle cx="30" cy="26" fill="#C9A227" r="2.5"></circle></svg>
+</div>
+
+<!-- ═══ SLIDE 6 — REINFORCEMENT LEARNING WITH VERIFIABLE REWARD ═════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media ring-frame">
+      <div class="ring-badge"><span class="ring-icon"></span><span class="frame-label">SLIDE <b>06</b> — LEARNING FROM VERIFIABLE OUTCOMES</span></div>
+      <img alt="Reinforcement learning with verifiable reward for agent skill improvement" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-6.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-6.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-6.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-6.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Explore, act, check the result, adjust</span>
+      <h3 class="brief-title">The agent can learn directly from the outcome when it is verifiable.</h3>
+      <p>Reinforcement learning with confirmable rewards enables an agent to explore online by suggesting an action, carrying it out, and verifying the outcome through objective measures like passing tests or providing accurate answers. This process allows the agent to update its policy in real time without relying on human-labeled examples.</p>
+      <p>How well this works depends heavily on <strong>reward density</strong>Receiving feedback after each step, like in a proof assistant verifying each line, simplifies assigning credit much more than receiving feedback only at the end of a lengthy multi-tool task.</p>
+    </div>
+  </div>
+</div>
+
+<div class="rings">
+  <svg height="52" viewBox="0 0 60 52" width="60"><circle cx="30" cy="26" fill="none" r="22" stroke="#B8B394" stroke-width="1"></circle><circle cx="30" cy="26" fill="none" r="15" stroke="#5C7A52" stroke-width="1.2"></circle><circle cx="30" cy="26" fill="none" r="8" stroke="#B8663E" stroke-width="1.4"></circle><circle cx="30" cy="26" fill="#C9A227" r="2.5"></circle></svg>
+</div>
+
+<!-- ═══ SLIDE 7 — CATASTROPHIC FORGETTING ════════════════════════════ -->
+<section id="forgetting">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The cost of adapting too freely</span>
+      <h2 class="section-title">Learning something new can erase something old</h2>
+      <p class="section-lede">This central risk significantly hinders continual adaptation, posing a challenge beyond just an engineering inconvenience.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media ring-frame">
+        <div class="ring-badge"><span class="ring-icon"></span><span class="frame-label">SLIDE <b>07</b> — CATASTROPHIC FORGETTING</span></div>
+        <img alt="Catastrophic forgetting: how continual fine-tuning erases previously learned skills" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-7.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-7.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-7.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-7.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">A well-documented, real failure mode</span>
+        <h3 class="brief-title">Old skills fade as new ones are pushed in</h3>
+        <p>Consistent adjustments with new data cause a decline in a model's ability in previously mastered skills - the more it focuses on current information, the more it tends to forget past knowledge. This is not an uncommon occurrence; it is a well-documented, repeatable trend in continual fine-tuning scenarios.</p>
+      </div>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Approach</th><th>Adaptation speed</th><th>Retention of prior skills</th></tr></thead>
+        <tbody>
+          <tr><td class="dim">Supervised fine-tuning</td><td>Fast, direct</td><td>Weaker — more prone to overwriting</td></tr>
+          <tr><td class="dim">On-policy distillation / RL</td><td>Slower, exploration-based</td><td>Stronger — forgets less, generalizes better</td></tr>
+          <tr><td class="dim">Memory-augmented (no weight change)</td><td>Immediate, retrieval-based</td><td>Strongest — nothing in the model itself changes</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="rings">
+  <svg height="52" viewBox="0 0 60 52" width="60"><circle cx="30" cy="26" fill="none" r="22" stroke="#B8B394" stroke-width="1"></circle><circle cx="30" cy="26" fill="none" r="15" stroke="#5C7A52" stroke-width="1.2"></circle><circle cx="30" cy="26" fill="none" r="8" stroke="#B8663E" stroke-width="1.4"></circle><circle cx="30" cy="26" fill="#C9A227" r="2.5"></circle></svg>
+</div>
+
+<!-- ═══ SLIDE 8 — CONSOLIDATION & REPLAY ═════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media ring-frame">
+      <div class="ring-badge"><span class="ring-icon"></span><span class="frame-label">SLIDE <b>08</b> — CONSOLIDATION: THE SLEEP ANALOGY</span></div>
+      <img alt="Memory consolidation and replay, drawing on the biological sleep analogy" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-8.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-8.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-8.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-8.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Borrowing a page from biology</span>
+      <h3 class="brief-title">Review during downtime, not every single moment</h3>
+      <p>The human brain does not consolidate memories in real-time; instead, it relies on organized replay during sleep to merge new experiences with existing knowledge. Similarly, emerging agent architectures adopt this approach by periodically reviewing recent interactions during downtime to solidify valuable information.</p>
+      <p>The timing of consolidation is just as crucial as the method. Infrequent consolidation allows valuable insights to deteriorate before they are recorded, while consolidating after every interaction brings back the risk of forgetting that periodic consolidation was intended to prevent.</p>
+    </div>
+  </div>
+</div>
+
+<div class="rings">
+  <svg height="52" viewBox="0 0 60 52" width="60"><circle cx="30" cy="26" fill="none" r="22" stroke="#B8B394" stroke-width="1"></circle><circle cx="30" cy="26" fill="none" r="15" stroke="#5C7A52" stroke-width="1.2"></circle><circle cx="30" cy="26" fill="none" r="8" stroke="#B8663E" stroke-width="1.4"></circle><circle cx="30" cy="26" fill="#C9A227" r="2.5"></circle></svg>
+</div>
+
+<!-- ═══ SLIDE 9 — SKILL EVOLUTION & DISCOVERY ════════════════════════ -->
+<section id="skills">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Learning doesn't stop at facts</span>
+      <h2 class="section-title">Turning a repeated pattern into a reusable skill</h2>
+      <p class="section-lede">The key lesson agents gain from experience is not just one fact, but a practical and adaptable method for addressing various issues.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media ring-frame">
+        <div class="ring-badge"><span class="ring-icon"></span><span class="frame-label">SLIDE <b>09</b> — SKILL EVOLUTION &amp; LIFELONG DISCOVERY</span></div>
+        <img alt="Skill evolution: agents converting recurring patterns into reusable learned skills" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-9.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-9.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-9.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-9.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">From "solved it once" to "knows how to solve it"</span>
+        <h3 class="brief-title">Recognizing a pattern is the first step, not the last</h3>
+        <p>A proficient system doesn't just store individual solutions when an agent tackles the same type of problem multiple times; instead, it identifies the repeated pattern and consolidates it into a reusable skill that is documented and easily accessible for the agent (or future versions), eliminating the need to recreate the solution from scratch each time.</p>
+        <p>Through an extended period of deployment, a collection of skills tailored to the agent's unique operating environment is formed, resembling true expertise rather than a stagnant set of instructions created at the start and never updated.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 10 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media ring-frame">
+      <div class="ring-badge"><span class="ring-icon"></span><span class="frame-label">SLIDE <b>10</b> — GROWTH WITH GOVERNANCE</span></div>
+      <img alt="Summary: balancing agent growth with oversight and reliability" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-10.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide600/agent-learning-and-adaptation-10.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide700/agent-learning-and-adaptation-10.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide900/agent-learning-and-adaptation-10.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-learning-and-adaptation/images/Slide1000/agent-learning-and-adaptation-10.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">An agent that learns is an agent that changes</span>
+      <h3 class="brief-title">The same growth that helps also has to stay accountable</h3>
+      <p>An agent that learns and evolves is continually changing, making it crucial to recognize that learning goes beyond just capabilities. As personalization grows and behavior evolves through experience, monitoring, assessment, and alignment must all adapt to keep up with a moving target.</p>
+      <p>Successful systems treat learning like any other production change: thoroughly reviewed, assessed based on actual results, and strategically integrated — growth that is earned and verified, not just accumulated passively with the hope of improvement.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Agent learning &amp; adaptation FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">What's the difference between memory-augmented and weight-based agent learning?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Memory-augmented learning preserves the model's original state while externalizing new knowledge for quick and inexpensive retrieval. In contrast, weight-based adaptation dynamically adjusts the model's parameters through fine-tuning or reinforcement learning to achieve deeper generalization, but at a slower pace, higher cost, and with the potential for forgetting past skills.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is catastrophic forgetting?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Catastrophic forgetting occurs when regular fine-tuning with new data leads a model to decline in performance on previously learned skills or knowledge. The more the model adjusts to recent data, the greater the danger of erasing past information. This phenomenon is widely observed in continual fine-tuning and is not an uncommon occurrence.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why do on-policy methods forget less than supervised fine-tuning?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Studies on continual learning have shown that on-policy techniques, such as on-policy distillation and on-policy reinforcement learning, have a tendency to retain information better and achieve better generalization compared to supervised fine-tuning. This is likely due to the fact that these methods update the model based on its own behavior and outcomes, rather than pushing it towards a predetermined external target that could potentially disrupt previously learned patterns.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is reinforcement learning with verifiable reward (RLVR)?<span class="plus">+</span></button>
+        <div class="faq-a"><p>RLVR is a training method in which an agent engages in real-time exploration by suggesting an action, carrying it out, and assessing a concrete outcome that can be verified, such as the success of a code passing its tests. This allows the agent to update its policy based on the verified signal within the same loop, rather than solely relying on pre-collected human-labeled examples.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What does "consolidation" mean for an AI agent?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Consolidation, like memory consolidation during sleep, is a periodic process where an agent reviews recent experiences offline instead of updating continuously. It aims to balance plasticity and retention to maintain the ability to learn while not forgetting previous knowledge.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How can an agent transform repeated experience into a transferable skill?<span class="plus">+</span></button>
+        <div class="faq-a"><p>By identifying repetitive problems and creating a documented solution instead of starting from scratch each time, an agent can build a personalized toolkit of learned skills tailored to its unique operating environment throughout an extended deployment.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to design your agent's learning loop?</h2>
+    <p>Begin by utilizing memory-augmented adaptation prior to implementing weight updates, and establish a consolidation schedule that involves carefully reviewing experiences instead of responding to each individual interaction.</p>
+    <ul class="cta-list">
+      <li>A memory-vs-weight-adaptation decision guide for your agent's use case</li>
+      <li>A forgetting-risk checklist for continual fine-tuning pipelines</li>
+      <li>A consolidation-cadence template balancing plasticity and retention</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#forgetting">Revisit catastrophic forgetting →</a>
+      <a class="btn btn-ghost" href="#skills">Back to skill evolution</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/agentic-ai-development-lifecycle.html">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for Controlling DataProducts and AI</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','paradigms','forgetting','skills','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

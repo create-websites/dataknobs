@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Agent Architecture Design: Layers, Components, and Patterns for Production Agents</title>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800&amp;family=Work+Sans:ital,wght@0,400;0,500;0,600;1,400&amp;family=Azeret+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --bg:#0F2A4A;
+  --bg2:#153761;
+  --panel:#1A4472;
+  --ink:#EAF3FB;
+  --ink-soft:#9FBEDA;
+  --line:#2C5480;
+  --line-strong:#3D6B9E;
+  --cyan:#5EC8E8;
+  --cyan-tint:#173F52;
+  --amber:#E8B84B;
+  --amber-tint:#4A3A1A;
+  --font-display:'Saira Condensed', sans-serif;
+  --font-body:'Work Sans', sans-serif;
+  --font-mono:'Azeret Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.68;
+  background-image:linear-gradient(var(--line) 1px, transparent 1px),linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:36px 36px;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px;}
+img{max-width:100%;display:block;}
+a{color:var(--cyan);}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);letter-spacing:.01em;font-weight:700;}
+
+/* ── dimension-line divider (signature motif) ─────────────────────── */
+.dim-line{height:46px;position:relative;display:flex;align-items:center;justify-content:center;gap:8px;}
+.dim-line::before,.dim-line::after{content:"";flex:1;border-top:1px solid var(--line-strong);position:relative;}
+.dim-line .lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);padding:0 12px;white-space:nowrap;}
+.dim-line .arrow{color:var(--line-strong);font-size:11px;}
+
+/* ── blueprint-sheet frame (signature motif) ──────────────────────── */
+.sheet-frame{position:relative;background:var(--panel);border:1px solid var(--line-strong);box-shadow:0 0 0 4px var(--bg2), 0 0 0 5px var(--line-strong);padding:20px 22px 16px;margin:6px;}
+.sheet-frame::before,.sheet-frame::after,.sheet-corner-tl,.sheet-corner-br{content:"";position:absolute;width:14px;height:14px;}
+.fig-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:10px;}
+.fig-label b{color:var(--cyan);}
+.sheet-frame img{border:1px solid var(--line-strong);}
+
+/* ── nav ──────────────────────────────────────────────────────────── */
+.topnav{position:sticky;top:0;z-index:50;background:rgba(15,42,74,0.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line-strong);}
+.topnav .row{max-width:1120px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.brand{font-family:var(--font-mono);font-weight:500;font-size:13px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;text-transform:uppercase;}
+.brand::before{content:"⌗";color:var(--cyan);}
+.navlinks{display:flex;gap:26px;list-style:none;font-family:var(--font-mono);font-size:12.5px;}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:4px 0;transition:color .2s;}
+.navlinks a.active,.navlinks a:hover{color:var(--cyan);}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--cyan);}
+@media (max-width:900px){.navlinks{display:none;}}
+
+/* ── hero ─────────────────────────────────────────────────────────── */
+.hero{padding:76px 0 44px;}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--cyan);display:inline-block;}
+.hero-title{font-size:clamp(2.5rem,6.2vw,4.4rem);line-height:1.02;margin-bottom:22px;font-weight:700;}
+.hero-title em{font-style:normal;color:var(--cyan);}
+.hero-sub{font-size:1.14rem;color:var(--ink-soft);max-width:660px;margin-bottom:32px;font-family:var(--font-body);}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px;}
+.btn{font-family:var(--font-mono);font-size:13px;padding:13px 22px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);transition:all .2s;}
+.btn-solid{background:var(--cyan);color:#0A2338;border-color:var(--cyan);}
+.btn-solid:hover{background:#87D8F0;}
+.btn-ghost{background:transparent;color:var(--ink);}
+.btn-ghost:hover{background:var(--bg2);}
+
+/* ── quick answer ─────────────────────────────────────────────────── */
+.quick-answer{background:var(--panel);border:1px solid var(--line-strong);border-left:4px solid var(--cyan);padding:28px 30px;margin:56px 0;max-width:920px;}
+.quick-answer .qa-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin-bottom:10px;display:block;}
+.quick-answer p{font-size:1.02rem;color:#DCEAF5;}
+.quick-answer strong{color:var(--ink);}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+section{padding:56px 0;}
+.section-head{max-width:700px;margin-bottom:40px;}
+.section-kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin-bottom:12px;}
+.section-title{font-size:clamp(1.75rem,3.2vw,2.4rem);margin-bottom:14px;font-weight:700;}
+.section-lede{color:var(--ink-soft);font-size:1.02rem;}
+
+/* ── brief rows ───────────────────────────────────────────────────── */
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:44px 0;}
+.brief-row.reverse .brief-media{order:2;}
+.brief-kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;}
+.brief-title{font-size:1.75rem;margin-bottom:14px;font-weight:700;}
+.brief-text p{font-size:.98rem;color:#D3E1EC;margin-bottom:14px;}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:6px;}
+.brief-list li{padding-left:20px;position:relative;font-size:.93rem;color:var(--ink-soft);}
+.brief-list li::before{content:"⌗";position:absolute;left:0;color:var(--cyan);}
+@media (max-width:900px){.brief-row{grid-template-columns:1fr;gap:30px;}.brief-row.reverse .brief-media{order:0;}}
+
+/* ── layer stack ──────────────────────────────────────────────────── */
+.layer-stack{display:flex;flex-direction:column;gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.layer-row{background:var(--panel);padding:16px 20px;display:flex;align-items:center;gap:16px;}
+.layer-row .num{font-family:var(--font-mono);font-size:11px;color:var(--cyan);width:24px;flex-shrink:0;}
+.layer-row .name{font-family:var(--font-display);font-size:1.05rem;font-weight:700;width:180px;flex-shrink:0;}
+.layer-row .desc{font-size:.88rem;color:var(--ink-soft);}
+@media (max-width:700px){.layer-row{flex-wrap:wrap;}.layer-row .name{width:100%;}}
+
+/* ── component grid ───────────────────────────────────────────────── */
+.comp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.comp-card{background:var(--panel);padding:20px 16px;}
+.comp-card .k{font-family:var(--font-mono);font-size:10px;color:var(--amber);margin-bottom:8px;}
+.comp-card h5{font-family:var(--font-display);font-size:1rem;margin-bottom:8px;font-weight:700;}
+.comp-card p{font-size:.82rem;color:var(--ink-soft);}
+@media (max-width:820px){.comp-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:520px){.comp-grid{grid-template-columns:1fr;}}
+
+/* ── table ────────────────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border:1px solid var(--line-strong);background:var(--panel);}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9rem;}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);background:var(--bg2);border-bottom:1px solid var(--line-strong);}
+td.dim{font-family:var(--font-mono);font-weight:600;color:var(--cyan);font-size:.85rem;}
+tr:last-child td{border-bottom:none;}
+
+/* ── faq ──────────────────────────────────────────────────────────── */
+.faq-item{border-bottom:1px solid var(--line-strong);}
+.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font-display);font-size:1.08rem;color:var(--ink);padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;font-weight:700;}
+.faq-q .plus{font-family:var(--font-mono);color:var(--cyan);transition:transform .25s;flex-shrink:0;}
+.faq-item.open .plus{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.96rem;max-width:820px;font-family:var(--font-body);}
+
+/* ── cta ──────────────────────────────────────────────────────────── */
+.cta-band{background:var(--bg2);padding:64px 0;border-top:1px solid var(--line-strong);}
+.cta-band p{color:var(--ink-soft);max-width:580px;margin-bottom:26px;font-size:1rem;}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-family:var(--font-mono);font-size:.88rem;color:var(--ink-soft);}
+.cta-list li::before{content:"✓ ";color:var(--cyan);}
+
+footer{padding:32px 0;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);border-top:1px solid var(--line-strong);}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="#top">AGENT ARCHITECTURE DESIGN</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#layers">Layers</a></li>
+      <li><a href="#patterns">Patterns</a></li>
+      <li><a href="#stack">Platform Stack</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Systems Design</span>
+    <h1 class="hero-title">A great model,<br/>a <em>brittle</em> blueprint.</h1>
+    <p class="hero-sub">A powerful model inside a poorly designed architecture fails consistently. A merely capable model inside a well-designed one delivers reliable, production-grade results. The difference isn't the model — it's how the reasoning, memory, tools, and orchestration layers are actually put together.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#layers">See the four-layer model →</a>
+      <a class="btn btn-ghost" href="#patterns">Compare architecture patterns</a>
+    </div>
+    <div class="sheet-frame reveal">
+      <span class="fig-label">FIG. <b>01</b> — AI AGENT ARCHITECTURE DESIGN</span>
+      <img alt="Cover slide: AI Agent Architecture Design" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1000/agent-architecture-design-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide600/agent-architecture-design-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide700/agent-architecture-design-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1000/agent-architecture-design-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>AI agent architecture</strong> is the structural blueprint that defines how an agent perceives input, reasons, uses memory, calls tools, and coordinates all of it toward a goal with limited human oversight. Production systems in 2026 are described by a <strong>four-layer reference model</strong> — reasoning, orchestration, memory and data, and tool integration — sitting inside a broader <strong>seven-layer platform stack</strong> once model choice, framework, observability, and governance are counted separately. The architecture matters more than the model: the same underlying LLM can power a reliable production agent or a brittle demo depending entirely on how these layers, and the design patterns connecting them — ReAct, Plan-and-Execute, orchestrator-worker, hierarchical — are actually assembled.</p>
+  </div>
+</div>
+
+<div class="dim-line"><span class="arrow">◄</span><span class="lbl">layer boundary</span><span class="arrow">►</span></div>
+
+<!-- ═══ SLIDE 2 — THE FOUR-LAYER REFERENCE MODEL ═══════════════════ -->
+<section id="layers">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The reference model</span>
+      <h2 class="section-title">Four layers, one loop</h2>
+      <p class="section-lede">Together these layers form the loop that turns a language model into a real-world autonomous system, rather than a chatbot with extra steps.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media sheet-frame">
+        <span class="fig-label">FIG. <b>02</b> — THE FOUR-LAYER MODEL</span>
+        <img alt="The four-layer AI agent architecture reference model" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-2.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide600/agent-architecture-design-2.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide700/agent-architecture-design-2.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-2.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">The minimum structure a production agent needs</span>
+        <h3 class="brief-title">Reasoning, orchestration, memory, tools</h3>
+        <p>The reasoning layer — typically an LLM — decides what to do next. The orchestration layer sequences those decisions into a coherent flow, routing between steps, tools, and sub-agents. The memory and data layer keeps context alive across steps and sessions. The tool integration layer is where reasoning actually turns into an effect on the outside world.</p>
+      </div>
+    </div>
+    <div class="layer-stack reveal">
+      <div class="layer-row"><span class="num">01</span><span class="name">Reasoning</span><span class="desc">The LLM at the core — deciding what to do next based on the current state and goal.</span></div>
+      <div class="layer-row"><span class="num">02</span><span class="name">Orchestration</span><span class="desc">Sequences decisions into a coherent flow; routes between steps, tools, and sub-agents.</span></div>
+      <div class="layer-row"><span class="num">03</span><span class="name">Memory &amp; Data</span><span class="desc">Keeps context alive across steps and sessions — short-term, long-term, and retrieved knowledge.</span></div>
+      <div class="layer-row"><span class="num">04</span><span class="name">Tool Integration</span><span class="desc">Where reasoning becomes action — APIs, databases, and external services the agent can call.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="dim-line"><span class="arrow">◄</span><span class="lbl">component boundary</span><span class="arrow">►</span></div>
+
+<!-- ═══ SLIDE 3 — CORE COMPONENTS ═══════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media sheet-frame">
+      <span class="fig-label">FIG. <b>03</b> — CORE COMPONENTS, NAMED</span>
+      <img alt="Core components of an AI agent architecture, individually named" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-3.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide600/agent-architecture-design-3.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide700/agent-architecture-design-3.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-3.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Zooming in one level further</span>
+      <h3 class="brief-title">Every agent rests on the same building blocks</h3>
+      <p>Beneath the four layers sit the individual components that implement them: perception and input processing to understand what's being asked, the reasoning engine to decide, memory systems to remember, a tool layer to act, an orchestration layer to sequence it all, observability to see what actually happened, and safety guardrails to keep it inside bounds.</p>
+      <p>How much freedom the model has to direct its own steps through these components — versus following a fixed, predetermined sequence — is what ultimately separates one architecture pattern from another.</p>
+    </div>
+  </div>
+</div>
+
+<div class="comp-grid reveal" style="max-width:1056px;margin:0 32px;">
+  <div class="comp-card"><div class="k">Input</div><h5>Perception</h5><p>Understands what's being asked, from text, structured data, or another agent's request.</p></div>
+  <div class="comp-card"><div class="k">Decision</div><h5>Reasoning Engine</h5><p>The LLM at the core, evaluating state and selecting the next step.</p></div>
+  <div class="comp-card"><div class="k">State</div><h5>Memory Systems</h5><p>Short-term working memory plus long-term, retrievable context.</p></div>
+  <div class="comp-card"><div class="k">Action</div><h5>Tool Layer</h5><p>The interface through which reasoning reaches real systems.</p></div>
+  <div class="comp-card"><div class="k">Flow</div><h5>Orchestration</h5><p>Sequences steps, routes between tools and sub-agents.</p></div>
+  <div class="comp-card"><div class="k">Visibility</div><h5>Observability</h5><p>Traces, logs, and metrics showing what the agent actually did.</p></div>
+  <div class="comp-card"><div class="k">Boundaries</div><h5>Safety Guardrails</h5><p>Constraints that keep autonomous behavior inside approved limits.</p></div>
+  <div class="comp-card"><div class="k">Assembly</div><h5>The Full Loop</h5><p>All seven components, cycling continuously toward the goal.</p></div>
+</div>
+
+<div class="dim-line"><span class="arrow">◄</span><span class="lbl">cycle boundary</span><span class="arrow">►</span></div>
+
+<!-- ═══ SLIDE 4 — THE AGENT REASONING CYCLE ═════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media sheet-frame">
+      <span class="fig-label">FIG. <b>04</b> — THE AGENT REASONING CYCLE</span>
+      <img alt="The agent reasoning cycle: perceive, reason, act, observe" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-4.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide600/agent-architecture-design-4.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide700/agent-architecture-design-4.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-4.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The loop, not the response, is the architecture</span>
+      <h3 class="brief-title">What separates an agent from a pipeline</h3>
+      <p>A traditional AI pipeline follows a predetermined pathway: fixed steps, fixed order, no deviation. Agent architecture instead centers on a decision-making loop — perceive the current state, reason about what to do, act, observe the result, and loop back with updated context — repeated until the goal is met or the agent determines it can't proceed further.</p>
+      <p>This is often called the agent reasoning cycle, and it's the structural feature that lets an agent adapt mid-task: a fixed pipeline can't change its plan when step three reveals something step one didn't anticipate; a genuine agent loop can.</p>
+    </div>
+  </div>
+</div>
+
+<div class="dim-line"><span class="arrow">◄</span><span class="lbl">pattern boundary</span><span class="arrow">►</span></div>
+
+<!-- ═══ SLIDE 5 — SINGLE-AGENT PATTERNS ═════════════════════════════ -->
+<section id="patterns">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Choosing a shape</span>
+      <h2 class="section-title">A shared vocabulary of architecture patterns</h2>
+      <p class="section-lede">Each pattern solves a specific failure mode. Real production systems usually combine more than one.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media sheet-frame">
+        <span class="fig-label">FIG. <b>05</b> — REACT VS. PLAN-AND-EXECUTE</span>
+        <img alt="ReAct and Plan-and-Execute as single-agent architecture patterns" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-5.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide600/agent-architecture-design-5.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide700/agent-architecture-design-5.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-5.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Dynamic exploration, or predictable structure</span>
+        <h3 class="brief-title">Match the pattern to how predictable the task is</h3>
+        <p><strong>ReAct</strong> interleaves a reasoning step with a tool call, so the agent explains why it's acting before it acts — the recommended starting point for most first agents, and the right choice for dynamic tasks where the next step genuinely depends on what the last one revealed.</p>
+        <p><strong>Plan-and-Execute</strong> commits to a fuller plan upfront, which suits predictable workflows better — those where the steps are largely known in advance and re-planning after every single action would just add latency without adding real flexibility.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="dim-line"><span class="arrow">◄</span><span class="lbl">topology boundary</span><span class="arrow">►</span></div>
+
+<!-- ═══ SLIDE 6 — MULTI-AGENT PATTERNS ══════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media sheet-frame">
+      <span class="fig-label">FIG. <b>06</b> — MULTI-AGENT TOPOLOGIES</span>
+      <img alt="Orchestrator-worker, hierarchical, and peer-to-peer multi-agent architecture patterns" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-6.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide600/agent-architecture-design-6.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide700/agent-architecture-design-6.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-6.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Splitting work across specialists</span>
+      <h3 class="brief-title">Three ways to arrange more than one agent</h3>
+      <p>The <strong>orchestrator-worker</strong> pattern uses a central coordinator to distribute work to specialized agents — the most common shape in production. The <strong>hierarchical</strong> pattern employs higher-level agents that assign sub-tasks to lower-level ones, useful when the work itself has a genuine nested structure. <strong>Peer-to-peer</strong> agents collaborate directly through a shared protocol without a central coordinator, trading centralized control for resilience and parallelism.</p>
+      <p>Frameworks like Microsoft AutoGen, CrewAI, and LangGraph are widely used to implement these topologies — but the framework only implements the pattern; choosing the right pattern for the task is still an architectural decision the framework can't make for you.</p>
+    </div>
+  </div>
+</div>
+
+<div class="dim-line"><span class="arrow">◄</span><span class="lbl">platform boundary</span><span class="arrow">►</span></div>
+
+<!-- ═══ SLIDE 7 — THE SEVEN-LAYER PLATFORM STACK ════════════════════ -->
+<section id="stack">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Zooming out to the full platform</span>
+      <h2 class="section-title">One box became seven layers</h2>
+      <p class="section-lede">The architecture diagrams that circulated a few years ago showed an agent as a single box — an LLM with a tool list and a memory blob. That abstraction hasn't survived contact with production.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media sheet-frame">
+        <span class="fig-label">FIG. <b>07</b> — THE SEVEN-LAYER PLATFORM STACK</span>
+        <img alt="The seven-layer AI agent platform stack: model, framework, orchestration, memory, tools, observability, governance" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-7.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide600/agent-architecture-design-7.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide700/agent-architecture-design-7.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-7.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Each layer, its own vendors and failure modes</span>
+        <h3 class="brief-title">"We use LangGraph" describes one layer of seven</h3>
+        <p>Model, framework, orchestration, memory, tool integration, observability, and governance — each is now a distinct layer with its own vendor landscape and its own way of breaking. The observability layer alone holds the trace store, the cost ledger, the response archive, the risk classification per run, and the human-oversight flag — none of which is decision-making logic, but all of which the rest of the stack depends on to be trustworthy.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="dim-line"><span class="arrow">◄</span><span class="lbl">reliability boundary</span><span class="arrow">►</span></div>
+
+<!-- ═══ SLIDE 8 — WHAT SEPARATES RELIABLE FROM BRITTLE ══════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media sheet-frame">
+      <span class="fig-label">FIG. <b>08</b> — RELIABLE VS. BRITTLE ARCHITECTURE</span>
+      <img alt="Architectural decisions that separate reliable agents from brittle ones" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-8.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide600/agent-architecture-design-8.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide700/agent-architecture-design-8.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-8.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The decisions that cascade</span>
+      <h3 class="brief-title">Memory design, tool design, error handling — not the model</h3>
+      <p>The architectural decisions around memory, tool design, orchestration logic, and error handling determine whether an agent performs reliably in the real world or only works on the carefully chosen test cases it was demoed with. A model swap rarely fixes a brittle agent, because the brittleness usually lives in these surrounding decisions, not in the reasoning engine itself.</p>
+      <p>This is also why architectural choices cascade through security, interoperability, and reliability in ways model selection alone can't reach — a well-architected system tolerates a weaker model far better than a brilliant model tolerates a poorly architected system.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 9 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media sheet-frame">
+      <span class="fig-label">FIG. <b>09</b> — ARCHITECTURE AS FOUNDATION</span>
+      <img alt="Summary: agent architecture as the foundation of reliable production systems" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1000/agent-architecture-design-9.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide600/agent-architecture-design-9.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide700/agent-architecture-design-9.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide900/agent-architecture-design-9.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-architecture-design/images/Slide1000/agent-architecture-design-9.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Standardization is arriving, ready or not</span>
+      <h3 class="brief-title">Get the boring layers right, first</h3>
+      <p>Standardizing agent deployment practices has become an explicit regulatory priority — since architectural choices cascade through security, interoperability, and reliability in ways model choice alone never will. Reasoning, orchestration, memory, and tools are the four layers no production agent can skip; observability and governance are what turn a working prototype into something an organization can actually stand behind.</p>
+      <p>Get the unglamorous layers right — memory design, tool schemas, error handling, tracing — before chasing the next model release. That's the discipline separating agents that survive their first real production quarter from the ones that only ever worked in the demo.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">AI agent architecture FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">What are the four core layers of AI agent architecture?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Reasoning (the LLM deciding what to do next), orchestration (sequencing decisions into a coherent flow), memory and data (keeping context alive across steps and sessions), and tool integration (where reasoning turns into real-world action). Together they form the loop that separates a genuine agent from a fixed pipeline.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What's the difference between ReAct and Plan-and-Execute?<span class="plus">+</span></button>
+        <div class="faq-a"><p>ReAct interleaves reasoning with tool calls, explaining why it acts before acting on each step — well suited to dynamic tasks where the next step depends on what the last one revealed. Plan-and-Execute commits to a fuller plan upfront, which fits predictable workflows better, since re-planning after every action would add latency without adding real flexibility.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What's the difference between orchestrator-worker and hierarchical multi-agent patterns?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Orchestrator-worker uses one central coordinator that distributes work directly to specialized agents — the most common production shape. Hierarchical stacks that idea into levels, with higher-level agents assigning sub-tasks to lower-level ones, which suits work that genuinely has a nested, multi-tier structure rather than a flat set of specialist tasks.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why does architecture matter more than model choice?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Because the decisions around memory design, tool design, orchestration logic, and error handling determine whether an agent performs reliably on real-world inputs or only on the carefully chosen cases it was demoed with. A stronger model rarely fixes a brittle architecture, since the brittleness usually lives in these surrounding design decisions rather than in the reasoning engine itself.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is the seven-layer agent platform stack?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Model, framework, orchestration, memory, tool integration, observability, and governance — a decomposition that has replaced the older single-box mental model of an agent as just an LLM with a tool list. Each layer has its own vendors and its own way of failing, which is why a statement like "we use LangGraph" only describes one of the seven layers.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Is there a regulatory push toward standardized agent architecture?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Yes — standardizing agent deployment practices has become an explicit priority for AI standards bodies, on the reasoning that architectural choices cascade through security, interoperability, and reliability in ways that model selection alone can't address. This makes deliberate architecture design a compliance consideration, not just an engineering one.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to design your agent's architecture?</h2>
+    <p>Start from the four-layer model, choose a pattern that matches how predictable your task actually is, and get memory, tool design, and error handling right before optimizing the model.</p>
+    <ul class="cta-list">
+      <li>A four-layer architecture worksheet for your next agent build</li>
+      <li>A pattern-selection guide: ReAct vs. Plan-and-Execute vs. multi-agent</li>
+      <li>A seven-layer platform stack checklist for build-vs-buy decisions</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#patterns">Revisit architecture patterns →</a>
+      <a class="btn btn-ghost" href="#stack">Back to the platform stack</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/agentic-ai-development-lifecycle.html">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for Controlling DataProducts and AI</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','layers','patterns','stack','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Knowledge and Context Engineering for AI Agents | DataKnobs</title>
+<meta content="A practical guide to knowledge and context engineering for AI agents, covering context types, token budgets, Write-Select-Compress-Isolate, RAG, vector databases, GraphRAG, memory tiers and context isolation." name="description"/>
+<meta content="context engineering, knowledge engineering, AI agents, RAG, vector database, GraphRAG, agent memory, context window, prompt engineering, token budget, DataKnobs" name="keywords"/>
+<meta content="Prashant Dhingra, DataKnobs" name="author"/>
+<meta content="index, follow, max-image-preview:large" name="robots"/>
+<link href="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html" rel="canonical"/>
+<meta content="article" property="og:type"/><meta content="DataKnobs" property="og:site_name"/><meta content="Knowledge and Context Engineering for AI Agents" property="og:title"/><meta content="Design reliable agent context with token budgets, retrieval, memory, compression, isolation, RAG and GraphRAG." property="og:description"/><meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-1.png" property="og:image"/><meta content="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html" property="og:url"/><meta content="summary_large_image" name="twitter:card"/><meta content="Prashant Dhingra" name="citation_author"/><meta content="Knowledge and Context Engineering for AI Agents" name="citation_title"/><meta content="Context engineering, knowledge engineering, RAG, GraphRAG, vector databases, agent memory and context isolation" name="ai-topic"/>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f8f7ff;--surface:#fff;--soft:#f2efff;--ink:#17122b;--muted:#6e6782;--line:#ddd6f1;--line2:#c8bdf0;--purple:#6d4aff;--purple2:#8f7bff;--violet:#a855f7;--green:#159a73;--amber:#c9872d;--red:#c94a67;--shadow:0 18px 55px rgba(64,43,132,.12);--display:'Inter',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:radial-gradient(circle at 8% 0%,rgba(143,123,255,.14),transparent 28rem),linear-gradient(180deg,#fdfcff,var(--bg));color:var(--ink);font-family:var(--display);font-size:17px;line-height:1.68}.wrap{max-width:1180px;margin:auto;padding:0 28px}img{max-width:100%;display:block}a{color:var(--purple)}h1,h2,h3,h4,h5{font-family:var(--display);letter-spacing:-.025em}
+.topnav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(18px);border-bottom:1px solid rgba(200,189,240,.82)}.topnav .row{max-width:1180px;margin:auto;padding:0 28px;height:72px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:800;font-size:15px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px}.brand:before{content:'DK';display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--violet));color:#fff;font-size:11px;box-shadow:0 8px 20px rgba(109,74,255,.22)}.navlinks{display:flex;gap:24px;list-style:none;font-size:13px;font-weight:700}.navlinks a{text-decoration:none;color:var(--muted);padding:8px 0;position:relative}.navlinks a.active,.navlinks a:hover{color:var(--purple)}.navlinks a.active:after{content:'';position:absolute;left:0;right:0;bottom:1px;height:2px;background:var(--purple)}
+.hero{padding:82px 0 48px;position:relative;overflow:hidden}.hero:before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(109,74,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(109,74,255,.05) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,#000,transparent 82%)}.hero .wrap{position:relative}.eyebrow,.section-kicker,.qa-label,.card-tab,.brief-kicker{font-family:var(--mono);text-transform:uppercase;letter-spacing:.09em}.eyebrow{font-size:12px;color:var(--purple);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;border:1px solid var(--line);background:rgba(255,255,255,.85);border-radius:999px;padding:7px 12px}.eyebrow:before{content:'';width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 5px rgba(109,74,255,.12)}.hero-title{font-size:clamp(2.6rem,6vw,4.8rem);line-height:1.02;margin-bottom:22px;font-weight:800;max-width:920px;letter-spacing:-.04em}.hero-title em{font-style:normal;background:linear-gradient(135deg,var(--purple),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}.hero-sub{font-size:1.15rem;color:var(--muted);max-width:760px;margin-bottom:32px}.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}.btn{font-size:14px;font-weight:800;padding:13px 22px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border-radius:12px;border:1px solid var(--line2);transition:.2s}.btn:hover{transform:translateY(-2px)}.btn-solid{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border-color:transparent}.btn-ghost{background:#fff;color:var(--ink)}
+.card-frame{position:relative;background:#fff;border:1px solid var(--line);padding:16px;border-radius:24px;box-shadow:var(--shadow);overflow:hidden}.card-frame:before{display:none}.card-tab{font-size:10.5px;color:var(--muted);display:inline-block;background:var(--soft);border:1px solid var(--line);padding:5px 11px;margin-bottom:12px;border-radius:999px}.card-tab b{color:var(--purple)}.card-frame img{border:1px solid var(--line);border-radius:16px}.quick-answer{background:linear-gradient(135deg,#fff,var(--soft));border:1px solid var(--line);border-left:5px solid var(--purple);padding:30px 32px;margin:60px 0;max-width:980px;border-radius:18px;box-shadow:0 14px 34px rgba(77,47,208,.08)}.quick-answer .qa-label{font-size:11px;color:var(--purple);margin-bottom:10px;display:block}.quick-answer p{font-size:1rem;color:var(--muted)}.quick-answer strong{color:var(--ink)}
+.perf{height:56px;display:flex;align-items:center;justify-content:center;gap:6px}.perf span{width:7px;height:7px;border-radius:50%;background:var(--purple2);border:0}.perf:before,.perf:after{content:'';flex:1;border-top:1px dashed var(--line2)}section{padding:64px 0}.section-head{max-width:760px;margin-bottom:42px}.section-kicker{font-size:12px;color:var(--purple);margin-bottom:12px}.section-title{font-size:clamp(1.9rem,3.4vw,2.7rem);margin-bottom:14px;font-weight:800}.section-lede{color:var(--muted);font-size:1.03rem}.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:48px 0}.brief-row.reverse .brief-media{order:2}.brief-kicker{font-size:11px;color:var(--purple);margin-bottom:10px}.brief-title{font-size:1.85rem;margin-bottom:14px;font-weight:800}.brief-text p{font-size:.98rem;color:var(--muted);margin-bottom:14px}.brief-list{list-style:none;display:flex;flex-direction:column;gap:11px;margin-top:10px}.brief-list li{padding:14px 16px 14px 44px;position:relative;font-size:.94rem;color:var(--muted);border:1px solid var(--line);border-radius:14px;background:#fff}.brief-list li:before{content:'✓';position:absolute;left:16px;top:14px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(109,74,255,.12);color:var(--purple);font-size:11px;font-weight:800}
+.budget{border:1px solid var(--line);background:#fff;padding:6px;display:flex;height:54px;margin:12px 0 10px;border-radius:14px;overflow:hidden}.budget-seg{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:#fff;white-space:nowrap}.budget-legend{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:8px}.budget-legend .dot{width:9px;height:9px;display:inline-block;margin-right:5px;border-radius:50%}.pillar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:18px}.pillar-card{background:#fff;padding:24px 20px;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 26px rgba(58,36,118,.07)}.pillar-card h5{font-size:1.05rem;margin-bottom:8px}.pillar-card p{font-size:.87rem;color:var(--muted)}.pillar-card .icon{font-size:1.5rem;margin-bottom:10px}.table-wrap{overflow-x:auto;border:1px solid var(--line);background:#fff;border-radius:18px;box-shadow:0 10px 28px rgba(64,43,132,.07)}table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9rem}th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line)}th{font-family:var(--mono);font-size:10px;text-transform:uppercase;color:var(--muted);background:var(--soft)}td.dim{font-family:var(--mono);font-weight:600;color:var(--purple)}tr:last-child td{border-bottom:none}
+.faq-item{border-bottom:1px solid var(--line)}.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:1.05rem;color:var(--ink);padding:22px 0;display:flex;justify-content:space-between;gap:20px;font-weight:800}.faq-q .plus{font-family:var(--mono);color:var(--purple);transition:.25s}.faq-item.open .plus{transform:rotate(45deg)}.faq-a{max-height:0;overflow:hidden;transition:max-height .3s}.faq-a p{padding-bottom:22px;color:var(--muted);font-size:.97rem;max-width:860px}.cta-band{background:linear-gradient(135deg,#24134d,#4c2caf 55%,#6d4aff);padding:72px 0;color:#fff}.cta-band .section-kicker{color:#d8d0ff}.cta-band .section-title{color:#fff}.cta-band p{color:#e8e3ff;max-width:620px;margin-bottom:26px}.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;color:#eeeaff}.cta-list li:before{content:'✓ ';color:#b8ffde;font-weight:800}.cta-band .btn-solid{background:#fff;color:var(--purple);box-shadow:none}.cta-band .btn-ghost{border-color:rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.08)}footer{background:#171126;color:#c9c2da;padding:38px 0;text-align:center;font-size:13px}.reveal{opacity:0;transform:translateY(18px);transition:.6s}.reveal.visible{opacity:1;transform:none}
+@media(max-width:900px){.navlinks{display:none}.brief-row{grid-template-columns:1fr;gap:30px}.brief-row.reverse .brief-media{order:0}.pillar-grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.wrap,.topnav .row{padding-left:18px;padding-right:18px}.hero{padding-top:56px}.hero-title{font-size:2.55rem}.pillar-grid{grid-template-columns:1fr}.quick-answer{padding:24px 22px}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="https://www.dataknobs.com/">DataKnobs · Knowledge &amp; Context</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#types">Context Types</a></li>
+      <li><a href="#pillars">Four Pillars</a></li>
+      <li><a href="#knowledge">Knowledge Layer</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Systems Design</span>
+    <h1 class="hero-title">What goes <em>in front</em><br/>of the model, matters.</h1>
+    <p class="hero-sub">Context engineering involves determining the precise information available to an LLM or agent during reasoning, such as instructions, memory, retrieved facts, and tools, to ensure a fixed, finite window results in a dependable answer rather than a mere estimation.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#types">See the six types of context →</a>
+      <a class="btn btn-ghost" href="#pillars">Jump to the four pillars</a>
+    </div>
+    <div class="card-frame reveal">
+      <span class="card-tab">SLIDE <b>01</b> — KNOWLEDGE &amp; CONTEXT ENGINEERING</span>
+      <img alt="Cover slide: Knowledge and Context Engineering" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>Context engineering</strong> Curating and assembling all the information a model sees at inference time, including system instructions, user requests, memory, knowledge retrieval, and tools, allows an agent to reason with precision and efficiency, ensuring only the necessary information is utilized. This process differs from <strong>prompt engineering</strong>Context engineering oversees the entire information lifecycle for a multi-step, sometimes multi-session task by crafting a single instruction. The widely recognized operating framework, popularized by LangChain, divides the discipline into four key steps: <strong>Write</strong> (save context for later), <strong>Select</strong> (pull in only what's relevant now), <strong>Compress</strong> (fit more meaning into fewer tokens), and <strong>Isolate</strong> (keep unrelated context from contaminating a task).</p>
+  </div>
+</div>
+
+<div class="perf"><span></span><span></span><span></span></div>
+
+<!-- ═══ SLIDE 2 — WHAT IS CONTEXT ENGINEERING ═══════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media card-frame">
+      <span class="card-tab">SLIDE <b>02</b> — CONTEXT VS. PROMPT ENGINEERING</span>
+      <img alt="Diagram comparing prompt engineering and context engineering" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">A shift in scope, not just vocabulary</span>
+      <h3 class="brief-title">Bigger than a well-written prompt</h3>
+      <p><strong>Prompt engineering</strong> It involves carefully wording a single directive - the phrasing, examples, and formatting - a skill applied to individual messages.</p>
+      <p><strong>Context engineering</strong> The architectural approach to information management encompasses the entire lifecycle of information, including selection, retrieval, filtering, construction, compression, evaluation, and refresh, ensuring seamless functionality throughout an agent's entire task rather than just its initial message, preventing issues such as missing critical documents or being overwhelmed by unnecessary information.</p>
+    </div>
+  </div>
+</div>
+
+<div class="perf"><span></span><span></span><span></span></div>
+
+<!-- ═══ SLIDE 3 — WHY IT MATTERS ═══════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media card-frame">
+      <span class="card-tab">SLIDE <b>03</b> — THE CONSTRAINTS THAT MAKE IT HARD</span>
+      <img alt="Four constraints of context engineering: tokens, cost, relevance, state" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-3.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-3.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-3.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-3.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Why this became its own discipline</span>
+      <h3 class="brief-title">Four pressures pushing back</h3>
+      <ul class="brief-list">
+        <li><strong>Token limits</strong> — even the most generous context windows have limits, requiring difficult decisions on what to include.</li>
+        <li><strong>Cost</strong> — each processed token incurs a cost; unchecked context expansion leads to increased budget expenses.</li>
+        <li><strong>Relevance</strong> — Superfluous information not only takes up space, it also diverts attention and diminishes the quality of reasoning.</li>
+        <li><strong>State persistence</strong> — agents must retain user preferences and previous interactions across multiple sessions, not just within a single session.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="perf"><span></span><span></span><span></span></div>
+
+<!-- ═══ SLIDE 4 — SIX TYPES OF CONTEXT ══════════════════════════════ -->
+<section id="types">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Anatomy of a context window</span>
+      <h2 class="section-title">Everything competing for the same budget</h2>
+      <p class="section-lede">Consider a context window as a checklist for a task: guidelines, the current issue, recent observations, reliable information, and available resources all come from the same limited pool of tokens.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media card-frame">
+        <span class="card-tab">SLIDE <b>04</b> — SIX TYPES OF CONTEXT</span>
+        <img alt="Six types of context in an agent's context window" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-4.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-4.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-4.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-4.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">A sample token allocation</span>
+        <h3 class="brief-title">Where the budget typically goes</h3>
+        <div class="budget-legend">
+          <span><span class="dot" style="background:var(--indigo);"></span>Instructions</span>
+          <span><span class="dot" style="background:var(--rust);"></span>User request</span>
+          <span><span class="dot" style="background:var(--sage);"></span>Retrieved knowledge</span>
+          <span><span class="dot" style="background:#B79A56;"></span>Memory</span>
+          <span><span class="dot" style="background:#8A8478;"></span>Tools &amp; state</span>
+        </div>
+        <div class="budget">
+          <div class="budget-seg" style="width:15%;background:var(--indigo);">15%</div>
+          <div class="budget-seg" style="width:10%;background:var(--rust);">10%</div>
+          <div class="budget-seg" style="width:45%;background:var(--sage);">45%</div>
+          <div class="budget-seg" style="width:20%;background:#B79A56;">20%</div>
+          <div class="budget-seg" style="width:10%;background:#8A8478;">10%</div>
+        </div>
+        <p style="font-size:.86rem;color:var(--ink-soft);">A knowledge-intensive agent task often fills up almost half of the window with retrieved documents, highlighting the importance of careful selection and compression over sheer window size.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="perf"><span></span><span></span><span></span></div>
+
+<!-- ═══ SLIDE 5 — FOUR PILLARS ══════════════════════════════════════ -->
+<section id="pillars">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The operating framework</span>
+      <h2 class="section-title">Write, Select, Compress, Isolate</h2>
+      <p class="section-lede">Four strategies, made famous by LangChain's research on agent engineering, that encompass nearly all the necessary tasks for a context-engineered system to maintain reliability as tasks become more lengthy and intricate.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media card-frame">
+        <span class="card-tab">SLIDE <b>05</b> — THE FOUR-PILLAR FRAMEWORK</span>
+        <img alt="Write, Select, Compress, Isolate context engineering framework" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-5.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-5.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-5.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-5.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">One system, four responsibilities</span>
+        <h3 class="brief-title">Four verbs, one context budget</h3>
+        <p>Every pillar addresses a unique failure mode: losing information, being overwhelmed by it, running out of space, or allowing unrelated tasks to overlap.</p>
+      </div>
+    </div>
+    <div class="pillar-grid reveal">
+      <div class="pillar-card"><div class="icon">✍️</div><h5>Write</h5><p>Store interim discoveries in a separate scratchpad to ensure they can be accessed later, preventing loss of important information when the window refreshes.</p></div>
+      <div class="pillar-card"><div class="icon">🎯</div><h5>Select</h5><p>Only bring in information that is pertinent to the current task. Not every piece of stored data needs to be included, so retrieval should be both thorough and selective.</p></div>
+      <div class="pillar-card"><div class="icon">🗜️</div><h5>Compress</h5><p>Condense or rearrange lengthy information to maximize efficiency without sacrificing necessary details for future use.</p></div>
+      <div class="pillar-card"><div class="icon">🧱</div><h5>Isolate</h5><p>Prevent any unrelated information, such as another task, user, or document set, from influencing the current thought process.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="perf"><span></span><span></span><span></span></div>
+
+<!-- ═══ SLIDE 6 — KNOWLEDGE LAYER (RAG / VECTOR DB) ═════════════════ -->
+<section id="knowledge">
+  <div class="wrap">
+    <div class="brief-row reveal">
+      <div class="brief-media card-frame">
+        <span class="card-tab">SLIDE <b>06</b> — THE KNOWLEDGE LAYER</span>
+        <img alt="Vector databases and RAG as the knowledge layer for context engineering" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-6.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-6.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-6.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-6.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Where 'select' actually happens</span>
+        <h3 class="brief-title">Retrieval turns a library into a lookup</h3>
+        <p>Agents cannot just copy and paste an entire external knowledge base into their window. Vector databases address this issue by representing documents, conversation history, and structured records as embeddings, allowing the system to retrieve only the pertinent passages for the current task.</p>
+        <p>When combined with a retrieval-augmented generation (RAG) pipeline, this enables 'select' to expand the agent's knowledge base beyond the limitations of a context window by loading only the necessary information at a time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="perf"><span></span><span></span><span></span></div>
+
+<!-- ═══ SLIDE 7 — KNOWLEDGE GRAPHS / GRAPHRAG ═══════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media card-frame">
+      <span class="card-tab">SLIDE <b>07</b> — KNOWLEDGE GRAPHS &amp; GRAPHRAG</span>
+      <img alt="Knowledge graphs and GraphRAG for structured context retrieval" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-7.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-7.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-7.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-7.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">When flat retrieval isn't enough</span>
+      <h3 class="brief-title">Facts that know how they connect</h3>
+      <p>Vector search can identify passages that share similarities, but it may not recognize the connections between a customer's ticket, their subscription tier, and the relevant policy document. In contrast, knowledge graphs explicitly model these relationships, allowing agents to navigate from a customer to their tickets to the applicable SLA in a structured manner, rather than relying on chance for all three to be surfaced through a similarity search.</p>
+      <p><strong>GraphRAG</strong> Integrating graph-aware traversal with retrieval helps pinpoint relevant facts and extract supporting text, minimizing errors and providing a clear path for answering complex, multi-source questions, especially important in environments with access restrictions or compliance regulations.</p>
+    </div>
+  </div>
+</div>
+
+<div class="perf"><span></span><span></span><span></span></div>
+
+<!-- ═══ SLIDE 8 — PATTERNS IN PRACTICE ══════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media card-frame">
+      <span class="card-tab">SLIDE <b>08</b> — PATTERNS SEEN IN PRODUCTION</span>
+      <img alt="Practical context engineering patterns: scratchpad, sub-agents, memory tiers" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-8.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-8.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-8.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-8.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">What this looks like day to day</span>
+      <h3 class="brief-title">Three patterns worth borrowing</h3>
+      <ul class="brief-list">
+        <li><strong>The scratchpad</strong> — as it operates, an agent records its discoveries in an external storage system, creating a lasting, searchable database to avoid starting from scratch every time.</li>
+        <li><strong>Sub-agent isolation</strong> A complicated task is divided among multiple smaller agents, each operating within their own specific and isolated context, with only the end outcome being shared upwards.</li>
+        <li><strong>Tiered memory</strong> Short-term memory stores the present conversation, while long-term memory retains lasting information and preferences, recalled selectively instead of replayed in its entirety each time.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="perf"><span></span><span></span><span></span></div>
+
+<!-- ═══ SLIDE 9 — CONCLUSION ═════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media card-frame">
+      <span class="card-tab">SLIDE <b>09</b> — OWNING THE CONTEXT WINDOW</span>
+      <img alt="Summary: owning your context window as a core design principle" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-9.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-9.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-9.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-9.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-9.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The principle that ties it together</span>
+      <h3 class="brief-title">Treat the window as owned, not infinite</h3>
+      <p>The enduring concept present in all frameworks like LangChain's four pillars, RAG, knowledge graphs, and tiered memory, is also found in the 12-Factor Agents design principles: an agent architecture should be robust. <strong>own its context window</strong> Instead of viewing it as an endless notepad, the model will autonomously organize itself.</p>
+      <p>This implies that each design choice regarding instructions, memory, and retrieval is done purposefully, with a defined responsibility and allocated resources, rather than relying on happenstance.</p>
+    </div>
+  </div>
+</div>
+
+<div class="perf"><span></span><span></span><span></span></div>
+
+<!-- ═══ CONTEXT TYPES REFERENCE TABLE ════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Quick reference</span>
+      <h2 class="section-title">The six types of context, side by side</h2>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Context type</th><th>What it holds</th><th>Primary pillar it feeds</th></tr></thead>
+        <tbody>
+          <tr><td class="dim">System instructions</td><td>Role, goals, constraints, safety rules</td><td>Write</td></tr>
+          <tr><td class="dim">User prompt</td><td>The specific request and its stated constraints</td><td>Select</td></tr>
+          <tr><td class="dim">Short-term memory</td><td>Recent conversation turns, current task state</td><td>Compress</td></tr>
+          <tr><td class="dim">Long-term memory</td><td>Durable facts, preferences, past sessions</td><td>Select</td></tr>
+          <tr><td class="dim">Retrieved knowledge</td><td>Documents, records, and graph facts pulled via RAG</td><td>Select / Compress</td></tr>
+          <tr><td class="dim">Tools &amp; state</td><td>Available actions and the live state of the environment</td><td>Isolate</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Context engineering FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">Is context engineering the same as prompt engineering?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Prompt engineering focuses on crafting the wording of individual instructions, while context engineering oversees the entire information lifecycle that an agent utilizes for a multi-step task, including instructions, memory, retrieved knowledge, and tools. Even a perfectly worded prompt can be ineffective if the surrounding context is inaccurate.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What are the four pillars of context engineering?<span class="plus">+</span></button>
+        <div class="faq-a"><p>The framework, popularized by LangChain's agent research, includes: Store (save context for future use), Retrieve (select only relevant information), Condense (pack more meaning into fewer words), and Shield (prevent unrelated context from interfering with the task at hand).</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How is knowledge engineering different from context engineering?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Knowledge engineering involves organizing and saving data for easy retrieval by constructing a vector database or knowledge graph. Context engineering is the next level, determining during inference which information from the stored knowledge is relevant to the model's current context window.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What exactly is GraphRAG and when does the added complexity become justified?<span class="plus">+</span></button>
+        <div class="faq-a"><p>GraphRAG integrates the explicit relationships of a knowledge graph with text lookup from retrieval-augmented generation, providing added complexity suitable for multi-source or time-sensitive inquiries, data with restricted access, or instances requiring explainable reasoning trails over single similarity-matched passages.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why does an agent need both short-term and long-term memory?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Short-term memory maintains the flow of conversation, while long-term memory stores important information to prevent repetitive learning. Selective retrieval of long-term memory prevents it from overwhelming the current task.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What does it mean to 'own your context window'?<span class="plus">+</span></button>
+        <div class="faq-a"><p>In the 12-Factor Agents methodology, the engineering team deliberately controls the contents of the model's context, treating it as a managed, finite resource instead of leaving it to the framework to decide.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to design your agent's context budget?</h2>
+    <p>Begin by identifying the six necessary types of context for your agent, then use Write, Select, Compress, and Isolate techniques to maintain a focused and relevant window as tasks become more complex.</p>
+    <ul class="cta-list">
+      <li>A context-budget worksheet for your next agent design review</li>
+      <li>A suggestion for a retrieval framework: consider utilizing vector search, knowledge graph, or a combination of both.</li>
+      <li>A memory-tiering plan for short-term vs. long-term state</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#pillars">Revisit the four pillars →</a>
+      <a class="btn btn-ghost" href="#types">Back to context types</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/agentic-ai-development-lifecycle.html">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for Controlling DataProducts and AI</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','types','pillars','knowledge','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

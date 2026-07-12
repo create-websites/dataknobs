@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Development and Prompt Engineering | DataKnobs</title>
+
+<meta content="A practical guide to developing AI agents and engineering production-grade system prompts, covering persistence, tool-use logic, error recovery, provider conventions, testing, prompt drift and versioning." name="description"/>
+<meta content="agent development, prompt engineering, system prompts, AI agents, tool use, error recovery, Claude prompts, GPT prompts, Gemini prompts, prompt testing, prompt versioning, DataKnobs" name="keywords"/>
+<meta content="Prashant Dhingra, DataKnobs" name="author"/>
+<meta content="index, follow, max-image-preview:large" name="robots"/>
+<link href="https://www.dataknobs.com/agentic-ai/guide/8-ai-agent-development-andprompt-engineering.html" rel="canonical"/>
+<meta content="article" property="og:type"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="Agent Development and Prompt Engineering" property="og:title"/>
+<meta content="Design agent instructions that hold up across multiple LLM calls, tool use, provider differences, edge cases and production failures." property="og:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png" property="og:image"/>
+<meta content="https://www.dataknobs.com/agentic-ai/guide/8-ai-agent-development-andprompt-engineering.html" property="og:url"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Agent Development and Prompt Engineering" name="twitter:title"/>
+<meta content="A DataKnobs guide to system prompts, tool-use rules, provider conventions and production testing." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png" name="twitter:image"/>
+<meta content="Prashant Dhingra" name="citation_author"/>
+<meta content="Agent Development and Prompt Engineering" name="citation_title"/>
+<meta content="Agent development, system prompts, prompt engineering, tool use, error recovery, prompt testing and versioning" name="ai-topic"/>
+
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+
+<style>
+:root{
+  --bg:#f8f7ff;
+  --surface:#ffffff;
+  --surface-soft:#f2efff;
+  --ink:#17122b;
+  --ink-soft:#6e6782;
+  --line:#ddd6f1;
+  --line-strong:#c8bdf0;
+  --purple:#6d4aff;
+  --purple-dark:#4d2fd0;
+  --purple-soft:#8f7bff;
+  --violet:#a855f7;
+  --green:#159a73;
+  --amber:#c9872d;
+  --red:#c94a67;
+  --shadow:0 18px 55px rgba(64,43,132,.12);
+  --font-display:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(circle at 8% 0%,rgba(143,123,255,.14),transparent 28rem),
+    linear-gradient(180deg,#fdfcff 0%,var(--bg) 100%);
+  color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.68;
+  -webkit-font-smoothing:antialiased
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+img{max-width:100%;display:block}
+a{color:var(--purple)}
+h1,h2,h3,h4,h5{font-family:var(--font-display);color:var(--ink);letter-spacing:-.025em}
+
+.topnav{
+  position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);
+  backdrop-filter:blur(18px);border-bottom:1px solid rgba(200,189,240,.82)
+}
+.topnav .row{
+  max-width:1180px;margin:0 auto;padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;height:72px
+}
+.brand{
+  font-family:var(--font-display);font-weight:800;font-size:15px;color:var(--ink);
+  text-decoration:none;display:flex;align-items:center;gap:10px;text-transform:none
+}
+.brand::before{
+  content:"DK";display:grid;place-items:center;width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--purple),var(--violet));color:#fff;font-size:11px;
+  letter-spacing:.05em;box-shadow:0 8px 20px rgba(109,74,255,.22)
+}
+.navlinks{display:flex;gap:24px;list-style:none;font-size:13px;font-weight:700}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:8px 0;transition:.2s}
+.navlinks a.active,.navlinks a:hover{color:var(--purple)}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:1px;height:2px;background:var(--purple);border-radius:3px}
+
+.hero{padding:82px 0 48px;position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(109,74,255,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(109,74,255,.05) 1px,transparent 1px);
+  background-size:48px 48px;mask-image:linear-gradient(to bottom,#000,transparent 82%)
+}
+.hero .wrap{position:relative}
+.eyebrow,.section-kicker,.qa-label,.frame-label,.brief-kicker{
+  font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.09em
+}
+.eyebrow{
+  font-size:12px;color:var(--purple);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;
+  border:1px solid var(--line);background:rgba(255,255,255,.85);border-radius:999px;padding:7px 12px
+}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 5px rgba(109,74,255,.12)}
+.hero-title{
+  font-size:clamp(2.6rem,6vw,4.8rem);line-height:1.02;margin-bottom:22px;
+  font-weight:800;max-width:920px;letter-spacing:-.04em
+}
+.hero-title em{
+  font-style:normal;background:linear-gradient(135deg,var(--purple),var(--violet));
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+.hero-sub{font-size:1.15rem;color:var(--ink-soft);max-width:760px;margin-bottom:32px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.btn{
+  font-size:14px;font-weight:800;padding:13px 22px;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;border-radius:12px;border:1px solid var(--line-strong);
+  transition:transform .2s,box-shadow .2s,background .2s
+}
+.btn:hover{transform:translateY(-2px)}
+.btn-solid{background:linear-gradient(135deg,var(--purple),var(--purple-soft));color:#fff;border-color:transparent;box-shadow:0 10px 28px rgba(109,74,255,.24)}
+.btn-solid:hover{box-shadow:0 14px 34px rgba(109,74,255,.32)}
+.btn-ghost{background:#fff;color:var(--ink)}
+.btn-ghost:hover{background:var(--surface-soft)}
+
+.ms-frame{
+  position:relative;background:var(--surface);border:1px solid var(--line);
+  padding:16px;border-radius:24px;box-shadow:var(--shadow);overflow:hidden
+}
+.ms-frame::after{display:none}
+.frame-label{font-size:10.5px;color:var(--ink-soft);display:block;margin:0 2px 12px}
+.frame-label b{color:var(--purple)}
+.ms-frame img{border:1px solid var(--line);border-radius:16px}
+
+.quick-answer{
+  background:linear-gradient(135deg,#fff,var(--surface-soft));border:1px solid var(--line);
+  border-left:5px solid var(--purple);padding:30px 32px;margin:60px 0;max-width:980px;
+  border-radius:18px;box-shadow:0 14px 34px rgba(77,47,208,.08)
+}
+.quick-answer .qa-label{font-size:11px;color:var(--purple);margin-bottom:10px;display:block}
+.quick-answer p{font-size:1rem;color:var(--ink-soft)}
+.quick-answer strong{color:var(--ink)}
+
+.markline{height:56px;position:relative;display:flex;align-items:center;justify-content:center}
+.markline svg{filter:drop-shadow(0 5px 10px rgba(64,43,132,.08))}
+.markline path:first-child,.markline path:last-child{stroke:var(--line-strong)!important}
+.markline path:nth-child(2){stroke:var(--purple)!important}
+
+section{padding:64px 0}
+.section-head{max-width:760px;margin-bottom:42px}
+.section-kicker{font-size:12px;color:var(--purple);margin-bottom:12px}
+.section-title{font-size:clamp(1.9rem,3.4vw,2.7rem);margin-bottom:14px;font-weight:800}
+.section-lede{color:var(--ink-soft);font-size:1.03rem}
+
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:48px 0}
+.brief-row.reverse .brief-media{order:2}
+.brief-kicker{font-size:11px;color:var(--purple);margin-bottom:10px}
+.brief-title{font-size:1.85rem;margin-bottom:14px;font-weight:800}
+.brief-text p{font-size:.98rem;color:var(--ink-soft);margin-bottom:14px}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:11px;margin-top:10px}
+.brief-list li{
+  padding:14px 16px 14px 44px;position:relative;font-size:.94rem;color:var(--ink-soft);
+  border:1px solid var(--line);border-radius:14px;background:#fff
+}
+.brief-list li::before{
+  content:"✓";position:absolute;left:16px;top:14px;width:20px;height:20px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(109,74,255,.12);color:var(--purple);font-size:11px;font-weight:800
+}
+
+.provider-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px;background:transparent;border:0
+}
+.provider-card{
+  background:#fff;padding:24px 22px;border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 10px 26px rgba(58,36,118,.07);transition:transform .2s,border-color .2s
+}
+.provider-card:hover{transform:translateY(-4px);border-color:var(--purple-soft)}
+.provider-card .k{font-family:var(--font-mono);font-size:10.5px;color:var(--purple);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
+.provider-card h5{font-size:1.08rem;margin-bottom:8px;font-weight:800}
+.provider-card p{font-size:.87rem;color:var(--ink-soft)}
+
+.code-block{
+  background:#171126;color:#eeeaff;font-family:var(--font-mono);font-size:.84rem;
+  padding:20px 22px;border-radius:14px;overflow-x:auto;line-height:1.6;margin:14px 0
+}
+.code-block .tag{color:#d5c9ff}
+.code-block .cm{color:#938ba5}
+
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-q{
+  width:100%;text-align:left;background:none;border:none;cursor:pointer;
+  font-family:var(--font-display);font-size:1.05rem;color:var(--ink);
+  padding:22px 0;display:flex;justify-content:space-between;align-items:center;
+  gap:20px;font-weight:800
+}
+.faq-q .plus{font-family:var(--font-mono);color:var(--purple);transition:transform .25s;flex-shrink:0}
+.faq-item.open .plus{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.97rem;max-width:860px}
+
+.cta-band{
+  background:linear-gradient(135deg,#24134d 0%,#4c2caf 55%,#6d4aff 100%);
+  padding:72px 0;color:#fff;position:relative;overflow:hidden
+}
+.cta-band::before{
+  content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(255,255,255,.18),transparent 28rem)
+}
+.cta-band .wrap{position:relative}
+.cta-band .section-kicker{color:#d8d0ff}
+.cta-band .section-title{color:#fff}
+.cta-band p{color:#e8e3ff;max-width:620px;margin-bottom:26px}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-size:.9rem;color:#eeeaff}
+.cta-list li::before{content:"✓ ";color:#b8ffde;font-weight:800}
+.cta-band .btn-solid{background:#fff;color:var(--purple-dark);box-shadow:none}
+.cta-band .btn-ghost{border-color:rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.08)}
+
+footer{
+  background:#171126;color:#c9c2da;padding:38px 0;text-align:center;font-size:13px;
+  border-top:1px solid rgba(255,255,255,.08)
+}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:none}
+
+@media (max-width:900px){
+  .navlinks{display:none}
+  .brief-row{grid-template-columns:1fr;gap:30px}
+  .brief-row.reverse .brief-media{order:0}
+}
+@media (max-width:760px){
+  .provider-grid{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .wrap,.topnav .row{padding-left:18px;padding-right:18px}
+  .hero{padding-top:56px}
+  .hero-title{font-size:2.55rem}
+  .quick-answer{padding:24px 22px}
+}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  *{scroll-behavior:auto!important}
+}
+</style>
+
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="https://www.dataknobs.com/">DataKnobs · Agent Development</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#anatomy">Anatomy</a></li>
+      <li><a href="#providers">Providers</a></li>
+      <li><a href="#testing">Testing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Development Practice</span>
+    <h1 class="hero-title">The instructions are<br/>the <em>product</em>.</h1>
+    <p class="hero-sub">A system prompt for an agent must withstand numerous LLM calls, adversarial user interactions, tool failures, and various provider platforms, distinguishing prompt engineering for chatbots from agents that must remain operational.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#anatomy">Break down a system prompt →</a>
+      <a class="btn btn-ghost" href="#testing">Jump to testing &amp; evaluation</a>
+    </div>
+    <div class="ms-frame reveal">
+      <span class="frame-label">SLIDE <b>01</b> — AGENT DEVELOPMENT &amp; PROMPT ENGINEERING</span>
+      <img alt="Cover slide: Agent Development and Prompt Engineering" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>Agent prompt engineering</strong> Writing system instructions to reliably guide an autonomous agent through multi-step tasks, including tool use, decision-making, and error recovery, rather than a single bounded response is known as procedural prompting. This method differs from standard prompt engineering in three key ways. <strong>persistence</strong> (the same instruction applies to numerous LLM calls, not just one) <strong>tool-use logic</strong> (the tool should be called at a specific time and in a particular manner, rather than just being mentioned) <strong>error recovery</strong> Given the unpredictable inputs, the agent must adhere to a disciplined approach when a step fails, treating the system prompt like production code by versioning, testing against edge cases, and monitoring post-shipment, rather than writing it once and forgetting about it.</p>
+  </div>
+</div>
+
+<div class="markline">
+  <svg height="30" viewBox="0 0 140 30" width="140"><path d="M6 15 H50" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path><path d="M58 20 Q64 6 70 20 Q76 6 82 20" fill="none" stroke="#B8332A" stroke-width="1.6"></path><path d="M90 15 H134" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 2 — PROMPT VS. AGENT PROMPT ENGINEERING ═══════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media ms-frame">
+      <span class="frame-label">SLIDE <b>02</b> — THREE PROPERTIES THAT CHANGE EVERYTHING</span>
+      <img alt="Three properties that separate agent prompting from chatbot prompting" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Why "just write a good prompt" isn't enough</span>
+      <h3 class="brief-title">A chatbot prompt operates briefly, while an agent prompt can run continuously for days.</h3>
+      <p>Traditional prompt engineering focuses on a linear exchange: one input, one output, and finished. However, agent prompting must adapt to a more complex interaction structure.</p>
+      <ul class="brief-list">
+        <li><strong>Persistence</strong> — multiple LLM calls are subject to the same instructions over varying amounts of time, spanning from minutes to days, rather than just one exchange</li>
+        <li><strong>Tool-use decisions</strong> — the prompt must include instructions on when to use a tool, how to analyze its outcome, and what the completion entails</li>
+        <li><strong>Error recovery</strong> — the prompt must outline the agent's response to a failed step, tool error, or incorrect assumption</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="markline">
+  <svg height="30" viewBox="0 0 140 30" width="140"><path d="M6 15 H50" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path><path d="M58 20 Q64 6 70 20 Q76 6 82 20" fill="none" stroke="#B8332A" stroke-width="1.6"></path><path d="M90 15 H134" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 3 — ANATOMY OF A SYSTEM PROMPT ════════════════════════ -->
+<section id="anatomy">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The building blocks</span>
+      <h2 class="section-title">What actually goes into a system prompt</h2>
+      <p class="section-lede">A system prompt must be general, unambiguous, and resistant to adversarial phrasing since it is evaluated against multiple user inputs, unlike a single user message.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media ms-frame">
+        <span class="frame-label">SLIDE <b>03</b> — ANATOMY OF A SYSTEM PROMPT</span>
+        <img alt="Diagram: the parts of a system prompt — persona, behavior, constraints, tools, output contract" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-3.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-3.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-3.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-3.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Everything meant to stay constant</span>
+        <h3 class="brief-title">Persona, behavior, constraints, tools, contract</h3>
+        <p>A system prompt is the set of instructions that the model receives prior to any user message, establishing the persona, behavior, constraints, available tools, and output contract that remain consistent throughout the entire conversation, rather than just the current turn.</p>
+        <p>In contrast, a user prompt is temporary and focused on a specific task - created for a single interaction and then discarded. Mixing up the two often leads to unreliable behavior from the agent: guidelines meant for the underlying system are repeatedly brought up and applied inconsistently in each interaction with the user.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="markline">
+  <svg height="30" viewBox="0 0 140 30" width="140"><path d="M6 15 H50" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path><path d="M58 20 Q64 6 70 20 Q76 6 82 20" fill="none" stroke="#B8332A" stroke-width="1.6"></path><path d="M90 15 H134" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 4 — PROVIDER CONVENTIONS ══════════════════════════════ -->
+<section id="providers">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">One prompt, three very different models</span>
+      <h2 class="section-title">Providers don't treat the system slot the same way</h2>
+      <p class="section-lede">One of the most common failures in production agent development is sending the same system prompt to every provider without any modifications.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media ms-frame">
+        <span class="frame-label">SLIDE <b>04</b> — SYSTEM PROMPT CONVENTIONS BY PROVIDER</span>
+        <img alt="System prompt conventions across Claude, GPT, and Gemini" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-4.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-4.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-4.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-4.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Same intent, different formatting rules</span>
+        <h3 class="brief-title">What each provider actually rewards</h3>
+        <p>The formatting decision is not just for looks - it significantly impacts the level of adherence to instructions by each provider.</p>
+      </div>
+    </div>
+    <div class="provider-grid reveal">
+      <div class="provider-card"><div class="k">Anthropic</div><h5>Claude</h5><p>A system parameter with genuine privileges, resistant to user overrides. It adheres to XML-style tags consistently and encourages structured prompts. To support intricate models, keep the prompt brief and allow the model's reasoning to handle complexity.</p></div>
+      <div class="provider-card"><div class="k">OpenAI</div><h5>GPT-5 / GPT-4o</h5><p>The system role is present but with limited privileges - determined user input can override it. In this case, numbered lists and section headers are more effective than XML, as developer messages and response-format constraints are where strict agreements should be enforced.</p></div>
+      <div class="provider-card"><div class="k">Google</div><h5>Gemini</h5><p>Utilizes a specialized system instruction field and effectively manages lengthy contexts, but can be disrupted by conflicting user requests, leading to noticeable instability in its behavior.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="markline">
+  <svg height="30" viewBox="0 0 140 30" width="140"><path d="M6 15 H50" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path><path d="M58 20 Q64 6 70 20 Q76 6 82 20" fill="none" stroke="#B8332A" stroke-width="1.6"></path><path d="M90 15 H134" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 5 — CORE WRITING PRINCIPLES ═══════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media ms-frame">
+      <span class="frame-label">SLIDE <b>05</b> — AS LONG AS NECESSARY, AS SHORT AS POSSIBLE</span>
+      <img alt="Core prompt-writing principles: brevity, structure, and clear constraints" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-5.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-5.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-5.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-5.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Every word should earn its place</span>
+      <h3 class="brief-title">Precision beats verbosity, almost every time</h3>
+      <p>The most effective prompts are typically less than one hundred words, while the least effective ones exceed five hundred. The distinction is not solely based on length; rather, a well-crafted prompt includes constraints or context essential for the model. Any extraneous details are eliminated.</p>
+      <p>The organization is just as important as being concise: having distinct sections, specific limitations, and, in many cases, a few carefully selected examples instead of an exhaustive list of exceptions. Zero-shot performance is sufficient when a model already excels at following instructions; include examples only if zero-shot is proven to be inadequate.</p>
+    </div>
+  </div>
+</div>
+
+<div class="markline">
+  <svg height="30" viewBox="0 0 140 30" width="140"><path d="M6 15 H50" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path><path d="M58 20 Q64 6 70 20 Q76 6 82 20" fill="none" stroke="#B8332A" stroke-width="1.6"></path><path d="M90 15 H134" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 6 — TOOL-USE RULES ════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media ms-frame">
+      <span class="frame-label">SLIDE <b>06</b> — TOOL-USE RULES INSIDE THE PROMPT</span>
+      <img alt="Rules governing when and how an agent uses tools, written into the system prompt" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-6.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-6.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-6.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-6.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Where agent prompts diverge most from chatbot prompts</span>
+      <h3 class="brief-title">Telling the agent when to reach for a tool</h3>
+      <p>A chatbot prompt simply instructs on what to say, while an agent prompt must also specify when to take action, including which tool to use, what arguments to provide, how to analyze results, and when to consider the task complete to prevent unnecessary tool usage.</p>
+      <p>Permission boundaries must be clearly defined, specifying which actions the agent can take independently and which require explicit approval before proceeding, instead of relying solely on the model's discretion.</p>
+    </div>
+  </div>
+</div>
+
+<div class="markline">
+  <svg height="30" viewBox="0 0 140 30" width="140"><path d="M6 15 H50" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path><path d="M58 20 Q64 6 70 20 Q76 6 82 20" fill="none" stroke="#B8332A" stroke-width="1.6"></path><path d="M90 15 H134" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 7 — TESTING & EVALUATION ══════════════════════════════ -->
+<section id="testing">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Beyond manual chat testing</span>
+      <h2 class="section-title">Golden prompts aren't enough at scale</h2>
+      <p class="section-lede">Manual adjustments are suitable for initial testing and do not hinder progress once an agent integrates with actual tools, memory, and customer interactions.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media ms-frame">
+        <span class="frame-label">SLIDE <b>07</b> — TESTING &amp; EVALUATION</span>
+        <img alt="Testing and evaluation workflow for agent prompts, including adversarial cases" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-7.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-7.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-7.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-7.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Measure the change, don't just feel it</span>
+        <h3 class="brief-title">Test edge cases like you'd test code</h3>
+        <p>As the agent's surface area increases with more tools, memory, customer-facing workflows, and opportunities for a prompt change to unintentionally cause issues, so do the potential failure points. It is crucial to include adversarial coverage from the beginning, such as jailbreak attempts and conflicts between the system and user prompt, rather than addressing them as an afterthought during the hardening process.</p>
+        <p>The key difference between successful teams and those facing backlash from users lies in their ability to link prompt modifications to actual results: a slight tweak can disrupt a tool's functionality without warning, and without thorough real-world testing, this issue may only become apparent once the product is already in use.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="markline">
+  <svg height="30" viewBox="0 0 140 30" width="140"><path d="M6 15 H50" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path><path d="M58 20 Q64 6 70 20 Q76 6 82 20" fill="none" stroke="#B8332A" stroke-width="1.6"></path><path d="M90 15 H134" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 8 — COMMON FAILURE MODES ══════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media ms-frame">
+      <span class="frame-label">SLIDE <b>08</b> — HOW PROMPTS FAIL IN PRODUCTION</span>
+      <img alt="Common ways prompts fail once an agent reaches production" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-8.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-8.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-8.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-8.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The same handful of failures, repeatedly</span>
+      <h3 class="brief-title">What actually breaks, once real users show up</h3>
+      <ul class="brief-list">
+        <li><strong>Prompt drift</strong> — a successful prompt during testing loses effectiveness as it encounters real-world scenarios different from those it was optimized for</li>
+        <li><strong>System/user contradictions</strong> — the model inconsistently resolves a conflict between a user request and a system instruction, sometimes in favor of the user when it shouldn't</li>
+        <li><strong>Jailbreak and adversarial framing</strong> — an adamant user revises an unauthorized plea until finding a loophole in a vaguely-worded restriction</li>
+        <li><strong>Undetected regressions</strong> An unnoticed glitch caused by a prompt edit can unexpectedly disrupt tool selection or output formatting, only discovered when triggered by a user.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="markline">
+  <svg height="30" viewBox="0 0 140 30" width="140"><path d="M6 15 H50" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path><path d="M58 20 Q64 6 70 20 Q76 6 82 20" fill="none" stroke="#B8332A" stroke-width="1.6"></path><path d="M90 15 H134" stroke="#BFAE85" stroke-dasharray="2 4" stroke-width="1.2"></path></svg>
+</div>
+
+<!-- ═══ SLIDE 9 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media ms-frame">
+      <span class="frame-label">SLIDE <b>09</b> — TREAT PROMPTS LIKE PRODUCTION CODE</span>
+      <img alt="Summary: version, test, and monitor prompts like production code" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-9.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide600/agent-development-and-prompt-engineering-9.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide700/agent-development-and-prompt-engineering-9.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide900/agent-development-and-prompt-engineering-9.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-development-and-prompt-engineering/images/Slide1000/agent-development-and-prompt-engineering-9.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The discipline that survives contact with production</span>
+      <h3 class="brief-title">Version it. Test it. Watch it after it ships.</h3>
+      <p>The difference between effective demo prompts and reliable production prompts is usually due to discipline rather than creativity: a system prompt that has undergone version control, extensive testing against various scenarios before release, and ongoing monitoring for consistency after deployment behaves vastly different from one that was simply written once and forgotten.</p>
+      <p>The current transition happening on the field involves a change in perspective - moving from 'prompt engineering' to requirement architecture: encoding domain knowledge and constraints accurately the first time to ensure consistent functionality in all future sessions.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Agent development &amp; prompt engineering FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">How is agent prompt engineering different from regular prompt engineering?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Standard prompt engineering focuses on optimizing a single constrained transaction - one input, one output. In contrast, agent prompt engineering must account for persistence (multiple LLM calls during a prolonged task), decision-making around tool usage (timing and method of calling a tool), and handling errors (response to step failures) - aspects that are not typically addressed in a standard chatbot prompt.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Is it possible to utilize the identical system prompt for Claude, GPT, and Gemini?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Unreliably so. Claude's system parameter holds a genuine advantage with XML-style structure, while GPT's system role excels with numbered lists and section headers. Gemini relies on a dedicated systemInstruction field and is prone to conflicts between system and user messages. Sending the same prompt to all three systems often results in inconsistent behavior.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How long should a system prompt be?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Keep the prompts concise and focused: strong prompts are typically under a hundred words, each sentence containing a necessary constraint or context for the model. Adding unnecessary language or redundant instructions only weakens the effectiveness of the prompt.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What should a system prompt say about tool use?<span class="plus">+</span></button>
+        <div class="faq-a"><p>The line should clearly outline the appropriate tool for each situation, the necessary arguments to provide, the correct interpretation of results, the criteria for task completion to trigger tool usage, and specify actions requiring human confirmation instead of autonomous execution.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why do prompts that work in testing fail in production?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Testing often depended on a limited number of ideal prompts rather than considering adversarial or edge cases. Requests from actual users can be unpredictable and sometimes contradict system instructions, leaving prompts designed only for clean test cases vulnerable.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What does it mean to treat prompts like production code?<span class="plus">+</span></button>
+        <div class="faq-a"><p>This involves tracking every prompt modification, evaluating it with actual and adversarial data before launching, and monitoring its performance post-release, instead of making live changes and only uncovering issues when users provide feedback.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to write a prompt that holds up in production?</h2>
+    <p>Begin by examining the three distinctive characteristics of agent prompting - persistence, tool-use logic, and error recovery - and conduct rigorous testing against adversarial scenarios prior to deployment, rather than waiting until afterwards.</p>
+    <ul class="cta-list">
+      <li>A system-prompt anatomy checklist: persona, behavior, constraints, tools, output contract</li>
+      <li>A provider-specific formatting guide for Claude, GPT, and Gemini</li>
+      <li>An adversarial test-case template for agent prompts before release</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#testing">Revisit testing &amp; evaluation →</a>
+      <a class="btn btn-ghost" href="#providers">Back to provider conventions</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/agentic-ai-development-lifecycle.html">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for Controlling DataProducts and AI</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','anatomy','providers','testing','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

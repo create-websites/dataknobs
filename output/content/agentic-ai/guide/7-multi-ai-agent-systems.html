@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Multi-Agent Systems: Orchestration Patterns | DataKnobs</title>
+<meta content="A practical guide to multi-agent systems covering supervisor-worker, hierarchical, swarm, pipeline, debate and fan-out patterns, shared state, coordination, A2A and token economics." name="description"/>
+<meta content="multi-agent systems, agent orchestration, supervisor worker, hierarchical agents, swarm agents, pipeline agents, debate agents, fan-out, shared state, A2A protocol, DataKnobs" name="keywords"/>
+<meta content="Prashant Dhingra, DataKnobs" name="author"/>
+<meta content="index, follow, max-image-preview:large" name="robots"/>
+<link href="https://www.dataknobs.com/agentic-ai/guide/7-multi-ai-agent-systems.html" rel="canonical"/>
+<meta content="article" property="og:type"/><meta content="DataKnobs" property="og:site_name"/><meta content="Multi-Agent Systems: Orchestration Patterns" property="og:title"/><meta content="Compare six production orchestration patterns, coordination models and token economics for AI-agent teams." property="og:description"/><meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide1000/multi-agent-systems-1.png" property="og:image"/><meta content="https://www.dataknobs.com/agentic-ai/guide/7-multi-ai-agent-systems.html" property="og:url"/>
+<meta content="summary_large_image" name="twitter:card"/><meta content="Multi-Agent Systems: Orchestration Patterns" name="twitter:title"/><meta content="A DataKnobs guide to supervisor, hierarchy, swarm, pipeline, debate and fan-out patterns." name="twitter:description"/><meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide1000/multi-agent-systems-1.png" name="twitter:image"/>
+<meta content="Prashant Dhingra" name="citation_author"/><meta content="Multi-Agent Systems: Orchestration Patterns" name="citation_title"/><meta content="Multi-agent systems, agent orchestration, shared state, A2A protocol, coordination and token economics" name="ai-topic"/>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f8f7ff;--surface:#fff;--surface-soft:#f2efff;--ink:#17122b;--ink-soft:#6e6782;--line:#ddd6f1;--line-strong:#c8bdf0;--purple:#6d4aff;--purple-dark:#4d2fd0;--purple-soft:#8f7bff;--violet:#a855f7;--green:#159a73;--amber:#c9872d;--red:#c94a67;--blue:#4f7cff;--shadow:0 18px 55px rgba(64,43,132,.12);--font-display:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-body:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background:radial-gradient(circle at 8% 0%,rgba(143,123,255,.14),transparent 28rem),linear-gradient(180deg,#fdfcff 0%,var(--bg) 100%);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased}.wrap{max-width:1180px;margin:0 auto;padding:0 28px}img{max-width:100%;display:block}a{color:var(--purple)}h1,h2,h3,h4,h5{font-family:var(--font-display);color:var(--ink);letter-spacing:-.025em}
+.topnav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(18px);border-bottom:1px solid rgba(200,189,240,.82)}.topnav .row{max-width:1180px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:72px}.brand{font-family:var(--font-display);font-weight:800;font-size:15px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px;text-transform:none}.brand::before{content:"DK";display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--violet));color:#fff;font-size:11px;letter-spacing:.05em;box-shadow:0 8px 20px rgba(109,74,255,.22)}.navlinks{display:flex;gap:24px;list-style:none;font-size:13px;font-weight:700}.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:8px 0;transition:.2s}.navlinks a.active,.navlinks a:hover{color:var(--purple)}.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:1px;height:2px;background:var(--purple);border-radius:3px}
+.hero{padding:82px 0 48px;position:relative;overflow:hidden}.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(109,74,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(109,74,255,.05) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,#000,transparent 82%)}.hero .wrap{position:relative}.eyebrow,.section-kicker,.qa-label,.frame-label,.brief-kicker{font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.09em}.eyebrow{font-size:12px;color:var(--purple);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;border:1px solid var(--line);background:rgba(255,255,255,.85);border-radius:999px;padding:7px 12px}.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 5px rgba(109,74,255,.12)}.hero-title{font-size:clamp(2.6rem,6vw,4.8rem);line-height:1.02;margin-bottom:22px;font-weight:800;max-width:920px;letter-spacing:-.04em}.hero-title em{font-style:normal;background:linear-gradient(135deg,var(--purple),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}.hero-sub{font-size:1.15rem;color:var(--ink-soft);max-width:760px;margin-bottom:32px}.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}.btn{font-size:14px;font-weight:800;padding:13px 22px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border-radius:12px;border:1px solid var(--line-strong);transition:transform .2s,box-shadow .2s,background .2s}.btn:hover{transform:translateY(-2px)}.btn-solid{background:linear-gradient(135deg,var(--purple),var(--purple-soft));color:#fff;border-color:transparent;box-shadow:0 10px 28px rgba(109,74,255,.24)}.btn-ghost{background:#fff;color:var(--ink)}.btn-ghost:hover{background:var(--surface-soft)}
+.node-frame{position:relative;background:var(--surface);border:1px solid var(--line);padding:16px;border-radius:24px;box-shadow:var(--shadow);overflow:hidden}.node-badge{display:flex;align-items:center;gap:10px;margin:0 2px 12px}.node-badge .dot{width:9px;height:9px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 5px rgba(109,74,255,.12)}.node-badge .dot::after{display:none}.frame-label{font-size:10.5px;color:var(--ink-soft)}.frame-label b{color:var(--purple)}.node-frame img{border:1px solid var(--line);border-radius:16px}
+.quick-answer{background:linear-gradient(135deg,#fff,var(--surface-soft));border:1px solid var(--line);border-left:5px solid var(--purple);padding:30px 32px;margin:60px 0;max-width:980px;border-radius:18px;box-shadow:0 14px 34px rgba(77,47,208,.08)}.quick-answer .qa-label{font-size:11px;color:var(--purple);margin-bottom:10px;display:block}.quick-answer p{font-size:1rem;color:var(--ink-soft)}.quick-answer strong{color:var(--ink)}
+.mesh{height:56px;display:flex;align-items:center;justify-content:center}.mesh svg{filter:drop-shadow(0 5px 10px rgba(64,43,132,.08))}.mesh line{stroke:var(--line-strong)!important}.mesh circle:nth-of-type(1){fill:var(--purple)!important}.mesh circle:nth-of-type(2){fill:var(--green)!important}.mesh circle:nth-of-type(3){fill:var(--violet)!important}
+section{padding:64px 0}.section-head{max-width:760px;margin-bottom:42px}.section-kicker{font-size:12px;color:var(--purple);margin-bottom:12px}.section-title{font-size:clamp(1.9rem,3.4vw,2.7rem);margin-bottom:14px;font-weight:800}.section-lede{color:var(--ink-soft);font-size:1.03rem}.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:48px 0}.brief-row.reverse .brief-media{order:2}.brief-kicker{font-size:11px;color:var(--purple);margin-bottom:10px}.brief-title{font-size:1.85rem;margin-bottom:14px;font-weight:800}.brief-text p{font-size:.98rem;color:var(--ink-soft);margin-bottom:14px}.brief-list{list-style:none;display:flex;flex-direction:column;gap:11px;margin-top:10px}.brief-list li{padding:14px 16px 14px 44px;position:relative;font-size:.94rem;color:var(--ink-soft);border:1px solid var(--line);border-radius:14px;background:#fff}.brief-list li::before{content:"✓";position:absolute;left:16px;top:14px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(109,74,255,.12);color:var(--purple);font-size:11px;font-weight:800}
+.role-legend{display:flex;flex-wrap:wrap;gap:16px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);margin:18px 0}.role-legend .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px}.pattern-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px;background:transparent;border:0}.pattern-card{background:#fff;padding:24px 22px;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 26px rgba(58,36,118,.07);transition:transform .2s,border-color .2s}.pattern-card:hover{transform:translateY(-4px);border-color:var(--purple-soft)}.pattern-card .k{font-family:var(--font-mono);font-size:10.5px;color:var(--purple);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}.pattern-card h5{font-size:1.08rem;margin-bottom:8px;font-weight:800}.pattern-card p{font-size:.87rem;color:var(--ink-soft)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);background:#fff;border-radius:18px;box-shadow:0 10px 28px rgba(64,43,132,.07)}table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9rem}th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line)}th{font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--surface-soft)}td.dim{font-family:var(--font-mono);font-weight:600;color:var(--purple);font-size:.85rem}tr:last-child td{border-bottom:none}.tagpill{font-family:var(--font-mono);font-size:10.5px;padding:4px 9px;border-radius:999px}.tagpill.low{background:#def7ee;color:#08745a}.tagpill.high{background:#fee7ec;color:#a92d46}
+.faq-item{border-bottom:1px solid var(--line)}.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font-display);font-size:1.05rem;color:var(--ink);padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;font-weight:800}.faq-q .plus{font-family:var(--font-mono);color:var(--purple);transition:transform .25s;flex-shrink:0}.faq-item.open .plus{transform:rotate(45deg)}.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.97rem;max-width:860px}
+.cta-band{background:linear-gradient(135deg,#24134d 0%,#4c2caf 55%,#6d4aff 100%);padding:72px 0;color:#fff;position:relative;overflow:hidden}.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(255,255,255,.18),transparent 28rem)}.cta-band .wrap{position:relative}.cta-band .section-kicker{color:#d8d0ff}.cta-band .section-title{color:#fff}.cta-band p{color:#e8e3ff;max-width:620px;margin-bottom:26px}.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-size:.9rem;color:#eeeaff}.cta-list li::before{content:"✓ ";color:#b8ffde;font-weight:800}.cta-band .btn-solid{background:#fff;color:var(--purple-dark);box-shadow:none}.cta-band .btn-ghost{border-color:rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.08)}footer{background:#171126;color:#c9c2da;padding:38px 0;text-align:center;font-size:13px;border-top:1px solid rgba(255,255,255,.08)}.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}.reveal.visible{opacity:1;transform:none}
+@media(max-width:900px){.navlinks{display:none}.brief-row{grid-template-columns:1fr;gap:30px}.brief-row.reverse .brief-media{order:0}.pattern-grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.wrap,.topnav .row{padding-left:18px;padding-right:18px}.hero{padding-top:56px}.hero-title{font-size:2.55rem}.pattern-grid{grid-template-columns:1fr}.quick-answer{padding:24px 22px}}@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="https://www.dataknobs.com/">DataKnobs · Multi-Agent Systems</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#patterns">Patterns</a></li>
+      <li><a href="#coordination">Coordination</a></li>
+      <li><a href="#economics">Economics</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Systems Architecture</span>
+    <h1 class="hero-title">One agent, or a<br/><em>team</em> of them?</h1>
+    <p class="hero-sub">Multi-agent systems delegate tasks to specialized agents that collaborate, exchange tasks, and verify each other's results. When implemented effectively, they outperform a single generalist agent. However, if implemented haphazardly, they often incur unnecessary costs and coordination efforts without any significant benefits.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#patterns">See the six orchestration patterns →</a>
+      <a class="btn btn-ghost" href="#economics">Check the real economics</a>
+    </div>
+    <div class="node-frame reveal">
+      <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>01</b> — MULTI-AGENT SYSTEMS</span></div>
+      <img alt="Cover slide: Multi-Agent Systems" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide1000/multi-agent-systems-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide1000/multi-agent-systems-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>A multi-agent system</strong> Coordinating multiple LLM-driven agents, each with a unique role, prompt, model tier, or tool set, is necessary to successfully complete tasks that a single generalist agent would struggle with due to inefficiency, slowness, or inability. This complexity is justified by three key conditions: <strong>specialization</strong> (a focused agent genuinely outperforms a generalist), <strong>parallelism</strong> (independent tasks can be executed concurrently, reducing overall time) <strong>critique</strong> Six orchestration patterns effectively enhance the quality of production systems beyond the capabilities of self-review within a single agent. <strong>supervisor/worker</strong>, <strong>hierarchical</strong>, <strong>swarm</strong>, <strong>pipeline</strong>, <strong>debate</strong>, and <strong>fan-out</strong> — it's important to note that multi-agent setups usually have 58% to 285% more token overhead compared to a single well-designed agent, so it's wise to ensure one of those three conditions is met before opting for a team.</p>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 2 — WHEN IT'S WORTH IT ════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot" style="background:var(--teal);"></span><span class="frame-label">SLIDE <b>02</b> — WHEN MULTI-AGENT ACTUALLY PAYS OFF</span></div>
+      <img alt="Three conditions that justify a multi-agent architecture" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Not a default, a decision</span>
+      <h3 class="brief-title">Earn the added complexity</h3>
+      <p>This shape is often overly utilized in applied AI: opting for multiple agents for the sake of complexity rather than necessity. A single well-defined agent, equipped with the appropriate tools and sufficient context, can effectively handle the majority of tasks.</p>
+      <ul class="brief-list">
+        <li><strong>Specialization</strong> — a specialized agent with a specific prompt and limited tools consistently surpasses a generalist in this particular task</li>
+        <li><strong>Parallelism</strong> - Multiple sub-tasks can be executed simultaneously, reducing the overall time taken for a task that would otherwise be completed sequentially by a single agent.</li>
+        <li><strong>Critique</strong> — a new critic agent, offering a fresh perspective, identifies mistakes that an individual agent consistently overlooks during self-review</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 3 — SUPERVISOR / ORCHESTRATOR-WORKER ══════════════════ -->
+<section id="patterns">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The orchestration patterns</span>
+      <h2 class="section-title">Six shapes cover almost every production system</h2>
+      <p class="section-lede">Every pattern is a unique response to a common inquiry: who determines the outcome and how are outcomes reconciled.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media node-frame">
+        <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>03</b> — SUPERVISOR / ORCHESTRATOR-WORKER</span></div>
+        <img alt="Supervisor pattern: central coordinator dispatching to worker agents" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-3.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-3.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-3.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-3.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">The 2026 production default</span>
+        <h3 class="brief-title">One coordinator, several specialists</h3>
+        <p>In most production scenarios, a central supervisor assigns tasks to specialist worker agents after breaking down the main goal into subtasks, eventually combining the results. This orchestrator-worker topology is utilized in approximately seventy percent of multi-agent systems.</p>
+        <p>Clear control and easy debugging are provided, as all decisions pass through a single point. However, the downside is the potential bottleneck of centralization, with the supervisor's expanding context window typically taking up most of the token spend, rather than the worker calls.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#1F8A82" r="6"></circle><circle cx="46" cy="34" fill="#3B4E8C" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 4 — HIERARCHICAL ═══════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>04</b> — HIERARCHICAL (SUPERVISORS OF SUPERVISORS)</span></div>
+      <img alt="Hierarchical pattern: nested supervisors managing specialist worker teams" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-4.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-4.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-4.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-4.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">When one layer of delegation isn't enough</span>
+      <h3 class="brief-title">A tree of supervisors, not just workers</h3>
+      <p>In hierarchical systems, supervisors are organized into levels, with a top-level coordinator assigning tasks to mid-level supervisors such as a research team lead and a code team lead. Each mid-level supervisor oversees a team of specialized workers. The higher levels prioritize coordination and planning, while the lower levels focus on carrying out tasks.</p>
+      <p>The added coordination overhead is justified only when the task complexity involves multiple distinct domains of expertise. Introducing an additional hierarchy to a task that can already be managed by a single supervisor only results in increased delays and expenses, without any corresponding advantage.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 5 — SWARM / DECENTRALIZED ══════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot" style="background:var(--teal);"></span><span class="frame-label">SLIDE <b>05</b> — SWARM / DECENTRALIZED PEER-TO-PEER</span></div>
+      <img alt="Swarm pattern: peer agents coordinating without central control" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-5.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-5.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-5.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-5.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">No single point of failure — or control</span>
+      <h3 class="brief-title">Peers, not a chain of command</h3>
+      <p>Autonomous agents in a swarm operate independently, communicating with nearby agents or through a message bus, rather than relying on central coordination. This decentralized approach eliminates bottlenecks and points of failure.</p>
+      <p>The cost of not having a coordinator is evident in the complexity of achieving system convergence and debugging. Swarm technology is most beneficial in research and summarization tasks, where independent parallel exploration proves to be highly effective.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#A63D6B" r="6"></circle><circle cx="46" cy="34" fill="#3B4E8C" r="6"></circle><circle cx="82" cy="23" fill="#1F8A82" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 6 — PIPELINE ═══════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>06</b> — PIPELINE / SEQUENTIAL</span></div>
+      <img alt="Pipeline pattern: agents processing work in sequence" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-6.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-6.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-6.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-6.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The simplest topology that still counts as multi-agent</span>
+      <h3 class="brief-title">Each agent refines what the last one made</h3>
+      <p>Agents in the pipeline work through tasks in a set order, with each one building upon the work of the previous agent - starting with drafting, then editing, and finally fact-checking. This linear process ensures that each step relies on the completion of the one before it, making the workflow straightforward to understand and troubleshoot, but also completely sequential with no overlap between tasks.</p>
+      <p>It is best suited for workflows that follow a truly organic order of drafting, editing, and verifying, as opposed to tasks that can be done simultaneously.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 7 — DEBATE / CONSENSUS ═════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot" style="background:var(--magenta);"></span><span class="frame-label">SLIDE <b>07</b> — DEBATE / CONSENSUS</span></div>
+      <img alt="Debate pattern: multiple agents argue perspectives, a judge arbitrates" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-7.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-7.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-7.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-7.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Paying for a second opinion</span>
+      <h3 class="brief-title">Two perspectives, a judge decides</h3>
+      <p>During the debate pattern, multiple agents present varying viewpoints on a common issue, with a distinct judge, possibly a different model, mediating between them. This method effectively implements the 'critique' condition for engaging in multi-agent systems, as an impartial second opinion can identify mistakes overlooked by a single agent's self-assessment.</p>
+      <p>The cost of running a debate pattern is significant, typically around two and a half times the cost of a single-model call. It should be reserved for high-stakes decisions where the potential cost of being wrong justifies the expense.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#1F8A82" r="6"></circle><circle cx="46" cy="34" fill="#A63D6B" r="6"></circle><circle cx="82" cy="23" fill="#3B4E8C" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ PATTERN QUICK REFERENCE ═══════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Quick reference</span>
+      <h2 class="section-title">All six patterns, at a glance</h2>
+    </div>
+    <div class="pattern-grid reveal">
+      <div class="pattern-card"><div class="k">Central control</div><h5>Supervisor / Worker</h5><p>One coordinator dispatches and synthesizes. The 2026 production default.</p></div>
+      <div class="pattern-card"><div class="k">Nested control</div><h5>Hierarchical</h5><p>Supervisors of supervisors, for genuinely multi-domain complexity.</p></div>
+      <div class="pattern-card"><div class="k">No central control</div><h5>Swarm</h5><p>Autonomous peers, parallel exploration, harder to coordinate.</p></div>
+      <div class="pattern-card"><div class="k">Fixed order</div><h5>Pipeline</h5><p>Sequential hand-offs, each agent refining the last one's output.</p></div>
+      <div class="pattern-card"><div class="k">Adversarial</div><h5>Debate</h5><p>Competing perspectives plus a judge; costly but high-assurance.</p></div>
+      <div class="pattern-card"><div class="k">Scatter-gather</div><h5>Fan-out</h5><p>Parallel dispatch to independent workers, results gathered back.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 8 — COORDINATION & SHARED STATE ═══════════════════════ -->
+<section id="coordination">
+  <div class="wrap">
+    <div class="brief-row reveal">
+      <div class="brief-media node-frame">
+        <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>08</b> — COORDINATION &amp; SHARED STATE</span></div>
+        <img alt="Diagram of shared state and coordination challenges in multi-agent systems" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-8.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-8.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-8.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-8.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Where multi-agent POCs actually fail</span>
+        <h3 class="brief-title">Context loss, not pattern choice, sinks most systems</h3>
+        <p>All orchestration patterns require persistent, shared state that outlasts any individual agent's actions. Without this crucial component, systems will encounter the same common failures regardless of the chosen pattern.</p>
+        <ul class="brief-list">
+          <li><strong>Context loss</strong> — intermediate results disappear between agent hand-offs</li>
+          <li><strong>Payload bloat</strong> — instead of sharing state references, the full context is passed through every hand-off.</li>
+          <li><strong>Race conditions</strong> — two agents overwrite each other's work with no coordination</li>
+          <li><strong>Recovery failures</strong> — no checkpoint exists to resume from after a crash</li>
+        </ul>
+        <p>Cross-vendor communication has its own emerging standard: the <strong>A2A protocol</strong>Under the Linux Foundation, it dictates how agents can communicate with one another across various frameworks or vendors, irrespective of the orchestration pattern in use.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#A63D6B" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#3B4E8C" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 9 — ECONOMICS ══════════════════════════════════════════ -->
+<section id="economics">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The honest cost picture</span>
+      <h2 class="section-title">Multi-agent is not free parallelism</h2>
+      <p class="section-lede">Each additional agent increases the number of tokens, causing the coordination overhead to grow more rapidly than anticipated by many teams.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media node-frame">
+        <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>09</b> — TOKEN ECONOMICS BY TOPOLOGY</span></div>
+        <img alt="Token overhead by multi-agent topology, and model tiering by role" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-9.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-9.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-9.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-9.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Where the spend actually goes</span>
+        <h3 class="brief-title">The supervisor's context, not the workers, drives cost</h3>
+        <p>Independent and decentralized configurations usually incur approximately 58% higher token overhead than a similar single agent setup, while centralized supervisor configurations can see an increase of up to 285%, as each worker's output ultimately passes through and expands the supervisor's context window.</p>
+        <p>One commonly used cost-saving strategy is model tiering, where a larger, more advanced model is designated for the planner or supervisor role, while smaller, less expensive models are used for routing classifiers and specific worker tasks. This is because the supervisor's decision-making quality has a greater impact on the overall outcome than any individual worker's performance.</p>
+      </div>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead><tr><th>Topology</th><th>Typical token overhead</th><th>Cost driver</th></tr></thead>
+        <tbody>
+          <tr><td class="dim">Single agent (baseline)</td><td><span class="tagpill low">0%</span></td><td>—</td></tr>
+          <tr><td class="dim">Independent / decentralized</td><td><span class="tagpill low">~58% extra</span></td><td>Redundant context across peers</td></tr>
+          <tr><td class="dim">Centralized / supervisor</td><td><span class="tagpill high">~285% extra</span></td><td>Supervisor's growing context window</td></tr>
+          <tr><td class="dim">Debate / consensus</td><td><span class="tagpill high">~2.5x a single call</span></td><td>Multiple full reasoning passes plus a judge</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#3B4E8C" r="6"></circle><circle cx="46" cy="34" fill="#1F8A82" r="6"></circle><circle cx="82" cy="23" fill="#A63D6B" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ SLIDE 10 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media node-frame">
+      <div class="node-badge"><span class="dot"></span><span class="frame-label">SLIDE <b>10</b> — MATCHING PATTERN TO TASK</span></div>
+      <img alt="Summary: matching an orchestration pattern to task characteristics" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide1000/multi-agent-systems-10.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide600/multi-agent-systems-10.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide700/multi-agent-systems-10.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide900/multi-agent-systems-10.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/multi-agent-systems/images/Slide1000/multi-agent-systems-10.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The decision that matters most</span>
+      <h3 class="brief-title">Pattern follows task, not the other way around</h3>
+      <p>In real systems, various patterns are frequently intertwined - for example, a hierarchical arrangement can involve a pipeline within individual teams, or a supervisor may initiate a swarm to facilitate parallel exploration before consolidating the outcomes. It is not incorrect to use these hybrid approaches; the error lies in selecting a structure without first comprehending the requirements of the task at hand.</p>
+      <p>Begin with one agent. Introduce a second only if specialization, parallelism, or critique proves its value - and budget for the additional overhead costs upfront, before they are reflected in the invoice.</p>
+    </div>
+  </div>
+</div>
+
+<div class="mesh">
+  <svg height="46" viewBox="0 0 130 46" width="130"><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="4" x2="34" y1="23" y2="23"></line><circle cx="46" cy="12" fill="#1F8A82" r="6"></circle><circle cx="46" cy="34" fill="#A63D6B" r="6"></circle><circle cx="82" cy="23" fill="#3B4E8C" r="6"></circle><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="15" y2="21"></line><line stroke="#A9B4BC" stroke-width="1.4" x1="51" x2="77" y1="31" y2="25"></line><line stroke="#A9B4BC" stroke-dasharray="3 3" stroke-width="1.4" x1="88" x2="126" y1="23" y2="23"></line></svg>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Multi-agent systems FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">In what circumstances is it more appropriate to utilize a multi-agent system over a single agent?<span class="plus">+</span></button>
+        <div class="faq-a"><p>If one of three conditions is met: a specialized agent outperforms a generalist on a sub-task, independent sub-tasks can be run in parallel to save time, or a separate critic agent catches errors missed by self-review, then it may be more cost-effective and easier to debug to use a single well-scoped agent.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What's the most common multi-agent pattern in production?<span class="plus">+</span></button>
+        <div class="faq-a"><p>The supervisor/ orchestrator-worker pattern is employed in around seventy percent of multi-agent deployments, where a central coordinator divides tasks into subtasks, assigns them to specialized workers, and combines the outcomes, providing precise control but risking the supervisor becoming a bottleneck.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is the price difference between a multi-agent system and a single agent system?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Decentralized, autonomous configurations usually have approximately 58% higher token overhead compared to a single agent, while centralized supervisor configurations can have up to 285% more, mainly due to the supervisor constantly absorbing each worker's output. Discussing patterns with a judge model can cost around 2.5 times more than making a call to a single model.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What's the difference between hierarchical and swarm patterns?<span class="plus">+</span></button>
+        <div class="faq-a"><p>In hierarchical structures, supervisors are organized into levels, with higher levels focusing on planning and coordination, while lower levels handle execution. This system remains centralized, but operates across multiple tiers. In contrast, Swarm operates without a central coordinator: autonomous peer agents work independently and communicate directly with each other, eliminating bottlenecks but making coordination more complex to understand.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why do multi-agent proof-of-concepts often fail in production?<span class="plus">+</span></button>
+        <div class="faq-a"><p>More often than not, the issue lies not in the chosen orchestration pattern, but in the absence of persistent shared state. This results in context loss during hand-offs, bloated payloads being passed at each step, clashes between agents overwriting each other's work, and no safety net to recover from crashes. Prioritizing coordination and state management is key, overshadowing the importance of selecting the 'perfect' topology.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is the A2A protocol?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Agent-to-Agent (A2A) is an open standard, currently managed by the Linux Foundation, designed for enabling communication between agents from various vendors or frameworks, allowing coordination across different orchestration patterns.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to design your agent team?</h2>
+    <p>Begin with only one agent, ensure one of the three conditions is met before introducing a second agent, and select the orchestration pattern that best fits the actual requirements of your task, rather than choosing the most grandiose option available.</p>
+    <ul class="cta-list">
+      <li>A single-agent-vs-multi-agent decision checklist</li>
+      <li>A pattern-selection guide mapped to task characteristics</li>
+      <li>A design template for shared-state to prevent common production failures</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#coordination">Revisit shared-state design →</a>
+      <a class="btn btn-ghost" href="#economics">Back to the economics</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/agentic-ai-development-lifecycle.html">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for Controlling DataProducts and AI</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','patterns','coordination','economics','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

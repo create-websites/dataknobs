@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Observability: Tracing, OpenTelemetry and Monitoring | DataKnobs</title>
+
+<meta content="A practical guide to observing AI agents in production with hierarchical traces, OpenTelemetry GenAI semantic conventions, LLM spans, tool spans, memory spans, multi-agent handoffs, cost attribution and failure analysis." name="description"/>
+<meta content="agent observability, AI agent observability, OpenTelemetry GenAI, agent tracing, LLM monitoring, tool spans, memory spans, multi-agent tracing, AgentOps, production AI monitoring, DataKnobs" name="keywords"/>
+<meta content="Prashant Dhingra, DataKnobs" name="author"/>
+<meta content="index, follow, max-image-preview:large" name="robots"/>
+<link href="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html" rel="canonical"/>
+<meta content="article" property="og:type"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="Agent Observability: Tracing, OpenTelemetry and Monitoring" property="og:title"/>
+<meta content="Trace model calls, tools, memory, orchestration and multi-agent handoffs using OpenTelemetry-compatible agent observability." property="og:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-1.png" property="og:image"/>
+<meta content="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html" property="og:url"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Agent Observability: Tracing, OpenTelemetry and Monitoring" name="twitter:title"/>
+<meta content="A DataKnobs guide to production tracing and observability for AI agents." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-1.png" name="twitter:image"/>
+<meta content="Prashant Dhingra" name="citation_author"/>
+<meta content="Agent Observability: Tracing, OpenTelemetry and Monitoring" name="citation_title"/>
+<meta content="Agent observability, OpenTelemetry GenAI, AI tracing, multi-agent monitoring, cost attribution and production reliability" name="ai-topic"/>
+
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+
+<style>
+:root{
+  --bg:#f8f7ff;
+  --surface:#ffffff;
+  --surface-soft:#f2efff;
+  --surface-deep:#ebe6ff;
+  --ink:#17122b;
+  --ink-soft:#6e6782;
+  --line:#ddd6f1;
+  --line-strong:#c8bdf0;
+  --purple:#6d4aff;
+  --purple-dark:#4d2fd0;
+  --purple-soft:#8f7bff;
+  --violet:#a855f7;
+  --blue:#4f7cff;
+  --green:#159a73;
+  --amber:#c9872d;
+  --red:#c94a67;
+  --shadow:0 18px 55px rgba(64,43,132,.12);
+  --font-display:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(circle at 8% 0%,rgba(143,123,255,.14),transparent 28rem),
+    linear-gradient(180deg,#fdfcff 0%,var(--bg) 100%);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.68;
+  -webkit-font-smoothing:antialiased
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+img{max-width:100%;display:block}
+a{color:var(--purple)}
+h1,h2,h3,h4,h5{font-family:var(--font-display);color:var(--ink);letter-spacing:-.025em}
+
+.topnav{
+  position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);
+  backdrop-filter:blur(18px);border-bottom:1px solid rgba(200,189,240,.82)
+}
+.topnav .row{
+  max-width:1180px;margin:0 auto;padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;height:72px
+}
+.brand{
+  font-family:var(--font-display);font-weight:800;font-size:15px;color:var(--ink);
+  text-decoration:none;display:flex;align-items:center;gap:10px;text-transform:none
+}
+.brand::before{
+  content:"DK";display:grid;place-items:center;width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--purple),var(--violet));color:#fff;font-size:11px;
+  letter-spacing:.05em;box-shadow:0 8px 20px rgba(109,74,255,.22)
+}
+.navlinks{display:flex;gap:24px;list-style:none;font-family:var(--font-body);font-size:13px;font-weight:700}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:8px 0;transition:.2s}
+.navlinks a.active,.navlinks a:hover{color:var(--purple)}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:1px;height:2px;background:var(--purple);border-radius:3px}
+
+.hero{padding:82px 0 48px;position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(109,74,255,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(109,74,255,.05) 1px,transparent 1px);
+  background-size:48px 48px;mask-image:linear-gradient(to bottom,#000,transparent 82%)
+}
+.hero .wrap{position:relative}
+.eyebrow,.section-kicker,.qa-label,.frame-label,.brief-kicker{
+  font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.09em
+}
+.eyebrow{
+  font-size:12px;color:var(--purple);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;
+  border:1px solid var(--line);background:rgba(255,255,255,.85);border-radius:999px;padding:7px 12px
+}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 5px rgba(109,74,255,.12)}
+.hero-title{font-size:clamp(2.6rem,6vw,4.8rem);line-height:1.02;margin-bottom:22px;font-weight:800;max-width:920px}
+.hero-title em{
+  font-style:normal;background:linear-gradient(135deg,var(--purple),var(--violet));
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+.hero-sub{font-size:1.15rem;color:var(--ink-soft);max-width:760px;margin-bottom:32px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.btn{
+  font-family:var(--font-body);font-size:14px;font-weight:800;padding:13px 22px;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;border-radius:12px;border:1px solid var(--line-strong);
+  transition:transform .2s,box-shadow .2s,background .2s
+}
+.btn:hover{transform:translateY(-2px)}
+.btn-solid{background:linear-gradient(135deg,var(--purple),var(--purple-soft));color:#fff;border-color:transparent;box-shadow:0 10px 28px rgba(109,74,255,.24)}
+.btn-solid:hover{box-shadow:0 14px 34px rgba(109,74,255,.32)}
+.btn-ghost{background:#fff;color:var(--ink)}
+.btn-ghost:hover{background:var(--surface-soft)}
+
+.trace-frame{
+  position:relative;background:var(--surface);border:1px solid var(--line);
+  padding:16px;border-radius:24px;box-shadow:var(--shadow);overflow:hidden
+}
+.trace-badge{display:flex;align-items:center;gap:10px;margin:0 2px 12px}
+.trace-badge .pill{
+  font-family:var(--font-mono);font-size:9.5px;padding:4px 9px;border-radius:999px;
+  background:#def7ee;color:#08745a;text-transform:uppercase;letter-spacing:.04em
+}
+.frame-label{font-size:10.5px;color:var(--ink-soft)}
+.frame-label b{color:var(--purple)}
+.trace-frame img{border:1px solid var(--line);border-radius:16px}
+
+.quick-answer{
+  background:linear-gradient(135deg,#fff,var(--surface-soft));border:1px solid var(--line);
+  border-left:5px solid var(--purple);padding:30px 32px;margin:60px 0;max-width:980px;
+  border-radius:18px;box-shadow:0 14px 34px rgba(77,47,208,.08)
+}
+.quick-answer .qa-label{font-size:11px;color:var(--purple);margin-bottom:10px;display:block}
+.quick-answer p{font-size:1rem;color:var(--ink-soft)}
+.quick-answer strong{color:var(--ink)}
+
+.waterfall{height:56px;display:flex;align-items:center;justify-content:center}
+.waterfall svg{filter:drop-shadow(0 6px 12px rgba(64,43,132,.08))}
+.waterfall rect:nth-child(1){fill:var(--purple)}
+.waterfall rect:nth-child(2),.waterfall rect:nth-child(4){fill:var(--green)}
+.waterfall rect:nth-child(3){fill:var(--amber)}
+
+section{padding:64px 0}
+.section-head{max-width:760px;margin-bottom:42px}
+.section-kicker{font-size:12px;color:var(--purple);margin-bottom:12px}
+.section-title{font-size:clamp(1.9rem,3.4vw,2.7rem);margin-bottom:14px;font-weight:800}
+.section-lede{color:var(--ink-soft);font-size:1.03rem}
+
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:48px 0}
+.brief-row.reverse .brief-media{order:2}
+.brief-kicker{font-size:11px;color:var(--purple);margin-bottom:10px}
+.brief-title{font-size:1.85rem;margin-bottom:14px;font-weight:800}
+.brief-text p{font-size:.98rem;color:var(--ink-soft);margin-bottom:14px}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:11px;margin-top:10px}
+.brief-list li{
+  padding:14px 16px 14px 44px;position:relative;font-size:.94rem;color:var(--ink-soft);
+  border:1px solid var(--line);border-radius:14px;background:#fff
+}
+.brief-list li::before{
+  content:"✓";position:absolute;left:16px;top:14px;width:20px;height:20px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(109,74,255,.12);color:var(--purple);font-size:11px;font-weight:800
+}
+
+.span-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:18px;background:transparent;border:0
+}
+.span-card{
+  background:#fff;padding:22px 18px;border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 10px 26px rgba(58,36,118,.07);transition:transform .2s,border-color .2s
+}
+.span-card:hover{transform:translateY(-4px);border-color:var(--purple-soft)}
+.span-card .k{font-family:var(--font-mono);font-size:10px;color:var(--purple);letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+.span-card h5{font-family:var(--font-display);font-size:1rem;margin-bottom:8px;font-weight:800}
+.span-card p{font-size:.84rem;color:var(--ink-soft)}
+
+.table-wrap{
+  overflow-x:auto;border:1px solid var(--line);background:#fff;border-radius:18px;
+  box-shadow:0 10px 28px rgba(64,43,132,.07)
+}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9rem}
+th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--surface-soft)}
+td.dim{font-family:var(--font-mono);font-weight:600;color:var(--purple);font-size:.85rem}
+tr:last-child td{border-bottom:none}
+.tagpill{font-family:var(--font-mono);font-size:10.5px;padding:4px 9px;border-radius:999px}
+.tagpill.good{background:#def7ee;color:#08745a}
+.tagpill.warn{background:#fff1d6;color:#8a5c00}
+.tagpill.bad{background:#fee7ec;color:#a92d46}
+
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-q{
+  width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font-display);
+  font-size:1.05rem;color:var(--ink);padding:22px 0;display:flex;justify-content:space-between;
+  align-items:center;gap:20px;font-weight:800
+}
+.faq-q .plus{font-family:var(--font-mono);color:var(--purple);transition:transform .25s;flex-shrink:0}
+.faq-item.open .plus{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.97rem;max-width:860px}
+
+.cta-band{
+  background:linear-gradient(135deg,#24134d 0%,#4c2caf 55%,#6d4aff 100%);
+  padding:72px 0;color:#fff;position:relative;overflow:hidden
+}
+.cta-band::before{
+  content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(255,255,255,.18),transparent 28rem)
+}
+.cta-band .wrap{position:relative}
+.cta-band .section-kicker{color:#d8d0ff}
+.cta-band .section-title{color:#fff}
+.cta-band p{color:#e8e3ff;max-width:620px;margin-bottom:26px}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-size:.9rem;color:#eeeaff}
+.cta-list li::before{content:"✓ ";color:#b8ffde;font-weight:800}
+.cta-band .btn-solid{background:#fff;color:var(--purple-dark);box-shadow:none}
+.cta-band .btn-ghost{border-color:rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.08)}
+
+footer{
+  background:#171126;color:#c9c2da;padding:38px 0;text-align:center;font-size:13px;
+  border-top:1px solid rgba(255,255,255,.08)
+}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:none}
+
+@media (max-width:900px){
+  .navlinks{display:none}
+  .brief-row{grid-template-columns:1fr;gap:30px}
+  .brief-row.reverse .brief-media{order:0}
+  .span-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  .wrap,.topnav .row{padding-left:18px;padding-right:18px}
+  .hero{padding-top:56px}
+  .hero-title{font-size:2.55rem}
+  .span-grid{grid-template-columns:1fr}
+  .quick-answer{padding:24px 22px}
+}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  *{scroll-behavior:auto!important}
+}
+</style>
+
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="https://www.dataknobs.com/">DataKnobs · Agent Observability</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#spans">Span Types</a></li>
+      <li><a href="#otel">OpenTelemetry</a></li>
+      <li><a href="#platforms">Platforms</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Production Reliability</span>
+    <h1 class="hero-title">Why did the<br/>agent do <em>that</em>?</h1>
+    <p class="hero-sub">Agent observability involves tracking every model call, tool execution, and reasoning step in a structured, replayable trace to detect failures that may appear as successful outcomes, such as accurate but incorrect outputs, unnecessary tool calls, or a plan deviating off course unnoticed.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#spans">See the four span types →</a>
+      <a class="btn btn-ghost" href="#otel">Learn the OpenTelemetry standard</a>
+    </div>
+    <div class="trace-frame reveal">
+      <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>01</b> — AGENT OBSERVABILITY</span></div>
+      <img alt="Cover slide: Agent Observability" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>Agent observability</strong> provides comprehensive insight into the actions taken by an AI agent in a production environment, including all model calls, tool selections, decision chains, memory retrievals, and agent-to-agent handoffs, all captured in a structured, hierarchical format that can be replayed. This surpasses traditional monitoring methods, which only confirm the service's availability without verifying if the agent made correct choices, passed accurate arguments, or followed its designated plan. The emerging standard that integrates these features is. <strong>OpenTelemetry's GenAI semantic conventions</strong> — a vendor-neutral vocabulary of <code>gen_ai.*</code> span and metric attributes that can be emitted by any instrumentation library and ingested by any backend, allowing teams to instrument once and easily switch observability platforms without having to re-instrument each trace point.</p>
+  </div>
+</div>
+
+<div class="waterfall">
+  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
+
+<!-- ═══ SLIDE 2 — WHY TRADITIONAL APM FALLS SHORT ═══════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media trace-frame">
+      <div class="trace-badge"><span class="pill" style="background:var(--red-tint);color:var(--red);">degraded</span><span class="frame-label">SLIDE <b>02</b> — WHY TRADITIONAL APM ISN'T ENOUGH</span></div>
+      <img alt="Why traditional application performance monitoring is insufficient for AI agents" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">A fundamentally different execution shape</span>
+      <h3 class="brief-title">Deterministic monitoring meets non-deterministic execution</h3>
+      <p>Conventional APM monitors the process of a request passing through middleware, interacting with a database, and generating a response with precision in milliseconds. An agent interprets a command, iterates through loops, utilizes various tools, assesses outcomes, and potentially utilizes additional tools before generating an outcome. Each iteration may lead to a different sequence of tools being activated, with task durations varying from 500 milliseconds to several minutes for complex processes.</p>
+      <p>Agents often fail in ways that appear successful, such as providing a polished but incorrect response, executing multiple tool commands unnecessarily to achieve the correct outcome, or performing an action that is technically correct but logically flawed. A dashboard indicating that the agent service is operational does not provide any insight into these potential failures.</p>
+    </div>
+  </div>
+</div>
+
+<div class="waterfall">
+  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
+
+<!-- ═══ SLIDE 3 — FOUR SPAN TYPES ════════════════════════════════════ -->
+<section id="spans">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The trace hierarchy</span>
+      <h2 class="section-title">Every agent run is a tree of spans</h2>
+      <p class="section-lede">One dialogue exchange can create seven or more layers of nested spans. When this is multiplied by five to ten exchanges, it becomes evident why production agents produce ten to a hundred times more telemetry than a standard API.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media trace-frame">
+        <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>03</b> — THE FOUR CORE SPAN TYPES</span></div>
+        <img alt="Four core span types in an agent trace: LLM calls, tool executions, memory, orchestration" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-3.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-3.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-3.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-3.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Miss one, get a blind spot</span>
+        <h3 class="brief-title">One span type per failure mode</h3>
+        <p>A basic agent trace schema must capture every potential issue in order to effectively address and fix failures. If certain types of problems are overlooked, such as tool-execution spans, then errors may go undetected, leading to actions being taken based on outdated data without any visible signs of a problem occurring. In such cases, the blame cannot be placed on the tool or the agent, but rather on the outdated information being used.</p>
+      </div>
+    </div>
+    <div class="span-grid reveal">
+      <div class="span-card"><div class="k">gen_ai.chat</div><h5>LLM calls</h5><p>Model name, number of tokens, latency, and completion status for a single model call.</p></div>
+      <div class="span-card"><div class="k">gen_ai.tool</div><h5>Tool executions</h5><p>Name of the tool, its arguments, the raw output it generates, the duration of the tool execution, the</p></div>
+      <div class="span-card"><div class="k">memory.*</div><h5>Memory operations</h5><p>What was obtained, where it came from, and if it was pertinent to the task at hand.</p></div>
+      <div class="span-card"><div class="k">invoke_agent</div><h5>Agent orchestration</h5><p>The plan, the decision taken, and the transfer of control among agents or stages.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="waterfall">
+  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
+
+<!-- ═══ SLIDE 4 — OPENTELEMETRY GENAI CONVENTIONS ═══════════════════ -->
+<section id="otel">
+  <div class="wrap">
+    <div class="brief-row reverse reveal">
+      <div class="brief-media trace-frame">
+        <div class="trace-badge"><span class="pill">standard</span><span class="frame-label">SLIDE <b>04</b> — OPENTELEMETRY GENAI SEMANTIC CONVENTIONS</span></div>
+        <img alt="OpenTelemetry GenAI semantic conventions: a vendor-neutral vocabulary for agent telemetry" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-4.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-4.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-4.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-4.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">The most important development isn't a product</span>
+        <h3 class="brief-title">A shared vocabulary, not another vendor format</h3>
+        <p>Before the adoption of a common standard, switching between observability backends required manually re-instrumenting every trace point. OpenTelemetry's GenAI semantic conventions have eliminated this tedious process by providing a standardized set of conventions. <code>gen_ai.*</code> Both instrumentation libraries can emit span and metric attributes that any OTLP-compatible backend can ingest.</p>
+        <p>After the spec was released, adoption of major agent frameworks quickly followed suit, with many now generating OTel-compliant spans either natively or through a lightweight instrumentation package. Leading backends are now able to read the standard directly. This means that developers only need to instrument once and can easily switch exporters instead of constantly rewriting instrumentation whenever the observability stack evolves.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="waterfall">
+  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
+
+<!-- ═══ SLIDE 5 — WHAT EACH SPAN SHOULD CAPTURE ═════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media trace-frame">
+      <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>05</b> — WHAT TO CAPTURE IN EACH SPAN</span></div>
+      <img alt="What each span should capture: model, tokens, latency, tool arguments, retries" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-5.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-5.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-5.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-5.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Metadata by default, content by choice</span>
+      <h3 class="brief-title">Enough to answer "why," without over-capturing</h3>
+      <p>Typically, instrumentation primarily captures metadata such as model name, token counts, latency, and finish reason, while intentionally excluding prompt content and tool arguments to avoid sensitive data exposure. Enabling content capture includes full prompt messages, system instructions, tool schemas, and results, which are beneficial for debugging purposes but require cautious handling instead of being enabled by default.</p>
+      <ul class="brief-list">
+        <li>Model stopped generating due to token counts for both input and output.</li>
+        <li>Tool name, arguments, raw output, duration, and retry count</li>
+        <li>Which agent assumed responsibility at every stage, and how was control passed back and forth?</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="waterfall">
+  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
+
+<!-- ═══ SLIDE 6 — MULTI-AGENT TRACING ═══════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media trace-frame">
+      <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>06</b> — TRACING ACROSS AGENT HANDOFFS</span></div>
+      <img alt="Multi-agent tracing: context propagation across agent-to-agent handoffs" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-6.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-6.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-6.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-6.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">One request, many agents, one trace</span>
+      <h3 class="brief-title">Following a request through the whole chain</h3>
+      <p>The majority of production setups are inherently designed to be multi-agent, with a planner assigning tasks to specialized agents that in turn utilize tools and services. The observability must demonstrate the complete journey of a single user request through the entire chain, rather than just focusing on the actions of individual agents in isolation.</p>
+      <p>The method involves context propagation, where trace context is carried with each agent or tool interaction. This allows for a clear visual hierarchy in the trace view: the root agent span is displayed at the top, with child spans for routing, planning, specialist agents, and tool usage nested below. This detailed view highlights the responsible agent at each stage, even when crossing queues and async workers.</p>
+    </div>
+  </div>
+</div>
+
+<div class="waterfall">
+  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
+
+<!-- ═══ SLIDE 7 — COST & TOKEN OBSERVABILITY ═════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media trace-frame">
+      <div class="trace-badge"><span class="pill" style="background:var(--amber-tint);color:#8A5F17;">watch</span><span class="frame-label">SLIDE <b>07</b> — COST &amp; TOKEN OBSERVABILITY</span></div>
+      <img alt="Cost and token observability: attribution by agent, sub-agent, and customer" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-7.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-7.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-7.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-7.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Cost hides in places you're not looking</span>
+      <h3 class="brief-title">Attribute cost down to the sub-agent</h3>
+      <p>Agent expenses can frequently be obscured within sub-agents, retries, and external API calls, rather than being directly attributed to the main request. This is why it is crucial for cost attribution to be granular, reaching down to every individual run, prompt, sub-agent, and even customer, instead of just focusing on the top-level agent. A documented real-world scenario resulted in costs exceeding thirteen thousand dollars in a single month. However, after implementing prompt caching, model routing, and redesigning the planning and execution process, the expenses were reduced by over ninety percent.</p>
+      <p>Pricing models can vary in complexity: certain platforms may charge only for LLM spans, while tool, retrieval, and embedding spans are included at no extra cost. This can result in a significantly lower cost for a system with numerous tool calls but few model calls compared to a flat per-span pricing model.</p>
+    </div>
+  </div>
+</div>
+
+<div class="waterfall">
+  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
+
+<!-- ═══ SLIDE 8 — COMMON FAILURE PATTERNS ════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media trace-frame">
+      <div class="trace-badge"><span class="pill" style="background:var(--red-tint);color:var(--red);">incident</span><span class="frame-label">SLIDE <b>08</b> — FAILURE PATTERNS OBSERVABILITY CATCHES</span></div>
+      <img alt="Common production failure patterns caught by agent observability" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-8.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-8.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-8.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-8.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">What shows up once real traffic arrives</span>
+      <h3 class="brief-title">The failures that hide without proper tracing</h3>
+      <ul class="brief-list">
+        <li><strong>Retry storms</strong> — a rate-limit error caused a retry, which in turn triggered another rate limit; the trace-storage bill quadrupled overnight after one documented incident generated 847 spans from a single conversation during a provider outage</li>
+        <li><strong>Invisible stale data</strong> — the LLM or tool does not make errors apparent when a cached result is retrieved from a outdated connection; only a tool-execution span can uncover this</li>
+        <li><strong>PII leakage into traces</strong> — Tool parameters and prompts frequently contain customer data, which is automatically sent to the observability backend by standard exporters unless specifically hidden</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="waterfall">
+  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
+
+<!-- ═══ SLIDE 9 — PLATFORM LANDSCAPE ═════════════════════════════════ -->
+<section id="platforms">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Tooling</span>
+      <h2 class="section-title">The 2026 observability platform landscape</h2>
+      <p class="section-lede">The OTel standard has led to the commoditization of tracing, with platform differentiation now focused on surfacing failed runs and converting production traces for the next test cycle.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media trace-frame">
+        <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>09</b> — OBSERVABILITY PLATFORMS COMPARED</span></div>
+        <img alt="Comparison of agent observability platforms in 2026" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-9.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-9.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-9.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-9.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Pick by deployment model, not by feature list alone</span>
+        <h3 class="brief-title">Self-hosted, managed SDK, or proxy gateway</h3>
+        <p>Organizing options based on their operation style helps simplify decision-making: self-hosted solutions such as Grafana Tempo or open-source Phoenix are ideal for teams seeking complete data control; managed services like Datadog or Honeycomb offer less operational burden in exchange for some control; agent platforms like Braintrust or LangSmith seamlessly integrate tracing into the evaluation and release process.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="table-wrap reveal" style="margin: 8px 32px 0;max-width:1056px;">
+  <table>
+    <thead><tr><th>Platform</th><th>Best for</th><th>Model</th></tr></thead>
+    <tbody>
+      <tr><td class="dim">Datadog / Honeycomb</td><td>Managed, AI-aware APM with native GenAI span support</td><td><span class="tagpill good">Managed SDK</span></td></tr>
+      <tr><td class="dim">Arize Phoenix</td><td>Open-source, OTel-first tracing plus custom evaluators</td><td><span class="tagpill warn">Self-hosted</span></td></tr>
+      <tr><td class="dim">Langfuse</td><td>Open-source trace store with prompt management built in</td><td><span class="tagpill warn">Self-hosted</span></td></tr>
+      <tr><td class="dim">LangSmith</td><td>Native fit for LangChain / LangGraph agent stacks</td><td><span class="tagpill good">Managed SDK</span></td></tr>
+      <tr><td class="dim">Braintrust</td><td>Trace-to-eval workflow, production failures become test cases</td><td><span class="tagpill bad">Trace-to-eval platform</span></td></tr>
+      <tr><td class="dim">Sentry</td><td>Agent traces unified with errors, replays, and infra traces</td><td><span class="tagpill good">Managed SDK</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="waterfall">
+  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
+
+<!-- ═══ SLIDE 10 — CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media trace-frame">
+      <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>10</b> — BUILT IN, NOT BOLTED ON</span></div>
+      <img alt="Summary: build agent observability in from the start, not after an outage" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-10.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-10.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-10.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-10.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-10.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The lesson every team learns the hard way, once</span>
+      <h3 class="brief-title">Minutes from a trace, not hours from log archaeology</h3>
+      <p>Teams that successfully implement tracing often share a common experience: when they can quickly diagnose production failures in minutes using traces instead of spending hours searching through unstructured logs, the benefits of early investment in tracing become clear and tangible.</p>
+      <p>Consider each user request as a standalone trace containing spans for planning, model calls, tool calls, and downstream services starting from the initial deployment, rather than treating it as an instrumentation task that is only addressed after a major outage occurs.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Agent observability FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">How is agent observability different from LLM monitoring?<span class="plus">+</span></button>
+        <div class="faq-a"><p>LLM monitoring tracks specific model call metrics like latency, tokens, and errors, while agent observability monitors the entire agent process including multi-step reasoning, tool execution, and agent-to-agent handoffs, providing insight into why an agent may have made more model calls than necessary.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is OpenTelemetry's role in agent observability?<span class="plus">+</span></button>
+        <div class="faq-a"><p>The GenAI semantic conventions of OpenTelemetry establish a universal set of gen_ai.* attributes for LLM calls, tool invocations, and agent operations. Adhering to this standard allows an agent's telemetry data to seamlessly integrate with any OTLP-compatible backend, simplifying the process of switching observability platforms to just swapping out an exporter instead of redoing all instrumentation in the codebase.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What are the four span types every agent trace needs?<span class="plus">+</span></button>
+        <div class="faq-a"><p>LLM calls cover a range of information including the model, tokens, latency, and finish reason. Tool executions involve details such as the tool name, arguments, output, duration, and retries. Memory operations detail what was retrieved and from where. Agent orchestrations track the plan, decision-making process, and control passing between steps or agents. Failure to capture any of these elements can result in customer complaints.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How can you track a multi-agent system involving agents calling one another?<span class="plus">+</span></button>
+        <div class="faq-a"><p>By propagating context, the trace carries the root agent span at the top followed by nested child spans for routing, planning, specialist agents, and tool usage, even across queues and async worker processes, when one agent calls another agent or a tool.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">How do teams keep agent tracing from becoming too expensive?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Limiting the number of retries at the instrumentation level prevents a single failure cascade from creating an excessive number of spans. Tail sampling is used to retain all error traces while only capturing a portion of successful ones. Understanding the pricing model of their platform is important, as some only bill for LLM spans, making tool-heavy agents more cost-effective to observe compared to a flat per-span price.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Can tracing prompts and tool arguments containing PII be done safely?<span class="plus">+</span></button>
+        <div class="faq-a"><p>By default, standard OTel exporters will gladly send complete prompts and tool-argument content to an observability backend if content capture is turned on. Due to this, most instrumentations only capture metadata such as model, tokens, and latency by default; enabling full content capture should include explicit masking or redaction for any sensitive fields.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to see inside your agent's execution?</h2>
+    <p>From day one, ensure the four core span types are aligned with OpenTelemetry GenAI conventions, and choose an observability platform based on deployment model rather than feature checklist alone.</p>
+    <ul class="cta-list">
+      <li>A minimum-viable trace schema covering all four span types</li>
+      <li>A platform comparison worksheet by deployment model and cost structure</li>
+      <li>A PII-masking checklist for safe content capture in production traces</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#otel">Revisit the OpenTelemetry standard →</a>
+      <a class="btn btn-ghost" href="#platforms">Back to platform comparison</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/agentic-ai-development-lifecycle.html">Agentic Ai Development Lifecycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for Controlling DataProducts and AI</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','spans','otel','platforms','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

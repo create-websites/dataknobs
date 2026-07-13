@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Economics in 2026: Evaluating Token Costs, ROI, and Unit Economics for AI Agents</title>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700&amp;family=Fira+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --bg:#0A0E0C;
+  --bg2:#111815;
+  --panel:#161F1B;
+  --ink:#E4EDE8;
+  --ink-soft:#7C8C83;
+  --line:#243830;
+  --line-strong:#33493F;
+  --green:#00D084;
+  --green-tint:#0F2E20;
+  --red:#FF4757;
+  --red-tint:#3A1418;
+  --gold:#F0B429;
+  --gold-tint:#3A2C0F;
+  --font-display:'Chakra Petch', sans-serif;
+  --font-body:'Manrope', sans-serif;
+  --font-mono:'Fira Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.68;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px;}
+img{max-width:100%;display:block;}
+a{color:var(--green);}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);letter-spacing:.01em;font-weight:600;}
+
+/* ── ticker-tape divider (signature motif) ────────────────────────── */
+.ticker{height:44px;position:relative;display:flex;align-items:center;justify-content:center;gap:18px;font-family:var(--font-mono);font-size:12px;overflow:hidden;}
+.ticker::before,.ticker::after{content:"";flex:1;border-top:1px solid var(--line-strong);max-width:60px;}
+.ticker .up{color:var(--green);}
+.ticker .down{color:var(--red);}
+
+/* ── price-panel frame (signature motif) ──────────────────────────── */
+.price-frame{position:relative;background:var(--panel);border:1px solid var(--line-strong);padding:18px 20px 14px;}
+.price-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:.03em;padding:3px 10px;border-radius:2px;margin-bottom:10px;}
+.price-badge.up{background:var(--green-tint);color:var(--green);}
+.price-badge.down{background:var(--red-tint);color:var(--red);}
+.price-badge.flat{background:var(--gold-tint);color:var(--gold);}
+.frame-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:10px;}
+.frame-label b{color:var(--gold);}
+.price-frame img{border:1px solid var(--line);}
+
+/* ── nav ──────────────────────────────────────────────────────────── */
+.topnav{position:sticky;top:0;z-index:50;background:rgba(10,14,12,0.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line-strong);}
+.topnav .row{max-width:1120px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.brand{font-family:var(--font-mono);font-weight:500;font-size:13px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;}
+.brand::before{content:"$";color:var(--gold);}
+.navlinks{display:flex;gap:26px;list-style:none;font-family:var(--font-mono);font-size:12.5px;}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:4px 0;transition:color .2s;}
+.navlinks a.active,.navlinks a:hover{color:var(--green);}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--green);}
+@media (max-width:900px){.navlinks{display:none;}}
+
+/* ── hero ─────────────────────────────────────────────────────────── */
+.hero{padding:76px 0 44px;}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--gold);display:inline-block;}
+.hero-title{font-size:clamp(2.3rem,5.8vw,4rem);line-height:1.08;margin-bottom:22px;font-weight:600;}
+.hero-title em{font-style:normal;color:var(--green);}
+.hero-sub{font-size:1.14rem;color:var(--ink-soft);max-width:660px;margin-bottom:32px;font-family:var(--font-body);}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px;}
+.btn{font-family:var(--font-mono);font-size:13px;padding:13px 22px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);transition:all .2s;}
+.btn-solid{background:var(--green);color:#052015;border-color:var(--green);}
+.btn-solid:hover{background:#3DE0A0;}
+.btn-ghost{background:transparent;color:var(--ink);}
+.btn-ghost:hover{background:var(--bg2);}
+
+/* ── quick answer ─────────────────────────────────────────────────── */
+.quick-answer{background:var(--panel);border:1px solid var(--line-strong);border-left:4px solid var(--gold);padding:28px 30px;margin:56px 0;max-width:920px;}
+.quick-answer .qa-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:block;}
+.quick-answer p{font-size:1.02rem;color:#D3DCD6;}
+.quick-answer strong{color:var(--ink);}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+section{padding:56px 0;}
+.section-head{max-width:700px;margin-bottom:40px;}
+.section-kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.section-title{font-size:clamp(1.7rem,3.2vw,2.3rem);margin-bottom:14px;font-weight:600;}
+.section-lede{color:var(--ink-soft);font-size:1.02rem;}
+
+/* ── brief rows ───────────────────────────────────────────────────── */
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:44px 0;}
+.brief-row.reverse .brief-media{order:2;}
+.brief-kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--green);margin-bottom:10px;}
+.brief-title{font-size:1.7rem;margin-bottom:14px;font-weight:600;}
+.brief-text p{font-size:.98rem;color:#C8D1CB;margin-bottom:14px;}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:6px;}
+.brief-list li{padding-left:20px;position:relative;font-size:.93rem;color:var(--ink-soft);}
+.brief-list li::before{content:"▸";position:absolute;left:0;color:var(--green);}
+@media (max-width:900px){.brief-row{grid-template-columns:1fr;gap:30px;}.brief-row.reverse .brief-media{order:0;}}
+
+/* ── stat grid ────────────────────────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.stat-card{background:var(--panel);padding:22px 18px;text-align:center;}
+.stat-card .v{font-family:var(--font-mono);font-size:1.9rem;color:var(--green);line-height:1;font-weight:700;}
+.stat-card .l{font-family:var(--font-mono);font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin-top:8px;}
+@media (max-width:820px){.stat-grid{grid-template-columns:1fr 1fr;}}
+
+/* ── kpi grid ─────────────────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.kpi-card{background:var(--panel);padding:20px 16px;}
+.kpi-card .k{font-family:var(--font-mono);font-size:10px;color:var(--gold);margin-bottom:8px;}
+.kpi-card h5{font-family:var(--font-display);font-size:.98rem;margin-bottom:8px;font-weight:600;}
+.kpi-card p{font-size:.82rem;color:var(--ink-soft);}
+@media (max-width:820px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:520px){.kpi-grid{grid-template-columns:1fr;}}
+
+/* ── table ────────────────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border:1px solid var(--line-strong);background:var(--panel);}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9rem;}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);background:var(--bg2);border-bottom:1px solid var(--line-strong);}
+td.dim{font-family:var(--font-mono);font-weight:600;color:var(--gold);font-size:.85rem;}
+tr:last-child td{border-bottom:none;}
+
+/* ── faq ──────────────────────────────────────────────────────────── */
+.faq-item{border-bottom:1px solid var(--line-strong);}
+.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font-display);font-size:1.05rem;color:var(--ink);padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;font-weight:600;}
+.faq-q .plus{font-family:var(--font-mono);color:var(--green);transition:transform .25s;flex-shrink:0;}
+.faq-item.open .plus{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.96rem;max-width:820px;font-family:var(--font-body);}
+
+/* ── cta ──────────────────────────────────────────────────────────── */
+.cta-band{background:var(--bg2);padding:64px 0;border-top:1px solid var(--line-strong);}
+.cta-band p{color:var(--ink-soft);max-width:580px;margin-bottom:26px;font-size:1rem;}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-family:var(--font-mono);font-size:.88rem;color:var(--ink-soft);}
+.cta-list li::before{content:"✓ ";color:var(--green);}
+
+footer{padding:32px 0;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);border-top:1px solid var(--line-strong);}
+</style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a class="brand" href="#top">AGENT ECONOMICS</a>
+    <ul class="navlinks" id="navlinks">
+      <li><a class="active" href="#overview">Overview</a></li>
+      <li><a href="#tokens">Token Economics</a></li>
+      <li><a href="#roi">ROI</a></li>
+      <li><a href="#finops">FinOps</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Agentic AI · Cost &amp; ROI</span>
+    <h1 class="hero-title">Token prices fell.<br/>The <em>bill</em> didn't.</h1>
+    <p class="hero-sub">An advanced model on the cusp of innovation saw a 67% decrease in cost annually. Despite this, Enterprise AI expenses continued to increase due to the high token consumption of agentic workflows, which require five to thirty times more tokens per task compared to a simple chat reply. The total expenditure is determined by both price and volume, not just price alone, ultimately shaping the economics of agents in 2026.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#tokens">See why the bill keeps rising →</a>
+      <a class="btn btn-ghost" href="#roi">Check the ROI benchmarks</a>
+    </div>
+    <div class="price-frame reveal">
+      <span class="price-badge flat">overview</span>
+      <span class="frame-label">SLIDE <b>01</b> :  AGENT ECONOMICS</span>
+      <img alt="Cover slide: Agent Economics" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide1000/agent-economics-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide600/agent-economics-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide700/agent-economics-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide1000/agent-economics-1.png 1000w" width="1000"/>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="quick-answer reveal" id="overview">
+    <span class="qa-label">Quick answer</span>
+    <p><strong>Agent economics</strong> Understanding, measuring, and managing the costs and value of running AI agents is a new challenge brought about by agentic AI, which has transformed enterprise AI spending from a fixed, predictable expense to a variable, consumption-driven compute cost. <strong>Tokens have become the atomic unit of that economy</strong>As every plan, tool, and decision burns them, total spending continues to rise despite falling per-token prices because agentic workflows require more tokens per task than a basic chat reply. This shift has moved the focus from cost-per-token optimization to measuring. <strong>cost per verified outcome</strong>According to McKinsey, well-planned enterprise deployments can achieve a 5.8x ROI within fourteen months, with success attributed to economically disciplined orchestration rather than the size of the model.</p>
+  </div>
+</div>
+
+<div class="ticker"><span class="up">▲ $2/1M in</span><span class="down">▼ 67% YoY</span><span class="up">▲ 30x complexity</span><span class="down">▼ token price</span><span class="up">▲ 5.8x ROI</span></div>
+
+<!-- ═══ SLIDE 2 :  FROM FIXED COST TO VARIABLE COMPUTE ═══════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media price-frame">
+      <span class="price-badge up">▲ cost shift</span>
+      <span class="frame-label">SLIDE <b>02</b> :  FIXED LABOR COST TO VARIABLE COMPUTE</span>
+      <img alt="The shift from fixed software and labor costs to variable, consumption-driven agent compute costs" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide600/agent-economics-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide700/agent-economics-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-2.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">A 30x jump, in three years</span>
+      <h3 class="brief-title">Simple software costs; orchestrated agents consume</h3>
+      <p>In 2023, a basic linear workflow cost around four cents per interaction. By 2026, a more intricate orchestrated system with additional tools, reasoning, and iterative loops costs approximately a dollar twenty per interaction - about thirty times higher for a system performing significantly more work, not just the same work at a slower pace.</p>
+      <p>Boards must understand the change: AI now trades a fixed software license or labor cost for a dynamic compute consumption model, more like a utility bill than a subscription. The total spend is determined by the price per token multiplied by the volume consumed, with volume being the variable often overlooked in budgets.</p>
+    </div>
+  </div>
+</div>
+
+<div class="ticker"><span class="down">▼ price/token</span><span class="up">▲ volume</span><span class="down">▼ predictability</span><span class="up">▲ token demand</span></div>
+
+<!-- ═══ SLIDE 3 :  TOKENS: THE NEW CURRENCY ══════════════════════════ -->
+<section id="tokens">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">The atomic unit of value</span>
+      <h2 class="section-title">Tokens are the currency; the exchange rate keeps moving</h2>
+      <p class="section-lede">A token is a compact unit of processed data, such as text characters, image fragments, or audio snippets. Every action, search, and decision made by an agent is quantified in terms of tokens.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media price-frame">
+        <span class="price-badge flat">tokenomics</span>
+        <span class="frame-label">SLIDE <b>03</b> :  TOKENS AS THE UNIT OF AI ECONOMICS</span>
+        <img alt="Tokens as the atomic unit of AI economics, and why falling prices don't mean falling bills" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-3.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide600/agent-economics-3.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide700/agent-economics-3.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-3.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">A cheaper token, not a cheaper bill</span>
+        <h3 class="brief-title">Even when unit price drops, aggregate spend climbs</h3>
+        <p>The decline in per-token list prices is overshadowed by organizations increasing modality, agent autonomy, and reasoning chains, leading to a decrease in per-unit savings. After implementing multi-agent systems, a large enterprise saw their daily token usage increase from 8 billion to 27 billion, resulting in individual tokens becoming cheaper but overall token costs remaining the same.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker"><span class="up">▲ tiered routing</span><span class="down">▼ 87% gap</span><span class="up">▲ frontier premium</span></div>
+
+<!-- ═══ SLIDE 4 :  MODEL ROUTING & CASCADE ARCHITECTURE ═══════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media price-frame">
+      <span class="price-badge up">▲ savings lever</span>
+      <span class="frame-label">SLIDE <b>04</b> :  MODEL ROUTING &amp; CASCADE ARCHITECTURE</span>
+      <img alt="Model routing and cascade architecture: matching model tier to task complexity" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-4.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide600/agent-economics-4.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide700/agent-economics-4.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-4.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Not every step needs the flagship model</span>
+      <h3 class="brief-title">Reserve frontier pricing for frontier work</h3>
+      <p>Classifying, extracting, detecting intent, and summarizing documents are the standard processes in enterprise workflows that do not necessitate advanced capabilities. The cost difference between basic and advanced models ranges from 20 to 50 times per token. Routinely sending all tasks to the top-tier model, regardless of complexity, is a major cause of excessive spending.</p>
+      <p>In a large-scale analysis, organizations that implement a tiered architecture, with small models for routing and classification, a mid-tier for structured reasoning, and a frontier for high-value or high-risk decisions, had a median blended cost of $2.31 per million tokens. In contrast, organizations routing all tasks to frontier models incurred a cost of $18.40 per million tokens, resulting in an 87% cost difference. This highlights the significant impact of architectural decisions made early in deployment, which are often not revisited.</p>
+    </div>
+  </div>
+</div>
+
+<div class="ticker"><span class="down">▼ cost/token</span><span class="up">▲ cost/outcome</span><span class="down">▼ vanity metric</span></div>
+
+<!-- ═══ SLIDE 5 :  COST PER OUTCOME, NOT COST PER TOKEN ═══════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media price-frame">
+      <span class="price-badge flat">the real KPI</span>
+      <span class="frame-label">SLIDE <b>05</b> :  COST PER OUTCOME, NOT COST PER TOKEN</span>
+      <img alt="Cost per verified outcome as the real economic metric, replacing cost per token" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-5.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide600/agent-economics-5.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide700/agent-economics-5.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-5.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">Executives don't care about token efficiency</span>
+      <h3 class="brief-title">They care about what one result costs</h3>
+      <p>Cost per resolved claim, cost per processed invoice, and cost per deployed feature are the key metrics that drive a business's operations. For an agent, unit economics can be simplified to total operating cost divided by completed work items that meet quality standards, rather than simply dividing raw token spend by other factors.</p>
+      <p>Companies that prioritize aligning metrics with outcomes are more successful than those solely focused on maximizing inference efficiency. A workflow may appear cost-effective per token, but could prove to be a poor investment if a low percentage of outputs meet review standards - the opposite is also true.</p>
+    </div>
+  </div>
+</div>
+
+<div class="ticker"><span class="up">▲ $60M saved</span><span class="up">▲ $3.5B saved</span><span class="up">▲ 5.8x ROI</span><span class="up">▲ 192% avg</span></div>
+
+<!-- ═══ SLIDE 6 :  THE ROI FRAMEWORK ══════════════════════════════════ -->
+<section id="roi">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Measuring the return, honestly</span>
+      <h2 class="section-title">Net value, not just time saved</h2>
+      <p class="section-lede">Only considering saved time can inflate ROI and prioritize the wrong agents. A comprehensive formula calculates value against all actual costs incurred by the agent.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media price-frame">
+        <span class="price-badge up">▲ net value</span>
+        <span class="frame-label">SLIDE <b>06</b> :  THE AGENT ROI FRAMEWORK</span>
+        <img alt="Agent ROI framework: net value formula including costs, failures, and support" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-6.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide600/agent-economics-6.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide700/agent-economics-6.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-6.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Value minus every real cost, not just the obvious one</span>
+        <h3 class="brief-title">Time saved, leakage prevented, revenue safeguarded - all efforts subtracted</h3>
+        <p>The net value is determined by subtracting model cost, tool cost, integration cost, human review cost, failure cost, and support cost from the sum of time removed, leakage avoided, revenue protected, and quality gained. The elimination of minutes of genuine human work is a key factor in determining the overall net value.</p>
+      </div>
+    </div>
+    <div class="stat-grid reveal">
+      <div class="stat-card"><div class="v">5.8x</div><div class="l">ROI within 14 months, well-scoped deployments</div></div>
+      <div class="stat-card"><div class="v">192%</div><div class="l">Average ROI, US enterprises</div></div>
+      <div class="stat-card"><div class="v">74%</div><div class="l">Of orgs see ROI within year one</div></div>
+      <div class="stat-card"><div class="v">$3.5B</div><div class="l">Reported savings, one enterprise deployment</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker"><span class="down">▼ 25-35% build</span><span class="up">▲ 65-75% run</span><span class="down">▼ upfront cost</span></div>
+
+<!-- ═══ SLIDE 7 :  TOTAL COST OF OWNERSHIP ════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reverse reveal">
+    <div class="brief-media price-frame">
+      <span class="price-badge flat">TCO</span>
+      <span class="frame-label">SLIDE <b>07</b> :  TOTAL COST OF OWNERSHIP</span>
+      <img alt="Total cost of ownership for AI agents: build cost is a fraction of the three-year total" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-7.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide600/agent-economics-7.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide700/agent-economics-7.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-7.png 900w" width="900"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The build is the smaller number</span>
+      <h3 class="brief-title">Build cost is 25–35% of the real three-year bill</h3>
+      <p>The upfront cost of an agent's initial build usually makes up only 25-33% of the total three-year ownership cost. For instance, an $80,000 build suggests a three-year budget nearing $600,000 when factoring in LLM consumption, infrastructure, maintenance, monitoring, and human oversight.</p>
+      <p>The decision between building or buying follows a similar logic: custom infrastructure is typically more cost-effective and capable than a packaged SaaS model by the second year, but only becomes justifiable when token production reaches a sufficient scale.</p>
+    </div>
+  </div>
+</div>
+
+<div class="ticker"><span class="up">▲ completion rate</span><span class="down">▼ iterations</span><span class="up">▲ resolution rate</span></div>
+
+<!-- ═══ SLIDE 8 :  OPERATIONAL KPIs FOR AGENT ECONOMICS ═══════════════ -->
+<section>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">What to actually watch</span>
+      <h2 class="section-title">Traditional AI metrics don't capture enterprise economics</h2>
+      <p class="section-lede">Autonomous systems require KPIs that accurately reflect how they allocate both time and money, rather than relying solely on accuracy metrics suited for a one-time model.</p>
+    </div>
+    <div class="brief-row reveal">
+      <div class="brief-media price-frame">
+        <span class="price-badge flat">KPI panel</span>
+        <span class="frame-label">SLIDE <b>08</b> :  OPERATIONAL KPIs FOR AGENT ECONOMICS</span>
+        <img alt="Operational KPIs for agent economics: completion rate, resolution rate, iterations, cost per result" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-8.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide600/agent-economics-8.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide700/agent-economics-8.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-8.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">Four numbers, watched together</span>
+        <h3 class="brief-title">High numbers of iterations indicate a cost issue, not a measure of quality.</h3>
+        <p>A high number of reasoning iterations per workflow indicates inefficiency and excessive token usage, rather than thoroughness. The key is to create concise execution loops with strict iteration limits, instead of allowing the agent to endlessly reflect in the pursuit of quality.</p>
+      </div>
+    </div>
+    <div class="kpi-grid reveal">
+      <div class="kpi-card"><div class="k">Reliability</div><h5>Completion rate</h5><p>% of workflows completed correctly, end to end, without correction.</p></div>
+      <div class="kpi-card"><div class="k">Labor displacement</div><h5>Autonomous resolution rate</h5><p>% resolved without any human intervention.</p></div>
+      <div class="kpi-card"><div class="k">Cost signal</div><h5>Reasoning iterations</h5><p>High loop counts in workflows indicate inefficiency, not attention to detail.</p></div>
+      <div class="kpi-card"><div class="k">The metric that matters</div><h5>Cost per resolved outcome</h5><p>What one completed, review-passing result actually costs.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker"><span class="down">▼ spend ceiling</span><span class="up">▲ chargeback</span><span class="down">▼ shadow AI</span></div>
+
+<!-- ═══ SLIDE 9 :  FINOPS FOR AGENTIC AI ═══════════════════════════════ -->
+<section id="finops">
+  <div class="wrap">
+    <div class="brief-row reveal">
+      <div class="brief-media price-frame">
+        <span class="price-badge down">▼ cost controls</span>
+        <span class="frame-label">SLIDE <b>09</b> :  FINOPS PRACTICES FOR AGENTIC AI</span>
+        <img alt="FinOps practices adapted for agentic AI: monitoring, chargeback, ROI thresholds, kill switches" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-9.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide600/agent-economics-9.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide700/agent-economics-9.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-9.png 900w" width="900"/>
+      </div>
+      <div class="brief-text">
+        <span class="brief-kicker">The function that governed cloud now governs tokens</span>
+        <h3 class="brief-title">The bill comes after the damage is already done if there are no circuit breakers.</h3>
+        <p>In just one year, the responsibility for overseeing AI expenses shifted drastically among FinOps professionals, with nearly all practitioners now managing these costs. This new challenge involves navigating a complex cost structure, characterized by token-based, consumption-driven, and constantly changing architecture, for which there is no established playbook.</p>
+        <p>Implementing practices such as real-time consumption monitoring at the workload level, business-unit chargeback for token use, ROI thresholds for new initiatives, explicit policies for discovering and remediating shadow AI, and hard kill switches at various levels is essential to prevent financial damage before it occurs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SLIDE 10 :  CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+  <div class="brief-row reveal">
+    <div class="brief-media price-frame">
+      <span class="price-badge up">▲ discipline wins</span>
+      <span class="frame-label">SLIDE <b>10</b> :  ECONOMIC DISCIPLINE OVER RAW CAPABILITY</span>
+      <img alt="Summary: economic discipline in agent orchestration matters more than raw model capability" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide1000/agent-economics-10.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide600/agent-economics-10.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide700/agent-economics-10.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide900/agent-economics-10.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-economics/images/Slide1000/agent-economics-10.png 1000w" width="1000"/>
+    </div>
+    <div class="brief-text">
+      <span class="brief-kicker">The competitive edge in 2026</span>
+      <h3 class="brief-title">The best model doesn't win. The best-run one does</h3>
+      <p>In 2026, the company that will have a competitive edge is not the one with the most cutting-edge model, but the one with the most economically disciplined approach, including tiered routing, iterative loops, real-time consumption tracking, and evaluating deployments based on cost per verified outcome rather than cost per token.</p>
+      <p>Organizations that focus on measuring tokens will hit a plateau, while those that measure outcomes will experience growth. Begin with a single workflow, accurately calculate the full net-value formula, and base the decision to scale on the cost per verified outcome, rather than enthusiasm alone.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-kicker">Frequently asked</span>
+      <h2 class="section-title">Agent economics FAQ</h2>
+    </div>
+    <div class="reveal" id="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q">How come enterprise AI costs continue to increase as token prices decrease?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Total spend is determined by multiplying the price per token by the volume consumed, with the volume growing faster than the price is decreasing. Agentic workflows require significantly more tokens per task compared to a basic chat interaction, and as enterprises increase the complexity and length of their reasoning chains, any potential savings per unit are overshadowed.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What is model routing and how much can it save?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Using model routing, also known as cascade architecture, involves sending basic tasks such as classification and extraction to smaller, more cost-effective models, while saving more advanced models for important or risky decisions. A study discovered that organizations implementing tiered routing had an average cost of $2.31 per million tokens, compared to $18.40 for those relying solely on frontier models :  an 87% cost difference resulting from a strategic architectural choice.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">Why is "cost per token" the wrong metric to optimize?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Executives and businesses prioritize cost per result, such as cost per resolved claim and cost per processed invoice, over the efficiency of token usage alone. A workflow may appear cost-effective per token, but could still be a bad investment if too few outputs meet quality standards; unit economics should be assessed as total operating cost divided by completed, review-passing work items.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What does the agent ROI formula actually include?<span class="plus">+</span></button>
+        <div class="faq-a"><p>The net value is the result of time saved from genuine removal, avoided leakage, protected revenue, and gained quality, minus various costs such as model, tool, integration, human review, failure, and support costs. Focusing solely on time saved without considering these costs can lead to an overestimation of ROI and the potential scaling of agents that may not be economically viable.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What percentage of the agent's overall expenses is attributed to the initial construction?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Usually, just 25-35% of the overall cost of ownership over three years is allocated towards the initial build. The rest is attributed to expenses such as LLM API usage, infrastructure, maintenance, monitoring, and human supervision. This is why simply budgeting for the build alone will significantly underestimate the true lifetime cost of running an agent.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">What FinOps practices should organizations adopt for agent spend?<span class="plus">+</span></button>
+        <div class="faq-a"><p>Tracking usage in real-time at the workload level, charging business units for token use, implementing ROI thresholds for new initiatives, creating a policy for discovering shadow-AI, and implementing spend ceilings, call-volume caps, and automatic shutoffs at various levels.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+  <div class="wrap">
+    <span class="section-kicker">Get started</span>
+    <h2 class="section-title">Ready to model your agent's real economics?</h2>
+    <p>Develop a tiered routing architecture prior to scaling up, consider the complete three-year total cost of ownership rather than just the initial build cost, and evaluate each deployment based on cost per verified outcome.</p>
+    <ul class="cta-list">
+      <li>A tiered model-routing decision guide by task complexity</li>
+      <li>A comprehensive ROI worksheet that includes all tangible costs, not just time saved</li>
+      <li>A FinOps starter checklist: monitoring, chargeback, and kill switches</li>
+    </ul>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#roi">Revisit the ROI framework →</a>
+      <a class="btn btn-ghost" href="#finops">Back to FinOps practices</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-engineering/">Agent Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-frameworks/">Agent Frameworks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-observability/">Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Ai Development Life Cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/beyond-react/">Beyond React</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/beyond-react-slides/">Beyond React Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/conflict-resolution/">Conflict Resolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/cost-aware-planning/">Cost Aware Planning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/design-patterns/">Design Patterns</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/emergent-behavior/">Emergent Behavior</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/episodic-memory/">Episodic Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/event-vs-goal-agents/">Event Vs Goal Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/fail-safe-agents/">Fail Safe Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/">Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/hierarchical-agents/">Hierarchical Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/mas-simulation/">Mas Simulation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-arch/">Memory Arch</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-compression/">Memory Compression</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-strategies/">Memory Strategies</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/multi-agent-systems/">Multi Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/planning-algorithms/">Planning Algorithms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/planning-vs-reactive/">Planning Vs Reactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/prompt-injection/">Prompt Injection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/sandboxing-agents/">Sandboxing Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/self-evolving-memory/">Self Evolving Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/stateless-stateful-agents/">Stateless Stateful Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/symbolic-llm-reasoning/">Symbolic Llm Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/testing/">Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-chaining/">Tool Chaining</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-hallucination/">Tool Hallucination</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-schema-latency/">Tool Schema Latency</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-selection/">Tool Selection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/uncertainty-handling/">Uncertainty Handling</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/use-cases/">Use Cases</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs and EKIP</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','tokens','roi','finops','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+
+
+
+</body></html>

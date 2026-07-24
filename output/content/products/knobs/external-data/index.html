@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DataKnobs External Data Intelligence | Source, Ingestion &amp; Governance Knobs</title>
+<meta content="DataKnobs External Data Intelligence helps enterprises register, approve, ingest, govern, monitor, and optimize external data through source, quality, cost, lineage, and consumption knobs." name="description"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
+<style>
+    :root {
+      --bg: #f4f6fb;
+      --panel: #ffffff;
+      --panel-soft: #f8fafc;
+      --text: #172033;
+      --muted: #687386;
+      --line: #e2e8f0;
+      --line-strong: #cbd5e1;
+      --brand: #5b5ce2;
+      --brand-2: #7c3aed;
+      --brand-soft: #eef2ff;
+      --success: #0f9f6e;
+      --success-soft: #d1fae5;
+      --warning: #d97706;
+      --warning-soft: #fef3c7;
+      --danger: #dc2626;
+      --danger-soft: #fee2e2;
+      --info: #2563eb;
+      --info-soft: #dbeafe;
+      --purple-soft: #ede9fe;
+      --shadow: 0 18px 50px rgba(17,24,39,.09);
+      --shadow-soft: 0 8px 30px rgba(17,24,39,.04);
+      --radius: 18px;
+      --sidebar: 272px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: var(--sidebar) minmax(0,1fr); }
+
+    .sidebar {
+      position: sticky; top: 0; height: 100vh; padding: 24px 18px;
+      background: linear-gradient(180deg,#121729 0%,#171d32 100%);
+      color: #eef2ff; display: flex; flex-direction: column; gap: 26px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 850; letter-spacing: -.02em; }
+    .brand-mark { width: 40px; height: 40px; border-radius: 13px; background: linear-gradient(135deg,#8b5cf6,#4f46e5); display:grid; place-items:center; box-shadow:0 12px 30px rgba(99,102,241,.35); }
+    .brand-mark span { position: relative; width: 20px; height: 20px; }
+    .brand-mark span::before,.brand-mark span::after { content:""; position:absolute; left:2px; right:2px; height:3px; border-radius:999px; background:white; }
+    .brand-mark span::before { top:5px; box-shadow:0 7px 0 white; }
+    .brand-mark span::after { width:6px; height:6px; border-radius:50%; left:10px; top:3px; box-shadow:-6px 7px 0 white; }
+    .brand small { display:block; margin-top:2px; color:#9ba7c5; font-weight:600; font-size:11px; letter-spacing:.02em; }
+    .nav-group { display:grid; gap:7px; }
+    .nav-label { padding:0 12px; color:#7f89a6; font-size:10px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; margin-bottom:3px; }
+    .nav-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; color:#bcc5dc; text-decoration:none; font-size:13px; font-weight:650; }
+    .nav-item:hover,.nav-item.active { color:white; background:rgba(255,255,255,.085); }
+    .nav-icon { width:22px; text-align:center; font-size:15px; }
+    .nav-count { margin-left:auto; min-width:23px; text-align:center; padding:2px 6px; border-radius:999px; font-size:10px; color:#f8fafc; background:rgba(255,255,255,.12); }
+    .sidebar-footer { margin-top:auto; padding:14px; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.04); }
+    .env-row { display:flex; justify-content:space-between; align-items:center; font-size:12px; }
+    .env-dot { width:8px; height:8px; border-radius:50%; background:#34d399; display:inline-block; margin-right:6px; }
+    .sidebar-footer small { display:block; margin-top:6px; color:#97a2bf; line-height:1.4; }
+
+    .main { min-width:0; }
+    .topbar { height:74px; display:flex; align-items:center; justify-content:space-between; padding:0 30px; background:rgba(255,255,255,.9); border-bottom:1px solid var(--line); backdrop-filter:blur(10px); position:sticky; top:0; z-index:30; }
+    .breadcrumbs { color:var(--muted); font-size:13px; }
+    .breadcrumbs strong { color:var(--text); }
+    .top-actions { display:flex; align-items:center; gap:10px; }
+    .icon-btn,.avatar { width:38px; height:38px; border-radius:12px; border:1px solid var(--line); background:white; display:grid; place-items:center; }
+    .avatar { border:none; background:linear-gradient(135deg,#ede9fe,#dbeafe); color:#4338ca; font-weight:800; }
+    .content { padding:30px; max-width:1740px; margin:0 auto; }
+    .page-head { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; margin-bottom:24px; }
+    .eyebrow { color:#4f46e5; font-size:11px; letter-spacing:.14em; text-transform:uppercase; font-weight:850; margin-bottom:8px; }
+    .page-head h1 { margin:0 0 9px; font-size:31px; letter-spacing:-.04em; }
+    .page-head p { margin:0; color:var(--muted); max-width:900px; line-height:1.6; font-size:14px; }
+    .page-actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+
+    .btn { border:1px solid var(--line); background:white; color:var(--text); border-radius:12px; padding:10px 14px; font-weight:750; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:.18s; }
+    .btn:hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(17,24,39,.07); }
+    .btn.primary { color:white; border:none; background:linear-gradient(135deg,var(--brand),var(--brand-2)); }
+    .btn.soft { background:#f1f5f9; }
+    .btn.danger { color:white; border:none; background:var(--danger); }
+    .btn.small { padding:7px 10px; font-size:12px; border-radius:10px; }
+    .btn:disabled { opacity:.52; cursor:not-allowed; transform:none; box-shadow:none; }
+
+    .stats { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:15px; margin-bottom:18px; }
+    .stat { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:17px; box-shadow:var(--shadow-soft); }
+    .stat-top { display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:12px; }
+    .stat-icon { width:31px; height:31px; border-radius:10px; display:grid; place-items:center; font-size:14px; }
+    .stat-value { margin-top:9px; font-size:27px; font-weight:850; letter-spacing:-.045em; }
+    .stat-sub { margin-top:5px; color:var(--muted); font-size:11px; line-height:1.4; }
+    .trend-up { color:#047857; font-weight:800; }
+    .trend-warn { color:#b45309; font-weight:800; }
+
+    .insight-strip { display:grid; grid-template-columns:1.2fr .8fr; gap:15px; margin-bottom:18px; }
+    .insight-card { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:17px; box-shadow:var(--shadow-soft); }
+    .insight-card h3 { margin:0 0 4px; font-size:14px; }
+    .insight-card > p { margin:0 0 15px; color:var(--muted); font-size:12px; }
+    .attention-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .attention-item { border:1px solid var(--line); border-radius:13px; padding:12px; background:#fbfcfe; }
+    .attention-item strong { display:block; font-size:12px; margin-bottom:5px; }
+    .attention-item span { color:var(--muted); font-size:11px; line-height:1.35; display:block; }
+    .coverage-row { display:flex; align-items:center; gap:10px; margin-top:10px; }
+    .coverage-label { width:88px; font-size:11px; color:var(--muted); }
+    .bar { height:8px; background:#eef2f7; border-radius:999px; flex:1; overflow:hidden; }
+    .bar > i { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#6366f1,#8b5cf6); }
+    .coverage-value { width:33px; text-align:right; font-size:11px; font-weight:800; }
+
+    .toolbar { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:13px; display:flex; gap:10px; align-items:center; margin-bottom:15px; box-shadow:var(--shadow-soft); }
+    .search { flex:1; min-width:240px; position:relative; }
+    .search input { width:100%; padding:10px 12px 10px 38px; border:1px solid var(--line); border-radius:12px; background:#fbfdff; outline:none; }
+    .search span { position:absolute; left:13px; top:9px; color:var(--muted); }
+    .toolbar select { border:1px solid var(--line); padding:10px 11px; border-radius:12px; background:white; color:var(--text); max-width:180px; }
+    input:focus,select:focus,textarea:focus { border-color:#a5b4fc !important; box-shadow:0 0 0 4px rgba(99,102,241,.10); outline:none; }
+
+    .panel { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+    .panel-head { padding:15px 17px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
+    .panel-head strong { font-size:14px; }
+    .panel-head span { font-size:11px; color:var(--muted); }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; min-width:1450px; }
+    th { text-align:left; padding:12px 14px; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.065em; background:#fbfcfe; border-bottom:1px solid var(--line); }
+    td { padding:14px; border-bottom:1px solid var(--line); vertical-align:middle; font-size:12px; }
+    tbody tr:hover { background:#fafbff; }
+    tbody tr:last-child td { border-bottom:0; }
+    .source-cell { display:flex; gap:11px; align-items:center; min-width:235px; }
+    .source-icon { width:42px; height:42px; border-radius:13px; display:grid; place-items:center; font-weight:850; color:#4338ca; background:#eef2ff; flex:0 0 auto; }
+    .source-name { font-weight:850; font-size:13px; margin-bottom:3px; }
+    .source-meta { color:var(--muted); font-size:10px; }
+    .badge { display:inline-flex; align-items:center; gap:5px; padding:5px 8px; border-radius:999px; font-size:10px; font-weight:850; white-space:nowrap; }
+    .badge.active,.badge.approved,.badge.healthy { background:var(--success-soft); color:#047857; }
+    .badge.warning,.badge.review { background:var(--warning-soft); color:#b45309; }
+    .badge.error,.badge.expired { background:var(--danger-soft); color:#b91c1c; }
+    .badge.disabled,.badge.archived { background:#e2e8f0; color:#64748b; }
+    .badge.draft,.badge.pending { background:var(--purple-soft); color:#6d28d9; }
+    .badge.info { background:var(--info-soft); color:#1d4ed8; }
+    .status-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+    .mini-stack { display:grid; gap:3px; }
+    .mini-stack strong { font-size:11px; }
+    .mini-stack span { color:var(--muted); font-size:10px; }
+    .consumer-pills { display:flex; gap:4px; flex-wrap:wrap; max-width:160px; }
+    .pill { border:1px solid var(--line); background:#f8fafc; border-radius:999px; padding:4px 7px; font-size:9px; font-weight:750; white-space:nowrap; }
+    .pill.more { color:#4f46e5; background:#eef2ff; border-color:#c7d2fe; }
+    .actions { display:flex; gap:6px; justify-content:flex-end; }
+    .action-btn { width:32px; height:32px; border-radius:10px; border:1px solid var(--line); background:white; display:grid; place-items:center; }
+    .action-btn:hover { background:#f8fafc; }
+    .empty { display:none; padding:55px 20px; text-align:center; color:var(--muted); }
+
+    .drawer-backdrop { position:fixed; inset:0; background:rgba(15,23,42,.4); opacity:0; visibility:hidden; transition:.2s; z-index:80; }
+    .drawer-backdrop.open { opacity:1; visibility:visible; }
+    .drawer { position:fixed; top:0; right:0; height:100vh; width:min(980px,100vw); background:white; z-index:90; transform:translateX(100%); transition:.26s ease; display:flex; flex-direction:column; box-shadow:-24px 0 70px rgba(15,23,42,.22); }
+    .drawer.open { transform:translateX(0); }
+    .drawer-head { padding:19px 22px 15px; border-bottom:1px solid var(--line); }
+    .drawer-head-top { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; }
+    .drawer-title-row { display:flex; align-items:center; gap:12px; }
+    .drawer-title-icon { width:45px; height:45px; border-radius:14px; display:grid; place-items:center; background:#eef2ff; color:#4338ca; font-weight:850; }
+    .drawer-head h2 { margin:0 0 4px; font-size:21px; }
+    .drawer-head p { margin:0; color:var(--muted); font-size:11px; }
+    .drawer-head-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    .tabs { display:flex; gap:5px; margin-top:15px; overflow-x:auto; scrollbar-width:none; }
+    .tab-btn { border:0; background:transparent; color:var(--muted); padding:8px 10px; border-radius:9px; font-size:11px; font-weight:800; white-space:nowrap; }
+    .tab-btn.active { color:#4338ca; background:#eef2ff; }
+    .drawer-body { padding:20px 22px 95px; overflow-y:auto; }
+    .drawer-footer { position:absolute; bottom:0; left:0; right:0; padding:13px 22px; border-top:1px solid var(--line); background:rgba(255,255,255,.96); backdrop-filter:blur(8px); display:flex; justify-content:space-between; gap:10px; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+    .section-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .detail-card { border:1px solid var(--line); border-radius:15px; background:#fff; padding:15px; }
+    .detail-card.full { grid-column:1/-1; }
+    .detail-card h3 { margin:0 0 4px; font-size:13px; }
+    .detail-card > p { margin:0 0 13px; color:var(--muted); font-size:10px; line-height:1.45; }
+    .kv-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px 16px; }
+    .kv { display:grid; gap:3px; }
+    .kv label { color:var(--muted); font-size:9px; text-transform:uppercase; letter-spacing:.06em; font-weight:800; }
+    .kv strong,.kv span { font-size:11px; overflow-wrap:anywhere; }
+    .kv.full { grid-column:1/-1; }
+    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; }
+    .field { display:grid; gap:6px; }
+    .field.full { grid-column:1/-1; }
+    .field label { font-size:11px; font-weight:800; }
+    .field input,.field select,.field textarea { width:100%; border:1px solid var(--line); border-radius:11px; padding:10px 11px; background:white; font-size:11px; }
+    .field textarea { min-height:78px; resize:vertical; }
+    .help { color:var(--muted); font-size:9px; line-height:1.4; }
+    .toggle-row { display:flex; justify-content:space-between; align-items:center; gap:15px; padding:12px; border:1px solid var(--line); border-radius:13px; background:#fbfcfe; }
+    .switch { position:relative; width:44px; height:25px; flex:0 0 auto; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; inset:0; border-radius:999px; background:#cbd5e1; transition:.2s; }
+    .slider::before { content:""; position:absolute; width:19px; height:19px; left:3px; top:3px; border-radius:50%; background:white; box-shadow:0 2px 7px rgba(0,0,0,.2); transition:.2s; }
+    .switch input:checked + .slider { background:var(--brand); }
+    .switch input:checked + .slider::before { transform:translateX(19px); }
+    .feed-row,.contract-row,.quality-row,.approval-row { display:grid; grid-template-columns:1.4fr .9fr .9fr .8fr auto; gap:10px; align-items:center; padding:11px 0; border-bottom:1px solid var(--line); }
+    .feed-row:last-child,.contract-row:last-child,.quality-row:last-child,.approval-row:last-child { border-bottom:0; }
+    .feed-row > div,.contract-row > div,.quality-row > div,.approval-row > div { min-width:0; }
+    .row-title { font-weight:800; font-size:11px; }
+    .row-sub { color:var(--muted); font-size:9px; margin-top:3px; overflow-wrap:anywhere; }
+    .metric { font-size:11px; font-weight:800; }
+    .quality-meter { height:7px; border-radius:999px; background:#eef2f7; overflow:hidden; margin-top:5px; }
+    .quality-meter i { display:block; height:100%; background:linear-gradient(90deg,#10b981,#34d399); border-radius:inherit; }
+    .lineage { display:grid; grid-template-columns:repeat(5,minmax(120px,1fr)); gap:28px; align-items:center; overflow-x:auto; padding:12px 4px 18px; }
+    .lineage-node { position:relative; min-width:120px; border:1px solid var(--line); border-radius:14px; background:#fff; padding:13px; text-align:center; box-shadow:var(--shadow-soft); }
+    .lineage-node:not(:last-child)::after { content:"→"; position:absolute; right:-21px; top:50%; transform:translateY(-50%); color:#818cf8; font-size:19px; font-weight:850; }
+    .node-icon { width:32px; height:32px; border-radius:10px; margin:0 auto 7px; display:grid; place-items:center; background:#eef2ff; color:#4338ca; font-weight:850; }
+    .lineage-node strong { display:block; font-size:10px; }
+    .lineage-node span { display:block; font-size:9px; color:var(--muted); margin-top:4px; }
+    .impact-box { margin-top:14px; border:1px solid #fde68a; background:#fffbeb; color:#92400e; border-radius:13px; padding:12px; font-size:10px; line-height:1.5; }
+    .test-box { border:1px dashed #c7d2fe; background:#f7f7ff; border-radius:14px; padding:14px; display:flex; justify-content:space-between; gap:12px; align-items:center; }
+    .test-result { display:none; margin-top:10px; border-radius:13px; padding:12px; font-size:10px; }
+    .test-result.success { display:block; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; }
+    .test-result.error { display:block; background:#fef2f2; border:1px solid #fecaca; color:#991b1b; }
+    .stepper { display:flex; align-items:center; gap:0; overflow-x:auto; padding:10px 0 2px; }
+    .approval-step { position:relative; min-width:140px; text-align:center; }
+    .approval-step:not(:last-child)::after { content:""; position:absolute; left:60%; right:-40%; top:15px; height:2px; background:#dbe3ee; }
+    .approval-step.done:not(:last-child)::after { background:#34d399; }
+    .step-dot { width:30px; height:30px; margin:0 auto 6px; border-radius:50%; display:grid; place-items:center; border:2px solid #cbd5e1; background:white; color:#64748b; font-size:10px; font-weight:850; position:relative; z-index:2; }
+    .approval-step.done .step-dot { background:#10b981; border-color:#10b981; color:white; }
+    .approval-step.current .step-dot { background:#eef2ff; border-color:#6366f1; color:#4338ca; }
+    .approval-step strong { font-size:9px; display:block; }
+    .approval-step span { font-size:8px; color:var(--muted); display:block; margin-top:2px; }
+
+    .modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,.43); display:none; place-items:center; z-index:110; padding:20px; }
+    .modal-backdrop.open { display:grid; }
+    .modal { width:min(650px,100%); max-height:90vh; overflow:auto; background:white; border-radius:20px; box-shadow:var(--shadow); }
+    .modal-head { padding:18px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; }
+    .modal-head h3 { margin:0; font-size:17px; }
+    .modal-body { padding:20px; }
+    .modal-footer { padding:14px 20px; border-top:1px solid var(--line); display:flex; justify-content:flex-end; gap:9px; }
+    .toast { position:fixed; right:22px; bottom:22px; min-width:280px; max-width:420px; background:#111827; color:white; padding:13px 15px; border-radius:13px; box-shadow:var(--shadow); transform:translateY(110px); opacity:0; transition:.24s; z-index:140; font-size:12px; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .mobile-menu { display:none; }
+
+    @media(max-width:1280px){
+      .stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .insight-strip { grid-template-columns:1fr; }
+    }
+    @media(max-width:1050px){
+      .app { grid-template-columns:84px minmax(0,1fr); }
+      .sidebar { padding:24px 12px; }
+      .brand-text,.nav-item span:not(.nav-icon),.nav-label,.sidebar-footer { display:none; }
+      .nav-item { justify-content:center; }
+    }
+    @media(max-width:790px){
+      .app { display:block; }
+      .sidebar { display:none; }
+      .mobile-menu { display:grid; }
+      .topbar { padding:0 15px; }
+      .content { padding:20px 14px; }
+      .page-head { flex-direction:column; }
+      .page-actions { width:100%; justify-content:flex-start; }
+      .stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .attention-list { grid-template-columns:1fr; }
+      .toolbar { flex-wrap:wrap; }
+      .toolbar .search { flex-basis:100%; }
+      .toolbar select { flex:1; max-width:none; }
+      .section-grid,.form-grid { grid-template-columns:1fr; }
+      .detail-card.full,.field.full { grid-column:auto; }
+      .feed-row,.contract-row,.quality-row,.approval-row { grid-template-columns:1fr 1fr; }
+      .feed-row > *:first-child,.contract-row > *:first-child,.quality-row > *:first-child,.approval-row > *:first-child { grid-column:1/-1; }
+    }
+    @media(max-width:520px){
+      .stats { grid-template-columns:1fr; }
+      .page-actions .btn { width:100%; }
+      .drawer-footer { flex-direction:column-reverse; }
+      .drawer-footer .btn { width:100%; }
+    }
+  </style>
+<style>
+.brand{display:block!important}
+.brand img{height:44px;width:auto;display:block;background:#fff;border-radius:14px;padding:7px 10px;margin-bottom:10px}
+.brand-text{font-weight:800}
+.brand-text small{display:block;margin-top:3px;color:#c4b5fd;font-size:11px}
+.sidebar{background:linear-gradient(180deg,#2e1065 0%,#4c1d95 55%,#312e81 100%)!important}
+.nav-item{color:#ddd6fe!important}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.12)!important;color:#fff!important}
+.nav-label{color:#c4b5fd!important}
+.knob-strip{padding:14px;border:1px solid rgba(255,255,255,.14);border-radius:15px;background:rgba(255,255,255,.08);margin-top:-10px}
+.knob-label{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#f5d0fe}
+.knob-mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.knob-mini-grid span{display:grid;place-items:center;height:30px;border-radius:9px;background:rgba(255,255,255,.08);font-size:9px;color:#ede9fe}
+.knob-overview{background:linear-gradient(135deg,#faf5ff,#eef2ff);border:1px solid #ddd6fe;border-radius:22px;padding:22px;margin-bottom:18px;box-shadow:var(--shadow-soft)}
+.knob-overview-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+.knob-overview h2{font-size:24px;letter-spacing:-.03em;margin:0 0 8px}
+.knob-overview p{margin:0;color:var(--muted);max-width:900px;font-size:13px}
+.knob-overview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.knob-overview-grid article{background:#fff;border:1px solid #ddd6fe;border-radius:16px;padding:14px}
+.knob-overview-grid strong{display:block;font-size:13px}
+.knob-overview-grid span{display:block;color:var(--muted);font-size:10px;line-height:1.45;margin-top:5px}
+.knob-overview-grid b{display:block;color:#7c3aed;font-size:12px;margin-top:10px}
+.knob-effectiveness{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.knob-effectiveness div{border:1px solid var(--line);background:#f8fafc;border-radius:13px;padding:13px}
+.knob-effectiveness span{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em}
+.knob-effectiveness strong{display:block;font-size:18px;color:#7c3aed;margin-top:6px}
+.btn.primary{background:linear-gradient(135deg,#7c3aed,#4f46e5)!important}
+.eyebrow{color:#7c3aed!important}
+.tab-btn.active{color:#6d28d9!important;background:#f5f3ff!important}
+@media(max-width:1200px){.knob-overview-grid{grid-template-columns:repeat(2,1fr)}.knob-effectiveness{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:790px){.knob-overview-head{flex-direction:column}.knob-overview-grid,.knob-effectiveness{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand">
+<img alt="DataKnobs logo" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png"/>
+<div class="brand-text">External Data Intelligence<small>Source, Quality &amp; Governance Knobs</small></div>
+</div>
+<div class="knob-strip">
+<div class="knob-label">Active external-data knobs</div>
+<div class="knob-mini-grid">
+<span>Source</span><span>Quality</span><span>Cost</span><span>Risk</span>
+</div>
+</div>
+<nav class="nav-group">
+<div class="nav-label">External Data</div>
+<a class="nav-item active" href="#"><span class="nav-icon">⌂</span><span>Overview</span></a>
+<a class="nav-item" href="#"><span class="nav-icon">◉</span><span>Sources</span><span class="nav-count">14</span></a>
+<a class="nav-item" href="#"><span class="nav-icon">⛓</span><span>Connectors &amp; Feeds</span><span class="nav-count">23</span></a>
+<a class="nav-item" href="#"><span class="nav-icon">▦</span><span>Datasets</span></a>
+<a class="nav-item" href="#"><span class="nav-icon">⌘</span><span>Contracts &amp; Schema Knobs</span></a>
+<a class="nav-item" href="#"><span class="nav-icon">⇢</span><span>Lineage &amp; Consumption</span></a>
+</nav>
+<nav class="nav-group">
+<div class="nav-label">Operations &amp; Governance</div>
+<a class="nav-item" href="#"><span class="nav-icon">▶</span><span>Ingestion Operations</span></a>
+<a class="nav-item" href="#"><span class="nav-icon">✓</span><span>Quality Knobs</span><span class="nav-count">4</span></a>
+<a class="nav-item" href="#"><span class="nav-icon">◫</span><span>Approvals</span><span class="nav-count">3</span></a>
+<a class="nav-item" href="#"><span class="nav-icon">♜</span><span>Audit Log</span></a>
+<a class="nav-item" href="#"><span class="nav-icon">⚙</span><span>Knobs &amp; Policies</span></a>
+</nav>
+<div class="sidebar-footer">
+<div class="env-row"><strong>Production</strong><span><i class="env-dot"></i>Healthy</span></div>
+<small>US West · Last platform check 2 minutes ago</small>
+</div>
+</aside>
+<main class="main">
+<header class="topbar">
+<button class="icon-btn mobile-menu">☰</button>
+<div class="breadcrumbs">Data Platform / External Data / <strong>Overview</strong></div>
+<div class="top-actions">
+<button class="icon-btn" title="Search">⌕</button>
+<button class="icon-btn" title="Notifications">🔔</button>
+<div class="avatar">PD</div>
+</div>
+</header>
+<div class="content">
+<section class="page-head">
+<div>
+<div class="eyebrow">DataKnobs External Data Intelligence</div>
+<h1>External Data Intelligence Control Center</h1>
+<p>Turn external data into governed, reusable intelligence. Register sources, configure ingestion, tune quality and cost thresholds, control permitted use, trace lineage, and measure downstream impact through enterprise data knobs.</p>
+</div>
+<div class="page-actions">
+<button class="btn" id="exportBtn">⇩ Export registry</button>
+<button class="btn primary" id="addSourceBtn">＋ Register external source</button>
+</div>
+</section>
+<section class="knob-overview">
+<div class="knob-overview-head">
+<div>
+<div class="eyebrow">External Data Knobs</div>
+<h2>Control which data enters, how it is governed, and where it creates value.</h2>
+<p>DataKnobs identifies the variables that most influence source reliability, information coverage, ingestion cost, quality, legal use, and downstream business outcomes.</p>
+</div>
+<button class="btn primary" onclick="showToast('Knob portfolio opened')">Manage knob portfolio</button>
+</div>
+<div class="knob-overview-grid">
+<article><strong>Selection Knobs</strong><span>Authority, jurisdiction, coverage, recency, exclusivity, and business relevance.</span><b>14 active</b></article>
+<article><strong>Ingestion Knobs</strong><span>Frequency, lookback, retries, batching, cursor strategy, and backfill behavior.</span><b>23 active</b></article>
+<article><strong>Quality Knobs</strong><span>Freshness, completeness, duplication, schema drift, and volume variance.</span><b>4 outside range</b></article>
+<article><strong>Governance Knobs</strong><span>Permitted use, retention, residency, model training, attribution, and redistribution.</span><b>3 pending</b></article>
+<article><strong>Cost Knobs</strong><span>Provider tier, query limits, storage retention, processing cadence, and budget alerts.</span><b>72% budget</b></article>
+<article><strong>Consumption Knobs</strong><span>Which <a href="https://www.dataknobs.com/data-products/">data products</a>, agents, APIs, workflows, and decisions may consume each source.</span><b>18 consumers</b></article>
+</div>
+</section>
+<section class="stats">
+<article class="stat">
+<div class="stat-top"><span>Governed sources</span><span class="stat-icon" style="background:#eef2ff;color:#4338ca">◉</span></div>
+<div class="stat-value" id="sourceCount">14</div>
+<div class="stat-sub"><span class="trend-up">+2 this quarter</span> · 6 provider categories</div>
+</article>
+<article class="stat">
+<div class="stat-top"><span>Active ingestion knobs</span><span class="stat-icon" style="background:#d1fae5;color:#047857">⛓</span></div>
+<div class="stat-value" id="feedCount">23</div>
+<div class="stat-sub">21 healthy · 2 degraded</div>
+</article>
+<article class="stat">
+<div class="stat-top"><span>Knobs out of range</span><span class="stat-icon" style="background:#fef3c7;color:#b45309">!</span></div>
+<div class="stat-value" id="attentionCount">4</div>
+<div class="stat-sub"><span class="trend-warn">2 quality</span> · 1 auth · 1 stale</div>
+</article>
+<article class="stat">
+<div class="stat-top"><span>Contracts expiring</span><span class="stat-icon" style="background:#fee2e2;color:#b91c1c">⌛</span></div>
+<div class="stat-value">3</div>
+<div class="stat-sub">Within the next 90 days</div>
+</article>
+<article class="stat">
+<div class="stat-top"><span>External data cost</span><span class="stat-icon" style="background:#dbeafe;color:#1d4ed8">$</span></div>
+<div class="stat-value">$48.6K</div>
+<div class="stat-sub">Monthly forecast · 72% of budget</div>
+</article>
+</section>
+<section class="insight-strip">
+<article class="insight-card">
+<h3>Knobs requiring attention</h3>
+<p>High-impact source, quality, approval, credential, and cost knobs requiring action.</p>
+<div class="attention-list">
+<div class="attention-item"><strong style="color:#b91c1c">Credential expires in 6 days</strong><span>Polygon market-data API key must be rotated before July 21.</span></div>
+<div class="attention-item"><strong style="color:#b45309">Quality threshold breached</strong><span>State enforcement actions delivered 42% fewer records than its baseline.</span></div>
+<div class="attention-item"><strong style="color:#6d28d9">Approval waiting</strong><span>India privacy law source is pending Legal and Security review.</span></div>
+</div>
+</article>
+<article class="insight-card">
+<h3>Coverage and selection knobs</h3>
+<p>Tune source coverage by information domain, jurisdiction, freshness, authority, and business value.</p>
+<div class="coverage-row"><span class="coverage-label">Market data</span><div class="bar"><i style="width:92%"></i></div><span class="coverage-value">92%</span></div>
+<div class="coverage-row"><span class="coverage-label">Court cases</span><div class="bar"><i style="width:78%"></i></div><span class="coverage-value">78%</span></div>
+<div class="coverage-row"><span class="coverage-label">Privacy law</span><div class="bar"><i style="width:66%"></i></div><span class="coverage-value">66%</span></div>
+<div class="coverage-row"><span class="coverage-label">Legislation</span><div class="bar"><i style="width:54%"></i></div><span class="coverage-value">54%</span></div>
+</article>
+</section>
+<section class="toolbar">
+<div class="search"><span>⌕</span><input id="searchInput" placeholder="Search source, provider, owner, jurisdiction, dataset, or consumer" type="search"/></div>
+<select id="domainFilter">
+<option value="all">All domains</option>
+<option>Market Data</option><option>Court &amp; Legal</option><option>Privacy &amp; Regulation</option><option>Financial Filings</option><option>News &amp; Research</option>
+</select>
+<select id="healthFilter">
+<option value="all">All health</option>
+<option value="healthy">Healthy</option><option value="warning">Warning</option><option value="error">Error</option><option value="disabled">Disabled</option>
+</select>
+<select id="approvalFilter">
+<option value="all">All approvals</option>
+<option value="approved">Approved</option><option value="review">In review</option><option value="pending">Pending</option><option value="expired">Expired</option>
+</select>
+<button class="btn soft" id="resetFilters">Reset</button>
+</section>
+<section class="panel">
+<div class="panel-head"><div><strong>External data product registry</strong><br/><span>Authoritative inventory of external sources, controls, data products, and downstream impact</span></div><span id="resultCount">8 sources shown</span></div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>External source</th>
+<th>Domain &amp; coverage</th>
+<th>Connectors / feeds</th>
+<th>Owner</th>
+<th>Destination</th>
+<th>Consumers</th>
+<th>Governance</th>
+<th>Health</th>
+<th style="text-align:right">Actions</th>
+</tr>
+</thead>
+<tbody id="sourceTableBody"></tbody>
+</table>
+<div class="empty" id="emptyState">No external sources match the current filters.</div>
+</div>
+</section>
+</div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">Knobs Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/ai-assistants/tutorials.html">AI Assistant AI Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-engineering-guide.html">Agent AI Engineering Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/">Agentic AI Course</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/guide.html">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/tutorial.html">Data Product Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-models/">LLM Models List </a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/8-tpu-gpu/google-tpus-vs-nvidia-amd-gpus.html">GPU vs TPU</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/pdf-slides/anthropic-models/">Anthropic models</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+<p>
+</p>
+<p>
+</p>
+</div>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/cto/">GenAI for CTO and IT</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/chief-compliance-officer/">GenAI for Compliance Officer</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/embeddings/embeddings-tutorial.html">Embeddings Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-quality-tutorial.html">Data Quality Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-tutorial.html">Data Lineage Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/ai-twin/ai-twin-for-industrial-systems.html">AI Twin for Industrial Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/predictive-maintenance/predictive-maintenance-with-ai-for-cnc-machines.html">AI Predictive Maintenance -Dataknobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/use-cases/agent-ai-use-cases-for-real-impact.html">Agent AI Use Cases For Real Impact</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-exec-deck.html">Agent Engineering Exec Deck</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-guide.html">Agent Engineering Guide</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer></main>
+</div>
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside aria-hidden="true" class="drawer" id="sourceDrawer">
+<div class="drawer-head">
+<div class="drawer-head-top">
+<div class="drawer-title-row">
+<div class="drawer-title-icon" id="drawerIcon">SRC</div>
+<div><h2 id="drawerTitle">External source</h2><p id="drawerSubtitle">Provider · Domain · Source ID</p></div>
+</div>
+<div class="drawer-head-actions">
+<span class="badge approved" id="drawerApproval"><span class="status-dot"></span>Approved</span>
+<span class="badge healthy" id="drawerHealth"><span class="status-dot"></span>Healthy</span>
+<button class="icon-btn" id="closeDrawerBtn">✕</button>
+</div>
+</div>
+<div class="tabs" id="drawerTabs">
+<button class="tab-btn active" data-tab="overview">Overview</button><button class="tab-btn" data-tab="knobs">Knobs</button>
+<button class="tab-btn" data-tab="connectors">Connectors &amp; Feeds</button>
+<button class="tab-btn" data-tab="destination">Destination</button>
+<button class="tab-btn" data-tab="contract">Data Contract</button>
+<button class="tab-btn" data-tab="quality">Quality &amp; SLA</button>
+<button class="tab-btn" data-tab="governance">Governance</button>
+<button class="tab-btn" data-tab="lineage">Lineage &amp; Consumption</button>
+<button class="tab-btn" data-tab="approval">Approval</button>
+</div>
+</div>
+<div class="drawer-body">
+<section class="tab-panel" data-panel="knobs">
+<div class="section-grid">
+<article class="detail-card">
+<h3>Selection knobs</h3><p>Determine whether this source is the right input for the required data product or business outcome.</p>
+<div class="kv-grid">
+<div class="kv"><label>Authority score</label><strong>92 / 100</strong></div>
+<div class="kv"><label>Coverage priority</label><span>High</span></div>
+<div class="kv"><label>Jurisdiction match</label><span id="kCoverage"></span></div>
+<div class="kv"><label>Uniqueness</label><span>Medium</span></div>
+<div class="kv"><label>Business relevance</label><span>Critical</span></div>
+<div class="kv"><label>Fallback source</label><span>Configured</span></div>
+</div>
+</article>
+<article class="detail-card">
+<h3>Ingestion knobs</h3><p>Control runtime behavior, freshness, resilience, and processing economics.</p>
+<div class="kv-grid">
+<div class="kv"><label>Frequency</label><strong id="kFrequency"></strong></div>
+<div class="kv"><label>Lookback</label><span>72 hours</span></div>
+<div class="kv"><label>Retry count</label><span>3</span></div>
+<div class="kv"><label>Backoff</label><span>Exponential</span></div>
+<div class="kv"><label>Batch size</label><span>50,000</span></div>
+<div class="kv"><label>Backfill</label><span>Enabled</span></div>
+</div>
+</article>
+<article class="detail-card">
+<h3>Quality knobs</h3><p>Tune promotion gates before external data becomes trusted enterprise intelligence.</p>
+<div class="kv-grid">
+<div class="kv"><label>Freshness threshold</label><strong>≤ 6 hours</strong></div>
+<div class="kv"><label>Completeness</label><span>≥ 98%</span></div>
+<div class="kv"><label>Duplicate tolerance</label><span>≤ 1%</span></div>
+<div class="kv"><label>Volume variance</label><span>± 50%</span></div>
+<div class="kv"><label>Schema drift</label><span>Quarantine</span></div>
+<div class="kv"><label>Promotion mode</label><span>Approval gated</span></div>
+</div>
+</article>
+<article class="detail-card">
+<h3>Governance and cost knobs</h3><p>Control permitted use, retention, AI use, provider spend, and operational limits.</p>
+<div class="kv-grid">
+<div class="kv"><label>AI inference</label><strong>Allowed</strong></div>
+<div class="kv"><label>Model training</label><span>Restricted</span></div>
+<div class="kv"><label>Redistribution</label><span>Not allowed</span></div>
+<div class="kv"><label>Retention</label><span>7 years</span></div>
+<div class="kv"><label>Monthly budget</label><span id="kBudget"></span></div>
+<div class="kv"><label>Alert threshold</label><span>80%</span></div>
+</div>
+</article>
+<article class="detail-card full">
+<h3>Knob effectiveness</h3><p>Measure whether current settings improve data-product quality, business outcomes, and operating efficiency.</p>
+<div class="knob-effectiveness">
+<div><span>Coverage gain</span><strong>+18%</strong></div>
+<div><span>Freshness improvement</span><strong>31 min</strong></div>
+<div><span>Cost avoided</span><strong>$4.2K/mo</strong></div>
+<div><span>Quality incidents reduced</span><strong>22%</strong></div>
+<div><span>Consumer impact</span><strong id="kConsumers"></strong></div>
+</div>
+</article>
+</div>
+</section>
+<section class="tab-panel active" data-panel="overview">
+<div class="section-grid">
+<article class="detail-card">
+<h3>Source identity</h3><p>Business-level definition of the external provider and information source.</p>
+<div class="kv-grid">
+<div class="kv"><label>Source ID</label><strong id="dSourceId"></strong></div>
+<div class="kv"><label>Environment</label><span>Production</span></div>
+<div class="kv"><label>Provider</label><strong id="dProvider"></strong></div>
+<div class="kv"><label>Domain</label><span id="dDomain"></span></div>
+<div class="kv"><label>Jurisdiction</label><span id="dCoverage"></span></div>
+<div class="kv"><label>Instrument types</label><span id="dInstrument"></span></div>
+<div class="kv full"><label>Business purpose</label><span id="dPurpose"></span></div>
+</div>
+</article>
+<article class="detail-card">
+<h3>Ownership &amp; accountability</h3><p>Teams responsible for business use, technical operation, and governance.</p>
+<div class="kv-grid">
+<div class="kv"><label>Business owner</label><strong id="dBusinessOwner"></strong></div>
+<div class="kv"><label>Technical owner</label><strong id="dTechnicalOwner"></strong></div>
+<div class="kv"><label>Data steward</label><span id="dSteward"></span></div>
+<div class="kv"><label>Criticality</label><span id="dCriticality"></span></div>
+<div class="kv"><label>Support contact</label><span>data-platform@dataknobs.com</span></div>
+<div class="kv"><label>Last recertified</label><span>June 28, 2026</span></div>
+</div>
+</article>
+<article class="detail-card full">
+<h3>Operational summary</h3><p>Current feed activity and enterprise impact.</p>
+<div class="kv-grid" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+<div class="kv"><label>Connectors</label><strong id="dConnectors"></strong></div>
+<div class="kv"><label>Active feeds</label><strong id="dFeeds"></strong></div>
+<div class="kv"><label>Curated datasets</label><strong id="dDatasets"></strong></div>
+<div class="kv"><label>Downstream consumers</label><strong id="dConsumers"></strong></div>
+<div class="kv"><label>Last successful run</label><span id="dLastRun"></span></div>
+<div class="kv"><label>Records today</label><span id="dRecords"></span></div>
+<div class="kv"><label>Monthly cost</label><span id="dCost"></span></div>
+<div class="kv"><label>Contract renewal</label><span id="dRenewal"></span></div>
+</div>
+</article>
+</div>
+</section>
+<section class="tab-panel" data-panel="connectors">
+<div class="detail-card full">
+<h3>Connectors and data feeds</h3><p>A source may expose multiple feeds through one or more technical connectors.</p>
+<div id="feedList"></div>
+</div>
+<div class="detail-card full" style="margin-top:14px">
+<h3>Connection validation</h3><p>Validate endpoint accessibility, authorization, response format, and sample-data availability.</p>
+<div class="test-box"><div><strong style="font-size:11px">Test primary connector</strong><div class="help">Secrets remain masked and are resolved by the backend.</div></div><button class="btn small" id="testConnectionBtn">Test connection</button></div>
+<div class="test-result" id="testResult"></div>
+</div>
+</section>
+<section class="tab-panel" data-panel="destination">
+<div class="section-grid">
+<article class="detail-card">
+<h3>Raw landing zone</h3><p>Immutable source-aligned storage retained for audit and reprocessing.</p>
+<div class="kv-grid">
+<div class="kv"><label>Platform</label><strong>GCP</strong></div><div class="kv"><label>Storage</label><span>Cloud Storage</span></div>
+<div class="kv full"><label>Path</label><span id="dRawPath"></span></div>
+<div class="kv"><label>Format</label><span>JSONL + source files</span></div><div class="kv"><label>Retention</label><span>7 years</span></div>
+<div class="kv"><label>Encryption</label><span>CMEK enabled</span></div><div class="kv"><label>Partition</label><span>ingestion_date</span></div>
+</div>
+</article>
+<article class="detail-card">
+<h3>Curated enterprise dataset</h3><p>Normalized destination used by APIs, analytics, agents, and models.</p>
+<div class="kv-grid">
+<div class="kv"><label>Platform</label><strong>BigQuery</strong></div><div class="kv"><label>Dataset</label><span id="dCuratedDataset"></span></div>
+<div class="kv full"><label>Table / collection</label><span id="dCuratedTable"></span></div>
+<div class="kv"><label>Schema version</label><span>v3.2</span></div><div class="kv"><label>Access model</label><span>RBAC + row policies</span></div>
+<div class="kv"><label>Quarantine</label><span>Enabled</span></div><div class="kv"><label>Catalog status</label><span class="badge approved">Published</span></div>
+</div>
+</article>
+<article class="detail-card full">
+<h3>Processing route</h3><p>Runtime path from source retrieval to governed enterprise data.</p>
+<div class="lineage">
+<div class="lineage-node"><div class="node-icon">SRC</div><strong>External source</strong><span id="destSourceNode"></span></div>
+<div class="lineage-node"><div class="node-icon">RAW</div><strong>Raw landing</strong><span>Immutable copy</span></div>
+<div class="lineage-node"><div class="node-icon">ETL</div><strong>Validation &amp; transform</strong><span>Schema + DQ checks</span></div>
+<div class="lineage-node"><div class="node-icon">CUR</div><strong>Curated dataset</strong><span>Normalized model</span></div>
+<div class="lineage-node"><div class="node-icon">API</div><strong>Serving layer</strong><span>API / agent / BI</span></div>
+</div>
+</article>
+</div>
+</section>
+<section class="tab-panel" data-panel="contract">
+<div class="detail-card full">
+<h3>Data contract</h3><p>Expected schema, identifiers, change controls, and delivery expectations agreed with the source owner.</p>
+<div id="contractList"></div>
+</div>
+<div class="section-grid" style="margin-top:14px">
+<article class="detail-card"><h3>Change management</h3><p>Controls for source-schema changes.</p><div class="kv-grid"><div class="kv"><label>Schema drift</label><span>Warn and quarantine</span></div><div class="kv"><label>Breaking change</label><span>Block publication</span></div><div class="kv"><label>Compatibility</label><span>Backward compatible</span></div><div class="kv"><label>Approval required</label><span>Data steward</span></div></div></article>
+<article class="detail-card"><h3>Delivery expectations</h3><p>Volume, freshness, and incrementality requirements.</p><div class="kv-grid"><div class="kv"><label>Delivery mode</label><span>Incremental</span></div><div class="kv"><label>Cursor</label><span>updated_at</span></div><div class="kv"><label>Expected volume</label><span>50K–600K / run</span></div><div class="kv"><label>Lookback</label><span>72 hours</span></div></div></article>
+</div>
+</section>
+<section class="tab-panel" data-panel="quality">
+<div class="detail-card full">
+<h3>Data quality controls</h3><p>Measurable controls applied before data is promoted to the curated enterprise layer.</p>
+<div id="qualityList"></div>
+</div>
+<div class="section-grid" style="margin-top:14px">
+<article class="detail-card"><h3>Operational SLA</h3><p>Commitments for timely and reliable ingestion.</p><div class="kv-grid"><div class="kv"><label>Freshness SLA</label><strong>≤ 6 hours</strong></div><div class="kv"><label>Availability</label><span>99.5%</span></div><div class="kv"><label>Recovery target</label><span>4 hours</span></div><div class="kv"><label>Retries</label><span>3 exponential</span></div><div class="kv"><label>Backfill</label><span>Supported</span></div><div class="kv"><label>Escalation</label><span>Data Platform on-call</span></div></div></article>
+<article class="detail-card"><h3>Current monitoring</h3><p>Latest measurements against the defined thresholds.</p><div class="kv-grid"><div class="kv"><label>Freshness</label><span class="badge healthy">42 minutes</span></div><div class="kv"><label>Completeness</label><span class="badge healthy">99.6%</span></div><div class="kv"><label>Duplicates</label><span class="badge healthy">0.08%</span></div><div class="kv"><label>Volume variance</label><span class="badge warning">-18%</span></div><div class="kv"><label>Schema drift</label><span class="badge healthy">None</span></div><div class="kv"><label>Last alert</label><span>2 days ago</span></div></div></article>
+</div>
+</section>
+<section class="tab-panel" data-panel="governance">
+<div class="section-grid">
+<article class="detail-card">
+<h3>Classification &amp; privacy</h3><p>Information sensitivity and regulatory handling requirements.</p>
+<div class="kv-grid"><div class="kv"><label>Classification</label><strong id="dClassification"></strong></div><div class="kv"><label>Personal data</label><span id="dPersonalData"></span></div><div class="kv"><label>Sensitive data</label><span>No restricted fields</span></div><div class="kv"><label>Residency</label><span>United States</span></div><div class="kv"><label>Retention</label><span>7 years</span></div><div class="kv"><label>Deletion policy</label><span>Contract driven</span></div></div>
+</article>
+<article class="detail-card">
+<h3>Permitted use</h3><p>Contractual and policy constraints governing enterprise use.</p>
+<div class="kv-grid"><div class="kv"><label>Internal analytics</label><span class="badge approved">Allowed</span></div><div class="kv"><label>AI inference</label><span class="badge approved">Allowed</span></div><div class="kv"><label>Model training</label><span class="badge warning">Restricted</span></div><div class="kv"><label>Redistribution</label><span class="badge error">Not allowed</span></div><div class="kv"><label>Attribution</label><span>Required</span></div><div class="kv"><label>Commercial use</label><span>Licensed</span></div></div>
+</article>
+<article class="detail-card full">
+<h3>Commercial and legal record</h3><p>Vendor agreement, renewal, quota, and procurement accountability.</p>
+<div class="kv-grid" style="grid-template-columns:repeat(4,minmax(0,1fr))"><div class="kv"><label>Contract ID</label><strong id="dContractId"></strong></div><div class="kv"><label>Pricing model</label><span>Monthly + usage</span></div><div class="kv"><label>Monthly budget</label><span id="dBudget"></span></div><div class="kv"><label>Current usage</label><span>72%</span></div><div class="kv"><label>Renewal date</label><span id="dGovRenewal"></span></div><div class="kv"><label>Procurement owner</label><span>Strategic Sourcing</span></div><div class="kv"><label>Legal approval</label><span class="badge approved">Approved</span></div><div class="kv"><label>Security review</label><span class="badge approved">Approved</span></div></div>
+</article>
+</div>
+</section>
+<section class="tab-panel" data-panel="lineage">
+<div class="detail-card full">
+<h3>End-to-end lineage</h3><p>Trace the path from external provider through enterprise datasets to products and decisions.</p>
+<div class="lineage">
+<div class="lineage-node"><div class="node-icon">SRC</div><strong id="linSource"></strong><span>External provider</span></div>
+<div class="lineage-node"><div class="node-icon">CON</div><strong id="linConnector"></strong><span>Primary connector</span></div>
+<div class="lineage-node"><div class="node-icon">RAW</div><strong id="linRaw"></strong><span>Raw zone</span></div>
+<div class="lineage-node"><div class="node-icon">CUR</div><strong id="linDataset"></strong><span>Curated data</span></div>
+<div class="lineage-node"><div class="node-icon">APP</div><strong id="linConsumer"></strong><span>Downstream use</span></div>
+</div>
+<div class="impact-box" id="impactBox"></div>
+</div>
+<div class="detail-card full" style="margin-top:14px">
+<h3>Registered consumers</h3><p>Applications, agents, APIs, and workflows approved to consume this data.</p>
+<div id="consumerList"></div>
+</div>
+</section>
+<section class="tab-panel" data-panel="approval">
+<div class="detail-card full">
+<h3>Production approval workflow</h3><p>Maker-checker controls before a source or material connector change reaches production.</p>
+<div class="stepper">
+<div class="approval-step done"><div class="step-dot">✓</div><strong>Draft</strong><span>Created Jul 2</span></div>
+<div class="approval-step done"><div class="step-dot">✓</div><strong>Connection tested</strong><span>Passed Jul 3</span></div>
+<div class="approval-step done"><div class="step-dot">✓</div><strong>Security review</strong><span>Approved Jul 5</span></div>
+<div class="approval-step done"><div class="step-dot">✓</div><strong>Legal / data review</strong><span>Approved Jul 6</span></div>
+<div class="approval-step current"><div class="step-dot">●</div><strong>Active</strong><span>Production</span></div>
+</div>
+</div>
+<div class="detail-card full" style="margin-top:14px">
+<h3>Approval history</h3><p>Evidence-backed record of approvals, changes, and recertification.</p>
+<div id="approvalList"></div>
+</div>
+</section>
+</div>
+<div class="drawer-footer">
+<button class="btn" id="viewAuditBtn">View audit history</button>
+<div style="display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end">
+<button class="btn" id="toggleSourceBtn">Disable source</button>
+<button class="btn" id="runNowBtn">▶ Run primary feed</button>
+<button class="btn primary" id="editSourceBtn">Edit source</button>
+</div>
+</div>
+</aside>
+<div class="modal-backdrop" id="addModal">
+<div class="modal">
+<div class="modal-head"><h3>Register external data source</h3><button class="icon-btn" data-close="addModal">✕</button></div>
+<div class="modal-body">
+<div class="form-grid">
+<div class="field"><label>Source name *</label><input id="newName" placeholder="Example: Washington Privacy Legislation"/></div>
+<div class="field"><label>Provider *</label><input id="newProvider" placeholder="Agency, vendor, website, or system"/></div>
+<div class="field"><label>Data domain *</label><select id="newDomain"><option>Privacy &amp; Regulation</option><option>Market Data</option><option>Court &amp; Legal</option><option>Financial Filings</option><option>News &amp; Research</option></select></div>
+<div class="field"><label>Jurisdiction *</label><input id="newCoverage" placeholder="US, Washington, EU, Global"/></div>
+<div class="field"><label>Business owner *</label><input id="newOwner" placeholder="Team or named owner"/></div>
+<div class="field"><label>Criticality</label><select id="newCriticality"><option>Medium</option><option>High</option><option>Mission critical</option><option>Low</option></select></div>
+<div class="field full"><label>Business purpose *</label><textarea id="newPurpose" placeholder="Why does the enterprise need this data and which decisions or products depend on it?"></textarea></div>
+<div class="field"><label>Initial connector type</label><select id="newConnectorType"><option>REST API</option><option>PDF / document URL</option><option>Website crawler</option><option>Cloud storage</option><option>Database</option><option>SFTP</option><option>RSS / Atom</option></select></div>
+<div class="field"><label>Approval route</label><select><option>Security + Legal + Data Steward</option><option>Security + Data Steward</option><option>Legal + Data Steward</option><option>Standard low-risk</option></select></div>
+</div>
+</div>
+<div class="modal-footer"><button class="btn" data-close="addModal">Cancel</button><button class="btn soft" id="saveDraftNewBtn">Save draft</button><button class="btn primary" id="createSourceBtn">Create and configure</button></div>
+</div>
+</div>
+<div class="modal-backdrop" id="editModal">
+<div class="modal">
+<div class="modal-head"><h3>Edit source configuration</h3><button class="icon-btn" data-close="editModal">✕</button></div>
+<div class="modal-body">
+<div class="form-grid">
+<div class="field"><label>Source name</label><input id="editName"/></div>
+<div class="field"><label>Provider</label><input id="editProvider"/></div>
+<div class="field"><label>Business owner</label><input id="editOwner"/></div>
+<div class="field"><label>Technical owner</label><input id="editTechOwner"/></div>
+<div class="field"><label>Polling frequency</label><select id="editFrequency"><option>Every 15 minutes</option><option>Hourly</option><option>Every 6 hours</option><option>Daily</option><option>Weekly</option><option>Manual only</option></select></div>
+<div class="field"><label>Criticality</label><select id="editCriticality"><option>Mission critical</option><option>High</option><option>Medium</option><option>Low</option></select></div>
+<div class="field full"><label>Business purpose</label><textarea id="editPurpose"></textarea></div>
+<div class="field full"><div class="toggle-row"><div><strong style="font-size:11px">Require approval for this change</strong><div class="help">Recommended for production endpoint, schema, governance, and schedule changes.</div></div><label class="switch"><input checked="" type="checkbox"/><span class="slider"></span></label></div></div>
+</div>
+</div>
+<div class="modal-footer"><button class="btn" data-close="editModal">Cancel</button><button class="btn primary" id="saveEditBtn">Save and submit for approval</button></div>
+</div>
+</div>
+<div class="modal-backdrop" id="auditModal">
+<div class="modal">
+<div class="modal-head"><h3>Recent audit history</h3><button class="icon-btn" data-close="auditModal">✕</button></div>
+<div class="modal-body" id="auditBody"></div>
+<div class="modal-footer"><button class="btn" data-close="auditModal">Close</button></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+  const sources = [
+    {
+      id:'SRC-MKT-001', name:'Polygon Market Data', provider:'Polygon.io', domain:'Market Data', coverage:'United States', instrument:'Stocks, Options, Reference Data',
+      connectors:2, feeds:4, datasets:3, consumers:['Stocks Assistant','Sector Intelligence','Alert Engine','Portfolio API'], owner:'Investment Intelligence', techOwner:'Data Platform', steward:'Market Data Steward', criticality:'Mission critical',
+      destination:'BigQuery · market_data', health:'warning', approval:'approved', governance:'Licensed · AI restricted', lastRun:'12 minutes ago', records:'1.34M', cost:'$18,500 / month', renewal:'September 30, 2026',
+      purpose:'Power real-time and end-of-day market intelligence, options analytics, sector rollups, portfolio monitoring, and investment decision support.',
+      rawPath:'gs://enterprise-external-data/raw/polygon/', curatedDataset:'market_data', curatedTable:'equity_quotes_v3 / options_chain_v2', classification:'Confidential', personalData:'No', contractId:'VND-POLY-2026-014', budget:'$22,000 / month',
+      primaryConnector:'Polygon REST API', connectorType:'REST API', frequency:'Every 15 minutes', endpoint:'https://api.polygon.io', icon:'MKT'
+    },
+    {
+      id:'SRC-LGL-002', name:'US Federal Court Cases', provider:'CourtListener', domain:'Court & Legal', coverage:'United States · Federal', instrument:'Opinions, Dockets, Citations',
+      connectors:1, feeds:3, datasets:2, consumers:['Court Cases Data Product','Stocks Litigation Signal','Legal Research Agent'], owner:'Regulatory Intelligence', techOwner:'Data Platform', steward:'Legal Data Steward', criticality:'High',
+      destination:'GCS + BigQuery · court_cases', health:'healthy', approval:'approved', governance:'Public · Attribution required', lastRun:'1 hour ago', records:'18,407', cost:'$0 / public', renewal:'Annual recertification',
+      purpose:'Create structured litigation intelligence, case-event monitoring, legal research context, and company-level litigation risk signals.',
+      rawPath:'gs://enterprise-external-data/raw/courtlistener/', curatedDataset:'court_cases', curatedTable:'opinions / dockets / parties', classification:'Internal', personalData:'Limited public identifiers', contractId:'PUB-COURT-2026-002', budget:'Infrastructure only',
+      primaryConnector:'CourtListener API', connectorType:'REST API', frequency:'Every 6 hours', endpoint:'https://www.courtlistener.com/api/rest/v3', icon:'LAW'
+    },
+    {
+      id:'SRC-PRV-003', name:'California Privacy Laws', provider:'California Legislature', domain:'Privacy & Regulation', coverage:'California', instrument:'Bills, Statutes, Regulations, Guidance',
+      connectors:2, feeds:3, datasets:2, consumers:['Privacy Compliance Agent','Kontrols Policy Engine','Legal Update Digest'], owner:'Privacy & Compliance', techOwner:'Knowledge Engineering', steward:'Privacy Law Steward', criticality:'High',
+      destination:'GCS + Vector Store · privacy_law', health:'warning', approval:'approved', governance:'Public law · Source citation required', lastRun:'3 hours ago', records:'21 documents', cost:'$1,200 / month', renewal:'December 31, 2026',
+      purpose:'Maintain authoritative, versioned privacy-law content for policy analysis, compliance testing, legal updates, and enterprise AI assistants.',
+      rawPath:'gs://enterprise-external-data/raw/california-privacy/', curatedDataset:'privacy_law', curatedTable:'legal_instruments / provisions / effective_dates', classification:'Internal', personalData:'No', contractId:'PUB-CA-2026-003', budget:'$2,000 / month',
+      primaryConnector:'Legislature website crawler', connectorType:'Website + PDF', frequency:'Daily', endpoint:'https://leginfo.legislature.ca.gov', icon:'PRV'
+    },
+    {
+      id:'SRC-REG-004', name:'EU Regulatory Guidance', provider:'European Data Protection Board', domain:'Privacy & Regulation', coverage:'European Union', instrument:'Guidelines, Opinions, Decisions',
+      connectors:1, feeds:2, datasets:2, consumers:['GDPR Assistant','Compliance Knowledge Base'], owner:'Privacy & Compliance', techOwner:'Knowledge Engineering', steward:'EU Regulatory Steward', criticality:'Medium',
+      destination:'GCS + Vector Store · gdpr_guidance', health:'healthy', approval:'approved', governance:'Public · Attribution required', lastRun:'5 hours ago', records:'46 items', cost:'$450 / month', renewal:'Annual recertification',
+      purpose:'Supply current EDPB guidance and opinions for GDPR research, policy interpretation, and compliance-assistant grounding.',
+      rawPath:'gs://enterprise-external-data/raw/edpb/', curatedDataset:'gdpr_guidance', curatedTable:'guidance_documents / sections', classification:'Internal', personalData:'No', contractId:'PUB-EDPB-2026-004', budget:'$750 / month',
+      primaryConnector:'EDPB RSS + document fetch', connectorType:'RSS / PDF', frequency:'Daily', endpoint:'https://edpb.europa.eu/feed', icon:'EU'
+    },
+    {
+      id:'SRC-LEG-005', name:'Legislation Document Archive', provider:'Internal Legal Operations', domain:'Court & Legal', coverage:'US & European Union', instrument:'Legislation PDFs, Amendments, Historical Versions',
+      connectors:1, feeds:2, datasets:1, consumers:['Legal Research Agent','Document Comparison Service'], owner:'Legal Operations', techOwner:'Enterprise Content', steward:'Legal Records Steward', criticality:'Medium',
+      destination:'GCS · legislation_archive', health:'disabled', approval:'approved', governance:'Internal licensed archive', lastRun:'Yesterday', records:'8,412 files', cost:'$2,800 / month', renewal:'October 15, 2026',
+      purpose:'Preserve approved legal documents and historical versions for research, comparison, citation, and audit evidence.',
+      rawPath:'gs://enterprise-external-data/raw/legal-archive/', curatedDataset:'legislation_archive', curatedTable:'documents / versions / citations', classification:'Confidential', personalData:'No', contractId:'INT-LEGAL-2026-005', budget:'$3,500 / month',
+      primaryConnector:'Legal archive bucket', connectorType:'Cloud Storage', frequency:'Daily', endpoint:'gs://legal-legislation-source', icon:'ARC'
+    },
+    {
+      id:'SRC-ENF-006', name:'State Enforcement Actions', provider:'Regulatory Database Vendor', domain:'Privacy & Regulation', coverage:'United States · State', instrument:'Enforcement Actions, Penalties, Consent Orders',
+      connectors:1, feeds:2, datasets:2, consumers:['Regulatory Risk Engine','Stocks Enforcement Signal','Compliance Dashboard'], owner:'Regulatory Intelligence', techOwner:'Data Platform', steward:'Enforcement Data Steward', criticality:'High',
+      destination:'BigQuery · enforcement_actions', health:'error', approval:'expired', governance:'Vendor licensed · No redistribution', lastRun:'2 days ago', records:'0', cost:'$9,600 / month', renewal:'August 20, 2026',
+      purpose:'Track regulatory enforcement, penalties, consent orders, and company-level risk signals across US state authorities.',
+      rawPath:'gs://enterprise-external-data/raw/enforcement-vendor/', curatedDataset:'enforcement_actions', curatedTable:'actions / entities / penalties', classification:'Confidential', personalData:'Limited business contacts', contractId:'VND-ENF-2025-088', budget:'$11,000 / month',
+      primaryConnector:'Vendor PostgreSQL replica', connectorType:'Database', frequency:'Daily', endpoint:'postgresql://regulatory-db/enforcement', icon:'ENF'
+    },
+    {
+      id:'SRC-FIN-007', name:'SEC Company Filings', provider:'US Securities and Exchange Commission', domain:'Financial Filings', coverage:'United States', instrument:'10-K, 10-Q, 8-K, 13F, Company Facts',
+      connectors:2, feeds:5, datasets:4, consumers:['Stocks Assistant','Earnings Intelligence','Company Fundamentals API','Research Agent'], owner:'Investment Intelligence', techOwner:'Data Platform', steward:'Financial Data Steward', criticality:'Mission critical',
+      destination:'GCS + BigQuery · sec_filings', health:'healthy', approval:'approved', governance:'Public · SEC fair-access rules', lastRun:'28 minutes ago', records:'72,114', cost:'$3,400 / month', renewal:'Annual recertification',
+      purpose:'Supply authoritative company filings, financial facts, corporate events, and source documents for investment research and AI analysis.',
+      rawPath:'gs://enterprise-external-data/raw/sec/', curatedDataset:'sec_filings', curatedTable:'submissions / company_facts / filing_documents', classification:'Internal', personalData:'Public officer names', contractId:'PUB-SEC-2026-007', budget:'$4,500 / month',
+      primaryConnector:'SEC EDGAR API', connectorType:'REST API + Files', frequency:'Hourly', endpoint:'https://data.sec.gov', icon:'SEC'
+    },
+    {
+      id:'SRC-IND-008', name:'India Digital Privacy Law', provider:'Ministry of Electronics and IT', domain:'Privacy & Regulation', coverage:'India', instrument:'Acts, Rules, Notifications, Guidance',
+      connectors:1, feeds:1, datasets:1, consumers:['India Privacy Assistant'], owner:'Privacy & Compliance', techOwner:'Knowledge Engineering', steward:'India Privacy Steward', criticality:'Medium',
+      destination:'GCS + Vector Store · india_privacy', health:'disabled', approval:'review', governance:'Public · Legal review pending', lastRun:'Never', records:': ', cost:'$300 / month', renewal:'Pending approval',
+      purpose:'Create a governed source of India privacy law and implementing rules for research, compliance guidance, and policy comparison.',
+      rawPath:'gs://enterprise-external-data/raw/india-privacy/', curatedDataset:'india_privacy', curatedTable:'instruments / provisions', classification:'Internal', personalData:'No', contractId:'PUB-IND-2026-008', budget:'$600 / month',
+      primaryConnector:'MeitY document crawler', connectorType:'Website + PDF', frequency:'Daily', endpoint:'https://www.meity.gov.in', icon:'IN'
+    }
+  ];
+
+  let selectedSource = sources[0];
+  const tbody = document.getElementById('sourceTableBody');
+  const emptyState = document.getElementById('emptyState');
+  const searchInput = document.getElementById('searchInput');
+  const domainFilter = document.getElementById('domainFilter');
+  const healthFilter = document.getElementById('healthFilter');
+  const approvalFilter = document.getElementById('approvalFilter');
+  const drawer = document.getElementById('sourceDrawer');
+  const drawerBackdrop = document.getElementById('drawerBackdrop');
+  const toast = document.getElementById('toast');
+
+  function escapeHtml(value='') { return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c])); }
+  function healthLabel(v){ return ({healthy:'Healthy',warning:'Warning',error:'Error',disabled:'Disabled'})[v] || v; }
+  function approvalLabel(v){ return ({approved:'Approved',review:'In review',pending:'Pending',expired:'Expired'})[v] || v; }
+  function showToast(message){ toast.textContent=message; toast.classList.add('show'); clearTimeout(showToast.t); showToast.t=setTimeout(()=>toast.classList.remove('show'),2600); }
+
+  function render(){
+    const q=searchInput.value.trim().toLowerCase();
+    const domain=domainFilter.value, health=healthFilter.value, approval=approvalFilter.value;
+    const filtered=sources.filter(s=>{
+      const hay=[s.name,s.provider,s.domain,s.coverage,s.instrument,s.owner,s.techOwner,s.destination,...s.consumers].join(' ').toLowerCase();
+      return (!q||hay.includes(q)) && (domain==='all'||s.domain===domain) && (health==='all'||s.health===health) && (approval==='all'||s.approval===approval);
+    });
+    tbody.innerHTML=filtered.map(s=>`
+      <tr>
+        <td><div class="source-cell"><div class="source-icon">${escapeHtml(s.icon)}</div><div><div class="source-name">${escapeHtml(s.name)}</div><div class="source-meta">${escapeHtml(s.provider)} · ${escapeHtml(s.id)}</div></div></div></td>
+        <td><div class="mini-stack"><strong>${escapeHtml(s.domain)}</strong><span>${escapeHtml(s.coverage)}</span><span>${escapeHtml(s.instrument)}</span></div></td>
+        <td><div class="mini-stack"><strong>${s.connectors} connector${s.connectors>1?'s':''} · ${s.feeds} feeds</strong><span>${escapeHtml(s.connectorType)} · ${escapeHtml(s.frequency)}</span></div></td>
+        <td><div class="mini-stack"><strong>${escapeHtml(s.owner)}</strong><span>Tech: ${escapeHtml(s.techOwner)}</span></div></td>
+        <td><div class="mini-stack"><strong>${escapeHtml(s.destination.split('·')[0].trim())}</strong><span>${escapeHtml((s.destination.split('·')[1]||'').trim())}</span></div></td>
+        <td><div class="consumer-pills">${s.consumers.slice(0,2).map(c=>`<span class="pill">${escapeHtml(c)}</span>`).join('')}${s.consumers.length>2?`<span class="pill more">+${s.consumers.length-2}</span>`:''}</div></td>
+        <td><div class="mini-stack"><span class="badge ${s.approval}"><span class="status-dot"></span>${approvalLabel(s.approval)}</span><span>${escapeHtml(s.governance)}</span></div></td>
+        <td><div class="mini-stack"><span class="badge ${s.health}"><span class="status-dot"></span>${healthLabel(s.health)}</span><span>${escapeHtml(s.lastRun)} · ${escapeHtml(s.records)}</span></div></td>
+        <td><div class="actions"><button class="action-btn" title="View source" onclick="openSource('${s.id}')">→</button><button class="action-btn" title="Run primary feed" onclick="quickRun('${s.id}')">▶</button><button class="action-btn" title="${s.health==='disabled'?'Enable':'Disable'}" onclick="quickToggle('${s.id}')">${s.health==='disabled'?'✓':'Ⅱ'}</button></div></td>
+      </tr>`).join('');
+    emptyState.style.display=filtered.length?'none':'block';
+    document.getElementById('resultCount').textContent=`${filtered.length} source${filtered.length===1?'':'s'} shown`;
+    document.getElementById('sourceCount').textContent=sources.length+6;
+    document.getElementById('feedCount').textContent=sources.reduce((a,s)=>a+s.feeds,0)+1;
+    document.getElementById('attentionCount').textContent=sources.filter(s=>['warning','error'].includes(s.health)||['review','expired'].includes(s.approval)).length;
+  }
+
+  function setBadge(el,type,label){ el.className=`badge ${type}`; el.innerHTML=`<span class="status-dot"></span>${label}`; }
+  function openSource(id){ selectedSource=sources.find(s=>s.id===id)||sources[0]; populateDrawer(); drawer.classList.add('open'); drawerBackdrop.classList.add('open'); drawer.setAttribute('aria-hidden','false'); }
+  function closeDrawer(){ drawer.classList.remove('open'); drawerBackdrop.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+
+  function populateDrawer(){
+    const s=selectedSource;
+    document.getElementById('drawerIcon').textContent=s.icon;
+    document.getElementById('drawerTitle').textContent=s.name;
+    document.getElementById('drawerSubtitle').textContent=`${s.provider} · ${s.domain} · ${s.id}`;
+    setBadge(document.getElementById('drawerApproval'),s.approval,approvalLabel(s.approval));
+    setBadge(document.getElementById('drawerHealth'),s.health,healthLabel(s.health));
+    const values={dSourceId:s.id,dProvider:s.provider,dDomain:s.domain,dCoverage:s.coverage,dInstrument:s.instrument,dPurpose:s.purpose,dBusinessOwner:s.owner,dTechnicalOwner:s.techOwner,dSteward:s.steward,dCriticality:s.criticality,dConnectors:s.connectors,dFeeds:s.feeds,dDatasets:s.datasets,dConsumers:s.consumers.length,dLastRun:s.lastRun,dRecords:s.records,dCost:s.cost,dRenewal:s.renewal,dRawPath:s.rawPath,dCuratedDataset:s.curatedDataset,dCuratedTable:s.curatedTable,dClassification:s.classification,dPersonalData:s.personalData,dContractId:s.contractId,dBudget:s.budget,dGovRenewal:s.renewal,destSourceNode:s.name,linSource:s.name,linConnector:s.primaryConnector,linRaw:s.rawPath.split('/').filter(Boolean).slice(-1)[0]||'raw',linDataset:s.curatedDataset,linConsumer:s.consumers[0],kCoverage:s.coverage,kFrequency:s.frequency,kBudget:s.budget,kConsumers:`${s.consumers.length} active`};
+    Object.entries(values).forEach(([id,v])=>{ const el=document.getElementById(id); if(el) el.textContent=v; });
+    document.getElementById('impactBox').innerHTML=`<strong>Downstream impact:</strong> Disabling this source can affect <strong>${s.datasets} curated dataset${s.datasets>1?'s':''}</strong>, <strong>${s.consumers.length} registered consumers</strong>, and dependent alerts or AI responses. A production disable action should require impact acknowledgment.`;
+    document.getElementById('toggleSourceBtn').textContent=s.health==='disabled'?'Enable source':'Disable source';
+
+    document.getElementById('feedList').innerHTML=Array.from({length:s.feeds},(_,i)=>`
+      <div class="feed-row"><div><div class="row-title">${i===0?s.primaryConnector:`${s.instrument.split(',')[0]} feed ${i+1}`}</div><div class="row-sub">${i===0?s.endpoint:`Configured sub-resource /feed/${i+1}`}</div></div><div><div class="row-title">${i===0?s.connectorType:'REST API'}</div><div class="row-sub">Auth: ${i===0?'Secret reference':'Inherited'}</div></div><div><div class="row-title">${i===0?s.frequency:'Daily'}</div><div class="row-sub">Incremental ingest</div></div><div><span class="badge ${s.health==='error'&&i===0?'error':s.health==='disabled'?'disabled':'active'}">${s.health==='error'&&i===0?'Failed':s.health==='disabled'?'Paused':'Active'}</span></div><button class="btn small" onclick="showToast('Feed configuration opened')">Configure</button></div>`).join('');
+
+    document.getElementById('contractList').innerHTML=[
+      ['Primary record key','source_record_id','Required · unique','Reject duplicate'],
+      ['Updated timestamp','updated_at','ISO-8601 UTC','Incremental cursor'],
+      ['Effective date','effective_date','Date or null','Warn if missing'],
+      ['Jurisdiction','jurisdiction_code','Controlled vocabulary','Normalize'],
+      ['Source URL','source_url','Valid HTTPS URL','Required for citation']
+    ].map(r=>`<div class="contract-row"><div><div class="row-title">${r[0]}</div><div class="row-sub">Business field</div></div><div class="metric">${r[1]}</div><div class="row-sub">${r[2]}</div><div class="row-sub">${r[3]}</div><button class="btn small" onclick="showToast('Field rule opened')">Edit</button></div>`).join('');
+
+    const qs=[['Freshness','≤ 6 hours',96],['Required-field completeness','≥ 98%',99],['Duplicate rate','≤ 1%',100],['Valid schema records','≥ 99%',98],['Volume variance','± 50% baseline',82]];
+    document.getElementById('qualityList').innerHTML=qs.map((r,i)=>`<div class="quality-row"><div><div class="row-title">${r[0]}</div><div class="quality-meter"><i style="width:${r[2]}%"></i></div></div><div class="metric">${r[1]}</div><div class="row-sub">Current: ${i===4?'-18%':'Within threshold'}</div><div><span class="badge ${i===4?'warning':'healthy'}">${i===4?'Watch':'Pass'}</span></div><button class="btn small" onclick="showToast('Quality rule opened')">Edit</button></div>`).join('');
+
+    document.getElementById('consumerList').innerHTML=s.consumers.map((c,i)=>`<div class="feed-row"><div><div class="row-title">${c}</div><div class="row-sub">${i%2===0?'Application / AI agent':'API / workflow'}</div></div><div><div class="row-title">${s.curatedDataset}</div><div class="row-sub">Curated access</div></div><div><div class="row-title">${i===0?'Critical':'Standard'}</div><div class="row-sub">Impact tier</div></div><div><span class="badge approved">Approved</span></div><button class="btn small" onclick="showToast('Consumer record opened')">View</button></div>`).join('');
+
+    document.getElementById('approvalList').innerHTML=[
+      ['Production activation','Data Platform Admin','Approved','July 6, 2026'],
+      ['Legal and permitted-use review','Enterprise Legal','Approved','July 6, 2026'],
+      ['Security and credential review','Security Engineering','Approved','July 5, 2026'],
+      ['Data contract review',s.steward,'Approved','July 4, 2026']
+    ].map(r=>`<div class="approval-row"><div><div class="row-title">${r[0]}</div><div class="row-sub">Evidence attached</div></div><div class="metric">${r[1]}</div><div><span class="badge approved">${r[2]}</span></div><div class="row-sub">${r[3]}</div><button class="btn small" onclick="showToast('Approval evidence opened')">View</button></div>`).join('');
+
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='overview'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel==='overview'));
+  }
+
+  function quickRun(id){ const s=sources.find(x=>x.id===id); showToast(`Run started for ${s.name}`); }
+  function quickToggle(id){ const s=sources.find(x=>x.id===id); s.health=s.health==='disabled'?'healthy':'disabled'; render(); showToast(`${s.name} ${s.health==='disabled'?'disabled':'enabled'}`); if(selectedSource&&selectedSource.id===id) populateDrawer(); }
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+  searchInput.addEventListener('input',render); domainFilter.addEventListener('change',render); healthFilter.addEventListener('change',render); approvalFilter.addEventListener('change',render);
+  document.getElementById('resetFilters').addEventListener('click',()=>{ searchInput.value=''; domainFilter.value='all'; healthFilter.value='all'; approvalFilter.value='all'; render(); });
+  document.getElementById('addSourceBtn').addEventListener('click',()=>openModal('addModal'));
+  document.getElementById('exportBtn').addEventListener('click',()=>showToast('External data product registry export prepared'));
+  drawerBackdrop.addEventListener('click',closeDrawer); document.getElementById('closeDrawerBtn').addEventListener('click',closeDrawer);
+  document.getElementById('drawerTabs').addEventListener('click',e=>{ const btn=e.target.closest('.tab-btn'); if(!btn)return; document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn)); document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===btn.dataset.tab)); });
+  document.getElementById('testConnectionBtn').addEventListener('click',()=>{ const btn=document.getElementById('testConnectionBtn'), result=document.getElementById('testResult'); btn.disabled=true; btn.textContent='Testing…'; result.className='test-result'; setTimeout(()=>{ btn.disabled=false; btn.textContent='Test connection'; result.className='test-result success'; result.innerHTML='<strong>Connection successful.</strong> Endpoint reachable, secret resolved, authorization accepted, JSON response validated, and 25 sample records returned in 428 ms.'; },850); });
+  document.getElementById('runNowBtn').addEventListener('click',()=>showToast(`Run started for ${selectedSource.primaryConnector}`));
+  document.getElementById('toggleSourceBtn').addEventListener('click',()=>quickToggle(selectedSource.id));
+  document.getElementById('editSourceBtn').addEventListener('click',()=>{ document.getElementById('editName').value=selectedSource.name; document.getElementById('editProvider').value=selectedSource.provider; document.getElementById('editOwner').value=selectedSource.owner; document.getElementById('editTechOwner').value=selectedSource.techOwner; document.getElementById('editFrequency').value=[...document.getElementById('editFrequency').options].some(o=>o.value===selectedSource.frequency)?selectedSource.frequency:'Daily'; document.getElementById('editCriticality').value=selectedSource.criticality; document.getElementById('editPurpose').value=selectedSource.purpose; openModal('editModal'); });
+  document.getElementById('saveEditBtn').addEventListener('click',()=>{ selectedSource.name=document.getElementById('editName').value||selectedSource.name; selectedSource.provider=document.getElementById('editProvider').value||selectedSource.provider; selectedSource.owner=document.getElementById('editOwner').value||selectedSource.owner; selectedSource.techOwner=document.getElementById('editTechOwner').value||selectedSource.techOwner; selectedSource.frequency=document.getElementById('editFrequency').value; selectedSource.criticality=document.getElementById('editCriticality').value; selectedSource.purpose=document.getElementById('editPurpose').value||selectedSource.purpose; selectedSource.approval='review'; closeModal('editModal'); populateDrawer(); render(); showToast('Changes saved and submitted for approval'); });
+  document.getElementById('viewAuditBtn').addEventListener('click',()=>{ document.getElementById('auditBody').innerHTML=[['Connector schedule changed','Prashant Dhingra','Today, 2:14 PM'],['Credential reference updated','Data Platform Admin','July 10, 2026'],['Quality threshold changed','Market Data Steward','July 8, 2026'],['Source activated','Data Platform Admin','July 6, 2026']].map(r=>`<div class="approval-row"><div><div class="row-title">${r[0]}</div><div class="row-sub">${selectedSource.id}</div></div><div class="metric">${r[1]}</div><div class="row-sub">${r[2]}</div><div><span class="badge info">Recorded</span></div><button class="btn small" onclick="showToast('Audit record opened')">View</button></div>`).join(''); openModal('auditModal'); });
+  document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
+  document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) closeModal(m.id); }));
+  document.getElementById('saveDraftNewBtn').addEventListener('click',()=>{ closeModal('addModal'); showToast('External source saved as draft'); });
+  document.getElementById('createSourceBtn').addEventListener('click',()=>{
+    const name=document.getElementById('newName').value.trim(), provider=document.getElementById('newProvider').value.trim();
+    if(!name||!provider){ showToast('Enter source name and provider'); return; }
+    const n={...sources[7],id:`SRC-NEW-${String(sources.length+1).padStart(3,'0')}`,name,provider,domain:document.getElementById('newDomain').value,coverage:document.getElementById('newCoverage').value||'To be defined',owner:document.getElementById('newOwner').value||'Unassigned',criticality:document.getElementById('newCriticality').value,purpose:document.getElementById('newPurpose').value||'Business purpose to be completed.',connectorType:document.getElementById('newConnectorType').value,approval:'pending',health:'disabled',feeds:1,connectors:1,consumers:[],icon:'NEW'};
+    sources.unshift(n); closeModal('addModal'); render(); openSource(n.id); showToast('Source created. Complete configuration and approvals.');
+  });
+
+  render();
+</script>
+</body></html>

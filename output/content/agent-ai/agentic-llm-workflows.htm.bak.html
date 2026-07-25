@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Architecture of Agency: An Interactive Exploration of LLM Workflows</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Chosen Palette: Warm Neutrals with Subtle Blue Accent -->
+<!-- Application Structure Plan: The SPA is designed as a thematic, non-linear dashboard. This structure abandons the report's sequential format in favor of user-centric sections (Concepts, Architecture, Building, Impact, Challenges). This allows users to immediately navigate to their area of interest, making the dense information more accessible. Interactions like tabbed interfaces, clickable diagrams, and interactive charts are used to break down complex topics into digestible, explorable chunks, prioritizing user engagement and understanding over passive reading. -->
+<!-- Visualization & Content Choices: 1. AI Paradigms (Table 1) -> Goal: Compare -> Viz: Interactive Grouped Bar Chart -> Interaction: Dropdown to select feature -> Justification: Makes comparison visual and user-driven. (Chart.js). 2. Architectural Pillars -> Goal: Organize/Explain -> Viz: HTML/CSS Diagram -> Interaction: Click to reveal details -> Justification: Visualizes system structure intuitively. (Tailwind). 3. Frameworks (Table 3) -> Goal: Compare -> Viz: Interactive Radar Chart -> Interaction: Hover tooltips, clickable legend -> Justification: Multi-variate comparison at a glance. (Chart.js). 4. Challenges -> Goal: Inform/Organize -> Viz: Expandable Grid -> Interaction: Click to expand/collapse -> Justification: Prevents information overload by showing overview first. (HTML/JS). -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #383838;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #3B82F6;
+            border-bottom-color: #3B82F6;
+        }
+        .pillar-card, .challenge-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .pillar-card:hover, .challenge-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
+		(function (w, d, s, l, i) {
+			w[l] = w[l] || []; w[l].push({
+				'gtm.start':
+					new Date().getTime(), event: 'gtm.js'
+			}); var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
+<body class="antialiased">
+<header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm" id="header">
+<nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+<h1 class="text-xl font-bold text-gray-800">Agentic AI</h1>
+<div class="hidden md:flex space-x-8">
+<a class="nav-link text-gray-600 border-b-2 border-transparent pb-1" href="#concepts">Concepts</a>
+<a class="nav-link text-gray-600 border-b-2 border-transparent pb-1" href="#architecture">Architecture</a>
+<a class="nav-link text-gray-600 border-b-2 border-transparent pb-1" href="#building">Building</a>
+<a class="nav-link text-gray-600 border-b-2 border-transparent pb-1" href="#impact">Impact</a>
+<a class="nav-link text-gray-600 border-b-2 border-transparent pb-1" href="#challenges">Challenges</a>
+</div>
+<button class="md:hidden text-gray-700 focus:outline-none" id="mobile-menu-button">
+<span class="text-2xl">☰</span>
+</button>
+</nav>
+<div class="hidden md:hidden px-6 pb-4" id="mobile-menu">
+<a class="block py-2 text-gray-600" href="#concepts">Concepts</a>
+<a class="block py-2 text-gray-600" href="#architecture">Architecture</a>
+<a class="block py-2 text-gray-600" href="#building">Building</a>
+<a class="block py-2 text-gray-600" href="#impact">Impact</a>
+<a class="block py-2 text-gray-600" href="#challenges">Challenges</a>
+</div>
+</header>
+<main class="container mx-auto px-6 py-12">
+<section class="text-center mb-24" id="hero">
+<h2 class="text-4xl md:text-6xl font-bold text-gray-900 mb-4">The Architecture of Agency</h2>
+<p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                Explore the paradigm shift from passive AI to proactive, autonomous agents. This interactive report breaks down the core concepts, architectures, and real-world impact of agentic <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> workflows.
+            </p>
+</section>
+<section class="mb-24 scroll-mt-20" id="concepts">
+<h3 class="text-3xl font-bold text-center mb-2 text-gray-800">Core Concepts</h3>
+<p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Agentic AI represents a fundamental leap, turning language models from text generators into goal-driven problem solvers. This section compares this new paradigm against other AI technologies to clarify its unique value.</p>
+<div class="bg-white p-8 rounded-xl shadow-lg">
+<h4 class="text-2xl font-semibold text-center mb-6">AI System Paradigms: A Comparison</h4>
+<div class="flex justify-center items-center mb-6">
+<label class="mr-4 font-medium text-gray-700" for="paradigm-selector">Compare by Feature:</label>
+<select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5" id="paradigm-selector">
+<option value="autonomy">Autonomy</option>
+<option value="adaptability">Adaptability</option>
+<option value="cost">Cost Profile</option>
+</select>
+</div>
+<div class="chart-container">
+<canvas id="paradigmChart"></canvas>
+</div>
+</div>
+</section>
+<section class="mb-24 scroll-mt-20" id="architecture">
+<h3 class="text-3xl font-bold text-center mb-2 text-gray-800">How It Works: The Four Pillars</h3>
+<p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Autonomous action isn't magic; it's architecture. Agentic systems are built on four interdependent pillars that work together to enable reasoning, action, and learning. Click on each pillar to learn more.</p>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+<div class="lg:col-span-1 grid grid-cols-2 lg:grid-cols-1 gap-6">
+<div class="pillar-card cursor-pointer bg-white p-6 rounded-xl shadow-md border-2 border-transparent" id="pillar-reasoning">
+<h4 class="text-xl font-semibold text-blue-600 mb-2"><span class="text-2xl mr-2">🧠</span>Reasoning &amp; Planning</h4>
+<p class="text-gray-600 text-sm">The agent's "brain," where goals are broken down into actionable steps.</p>
+</div>
+<div class="pillar-card cursor-pointer bg-white p-6 rounded-xl shadow-md border-2 border-transparent" id="pillar-tools">
+<h4 class="text-xl font-semibold text-green-600 mb-2"><span class="text-2xl mr-2">🛠</span>Tool Integration</h4>
+<p class="text-gray-600 text-sm">The agent's "hands," allowing it to interact with the external world via APIs and functions.</p>
+</div>
+<div class="pillar-card cursor-pointer bg-white p-6 rounded-xl shadow-md border-2 border-transparent" id="pillar-memory">
+<h4 class="text-xl font-semibold text-purple-600 mb-2"><span class="text-2xl mr-2">💭</span>Memory</h4>
+<p class="text-gray-600 text-sm">Provides context and learning, from short-term session data to long-term experiences.</p>
+</div>
+<div class="pillar-card cursor-pointer bg-white p-6 rounded-xl shadow-md border-2 border-transparent" id="pillar-reflection">
+<h4 class="text-xl font-semibold text-yellow-600 mb-2"><span class="text-2xl mr-2">🔍</span>Reflection</h4>
+<p class="text-gray-600 text-sm">The capacity for self-correction and learning from the outcomes of actions.</p>
+</div>
+</div>
+<div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-lg min-h-[300px] fade-in" id="pillar-details">
+<h4 class="text-2xl font-bold mb-4 text-gray-800" id="pillar-title">Select a Pillar</h4>
+<p class="text-gray-700 leading-relaxed" id="pillar-content">Click on one of the four pillars to the left to see a detailed explanation of its role in the agentic architecture. Understanding these components is key to grasping how agents move from simple instruction-following to complex problem-solving.</p>
+</div>
+</div>
+</section>
+<section class="mb-24 scroll-mt-20" id="building">
+<h3 class="text-3xl font-bold text-center mb-2 text-gray-800">Building Agentic Systems</h3>
+<p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">From design patterns to orchestration frameworks, building an agentic workflow involves key architectural choices. This section provides a high-level comparison of the leading open-source frameworks available to developers.</p>
+<div class="bg-white p-8 rounded-xl shadow-lg">
+<h4 class="text-2xl font-semibold text-center mb-6">Framework Comparison</h4>
+<div class="chart-container">
+<canvas id="frameworkChart"></canvas>
+</div>
+</div>
+</section>
+<section class="mb-24 scroll-mt-20" id="impact">
+<h3 class="text-3xl font-bold text-center mb-2 text-gray-800">Real-World Impact</h3>
+<p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Agentic AI is already automating complex processes across various industries. The most successful deployments divide broad problems into specialized roles fulfilled by collaborating agents.</p>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+<div class="bg-white p-8 rounded-xl shadow-lg">
+<h4 class="text-xl font-semibold mb-3 text-gray-800"><span class="text-2xl mr-2">💳</span>Business Automation</h4>
+<p class="text-gray-600">Agents are streamlining functions in finance, HR, and supply chain management by handling tasks like financial reconciliation, resume screening, and real-time inventory optimization.</p>
+</div>
+<div class="bg-white p-8 rounded-xl shadow-lg">
+<h4 class="text-xl font-semibold mb-3 text-gray-800"><span class="text-2xl mr-2">💻</span>AI Software Engineers</h4>
+<p class="text-gray-600">Systems like Devin AI can now autonomously write, debug, and deploy code. They act as capable junior engineers, tackling backlogs and freeing up human developers for more strategic work.</p>
+</div>
+<div class="bg-white p-8 rounded-xl shadow-lg">
+<h4 class="text-xl font-semibold mb-3 text-gray-800"><span class="text-2xl mr-2">🔬</span>Scientific Discovery</h4>
+<p class="text-gray-600">In fields like drug discovery, multi-agent systems automate the entire research cycle from literature review and hypothesis generation to data analysis dramatically accelerating the pace of innovation.</p>
+</div>
+</div>
+</section>
+<section class="scroll-mt-20" id="challenges">
+<h3 class="text-3xl font-bold text-center mb-2 text-gray-800">Challenges &amp; The Future</h3>
+<p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Widespread adoption depends on overcoming significant technical, security, and ethical hurdles. Click on a challenge below to explore the risks and potential mitigation strategies.</p>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="challenge-card cursor-pointer bg-white p-6 rounded-xl shadow-md">
+<h4 class="text-lg font-semibold text-red-600">LLM Hallucination</h4>
+<div class="challenge-content hidden mt-3 text-gray-600 text-sm">
+<p><strong>Risk:</strong> Agents may act on fabricated information, leading to flawed decisions and harmful outcomes.</p>
+<p class="mt-2"><strong>Mitigation:</strong> Grounding responses with Retrieval-Augmented Generation (RAG), enforcing logical reasoning, and implementing self-consistency checks.</p>
+</div>
+</div>
+<div class="challenge-card cursor-pointer bg-white p-6 rounded-xl shadow-md">
+<h4 class="text-lg font-semibold text-red-600">Prompt Injection</h4>
+<div class="challenge-content hidden mt-3 text-gray-600 text-sm">
+<p><strong>Risk:</strong> Attackers can embed malicious instructions in data to hijack the agent's control flow, causing unintended actions or data leaks.</p>
+<p class="mt-2"><strong>Mitigation:</strong> Input sanitization, treating agents as privileged identities with least-privilege access, and monitoring for anomalous behavior.</p>
+</div>
+</div>
+<div class="challenge-card cursor-pointer bg-white p-6 rounded-xl shadow-md">
+<h4 class="text-lg font-semibold text-red-600">Algorithmic Bias</h4>
+<div class="challenge-content hidden mt-3 text-gray-600 text-sm">
+<p><strong>Risk:</strong> Agents can inherit and amplify societal biases from their training data, leading to unfair or discriminatory outcomes.</p>
+<p class="mt-2"><strong>Mitigation:</strong> Rigorous evaluation, trajectory analysis to detect biased reasoning, and maintaining a human-in-the-loop for sensitive decisions.</p>
+</div>
+</div>
+<div class="challenge-card cursor-pointer bg-white p-6 rounded-xl shadow-md">
+<h4 class="text-lg font-semibold text-orange-600">Latency &amp; Cost</h4>
+<div class="challenge-content hidden mt-3 text-gray-600 text-sm">
+<p><strong>Risk:</strong> Multi-step workflows with many LLM calls can be slow and expensive, making them unsuitable for real-time applications.</p>
+<p class="mt-2"><strong>Mitigation:</strong> Using smaller, specialized models (SLMs) for routine tasks and reserving large models for high-level planning and reasoning.</p>
+</div>
+</div>
+<div class="challenge-card cursor-pointer bg-white p-6 rounded-xl shadow-md">
+<h4 class="text-lg font-semibold text-orange-600">Error Propagation</h4>
+<div class="challenge-content hidden mt-3 text-gray-600 text-sm">
+<p><strong>Risk:</strong> An error by one agent can cascade through a multi-agent system, leading to complete task failure that is difficult to debug.</p>
+<p class="mt-2"><strong>Mitigation:</strong> Modular design with clear responsibilities, robust state management, and comprehensive observability to trace errors to their root cause.</p>
+</div>
+</div>
+<div class="challenge-card cursor-pointer bg-white p-6 rounded-xl shadow-md">
+<h4 class="text-lg font-semibold text-orange-600">Accountability</h4>
+<div class="challenge-content hidden mt-3 text-gray-600 text-sm">
+<p><strong>Risk:</strong> The "black box" nature of LLMs makes it difficult to determine responsibility when an autonomous agent causes harm.</p>
+<p class="mt-2"><strong>Mitigation:</strong> Ensuring transparency through agent observability, trajectory evaluation, and developing new legal/ethical frameworks for autonomous systems.</p>
+</div>
+</div>
+</div>
+</section>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-slides/">Agent Ai Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/approaches/">Approaches</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/architecture/">Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/challenges/">Challenges</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/chapters/">Chapters</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/consumer-facing/">Consumer Facing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/design-patterns/">Design Patterns</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/enterprise/">Enterprise</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/framework-for-agent-ai-adoption/">Framework For Agent Ai Adoption</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/functional-calling-mcp-a2a/">Functional Calling Mcp A2A</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/guide/">Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/layers/">Layers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/life-cycle/">Life Cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/mcp/">Mcp</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/multi-agent/">Multi Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/prompt-engineering/">Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/slides/">Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/testing/">Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/use-cases/">Use Cases</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/1-intro-agent-to-agent.html">1 Intro Agent To Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/1-overview-ai-agent.html">1 Overview Ai Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/10-transform-education.html">10 Transform Education</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/11-build-ai-agent-with-dataknobs.html">11 Build Ai Agent With Dataknobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/13-prompt-engineering-ai-agent.html">13 Prompt Engineering Ai Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/15-integrate-ai-agent-with-workflows.html">15 Integrate Ai Agent With Workflows</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/16-version-control-for-ai-agent.html">16 Version Control For Ai Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/17-how-generative-ai-enhances-agent-capabilities.html">17 How Generative Ai Enhances Agent Capabilities</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/18-exploring-the-ethical-implications-of-autonomous-ai-agents.html">18 Exploring The Ethical Implications Of Autonomous Ai Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/19-sustainability-in-ai-agents-building-energy-efficient-solutions.html">19 Sustainability In Ai Agents Building Energy Efficient Solutions</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/2-ai-assistant-vs-ai-agent.html">2 Ai Assistant Vs Ai Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/20-the-role-of-fine-tuning-in-creating-specialized-ai-agents.html">20 The Role Of Fine Tuning In Creating Specialized Ai Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/21-why-small-businesses-need-agent-ai-to-stay-ahead-in-seo.html">21 Why Small Businesses Need Agent Ai To Stay Ahead In Seo</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/22-competitive-advantage-of-ai-driven-web-design-through-agents.html">22 Competitive Advantage Of Ai Driven Web Design Through Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/23-how-ai-agents-help-startups-stay-agile-and-scalable.html">23 How Ai Agents Help Startups Stay Agile And Scalable</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/24-leveraging-ai-agents-to-outrank-competitors-in-search-results.html">24 Leveraging Ai Agents To Outrank Competitors In Search Results</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/25-agent-ai-and-multi-agent-systems-collaboration-for-complex-tasks.html">25 Agent Ai And Multi Agent Systems Collaboration For Complex Tasks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/26-how-iot-and-agent-ai-work-together-for-smart-solutions.html">26 How Iot And Agent Ai Work Together For Smart Solutions</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/27-top-open-source-tools-and-frameworks-for-building-ai-agents.html">27 Top Open Source Tools And Frameworks For Building Ai Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/28-integrating-voice-and-vision-in-ai-agents-the-future-of-multi-modal-interaction.html">28 Integrating Voice And Vision In Ai Agents The Future Of Multi Modal Interaction</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/29-overcoming-data-privacy-challenges-in-ai-agent-development.html">29 Overcoming Data Privacy Challenges In Ai Agent Development</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/3-chatbots-to-autonomous-systems..html">3 Chatbots To Autonomous Systems.</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/3-chatbots-to-autonomous-systems.html">3 Chatbots To Autonomous Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/30-common-mistakes-to-avoid-when-deploying-ai-agents.html">30 Common Mistakes To Avoid When Deploying Ai Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/31-ensuring-scalability-and-reliability-in-agent-ai-systems.html">31 Ensuring Scalability And Reliability In Agent Ai Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/32-success-stories-businesses-transformed-by-agent-ai.html">32 Success Stories Businesses Transformed By Agent Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/4-customer-support-and-experience-with-agent-ai.html">4 Customer Support And Experience With Agent Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/5-agent-ai-in-ecommerce-personalization.html">5 Agent Ai In Ecommerce Personalization</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/7-financial-advisor-ai-agent.html">7 Financial Advisor Ai Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/8-principles-of-research-ai-agents.html">8 Principles Of Research Ai Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/9-kreatewebsites-agent-compete-with-giants.html">9 Kreatewebsites Agent Compete With Giants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/a2a-slides-tutorial.html">A2A Slides Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/adoption-framework.html">Adoption Framework</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-1.html">Agent Ai 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-10.html">Agent Ai 10</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-11.html">Agent Ai 11</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-12.html">Agent Ai 12</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-13.html">Agent Ai 13</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-14.html">Agent Ai 14</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-15.html">Agent Ai 15</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-16.html">Agent Ai 16</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-17.html">Agent Ai 17</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-18.html">Agent Ai 18</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-19.html">Agent Ai 19</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-2.html">Agent Ai 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-20.html">Agent Ai 20</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-21.html">Agent Ai 21</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-22.html">Agent Ai 22</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-23.html">Agent Ai 23</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-24.html">Agent Ai 24</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-3.html">Agent Ai 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-4.html">Agent Ai 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-5.html">Agent Ai 5</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-6.html">Agent Ai 6</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-7.html">Agent Ai 7</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-8.html">Agent Ai 8</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-9.html">Agent Ai 9</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-banking.html">Agent Ai Banking</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-evolution.html">Agent Ai Evolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-for-aerospace.html">Agent Ai For Aerospace</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-for-energy-domain.html">Agent Ai For Energy Domain</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-for-enterprise-scale.html">Agent Ai For Enterprise Scale</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-for-marketing-analytics.html">Agent Ai For Marketing Analytics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-for-media-domain.html">Agent Ai For Media Domain</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-for-transportation.html">Agent Ai For Transportation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-slides.html">Agent Ai Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-ai-vs-automation.html">Agent Ai Vs Automation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-building-with-langchain.html">Agent Building With Langchain</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-exec-deck.html">Agent Engineering Exec Deck</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-guide.html">Agent Engineering Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agenti-ai-for-retail-ecommerce.html">Agenti Ai For Retail Ecommerce</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agentic-ai-llm-workflows.html">Agentic Ai Llm Workflows</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agentic-ai-one-pager.html">Agentic Ai One Pager</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agentic-ai-progress-in-2024-2025.html">Agentic Ai Progress In 2024 2025</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agentic-rag.html">Agentic Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/ai-agent-for-customer-support.html">Ai Agent For Customer Support</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/ai-agent-for-telecommunication.html">Ai Agent For Telecommunication</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/ai-agent-in-real-estate.html">Ai Agent In Real Estate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/ai-agent-powerpoint.html">Ai Agent Powerpoint</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/ai-agent-vs-agentic-ai.html">Ai Agent Vs Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/ai-agents-and-reinforcement-learning.html">Ai Agents And Reinforcement Learning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/ai-agents-in-cyber-security.html">Ai Agents In Cyber Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/ai-agents-in-healtcare-systems.html">Ai Agents In Healtcare Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/autonomous-vehicles.html">Autonomous Vehicles</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/backup-page.html">Backup Page</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/chatbot-assistant-aaiagent.html">Chatbot Assistant Aaiagent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/conversational-ai-agents.html">Conversational Ai Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/decision-framwork-for-ai-agents.html">Decision Framwork For Ai Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/evolution-of-ai-agents.html">Evolution Of Ai Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/evolution-of-llms-8-stages-ai-advancement.html">Evolution Of Llms 8 Stages Ai Advancement</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/functional-calling-mcp-a2a.html">Functional Calling Mcp A2A</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/how-multi-agents-systems-work.html">How Multi Agents Systems Work</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/impac-on-future-of-work.html">Impac On Future Of Work</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/llm-to-agentic-ai-journey.html">Llm To Agentic Ai Journey</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/mcp-server.html">Mcp Server</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/metaverse.html">Metaverse</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/ml-model-vs-agent-ai.html">Ml Model Vs Agent Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/multi-agent-ai-systems-finance-guide.html">Multi Agent Ai Systems Finance Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/personalization.html">Personalization</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/predicitve-maintenance.html">Predicitve Maintenance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/realtime-decisions.html">Realtime Decisions</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/rl-agent.html">Rl Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/role-of-rag-in-ai-agents.html">Role Of Rag In Ai Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/smart-cities.html">Smart Cities</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/trust-and-transparency.html">Trust And Transparency</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Tutorials</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/vendors.html">Vendors</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Data to AI Products - Continuously Improved by Intelligent Knobs</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer></main>
+<!--
+
+    <footer class="bg-gray-100 mt-20">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-600">
+            <p>Interactive report generated based on "The Architecture of Agency: A Comprehensive Analysis of LLM-Powered Agentic Workflows".</p>
+            <p class="text-sm mt-2">This is a conceptual, educational tool and does not constitute a formal research publication.</p>
+        </div>
+    </footer>
+
+-->
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const data = {
+                paradigms: {
+                    labels: ['Non-Agentic', 'Fine-Tuned', 'Traditional RAG', 'Agentic Workflow'],
+                    features: {
+                        autonomy: {
+                            title: 'Autonomy Level',
+                            values: [1, 1, 2, 3],
+                            labels: ['Low', 'Low', 'Medium', 'High']
+                        },
+                        adaptability: {
+                            title: 'Adaptability',
+                            values: [1, 1, 1, 3],
+                            labels: ['Low', 'Low', 'Low', 'High']
+                        },
+                        cost: {
+                            title: 'Relative Cost Profile',
+                            values: [1, 3, 2, 3],
+                            labels: ['Low', 'High', 'Medium', 'High']
+                        }
+                    }
+                },
+                pillars: {
+                    reasoning: {
+                        title: '&#129504; Reasoning & Planning',
+                        content: "This is the agent's cognitive core. The LLM breaks down a high-level goal (e.g., 'plan my trip') into a sequence of smaller, manageable sub-tasks. It then generates and adapts a plan to execute these steps. Advanced agents use frameworks like ReAct (Reasoning and Acting) to dynamically adjust their plan based on feedback after each action, allowing them to recover from errors and handle unexpected events."
+                    },
+                    tools: {
+                        title: '&#128736; Tool Integration',
+                        content: "Tools are the bridge to the outside world, enabling an agent to perform actions. Through 'function calling,' the LLM's reasoning engine can invoke external APIs, query databases, or run scripts. This transforms the agent from a passive text generator into an active problem-solver that can gather real-time information and execute tasks in other systems."
+                    },
+                    memory: {
+                        title: '&#128173; Memory',
+                        content: "Memory gives an agent context and the ability to learn. Short-term memory holds information for the current task, while long-term memory, often using vector databases, stores experiences across sessions. This allows for personalization and prevents the agent from repeating mistakes. Advanced memory systems create an interconnected knowledge graph that evolves over time."
+                    },
+                    reflection: {
+                        title: '&#128269; Reflection & Self-Correction',
+                        content: "This is the crucial feedback loop. After performing an action, the agent observes the outcome and reflects: Did it work? Did I get closer to my goal? This allows the agent to self-correct, retry a failed step with a different approach, or recognize that the task is complete. For high-stakes actions, this loop can include a 'Human-in-the-Loop' step, pausing the workflow for human approval."
+                    }
+                },
+                frameworks: {
+                    labels: ['Control Level', 'State Management', 'Human-in-the-Loop', 'Ease of Use', 'Flexibility'],
+                    datasets: [
+                        {
+                            label: 'LangGraph',
+                            data: [5, 5, 5, 2, 5],
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        },
+                        {
+                            label: 'AutoGen',
+                            data: [3, 3, 4, 4, 3],
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        },
+                        {
+                            label: 'CrewAI',
+                            data: [2, 2, 3, 5, 2],
+                            borderColor: 'rgba(139, 92, 246, 1)',
+                            backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        }
+                    ]
+                }
+            };
+
+            let paradigmChart;
+            const paradigmCtx = document.getElementById('paradigmChart').getContext('2d');
+
+            function createOrUpdateParadigmChart(feature) {
+                const featureData = data.paradigms.features[feature];
+                if (paradigmChart) {
+                    paradigmChart.data.datasets[0].data = featureData.values;
+                    paradigmChart.data.datasets[0].label = featureData.title;
+                    paradigmChart.options.plugins.tooltip.callbacks.label = function(context) {
+                        return featureData.labels[context.dataIndex];
+                    };
+                    paradigmChart.update();
+                } else {
+                    paradigmChart = new Chart(paradigmCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.paradigms.labels,
+                            datasets: [{
+                                label: featureData.title,
+                                data: featureData.values,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(255, 159, 64, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(54, 162, 235, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 3.5,
+                                    ticks: {
+                                        stepSize: 1,
+                                        callback: function(value, index, values) {
+                                            if (value === 1) return 'Low';
+                                            if (value === 2) return 'Medium';
+                                            if (value === 3) return 'High';
+                                            return '';
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return featureData.labels[context.dataIndex];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            createOrUpdateParadigmChart('autonomy');
+            document.getElementById('paradigm-selector').addEventListener('change', (e) => {
+                createOrUpdateParadigmChart(e.target.value);
+            });
+
+            const frameworkCtx = document.getElementById('frameworkChart').getContext('2d');
+            new Chart(frameworkCtx, {
+                type: 'radar',
+                data: {
+                    labels: data.frameworks.labels,
+                    datasets: data.frameworks.datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            pointLabels: {
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.raw;
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const pillarCards = document.querySelectorAll('.pillar-card');
+            const pillarTitle = document.getElementById('pillar-title');
+            const pillarContent = document.getElementById('pillar-content');
+            const pillarDetailsContainer = document.getElementById('pillar-details');
+
+            pillarCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    pillarCards.forEach(c => c.classList.remove('border-blue-500'));
+                    card.classList.add('border-blue-500');
+                    
+                    const pillarKey = card.id.split('-')[1];
+                    const pillarData = data.pillars[pillarKey];
+                    
+                    pillarDetailsContainer.classList.remove('fade-in');
+                    void pillarDetailsContainer.offsetWidth; 
+                    pillarDetailsContainer.classList.add('fade-in');
+
+                    pillarTitle.innerHTML = pillarData.title;
+                    pillarContent.textContent = pillarData.content;
+                });
+            });
+
+            const challengeCards = document.querySelectorAll('.challenge-card');
+            challengeCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const content = card.querySelector('.challenge-content');
+                    const isVisible = !content.classList.contains('hidden');
+
+                    document.querySelectorAll('.challenge-content').forEach(c => c.classList.add('hidden'));
+                    
+                    if (!isVisible) {
+                        content.classList.remove('hidden');
+                    }
+                });
+            });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body></html>

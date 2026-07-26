@@ -2,9 +2,64 @@
 <html class="scroll-smooth" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Vector Database CRUD Operations Explained</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<meta content="How vector databases handle Create, Read, Update, and Delete under the hood :  HNSW internals, tuning, pre/post-filtering, consistency, and code across six engines." name="description"/>
+<meta content="vector database, CRUD operations, HNSW index, ANN search, Pinecone, Weaviate, Milvus, ChromaDB, pgvector, Qdrant, vector search tuning" name="keywords"/>
+<meta content="Dataknobs" name="author"/>
+<meta content="index, follow" name="robots"/>
+<meta content="Vector Database CRUD Operations Explained | Dataknobs" property="og:title"/>
+<meta content="How vector databases handle Create, Read, Update, and Delete under the hood, with tuning guidance and code across six engines." property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://www.dataknobs.com/vector-db-crud.html" property="og:url"/>
+<meta content="Dataknobs" property="og:site_name"/>
+<meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Vector Database CRUD Operations Explained | Dataknobs" name="twitter:title"/>
+<meta content="How vector databases handle Create, Read, Update, and Delete under the hood, with tuning guidance and code across six engines." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" name="twitter:image"/>
+<meta content="vector database CRUD, HNSW tuning, pre-filtering, post-filtering, ANN search, vector database consistency" name="generative-engine-optimization"/>
+<link href="https://www.dataknobs.com/vector-db-crud.html" rel="canonical"/>
+<title>Vector Database CRUD Operations Explained | Dataknobs</title>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production-with-dk-sections.css" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-JF94J1W5MC');
+    </script>
+<!-- Google Tag Manager -->
+<script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');
+    </script>
+<!-- End Google Tag Manager -->
+<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Vector Database CRUD Operations Explained",
+      "description": "How vector databases handle Create, Read, Update, and Delete under the hood, with tuning guidance and code across six engines.",
+      "author": {"@type": "Organization", "name": "Dataknobs"},
+      "publisher": {"@type": "Organization", "name": "Dataknobs", "logo": {"@type": "ImageObject", "url": "https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg"}},
+      "mainEntityOfPage": "https://www.dataknobs.com/vector-db-crud.html",
+      "keywords": ["vector database", "CRUD", "HNSW", "ANN search", "pgvector", "Qdrant", "Pinecone", "Weaviate", "Milvus", "ChromaDB"]
+    }
+    </script>
 <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -59,37 +114,76 @@
             padding: 1rem;
             overflow-x: auto;
         }
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
     </style>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-
-		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
-		(function (w, d, s, l, i) {
-			w[l] = w[l] || []; w[l].push({
-				'gtm.start':
-					new Date().getTime(), event: 'gtm.js'
-			}); var f = d.getElementsByTagName(s)[0],
-				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-JF94J1W5MC');
-</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
+</script></head>
 <body>
-<!-- Header -->
-<header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 border-b border-slate-200">
+<header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+<div class="mx-auto max-w-7xl px-6 py-4 lg:px-8">
+<div class="flex items-center justify-between">
+<a aria-label="DataKnobs Home" class="flex items-center gap-3" href="https://www.dataknobs.com/">
+<img alt="DataKnobs AI data products platform logo" class="h-12 w-auto sm:h-14" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png"/>
+</a>
+<nav aria-label="Primary navigation" class="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
+<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#platform">Platform</a>
+<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#data-flywheel">Data Flywheel</a>
+<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#capabilities">Capabilities</a>
+<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#use-cases">Use Cases</a>
+<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#how-it-works">How It Works</a>
+<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#knobs-value">Knobs</a>
+<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/pricing/">Pricing</a>
+<a class="rounded-full bg-violet-600 px-5 py-2.5 text-white shadow-sm transition hover:bg-violet-700" href="https://www.dataknobs.com/search.html">
+          Search
+        </a>
+</nav>
+<button aria-controls="mobile-menu" aria-expanded="false" aria-label="Open main menu" class="inline-flex items-center justify-center rounded-xl border border-slate-200 p-2 text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 md:hidden" id="mobile-menu-button" type="button">
+<svg class="h-6 w-6" fill="none" id="menu-open-icon" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<svg class="hidden h-6 w-6" fill="none" id="menu-close-icon" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<nav aria-label="Mobile navigation" class="hidden border-t border-slate-200 pt-4 md:hidden" id="mobile-menu">
+<div class="flex flex-col gap-2 text-sm font-medium text-slate-700">
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#platform">Platform</a>
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#data-flywheel">Data Flywheel</a>
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#capabilities">Capabilities</a>
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#use-cases">Use Cases</a>
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#how-it-works">How It Works</a>
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#knobs-value">Knobs</a>
+<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/pricing/">Pricing</a>
+<a class="mt-2 rounded-full bg-violet-600 px-5 py-3 text-center text-white shadow-sm transition hover:bg-violet-700" href="https://www.dataknobs.com/search.html">
+          Search
+        </a>
+</div>
+</nav>
+</div>
+</header>
+<!-- Page's own in-page nav -->
+<header class="bg-white/80 backdrop-blur-sm sticky top-[76px] md:top-[88px] z-40 border-b border-slate-200">
 <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
 <div class="text-xl font-bold tracking-tighter text-slate-900">
 <span class="gradient-text">Vector DB CRUD Explained</span>
 </div>
-<div class="hidden md:flex items-center space-x-6 text-slate-700">
+<div class="hidden md:flex items-center space-x-6 text-slate-700 text-sm">
 <a class="hover:text-violet-500 transition-colors" href="#architecture">Architecture</a>
 <a class="hover:text-violet-500 transition-colors" href="#crud">CRUD Deep Dive</a>
+<a class="hover:text-violet-500 transition-colors" href="#tuning">Tuning HNSW</a>
+<a class="hover:text-violet-500 transition-colors" href="#filtering">Filtering</a>
 <a class="hover:text-violet-500 transition-colors" href="#maintenance">Maintenance</a>
+<a class="hover:text-violet-500 transition-colors" href="#consistency">Consistency</a>
 <a class="hover:text-violet-500 transition-colors" href="#comparison">Comparison</a>
 <a class="hover:text-violet-500 transition-colors" href="#examples">Code Examples</a>
 </div>
@@ -104,7 +198,7 @@ gtag('config', 'G-JF94J1W5MC');
                     The Data Lifecycle in High-Dimensional Space
                 </h1>
 <p class="text-lg md:text-xl text-slate-600 max-w-4xl mx-auto">
-                    A comprehensive analysis of Create, Read, Update, and Delete (CRUD) operations in vector databases and their architectural imperatives.
+                    A comprehensive, engine-by-engine look at Create, Read, Update, and Delete (CRUD) operations in vector databases :  and the architectural tradeoffs behind each one.
                 </p>
 </div>
 </section>
@@ -145,15 +239,38 @@ gtag('config', 'G-JF94J1W5MC');
 <p class="mb-4">The Create operation is a multi-stage process involving two key steps: <strong>Vectorization</strong>, where raw data is converted into a vector embedding by a machine learning model, and <strong>Indexing</strong>, where the vector and its metadata are stored and added to the ANN index.</p>
 <p>Many databases use an <code>upsert</code> operation, which combines "update" and "insert." If a vector's ID exists, it's updated; if not, it's created. For optimal throughput, it's crucial to batch these operations, sending hundreds or thousands of vectors in a single request.</p>
 </div>
-<div class="feature-card"><img alt="Diagram of vectorization and indexing pipeline" class="rounded-lg" src="https://storage.googleapis.com/gweb-a-drive-images/b440406822c7003c271e843152433e38.png"/></div>
+<div class="feature-card">
+<p class="text-sm font-semibold text-slate-500 mb-2">Batched ingestion, in practice</p>
+<pre><code class="language-python">def ingest(records, embed_model, index, batch_size=200):
+    for batch in chunked(records, batch_size):
+        vectors = embed_model.encode(
+            [r.text for r in batch]
+        )
+        index.upsert([
+            {"id": r.id, "values": v, "metadata": r.meta}
+            for r, v in zip(batch, vectors)
+        ])</code></pre>
+</div>
 </div>
 <!-- Read -->
 <div class="grid md:grid-cols-2 gap-8 items-center">
-<div class="feature-card"><img alt="Diagram of a hybrid search query" class="rounded-lg" src="https://storage.googleapis.com/gweb-a-drive-images/594e9f546682705f42654922116da197.png"/></div>
+<div class="feature-card">
+<p class="text-sm font-semibold text-slate-500 mb-2">Hybrid search: vector + metadata filter</p>
+<pre><code class="language-python">results = index.query(
+    vector=embed_model.encode(
+        "wireless headphones under $100"
+    ),
+    filter={
+        "category": {"$eq": "electronics"},
+        "price": {"$lt": 100}
+    },
+    top_k=10
+)</code></pre>
+</div>
 <div>
 <h3 class="text-2xl font-bold text-slate-800 mb-4">Read: Similarity Search and Hybrid Filtering</h3>
 <p class="mb-4">The Read operation is the core function of a vector database. It begins by vectorizing the user's query with the same embedding model used for the stored data. The database then performs an ANN search to find the "closest" vectors based on a chosen distance metric like <strong>Cosine Similarity</strong> or <strong>Euclidean Distance</strong>.</p>
-<p>The true power lies in <strong>hybrid search</strong>, which combines this semantic search with structured metadata filtering, allowing for highly specific and contextually relevant queries (e.g., "find similar products where price &lt; $100").</p>
+<p>The true power lies in <strong>hybrid search</strong>, which combines this semantic search with structured metadata filtering, allowing for highly specific and contextually relevant queries (e.g., "find similar products where price &lt; $100"). How the filter and the ANN search are actually combined under the hood is a bigger deal than it looks :  see <a class="text-violet-600 hover:underline" href="#filtering">Pre-Filtering vs. Post-Filtering</a> below.</p>
 </div>
 </div>
 <!-- Update & Delete -->
@@ -163,9 +280,81 @@ gtag('config', 'G-JF94J1W5MC');
 <p class="mb-4">Direct, in-place updates of vectors are rare and computationally expensive. Instead, an <strong>Update</strong> is almost always implemented as a logical <strong>"delete-then-insert"</strong> operation.</p>
 <p>Similarly, a <strong>Delete</strong> is typically a "soft delete" or <strong>"tombstoning"</strong>. The vector is not physically removed but is marked for deletion. This creates "holes" in the HNSW graph, degrading index navigability and performance over time. The actual removal happens during later maintenance processes.</p>
 </div>
-<div class="feature-card"><img alt="Diagram showing a soft delete creating a hole in an HNSW graph" class="rounded-lg" src="https://storage.googleapis.com/gweb-a-drive-images/e1f57ab5549008ac631481b212f45cd8.png"/></div>
+<div class="feature-card">
+<p class="text-sm font-semibold text-slate-500 mb-2">Tombstones still cost graph traversal</p>
+<pre><code class="language-python">for candidate in hnsw_search(query_vector, ef=64):
+    if candidate.id in tombstones:
+        continue  # skipped, but still traversed
+    results.append(candidate)
+    if len(results) == top_k:
+        break</code></pre>
+<p class="text-xs text-slate-500 mt-2">Every tombstoned node the graph walks through is wasted traversal :  the more soft-deletes accumulate, the more this loop pays for candidates it will throw away.</p>
 </div>
 </div>
+</div>
+</div>
+</section>
+<!-- Section 2b: Tuning HNSW -->
+<section class="py-20 bg-slate-50" id="tuning">
+<div class="container mx-auto px-6">
+<div class="section-header">
+<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Tuning HNSW for Production</h2>
+<p class="text-slate-600 mt-2 max-w-3xl mx-auto">HNSW exposes three parameters that trade recall, latency, memory, and build time against each other. Getting them wrong is invisible in a demo and expensive in production.</p>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<div class="feature-card bg-white">
+<h3 class="text-xl font-bold text-slate-800 mb-2"><code>M</code></h3>
+<p class="text-sm">Max connections per node in the graph. Higher <code>M</code> improves recall and query speed but grows the index's memory footprint roughly linearly. Typical range: 16–64.</p>
+</div>
+<div class="feature-card bg-white">
+<h3 class="text-xl font-bold text-slate-800 mb-2"><code>efConstruction</code></h3>
+<p class="text-sm">Search width used while <em>building</em> the graph. Higher values produce a better-connected, higher-quality graph at the cost of slower ingestion. Set once, felt at write time.</p>
+</div>
+<div class="feature-card bg-white">
+<h3 class="text-xl font-bold text-slate-800 mb-2"><code>ef</code> / <code>efSearch</code></h3>
+<p class="text-sm">Search width at <em>query</em> time. The one knob you can safely change per-request without rebuilding anything :  raise it for a high-stakes query, lower it for a cheap one.</p>
+</div>
+</div>
+<div class="max-w-3xl mx-auto mt-10 feature-card bg-white">
+<p class="text-sm font-semibold text-slate-500 mb-2">Setting build-time and query-time parameters separately</p>
+<pre><code class="language-python"># Build-time: paid once, when the collection is created
+client.create_collection(
+    collection_name="products",
+    vectors_config=VectorParams(size=768, distance=Distance.COSINE),
+    hnsw_config=HnswConfigDiff(m=32, ef_construct=200)
+)
+
+# Query-time: paid per request, tune per use case
+client.search(
+    collection_name="products",
+    query_vector=query_embedding,
+    search_params=SearchParams(hnsw_ef=128),
+    limit=10
+)</code></pre>
+</div>
+<p class="text-center mt-8 max-w-2xl mx-auto text-sm">None of these have a universally "correct" value :  the right setting depends on your recall target, query volume, and latency budget, which is exactly the kind of tradeoff worth measuring against your own data rather than copying a blog post's defaults.</p>
+</div>
+</section>
+<!-- Section 2c: Filtering -->
+<section class="py-20 bg-white" id="filtering">
+<div class="container mx-auto px-6">
+<div class="section-header">
+<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Pre-Filtering vs. Post-Filtering</h2>
+<p class="text-slate-600 mt-2 max-w-3xl mx-auto">Combining a metadata filter with an ANN search sounds simple. How an engine actually does it changes your recall in ways that only show up once your filters get selective.</p>
+</div>
+<div class="grid md:grid-cols-2 gap-12">
+<div class="feature-card bg-slate-50">
+<h3 class="text-2xl font-bold text-slate-800 mb-4">Post-Filtering</h3>
+<p class="mb-4">Run the ANN search first, then discard results that fail the metadata filter. Simple and fast to implement — but if the filter is narrow (say, 1% of the corpus matches), the ANN search can return a full page of candidates that all get filtered away, leaving you with too few results, or none.</p>
+<p class="text-sm text-slate-500">Symptom in production: result counts that quietly shrink as filters get more specific, with no error to explain why.</p>
+</div>
+<div class="feature-card bg-slate-50">
+<h3 class="text-2xl font-bold text-slate-800 mb-4">Pre-Filtering</h3>
+<p class="mb-4">Restrict the candidate set to matching metadata before or during graph traversal — for example, only following HNSW edges into nodes that pass a bitmap filter. Correct results even under narrow filters, but it's more engineering to build well and can slow traversal when the filter excludes most of the graph.</p>
+<p class="text-sm text-slate-500">Symptom in production: slower queries as filters get more selective, instead of fewer results.</p>
+</div>
+</div>
+<p class="text-center mt-10 max-w-2xl mx-auto text-sm">Engines differ meaningfully on which strategy they use and how well it's implemented — this is a concrete, measurable thing to benchmark against your own filter patterns before picking an engine, not something to assume from the marketing page.</p>
 </div>
 </section>
 <!-- Section 3: Maintenance -->
@@ -188,8 +377,31 @@ gtag('config', 'G-JF94J1W5MC');
 <p class="text-center mt-12 max-w-2xl mx-auto">These asynchronous processes mean vector databases operate on an <strong>eventual consistency</strong> model. There is an inherent delay between when a change is made and when it is fully reflected across the optimized index.</p>
 </div>
 </section>
+<!-- Section 3b: Consistency & Durability -->
+<section class="py-20 bg-white" id="consistency">
+<div class="container mx-auto px-6">
+<div class="section-header">
+<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Consistency &amp; Durability Under the Hood</h2>
+<p class="text-slate-600 mt-2 max-w-3xl mx-auto">Eventual consistency doesn't mean "unsafe" — it describes a specific, well-understood durability pattern.</p>
+</div>
+<div class="max-w-3xl mx-auto space-y-6">
+<div class="feature-card bg-slate-50">
+<h3 class="text-xl font-bold text-slate-800 mb-2">Write-Ahead Logging</h3>
+<p class="text-sm">Most production vector databases layer a write-ahead log (WAL) underneath the ANN index: a write is durably logged before it's applied to the in-memory graph. If the process crashes mid-update, the log replays on restart — the same durability pattern relational databases have used for decades, applied here to a much less mutation-friendly data structure.</p>
+</div>
+<div class="feature-card bg-slate-50">
+<h3 class="text-xl font-bold text-slate-800 mb-2">Replication Lag Is the Real "Eventual" in Eventual Consistency</h3>
+<p class="text-sm">In a replicated deployment, a write acknowledged by the primary hasn't necessarily reached every replica yet. A read routed to a lagging replica can miss a just-written vector, or still return one that was just deleted. If your application logic assumes read-after-write consistency, verify it — don't assume it.</p>
+</div>
+<div class="feature-card bg-slate-50">
+<h3 class="text-xl font-bold text-slate-800 mb-2">Maintenance Runs on Top of, Not Instead of, the WAL</h3>
+<p class="text-sm">Compaction and re-indexing (above) are optimizations layered on a durability model that's already keeping your data safe. Turning them off doesn't threaten durability — it just lets tombstones and fragmentation accumulate until query latency and recall degrade.</p>
+</div>
+</div>
+</div>
+</section>
 <!-- Section 4: Comparative Framework -->
-<section class="py-20 bg-white" id="comparison">
+<section class="py-20 bg-slate-50" id="comparison">
 <div class="container mx-auto px-6">
 <div class="section-header">
 <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Comparative Framework: CRUD Across Paradigms</h2>
@@ -210,6 +422,7 @@ gtag('config', 'G-JF94J1W5MC');
 <tr><td><strong>Update Mechanism</strong></td><td>Complex "delete-then-insert"</td><td>Efficient in-place UPDATE</td><td>In-place updates are common</td></tr>
 <tr><td><strong>Delete Mechanism</strong></td><td>Complex "soft deletes" (tombstoning)</td><td>Atomic DELETE statement</td><td>Deferred or immediate deletes</td></tr>
 <tr><td><strong>Consistency Model</strong></td><td>Eventual Consistency (BASE)</td><td>Strong Consistency (ACID)</td><td>Eventual Consistency (BASE) is common</td></tr>
+<tr><td><strong>Filter + Search</strong></td><td>Pre- or post-filtering, engine-dependent</td><td>WHERE clause, always exact</td><td>Field query, always exact</td></tr>
 <tr><td><strong>Primary Use Case</strong></td><td>AI/ML applications, semantic search</td><td>Transactional systems, systems of record</td><td>Big data, high scalability applications</td></tr>
 </tbody>
 </table>
@@ -217,10 +430,11 @@ gtag('config', 'G-JF94J1W5MC');
 </div>
 </section>
 <!-- Section 5: Code Examples -->
-<section class="py-20 bg-slate-50" id="examples">
+<section class="py-20 bg-white" id="examples">
 <div class="container mx-auto px-6">
 <div class="section-header">
 <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Practical Implementations: Code Examples</h2>
+<p class="text-slate-600 mt-2 max-w-3xl mx-auto">The same four CRUD operations, across six engines with genuinely different APIs.</p>
 </div>
 <div class="space-y-12">
 <div>
@@ -277,11 +491,46 @@ query_results = collection.query(query_texts=["A query"], n_results=1, where={"s
 collection.delete(ids=["id1"])
                         </code></pre>
 </div>
+<div>
+<h3 class="text-2xl font-bold text-slate-800 mb-4">Qdrant</h3>
+<pre><code class="language-python">
+# Assumes 'client' is an initialized QdrantClient
+# Create/Update
+client.upsert(
+    collection_name="demo",
+    points=[PointStruct(id=1, vector=[0.1, ..., 0.9], payload={"genre": "fiction"})]
+)
+# Read (Similarity Search)
+hits = client.search(collection_name="demo", query_vector=[0.1, ..., 0.9], limit=5)
+# Delete
+client.delete(collection_name="demo", points_selector=[1])
+                        </code></pre>
+</div>
+<div>
+<h3 class="text-2xl font-bold text-slate-800 mb-4">pgvector (PostgreSQL)</h3>
+<pre><code class="language-sql">
+-- Create
+INSERT INTO items (id, embedding, metadata)
+VALUES (1, '[0.1, 0.2, ..., 0.9]', '{"genre": "fiction"}');
+-- Read (Similarity Search)
+SELECT id, metadata FROM items
+ORDER BY embedding &lt;=&gt; '[0.1, 0.2, ..., 0.9]'
+LIMIT 5;
+-- Update
+UPDATE items SET embedding = '[0.2, ...]' WHERE id = 1;
+-- Delete
+DELETE FROM items WHERE id = 1;
+                        </code></pre>
+</div>
+</div>
+<div class="mt-16 max-w-3xl mx-auto rounded-2xl p-8 text-white text-center" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);">
+<h3 class="text-xl font-semibold">Where Dataknobs fits</h3>
+<p class="mt-3 text-white/90 text-sm">HNSW parameters, pre/post-filtering behavior, and consistency guarantees vary enough between engines that the right choice is rarely obvious from documentation alone. Dataknobs' AbExperiment benchmarks vector database and retrieval strategy choices against your own data before you commit, and Kontrols keeps lineage on which engine, index config, and embedding model is running where.</p>
+<a class="mt-5 inline-flex items-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-violet-700 shadow-sm transition hover:bg-violet-50" href="mailto:contact@dataknobs.com">Talk to Dataknobs →</a>
 </div>
 </div>
 </section>
 </main>
-<!-- Footer -->
 <footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -329,12 +578,43 @@ collection.delete(ids=["id1"])
 </div>
 </div>
 <div class="mt-8 text-center text-sm text-gray-400">
-<p class="text-sm text-gray-400">Data to AI Products - Continuously Improved by Intelligent Knobs</p>
+<p class="text-sm text-gray-400">Manage Data products and AI with knobs</p>
 </div>
 <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
-<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<p class="text-sm text-gray-400">© 2026 Data Knobs. All rights reserved.</p>
 <div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
 </div>
 </div>
 </footer>
+<script>
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuOpenIcon = document.getElementById('menu-open-icon');
+  const menuCloseIcon = document.getElementById('menu-close-icon');
+
+  if (mobileMenuButton && mobileMenu && menuOpenIcon && menuCloseIcon) {
+    const closeMobileMenu = () => {
+      mobileMenu.classList.add('hidden');
+      mobileMenuButton.setAttribute('aria-expanded', 'false');
+      menuOpenIcon.classList.remove('hidden');
+      menuCloseIcon.classList.add('hidden');
+    };
+
+    const openMobileMenu = () => {
+      mobileMenu.classList.remove('hidden');
+      mobileMenuButton.setAttribute('aria-expanded', 'true');
+      menuOpenIcon.classList.add('hidden');
+      menuCloseIcon.classList.remove('hidden');
+    };
+
+    mobileMenuButton.addEventListener('click', () => {
+      const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+      isExpanded ? closeMobileMenu() : openMobileMenu();
+    });
+
+    mobileMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', closeMobileMenu);
+    });
+  }
+</script>
 </body></html>

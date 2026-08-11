@@ -345,16 +345,16 @@ client.search(
 <div class="grid md:grid-cols-2 gap-12">
 <div class="feature-card bg-slate-50">
 <h3 class="text-2xl font-bold text-slate-800 mb-4">Post-Filtering</h3>
-<p class="mb-4">Run the ANN search first, then discard results that fail the metadata filter. Simple and fast to implement — but if the filter is narrow (say, 1% of the corpus matches), the ANN search can return a full page of candidates that all get filtered away, leaving you with too few results, or none.</p>
+<p class="mb-4">Run the ANN search first, then discard results that fail the metadata filter. Simple and fast to implement :  but if the filter is narrow (say, 1% of the corpus matches), the ANN search can return a full page of candidates that all get filtered away, leaving you with too few results, or none.</p>
 <p class="text-sm text-slate-500">Symptom in production: result counts that quietly shrink as filters get more specific, with no error to explain why.</p>
 </div>
 <div class="feature-card bg-slate-50">
 <h3 class="text-2xl font-bold text-slate-800 mb-4">Pre-Filtering</h3>
-<p class="mb-4">Restrict the candidate set to matching metadata before or during graph traversal — for example, only following HNSW edges into nodes that pass a bitmap filter. Correct results even under narrow filters, but it's more engineering to build well and can slow traversal when the filter excludes most of the graph.</p>
+<p class="mb-4">Restrict the candidate set to matching metadata before or during graph traversal :  for example, only following HNSW edges into nodes that pass a bitmap filter. Correct results even under narrow filters, but it's more engineering to build well and can slow traversal when the filter excludes most of the graph.</p>
 <p class="text-sm text-slate-500">Symptom in production: slower queries as filters get more selective, instead of fewer results.</p>
 </div>
 </div>
-<p class="text-center mt-10 max-w-2xl mx-auto text-sm">Engines differ meaningfully on which strategy they use and how well it's implemented — this is a concrete, measurable thing to benchmark against your own filter patterns before picking an engine, not something to assume from the marketing page.</p>
+<p class="text-center mt-10 max-w-2xl mx-auto text-sm">Engines differ meaningfully on which strategy they use and how well it's implemented :  this is a concrete, measurable thing to benchmark against your own filter patterns before picking an engine, not something to assume from the marketing page.</p>
 </div>
 </section>
 <!-- Section 3: Maintenance -->
@@ -382,20 +382,20 @@ client.search(
 <div class="container mx-auto px-6">
 <div class="section-header">
 <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Consistency &amp; Durability Under the Hood</h2>
-<p class="text-slate-600 mt-2 max-w-3xl mx-auto">Eventual consistency doesn't mean "unsafe" — it describes a specific, well-understood durability pattern.</p>
+<p class="text-slate-600 mt-2 max-w-3xl mx-auto">Eventual consistency doesn't mean "unsafe" :  it describes a specific, well-understood durability pattern.</p>
 </div>
 <div class="max-w-3xl mx-auto space-y-6">
 <div class="feature-card bg-slate-50">
 <h3 class="text-xl font-bold text-slate-800 mb-2">Write-Ahead Logging</h3>
-<p class="text-sm">Most production vector databases layer a write-ahead log (WAL) underneath the ANN index: a write is durably logged before it's applied to the in-memory graph. If the process crashes mid-update, the log replays on restart — the same durability pattern relational databases have used for decades, applied here to a much less mutation-friendly data structure.</p>
+<p class="text-sm">Most production vector databases layer a write-ahead log (WAL) underneath the ANN index: a write is durably logged before it's applied to the in-memory graph. If the process crashes mid-update, the log replays on restart :  the same durability pattern relational databases have used for decades, applied here to a much less mutation-friendly data structure.</p>
 </div>
 <div class="feature-card bg-slate-50">
 <h3 class="text-xl font-bold text-slate-800 mb-2">Replication Lag Is the Real "Eventual" in Eventual Consistency</h3>
-<p class="text-sm">In a replicated deployment, a write acknowledged by the primary hasn't necessarily reached every replica yet. A read routed to a lagging replica can miss a just-written vector, or still return one that was just deleted. If your application logic assumes read-after-write consistency, verify it — don't assume it.</p>
+<p class="text-sm">In a replicated deployment, a write acknowledged by the primary hasn't necessarily reached every replica yet. A read routed to a lagging replica can miss a just-written vector, or still return one that was just deleted. If your application logic assumes read-after-write consistency, verify it :  don't assume it.</p>
 </div>
 <div class="feature-card bg-slate-50">
 <h3 class="text-xl font-bold text-slate-800 mb-2">Maintenance Runs on Top of, Not Instead of, the WAL</h3>
-<p class="text-sm">Compaction and re-indexing (above) are optimizations layered on a durability model that's already keeping your data safe. Turning them off doesn't threaten durability — it just lets tombstones and fragmentation accumulate until query latency and recall degrade.</p>
+<p class="text-sm">Compaction and re-indexing (above) are optimizations layered on a durability model that's already keeping your data safe. Turning them off doesn't threaten durability :  it just lets tombstones and fragmentation accumulate until query latency and recall degrade.</p>
 </div>
 </div>
 </div>

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stocks Assistant - DataKnobs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+    <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
+	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
+	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
+<style>
+  :root {
+    --purple: #7c3aed;
+    --purple-dark: #5b21b6;
+    --indigo: #4f46e5;
+    --bg: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --muted-2: #64748b;
+    --line: rgba(148, 163, 184, 0.24);
+    --line-strong: #e2e8f0;
+    --soft: #f8fafc;
+    --shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 30px 90px rgba(15, 23, 42, 0.14);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.05), transparent 28%),
+      radial-gradient(circle at 100% 20%, rgba(79, 70, 229, 0.05), transparent 24%),
+      linear-gradient(180deg, #ffffff 0%, #fcfbff 100%);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { width: min(1240px, calc(100% - 40px)); margin: 0 auto; }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 100; backdrop-filter: blur(14px);
+    background: rgba(255,255,255,0.72); border-bottom: 1px solid rgba(226,232,240,0.8);
+  }
+  .site-header-inner { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:16px 0; }
+  .brand { display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:-0.04em; font-size:1.05rem; text-decoration:none; color:var(--text); }
+  .brand-mark { width:34px; height:34px; border-radius:12px; background:linear-gradient(135deg,var(--purple),var(--indigo)); box-shadow:0 12px 28px rgba(124,58,237,0.28); position:relative; }
+  .brand-mark::before,.brand-mark::after { content:""; position:absolute; border-radius:999px; background:rgba(255,255,255,0.95); }
+  .brand-mark::before { width:14px; height:14px; top:6px; left:10px; }
+  .brand-mark::after { width:6px; height:6px; right:7px; bottom:7px; }
+  .brand span { color: var(--purple); }
+  .top-nav { display:flex; align-items:center; gap:24px; }
+  .top-nav a { text-decoration:none; color:var(--muted); font-size:0.95rem; font-weight:600; }
+  .top-nav a:hover { color:var(--purple); }
+  .nav-cta { padding:11px 16px; border-radius:12px; background:linear-gradient(135deg,var(--purple),var(--indigo)); color:white !important; box-shadow:0 14px 32px rgba(79,70,229,0.2); }
+
+  .product-strip { border-bottom:1px solid rgba(226,232,240,0.8); background:rgba(255,255,255,0.6); }
+  .product-strip-inner { display:flex; gap:10px; padding:14px 0; overflow-x:auto; scrollbar-width:thin; }
+  .product-chip { white-space:nowrap; text-decoration:none; color:var(--muted); border:1px solid var(--line); background:rgba(255,255,255,0.88); border-radius:999px; padding:10px 14px; font-size:0.9rem; font-weight:700; box-shadow:var(--shadow); }
+  .product-chip:hover,.product-chip.active { color:var(--purple); border-color:rgba(124,58,237,0.24); background:linear-gradient(135deg,#faf5ff,#eef2ff); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all .25s ease;
+  }
+  .btn-primary { background: white; color: var(--purple-dark); box-shadow: 0 12px 30px rgba(15,23,42,.16); }
+  .btn-primary:hover { transform: translateY(-2px); background: #f8fafc; }
+  .btn-secondary { border: 1px solid rgba(255,255,255,.28); color: white; background: rgba(255,255,255,.08); }
+  .btn-secondary:hover { transform: translateY(-2px); background: rgba(255,255,255,.14); }
+  .btn-outline { border: 1px solid var(--line-strong); color: var(--text); background: white; }
+  .btn-outline:hover { transform: translateY(-2px); border-color: #c4b5fd; }
+
+  .hero {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 42%, #4f46e5 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero:before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(255,255,255,.18), transparent 24%),
+      radial-gradient(circle at 88% 18%, rgba(255,255,255,.10), transparent 22%),
+      radial-gradient(circle at 70% 80%, rgba(255,255,255,.09), transparent 25%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 48px;
+    align-items: center;
+    padding: 88px 0 84px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(255,255,255,.22);
+    background: rgba(255,255,255,.10);
+    padding: 9px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  h1 {
+    margin: 22px 0 0;
+    font-size: clamp(2.7rem, 5vw, 4.8rem);
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    max-width: 720px;
+  }
+  .hero p.lead {
+    margin-top: 24px;
+    max-width: 630px;
+    font-size: 1.1rem;
+    color: rgba(255,255,255,.9);
+  }
+  .hero-cta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+  }
+  .hero-points {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 14px;
+    margin-top: 36px;
+  }
+  .point {
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.10);
+    backdrop-filter: blur(8px);
+  }
+  .point strong { display:block; font-size:.95rem; }
+  .point span { display:block; margin-top:4px; color: rgba(255,255,255,.82); font-size:.92rem; }
+
+  .product-shell {
+    background: rgba(255,255,255,.98);
+    border-radius: 28px;
+    padding: 24px;
+    color: var(--text);
+    box-shadow: 0 28px 80px rgba(15,23,42,.22);
+    animation: floatIn .8s ease forwards;
+    opacity: 0;
+    transform: translateY(16px) scale(.985);
+  }
+  .shell-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .shell-top small { color: #64748b; display:block; }
+  .shell-top strong { font-size: 1.05rem; }
+  .pill {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #f3e8ff;
+    color: var(--purple);
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .score-row {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .score-card {
+    border: 1px solid var(--line-strong);
+    border-radius: 18px;
+    padding: 16px;
+    background: white;
+  }
+  .score-card small { color:#64748b; display:block; }
+  .score-value { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.04em; margin-top: 4px; }
+  .score-note { color:#475569; font-size:.9rem; }
+  .insight-card {
+    border: 1px solid var(--line-strong);
+    border-radius: 18px;
+    padding: 16px;
+    background: linear-gradient(180deg, #ffffff 0%, #faf7ff 100%);
+    margin-top: 12px;
+  }
+  .insight-list {
+    margin: 12px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+  }
+
+  .section { padding: 84px 0; }
+  .section.alt { background: var(--soft); }
+  .label {
+    color: var(--purple);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-weight: 800;
+  }
+  h2 {
+    margin: 10px 0 0;
+    font-size: clamp(2rem, 3.2vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+  }
+  .sub {
+    margin-top: 16px;
+    max-width: 760px;
+    color: var(--muted);
+    font-size: 1.03rem;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 20px;
+    margin-top: 34px;
+  }
+  .feature-card {
+    background: white;
+    border: 1px solid var(--line-strong);
+    border-radius: 22px;
+    padding: 22px;
+    transition: all .25s ease;
+  }
+  .feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(15,23,42,.08);
+    border-color: #c4b5fd;
+  }
+  .icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: white;
+    font-weight: 800;
+    font-size: 1rem;
+  }
+  .feature-card h3 { margin: 16px 0 8px; font-size: 1.1rem; }
+  .feature-card p { margin: 0; color: var(--muted); }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 34px;
+  }
+  .panel {
+    background: white;
+    border: 1px solid var(--line-strong);
+    border-radius: 24px;
+    padding: 26px;
+  }
+  .panel h3 { margin: 8px 0 10px; font-size: 1.25rem; }
+  .panel p { color: var(--muted); margin: 0 0 14px; }
+  .panel ul { margin: 0; padding-left: 18px; color: var(--muted); }
+  .panel li + li { margin-top: 8px; }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 20px;
+    margin-top: 34px;
+  }
+  .step {
+    background: white;
+    border: 1px solid var(--line-strong);
+    border-radius: 22px;
+    padding: 22px;
+    position: relative;
+  }
+  .step-num {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: #ede9fe;
+    color: var(--purple);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: .95rem;
+  }
+  .step h3 { margin: 14px 0 8px; }
+  .step p { color: var(--muted); margin: 0; }
+
+  .quote {
+    margin-top: 34px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: white;
+    border-radius: 28px;
+    padding: 34px;
+  }
+  .quote p { color: rgba(255,255,255,.92); font-size: 1.08rem; margin: 10px 0 0; }
+
+  .cta-section { padding: 84px 0 96px; }
+  .cta-box {
+    border-radius: 30px;
+    background: linear-gradient(135deg, #faf5ff 0%, #eef2ff 100%);
+    border: 1px solid #ddd6fe;
+    padding: 42px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+  }
+  .cta-box p { color: var(--muted); max-width: 720px; margin: 16px auto 0; }
+  .cta-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:24px; }
+
+  .site-footer {
+    margin-top: 80px; border-top: 1px solid rgba(226,232,240,0.8); background: linear-gradient(180deg, rgba(250,247,255,0.7), rgba(255,255,255,0.95));
+  }
+  .site-footer-inner { display:grid; grid-template-columns:1.2fr 0.8fr 0.8fr 0.8fr; gap:24px; padding:48px 0 28px; }
+  .footer-brand p,.footer-col p { color:var(--muted); line-height:1.7; margin:12px 0 0; font-size:.95rem; }
+  .footer-col h4 { margin:0; font-size:.95rem; letter-spacing:-.02em; }
+  .footer-links { display:grid; gap:10px; margin-top:14px; }
+  .footer-links a { text-decoration:none; color:var(--muted); font-size:.92rem; }
+  .footer-links a:hover { color:var(--purple); }
+  .footer-bottom { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:18px 0 28px; border-top:1px solid rgba(226,232,240,0.8); color:var(--muted-2); font-size:.9rem; }
+
+  @keyframes floatIn { to { opacity: 1; transform: translateY(0) scale(1); } }
+
+  @media (max-width: 1080px) {
+    .hero-grid, .two-col { grid-template-columns: 1fr; }
+    .feature-grid, .steps, .site-footer-inner { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 760px) {
+    .top-nav a:not(.nav-cta) { display:none; }
+    .container { width: min(1180px, calc(100% - 28px)); }
+    .hero-grid { padding: 72px 0 70px; gap: 28px; }
+    .hero-points, .score-row, .feature-grid, .steps, .site-footer-inner { grid-template-columns: 1fr; }
+    h1 { font-size: 2.7rem; }
+    .product-shell, .cta-box { padding: 22px; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+	
+
+	  
+	   <a aria-label="DataKnobs Home" class="flex items-center gap-3" href="https://www.dataknobs.com/">
+            <img alt="DataKnobs AI data products platform logo" class="h-12 w-auto sm:h-14" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"/>
+      </a>
+	  
+	  	<div class="brand">
+        <div>Stocks <span>AI Assistant</span></div>
+      </div>
+	  
+      <nav class="top-nav">
+        <a href="index.html">Platform</a>
+        <a href="index.html#products">Products</a>
+        <a href="index.html#usecases">Use Cases</a>
+        <a href="index.html#platform">KreateBots</a>
+        <a class="nav-cta" href="#contact">Book a Demo</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="product-strip">
+    <div class="container product-strip-inner">
+      <a class="product-chip active" href="https://www.dataknobs.com/use-cases/stocks-ai/">Stocks Assistant</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/stocks-ai/stocks-portfolio-agent.html">Stocks Portfolio AI Agent</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/tax-research-assistant/">Tax Research Assistant</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/ai-financial-planner/">Financial Planner AI Assistant</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/call-audit-ai/">Call Audit AI</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/regulatory-ai-automation/">Regulatory AI Agent</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/ecommerce-analysis-agent/">E-commerce Analysis Agent</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/clause-map/">Applicable Laws AI Agent</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/data-subject-rights/">DSAR AI Assistant</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">Stocks Assistant • Market Intelligence Platform</div>
+        <h1>The Market OS for the intelligence age of investing.</h1>
+        <p class="lead">
+          Stocks Assistant translates earnings narratives and options positioning into actionable intelligence, enabling investors to analyze execution, interpret market sentiment, and make informed decisions confidently.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="https://stocks-assistant.kreatebots.com/">Try Web App</a>
+          <a class="btn btn-secondary" href="#features">Explore Features</a>
+        </div>
+        <div class="hero-points">
+          <div class="point">
+            <strong>Understand execution</strong>
+            <span>AI turns long earnings calls into structured signal.</span>
+          </div>
+          <div class="point">
+            <strong>Read market intent</strong>
+            <span>Options data reveals how capital is positioning.</span>
+          </div>
+          <div class="point">
+            <strong>Act with confidence</strong>
+            <span>Scores and AI guidance reduce noise and speed decisions.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-shell">
+        <div class="shell-top">
+          <div>
+            <small>Live Product Snapshot</small>
+            <strong>Fundamentals + Market Interest</strong>
+          </div>
+          <div class="pill">AI Powered</div>
+        </div>
+
+        <div class="score-row">
+          <div class="score-card">
+            <small>Momentum Score</small>
+            <div class="score-value">78</div>
+            <div class="score-note">Positive multi-quarter execution</div>
+          </div>
+          <div class="score-card">
+            <small>Company Performance</small>
+            <div class="score-value">82</div>
+            <div class="score-note">Durable business strength</div>
+          </div>
+          <div class="score-card">
+            <small>Options Sentiment</small>
+            <div class="score-value">Bullish</div>
+            <div class="score-note">Call interest leading put activity</div>
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <small style="color:#64748b; font-weight:700;">AI Earnings Insight</small>
+          <ul class="insight-list">
+            <li>Management emphasized sustained revenue growth and improving margin discipline.</li>
+            <li>Forward guidance was increased, with greater certainty in implementation for the upcoming two quarters.</li>
+            <li>Investors' positioning in options indicates a bullish sentiment leading up to the upcoming catalyst.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="label">Core Features</div>
+      <h2>From raw market data to productized investing intelligence.</h2>
+      <p class="sub">
+        Stocks Assistant not only aggregates data like most investing tools, but also structures and scores it, allowing for easy querying within a unified product experience.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card"><div class="icon">01</div><h3>AI Earnings Intelligence</h3><p>Analyze complete earnings transcripts to extract key insights on growth factors, guidance updates, management sentiment, and potential risks to execution.</p></div>
+        <div class="feature-card"><div class="icon">02</div><h3>Momentum Score</h3><p>Assess performance over four quarters with a standardized 0-100 rating instead of focusing too much on one earnings report.</p></div>
+        <div class="feature-card"><div class="icon">03</div><h3>Company Performance Score</h3><p>Remove short-term fluctuations by using a durability indicator that considers consistency, revenue trends, and sustainability.</p></div>
+        <div class="feature-card"><div class="icon">04</div><h3>Options Market Intelligence</h3><p>Analyze the interest in call and put options, the concentration of open interest, and the positioning driven by expiry to gauge market expectations.</p></div>
+        <div class="feature-card"><div class="icon">05</div><h3>Unified Market View</h3><p>Linking companies' statements with market predictions seamlessly in a single workflow.</p></div>
+        <div class="feature-card"><div class="icon">06</div><h3>Conversational AI Access</h3><p>Pose more insightful inquiries such as "Is there noticeable improvement in execution?" or "In what areas is sentiment deviating from fundamentals?" and receive immediate responses.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="how-it-works">
+    <div class="container">
+      <div class="label">How It Works</div>
+      <h2>Analyze narrative. Measure execution. Map intent.</h2>
+      <p class="sub">
+        Stocks Assistant bridges the gap between raw market data and investor decisions by creating an intelligence layer.
+      </p>
+
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><h3>Ingest raw market artifacts</h3><p>Earnings transcripts, options chains, company performance history, and event-specific context serve as the foundational inputs.</p></div>
+        <div class="step"><div class="step-num">2</div><h3>Generate normalized intelligence</h3><p>AI identifies narrative cues as it scores layers that condense complexity into understandable performance and longevity measures.</p></div>
+        <div class="step"><div class="step-num">3</div><h3>Deliver decision-ready outputs</h3><p>Investors peruse stock pages, evaluate companies, track sentiment, and seek insights using a conversational assistant.</p></div>
+      </div>
+
+      <div class="quote">
+        <div class="label" style="color:#ddd6fe;">Why it matters</div>
+        <h3 style="margin:10px 0 0; font-size:1.8rem;">Markets produce data. Stocks Assistant produces understanding.</h3>
+        <p>Rather than contributing to the clutter with another dashboard, the platform offers a streamlined intelligence layer to assist investors in quickly analyzing execution, sentiment, and positioning.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="views">
+    <div class="container">
+      <div class="label">Two Views. One Intelligence Layer.</div>
+      <h2>Understand both the business and the bet.</h2>
+      <p class="sub">
+        Stocks Assistant is formed by two perspectives that work together to offer both context and conviction.
+      </p>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="label">Fundamentals View</div>
+          <h3>How strong is execution?</h3>
+          <p>Leverage transcript intelligence and scoring models to determine if a company is progressing, stagnant, or declining.</p>
+          <ul>
+            <li>AI-generated earnings insights</li>
+            <li>Earnings Call Momentum Score</li>
+            <li>Company Performance Score</li>
+            <li>Longer-term execution trend analysis</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="label">Market Interest View</div>
+          <h3>How is the market positioning?</h3>
+          <p>Analyze capital movements through options structure and sentiment to anticipate price movements before they are fully priced in.</p>
+          <ul>
+            <li>Call vs put interest</li>
+            <li>Open interest concentration</li>
+            <li>Bullish vs bearish behavior</li>
+            <li>Pre-event positioning signals</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="mobile">
+    <div class="container">
+      <div class="label">Available Everywhere</div>
+      <h2>Market intelligence on web and mobile.</h2>
+      <p class="sub">
+        Decisions are not confined to the desk. With Stocks Assistant, investors can track execution and sentiment on web, iOS, and Android for a seamless intelligence experience on the go.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card"><div class="icon">W</div><h3>Web Platform</h3><p>Access comprehensive stock-level intelligence pages featuring scores, transcript insights, and options-based sentiment all in one convenient location.</p></div>
+        <div class="feature-card"><div class="icon">iOS</div><h3>iPhone App</h3><p>Monitor market intent, review earnings insights, and check scores easily with our mobile-first experience.</p></div>
+        <div class="feature-card"><div class="icon">A</div><h3>Android App</h3><p>Access signals for execution and positioning from anywhere without the need to return to a desktop workflow.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section" id="contact">
+    <div class="container">
+      <div class="cta-box">
+        <div class="label">Get Started</div>
+        <h2>Move beyond dashboards. Start querying market intelligence.</h2>
+        <p>
+          Stocks Assistant helps investors understand what companies are saying, how they are executing, and how the market is positioning   all through one modern intelligence layer.
+        </p>
+        <div class="cta-actions">
+          <a class="btn btn-primary" href="https://stocks-assistant.kreatebots.com/">Open Web App</a>
+          <a class="btn btn-outline" href="https://play.google.com/store/apps/details?id=com.stocksassistant.app&amp;hl=en_US">Android App</a>
+          <a class="btn btn-outline" href="https://apps.apple.com/nz/app/stocks-assistant-ai/id6757417850">iOS App</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/stocks-ai/dataknobs-stock-pricing.html">Dataknobs Stock Pricing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/stocks-ai/stock-assistant-earning-call.html">Stock Assistant Earning Call</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/stocks-ai/stocks-assistant.html">Stocks Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/stocks-ai/stocks-portfolio-agent.html">Stocks Portfolio Agent</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Dataknobs use cases and customers using Knobs</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+
+</body></html>

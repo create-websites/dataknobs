@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Call Audit AI - DataKnobs</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+    <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
+	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
+	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #faf7ff;
+    --surface: rgba(255,255,255,0.84);
+    --text: #0f172a;
+    --muted: #475569;
+    --muted-2: #64748b;
+    --line: rgba(148, 163, 184, 0.24);
+    --purple: #7c3aed;
+    --purple-2: #8b5cf6;
+    --indigo: #4f46e5;
+    --blue: #38bdf8;
+    --shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 30px 90px rgba(15, 23, 42, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.05), transparent 28%),
+      radial-gradient(circle at 100% 20%, rgba(79, 70, 229, 0.05), transparent 24%),
+      linear-gradient(180deg, #ffffff 0%, #fcfbff 100%);
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: min(1240px, calc(100% - 40px));
+    margin: 0 auto;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(14px);
+    background: rgba(255,255,255,0.72);
+    border-bottom: 1px solid rgba(226,232,240,0.8);
+  }
+
+  .site-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 0;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    font-size: 1.05rem;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--purple), var(--indigo));
+    box-shadow: 0 12px 28px rgba(124, 58, 237, 0.28);
+    position: relative;
+  }
+
+  .brand-mark::before,
+  .brand-mark::after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.95);
+  }
+
+  .brand-mark::before {
+    width: 14px;
+    height: 14px;
+    top: 6px;
+    left: 10px;
+  }
+
+  .brand-mark::after {
+    width: 6px;
+    height: 6px;
+    right: 7px;
+    bottom: 7px;
+  }
+
+  .brand span { color: var(--purple); }
+
+  .top-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .top-nav a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .top-nav a:hover { color: var(--purple); }
+
+  .nav-cta {
+    padding: 11px 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--purple), var(--indigo));
+    color: white !important;
+    box-shadow: 0 14px 32px rgba(79, 70, 229, 0.2);
+  }
+
+  .product-strip {
+    border-bottom: 1px solid rgba(226,232,240,0.8);
+    background: rgba(255,255,255,0.6);
+  }
+
+  .product-strip-inner {
+    display: flex;
+    gap: 10px;
+    padding: 14px 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .product-chip {
+    white-space: nowrap;
+    text-decoration: none;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.88);
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    box-shadow: var(--shadow);
+  }
+
+  .product-chip:hover,
+  .product-chip.active {
+    color: var(--purple);
+    border-color: rgba(124,58,237,0.24);
+    background: linear-gradient(135deg, #faf5ff, #eef2ff);
+  }
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 40px 0 32px;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 10% 18%, rgba(124, 58, 237, 0.16), transparent 22%),
+      radial-gradient(circle at 88% 12%, rgba(56, 189, 248, 0.14), transparent 18%),
+      radial-gradient(circle at 82% 72%, rgba(79, 70, 229, 0.13), transparent 22%);
+    filter: blur(8px);
+    animation: drift 16s ease-in-out infinite alternate;
+  }
+
+  .hero-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 42px;
+    align-items: center;
+    padding: 54px 0 58px;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(124, 58, 237, 0.14);
+    background: rgba(255,255,255,0.7);
+    color: var(--purple);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    box-shadow: var(--shadow);
+  }
+
+  h1 {
+    margin: 22px 0 0;
+    font-size: clamp(3rem, 6vw, 5.4rem);
+    line-height: 0.97;
+    letter-spacing: -0.06em;
+    max-width: 780px;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--purple), var(--indigo), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero-copy {
+    margin-top: 24px;
+    max-width: 700px;
+    color: var(--muted);
+    font-size: 1.12rem;
+    line-height: 1.72;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 32px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--purple), var(--indigo));
+    color: white;
+    box-shadow: 0 18px 40px rgba(79, 70, 229, 0.24);
+  }
+
+  .btn-secondary {
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(255,255,255,0.86);
+    color: var(--text);
+    box-shadow: var(--shadow);
+  }
+
+  .btn:hover { transform: translateY(-2px); }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-top: 36px;
+  }
+
+  .stat {
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(12px);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .stat strong {
+    display: block;
+    font-size: 1.5rem;
+    letter-spacing: -0.05em;
+  }
+
+  .stat span {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+
+  .hero-panel {
+    position: relative;
+    border-radius: 30px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.82));
+    border: 1px solid rgba(226,232,240,0.8);
+    box-shadow: var(--shadow-lg);
+    padding: 22px;
+    overflow: hidden;
+  }
+
+  .hero-panel::before {
+    content: "";
+    position: absolute;
+    inset: -30% auto auto -20%;
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(124,58,237,0.22), transparent 60%);
+    pointer-events: none;
+  }
+
+  .panel-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .panel-title small {
+    display: block;
+    color: var(--muted-2);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 800;
+  }
+
+  .panel-title strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 1.08rem;
+    letter-spacing: -0.03em;
+  }
+
+  .status-pill {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #ede9fe;
+    color: var(--purple);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .mock-grid {
+    display: grid;
+    grid-template-columns: 1.08fr 0.92fr;
+    gap: 14px;
+  }
+
+  .mock-main,
+  .mock-side-card,
+  .mini-chart,
+  .queue-card {
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.92);
+    box-shadow: 0 14px 40px rgba(15,23,42,0.06);
+  }
+
+  .mock-main { padding: 18px; }
+  .mock-side { display: grid; gap: 14px; }
+
+  .mock-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .mock-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    letter-spacing: -0.03em;
+  }
+
+  .signal-badge {
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(79,70,229,0.1));
+    color: var(--purple);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .summary-box {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #faf5ff, #eef2ff);
+    border: 1px solid rgba(196,181,253,0.45);
+  }
+
+  .summary-box p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    line-height: 1.65;
+    font-size: 0.96rem;
+  }
+
+  .score-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .score-box {
+    padding: 12px;
+    border-radius: 16px;
+    background: white;
+    border: 1px solid rgba(226,232,240,0.8);
+  }
+
+  .score-box small {
+    display: block;
+    color: var(--muted-2);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 800;
+  }
+
+  .score-box strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 1.1rem;
+    letter-spacing: -0.04em;
+  }
+
+  .score-box span {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  .mini-chart, .mock-side-card, .queue-card { padding: 16px; }
+
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 92px;
+    margin-top: 12px;
+  }
+
+  .bar {
+    flex: 1;
+    border-radius: 999px 999px 8px 8px;
+    background: linear-gradient(180deg, rgba(124,58,237,0.9), rgba(79,70,229,0.28));
+    animation: rise 1.2s ease both;
+  }
+
+  .bar:nth-child(1) { height: 36%; animation-delay: .08s; }
+  .bar:nth-child(2) { height: 74%; animation-delay: .16s; }
+  .bar:nth-child(3) { height: 50%; animation-delay: .24s; }
+  .bar:nth-child(4) { height: 84%; animation-delay: .32s; }
+  .bar:nth-child(5) { height: 62%; animation-delay: .4s; }
+
+  .queue-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(226,232,240,0.8);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .queue-item:first-of-type { border-top: 0; padding-top: 0; }
+
+  .queue-badge {
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .8s ease, transform .8s ease;
+  }
+
+  .reveal.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .section { padding: 100px 0; }
+  .section.alt { background: linear-gradient(180deg, rgba(250,247,255,0.7), rgba(255,255,255,0.8)); }
+  .section.center { text-align: center; }
+
+  .label {
+    color: var(--purple);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  h2 {
+    margin: 12px 0 0;
+    font-size: clamp(2.3rem, 4vw, 4rem);
+    line-height: 1.02;
+    letter-spacing: -0.05em;
+  }
+
+  .sub {
+    margin: 18px auto 0;
+    max-width: 780px;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.75;
+  }
+
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 56px;
+  }
+
+  .flow-card {
+    padding: 28px;
+    border-radius: 24px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.9);
+    box-shadow: var(--shadow);
+    text-align: left;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  }
+
+  .flow-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(124,58,237,0.24);
+  }
+
+  .flow-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--purple), var(--indigo));
+    box-shadow: 0 18px 34px rgba(79, 70, 229, 0.24);
+  }
+
+  .flow-card h3 {
+    margin: 18px 0 8px;
+    font-size: 1.22rem;
+    letter-spacing: -0.03em;
+  }
+
+  .flow-card p { margin: 0; color: var(--muted); }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 52px;
+  }
+
+  .info-card {
+    padding: 28px;
+    border-radius: 26px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.88);
+    box-shadow: var(--shadow);
+  }
+
+  .info-card h3 {
+    margin: 14px 0 10px;
+    font-size: 1.35rem;
+    letter-spacing: -0.03em;
+  }
+
+  .info-card p { margin: 0; color: var(--muted); }
+
+  .info-card ul {
+    margin: 16px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+  }
+
+  .info-card li + li { margin-top: 8px; }
+
+  .cap-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-top: 52px;
+  }
+
+  .cap-card {
+    position: relative;
+    overflow: hidden;
+    padding: 28px;
+    border-radius: 26px;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,247,255,0.9));
+    box-shadow: var(--shadow);
+    transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+  }
+
+  .cap-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(124,58,237,0.24);
+  }
+
+  .cap-card h3 {
+    margin: 16px 0 10px;
+    font-size: 1.28rem;
+    letter-spacing: -0.04em;
+  }
+
+  .cap-card p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .cap-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--purple), var(--indigo));
+    color: white;
+    font-weight: 800;
+  }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-top: 48px;
+  }
+
+  .metric-card {
+    padding: 22px 18px;
+    border-radius: 22px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.9);
+    box-shadow: var(--shadow);
+    text-align: left;
+  }
+
+  .metric-card strong {
+    display: block;
+    font-size: 1.45rem;
+    letter-spacing: -0.04em;
+  }
+
+  .metric-card span {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .examples-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 24px;
+    margin-top: 52px;
+  }
+
+  .example-box {
+    padding: 26px;
+    border-radius: 26px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.9);
+    box-shadow: var(--shadow);
+  }
+
+  .example-box h3 {
+    margin: 12px 0 14px;
+    font-size: 1.3rem;
+    letter-spacing: -0.03em;
+  }
+
+  .example-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .example-item {
+    padding: 14px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid rgba(226,232,240,0.9);
+  }
+
+  .example-item strong {
+    display: block;
+    font-size: 0.9rem;
+  }
+
+  .example-item span {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+
+  .cta {
+    padding: 108px 0 120px;
+  }
+
+  .cta-box {
+    position: relative;
+    overflow: hidden;
+    border-radius: 34px;
+    padding: 52px;
+    border: 1px solid rgba(196,181,253,0.45);
+    background: linear-gradient(135deg, rgba(250,245,255,0.96), rgba(238,242,255,0.96));
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+  }
+
+  .cta-box::before {
+    content: "";
+    position: absolute;
+    inset: auto auto -40% -10%;
+    width: 320px;
+    height: 320px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(124,58,237,0.13), transparent 60%);
+  }
+
+  .cta-box::after {
+    content: "";
+    position: absolute;
+    inset: -20% -6% auto auto;
+    width: 280px;
+    height: 280px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(56,189,248,0.14), transparent 60%);
+  }
+
+  .cta-box > * { position: relative; z-index: 1; }
+
+  .cta-box p {
+    max-width: 760px;
+    margin: 16px auto 0;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.75;
+  }
+
+  .cta-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 28px;
+  }
+
+  .site-footer {
+    margin-top: 80px;
+    border-top: 1px solid rgba(226,232,240,0.8);
+    background: linear-gradient(180deg, rgba(250,247,255,0.7), rgba(255,255,255,0.95));
+  }
+
+  .site-footer-inner {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr;
+    gap: 24px;
+    padding: 48px 0 28px;
+  }
+
+  .footer-brand p,
+  .footer-col p {
+    color: var(--muted);
+    line-height: 1.7;
+    margin: 12px 0 0;
+    font-size: 0.95rem;
+  }
+
+  .footer-col h4 { margin: 0; font-size: 0.95rem; letter-spacing: -0.02em; }
+  .footer-links { display: grid; gap: 10px; margin-top: 14px; }
+  .footer-links a { text-decoration: none; color: var(--muted); font-size: 0.92rem; }
+  .footer-links a:hover { color: var(--purple); }
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 0 28px;
+    border-top: 1px solid rgba(226,232,240,0.8);
+    color: var(--muted-2);
+    font-size: 0.9rem;
+  }
+
+  @keyframes drift {
+    from { transform: translate3d(0, 0, 0) scale(1); }
+    to { transform: translate3d(0, -18px, 0) scale(1.04); }
+  }
+
+  @keyframes rise {
+    from { transform: scaleY(0.4); transform-origin: bottom; opacity: 0.4; }
+    to { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+  }
+
+  @media (max-width: 1100px) {
+    .hero-grid,
+    .mock-grid,
+    .grid-2,
+    .examples-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-stats,
+    .flow,
+    .cap-grid,
+    .metric-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .container { width: min(1240px, calc(100% - 28px)); }
+    .top-nav a:not(.nav-cta) { display: none; }
+    .hero { padding-top: 24px; }
+    .hero-grid { padding: 36px 0 44px; }
+    .hero-stats,
+    .flow,
+    .grid-2,
+    .cap-grid,
+    .metric-grid,
+    .score-row,
+    .examples-grid,
+    .site-footer-inner {
+      grid-template-columns: 1fr;
+    }
+
+    h1 { font-size: 3rem; }
+    h2 { font-size: 2.35rem; }
+    .cta-box { padding: 30px 22px; }
+    .hero-panel { padding: 16px; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-mark"></div>
+        <div>Data<span>Knobs</span></div>
+      </a>
+      <nav class="top-nav">
+        <a href="index.html">Platform</a>
+        <a href="index.html#products">Products</a>
+        <a href="index.html#usecases">Use Cases</a>
+        <a href="index.html#platform">KreateBots</a>
+        <a class="nav-cta" href="#contact">Book a Demo</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="product-strip">
+    <div class="container product-strip-inner">
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/stocks-ai/">Stocks Assistant</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/stocks-ai/stocks-portfolio-agent.html">Stocks Portfolio AI Agent</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/tax-research-assistant/">Tax Research Assistant</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/ai-financial-planner/">Financial Planner AI Assistant</a>
+      <a class="product-chip active" href="https://www.dataknobs.com/use-cases/call-audit-ai/">Call Audit AI</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/regulatory-ai-automation/">Regulatory AI Agent</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/ecommerce-analysis-agent/">E-commerce Analysis Agent</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/clause-map/">Applicable Laws AI Agent</a>
+      <a class="product-chip" href="https://www.dataknobs.com/use-cases/data-subject-rights/">DSAR AI Assistant</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="container hero-grid">
+      <div class="reveal show">
+        <div class="eyebrow">AI-powered  Audit for Calls</div>
+        <h1>
+          Turn customer calls and interaction text into <span class="gradient-text">decision-ready cases</span> in seconds.
+        </h1>
+        <div class="hero-copy">
+          DataKnobs Call Audit enables organizations to analyze customer interactions across various channels such as transcripts, emails, and posts, converting them into valuable feedback, complaints, and requests. The platform utilizes AI to triage, summarize, classify, route, and analyze customer interactions, helping teams streamline processes, identify root causes, and maintain a comprehensive audit trail for prioritized cases.
+        </div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#capabilities">Explore Capabilities</a>
+          <a class="btn btn-secondary" href="#contact">Run a Pilot</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <strong>30–60%</strong>
+            <span>Faster triage time</span>
+          </div>
+          <div class="stat">
+            <strong>Fewer</strong>
+            <span>Misrouted tickets and queue ping-pong</span>
+          </div>
+          <div class="stat">
+            <strong>Audit-ready</strong>
+            <span>Structured evidence and routing rationale</span>
+          </div>
+          <div class="stat">
+            <strong>Trend-aware</strong>
+            <span>Theme clustering and escalation signals</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-panel reveal show">
+        <div class="panel-top">
+          <div class="panel-title">
+            <small>Live workflow preview</small>
+            <strong>Interaction text/call → structured case</strong>
+          </div>
+          <div class="status-pill">Ops + Compliance Ready</div>
+        </div>
+
+        <div class="mock-grid">
+          <div class="mock-main">
+            <div class="mock-header">
+              <h3>Call and Interaction Summary</h3>
+              <div class="signal-badge">High Severity</div>
+            </div>
+            <div class="summary-box">
+              <small style="color: var(--muted-2); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 800;">AI Summary</small>
+              <p>Customer has complained about being billed after canceling their subscription, stating that customer support had previously assured them the issue was resolved. They are now requesting a prompt refund and written confirmation.</p>
+            </div>
+            <div class="score-row">
+              <div class="score-box">
+                <small>Category</small>
+                <strong>Billing</strong>
+                <span>Subscription / Continued Charges</span>
+              </div>
+              <div class="score-box">
+                <small>Owner</small>
+                <strong>Billing Ops</strong>
+                <span>Auto-routed with confidence 0.92</span>
+              </div>
+              <div class="score-box">
+                <small>Next Step</small>
+                <strong>Refund Flow</strong>
+                <span>Verify cancellation and confirm invoice history</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-side">
+            <div class="mini-chart">
+              <small style="color: var(--muted-2); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 800;">Theme volume</small>
+              <div style="margin-top: 6px; font-weight: 800; letter-spacing: -.03em;">Top call and complaint drivers</div>
+              <div class="bars">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+              </div>
+            </div>
+            <div class="queue-card">
+              <small style="color: var(--muted-2); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 800;">Routing queue</small>
+              <div style="margin-top: 6px; font-weight: 800; letter-spacing: -.03em;">Next cases in review</div>
+              <div class="queue-item"><span>Billing dispute with chargeback risk</span><div class="queue-badge">Urgent</div></div>
+              <div class="queue-item"><span>Product defect mentioned in return request</span><div class="queue-badge" style="background:#dbeafe;color:#1d4ed8;">Review</div></div>
+              <div class="queue-item"><span>Legal escalation language in email thread</span><div class="queue-badge" style="background:#fee2e2;color:#b91c1c;">Escalate</div></div>
+            </div>
+            <div class="mock-side-card">
+              <small style="color: var(--muted-2); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 800;">Evidence lines</small>
+              <div style="margin-top: 10px; color: var(--muted); font-size: .92rem; line-height: 1.65;">“I canceled last month but I’m still being charged.”<br/><br/>“Support told me it was fixed and it happened again.”</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section center" id="how-it-works">
+    <div class="container">
+      <div class="label reveal">How it works</div>
+      <h2 class="reveal">Ingest, understand, route, and learn.</h2>
+      <div class="sub reveal">Audit AI's capabilities cover the entire process from unprocessed interactions to organized cases, maintaining crucial evidence and analytics for operations, product development, quality assurance, and compliance teams.</div>
+
+      <div class="flow">
+        <div class="flow-card reveal">
+          <div class="flow-icon">01</div>
+          <h3>Ingest &amp; normalize</h3>
+          <p>Integrate email, CRM, ticketing, chat, forms, and call transcripts, and if desired, remove duplicates, identify language, combine conversations, and censor personal information before reviewing.</p>
+        </div>
+        <div class="flow-card reveal">
+          <div class="flow-icon">02</div>
+          <h3>Understand the customer call and interaction</h3>
+          <p>Leverage LLM summarization, complaint detection, multi-label categorization, entity extraction, sentiment analysis, and escalation signals to transform unstructured narratives into organized data.</p>
+        </div>
+        <div class="flow-card reveal">
+          <div class="flow-icon">03</div>
+          <h3>Trigger workflow actions</h3>
+          <p>Automatically direct to appropriate queue, generate tickets, recommend optimal steps, and escalate complex cases for human assessment if unsure.</p>
+        </div>
+        <div class="flow-card reveal">
+          <div class="flow-icon">04</div>
+          <h3>Analyze &amp; improve</h3>
+          <p>Identify common issues, track key causes, detect irregularities, and incorporate human input for ongoing quality enhancement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="capabilities">
+    <div class="container">
+      <div class="label reveal">Capabilities</div>
+      <h2 class="reveal">Purpose-built for triage, routing, evidence, and complaint intelligence.</h2>
+      <div class="sub reveal">The system is designed not just to detect complaints, but to make them operationally useful   with summaries, categories, highlighted evidence, ownership suggestions, and analytics that expose recurring patterns.</div>
+
+      <div class="cap-grid">
+        <div class="cap-card reveal">
+          <div class="cap-icon">01</div>
+          <h3>Complaint &amp; Issue detection</h3>
+          <p>Categorize interactions as complaints/issues or not complaints/feedback, including confidence scores and customizable rationales for review processes.</p>
+        </div>
+        <div class="cap-card reveal">
+          <div class="cap-icon">02</div>
+          <h3>Evidence highlighting</h3>
+          <p>Pinpoint the specific phrases or sentences that convey dissatisfaction, disagreements over billing, unfulfilled promises, harm, or language indicating escalation.</p>
+        </div>
+        <div class="cap-card reveal">
+          <div class="cap-icon">03</div>
+          <h3>Customer Call summaries</h3>
+          <p>Create brief and uniform summaries that outline the issues, customer needs, and preceding events.</p>
+        </div>
+        <div class="cap-card reveal">
+          <div class="cap-icon">04</div>
+          <h3>Taxonomy classification</h3>
+          <p>Categorize each complaint based on Billing, Product Defect, Refund, Delivery, Fraud, or Compliance, along with their respective subcategories and root causes.</p>
+        </div>
+        <div class="cap-card reveal">
+          <div class="cap-icon">05</div>
+          <h3>Entity extraction</h3>
+          <p>Convert organized data fields such as product, order ID, subscription ID, dates, amounts, channel, location, and policy references to JSON format.</p>
+        </div>
+        <div class="cap-card reveal">
+          <div class="cap-icon">06</div>
+          <h3>Severity &amp; routing</h3>
+          <p>Assess urgency, identify escalation triggers, and recommend appropriate owner, queue, priority, and follow-up action for each situation.</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="info-card reveal">
+          <div class="label">Complaint mining from calls and emails</div>
+          <h3>Find complaints hidden inside long conversations.</h3>
+          <p>Auit AI scans transcripts and messages to distinguish interactions that blend complaint content with general questions or account context, revealing the evidence and meaning without the need for manual review of each line.</p>
+          <ul>
+            <li>Works across phone calls, emails, chats, and tickets</li>
+            <li>Separates complaint statements from background context, routine feedback, request</li>
+            <li>Flags potential legal, safety, fraud, or discrimination language</li>
+          </ul>
+        </div>
+        <div class="info-card reveal">
+          <div class="label">Workflow automation</div>
+          <h3>Reduce backlog without losing control.</h3>
+          <p>Leverage customizable guidelines and certainty levels to determine the automatic routing, activation of standard operating procedures, and escalation to a human reviewer for validation.</p>
+          <ul>
+            <li>Auto-create tickets in the right queue</li>
+            <li>Trigger refund, replacement, or compliance workflows</li>
+            <li>Support human-in-the-loop review for low-confidence edge cases</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="outputs">
+    <div class="container">
+      <div class="label reveal">Example outputs</div>
+      <h2 class="reveal">Structured, explainable, and ready for downstream systems.</h2>
+      <div class="sub reveal">Rather than keeping complaints buried in narrative, the system generates results that can be readily utilized by your teams and platforms.</div>
+
+      <div class="examples-grid">
+        <div class="example-box reveal">
+          <div class="label">Structured output</div>
+          <h3>Complaint case payload</h3>
+          <div class="example-list">
+            <div class="example-item">
+              <strong>Summary</strong>
+              <span>Customer reports recurring billing after cancellation and requests immediate refund.</span>
+            </div>
+            <div class="example-item">
+              <strong>Category</strong>
+              <span>Billing → Subscription → Cancellation / Continued Charges</span>
+            </div>
+            <div class="example-item">
+              <strong>Severity</strong>
+              <span>High</span>
+            </div>
+            <div class="example-item">
+              <strong>Suggested owner</strong>
+              <span>Billing Ops</span>
+            </div>
+            <div class="example-item">
+              <strong>Entities</strong>
+              <span>customer_id, subscription_id, dates, amounts</span>
+            </div>
+            <div class="example-item">
+              <strong>Recommended next step</strong>
+              <span>Verify cancellation timestamp, confirm last invoice, issue refund, send confirmation.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="example-box reveal">
+          <div class="label">Trend intelligence</div>
+          <h3>What leaders can see</h3>
+          <div class="example-list">
+            <div class="example-item">
+              <strong>Theme</strong>
+              <span>“Billing continues after cancellation”</span>
+            </div>
+            <div class="example-item">
+              <strong>Driver</strong>
+              <span>Volume spike in one subscription plan and one region</span>
+            </div>
+            <div class="example-item">
+              <strong>Risk signal</strong>
+              <span>Medium regulatory / charge dispute escalation risk</span>
+            </div>
+            <div class="example-item">
+              <strong>Operational action</strong>
+              <span>Send a sample to QA, initiate billing review, update dashboard, and notify the owner.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="results">
+    <div class="container center">
+      <div class="label reveal">Results &amp; controls</div>
+      <h2 class="reveal">Built to improve speed, consistency, and compliance confidence.</h2>
+      <div class="sub reveal">The Complaint AI is created to deliver tangible operational benefits while upholding governance, transparency, and human supervision as necessary.</div>
+
+      <div class="metric-grid">
+        <div class="metric-card reveal"><strong>30–60%</strong><span>Faster triage time with summary and routing automation</span></div>
+        <div class="metric-card reveal"><strong>Higher</strong><span>First-contact resolution via next-best actions and templates</span></div>
+        <div class="metric-card reveal"><strong>Lower</strong><span>Misrouting through consistent classification and rules</span></div>
+        <div class="metric-card reveal"><strong>Better</strong><span>Product and CX insight from root-cause themes</span></div>
+        <div class="metric-card reveal"><strong>Stronger</strong><span>Audit readiness with evidence trail and decision logs</span></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="info-card reveal" style="text-align:left;">
+          <div class="label">Trust &amp; security</div>
+          <h3>Controls for regulated and high-volume environments.</h3>
+          <ul>
+            <li>PII redaction and role-based access control</li>
+            <li>Configurable taxonomy, business rules, and severity logic</li>
+            <li>Audit logs display the extracted information and the reasons for its routing.</li>
+            <li>Human-in-the-loop review for low-confidence or high-risk cases</li>
+          </ul>
+        </div>
+        <div class="info-card reveal" style="text-align:left;">
+          <div class="label">Where it fits best</div>
+          <h3>Ideal for support, CX, product, QA, and compliance teams.</h3>
+          <ul>
+            <li>High-volume customer service and complaint operations</li>
+            <li>Regulated complaint handling in finance, healthcare, telecom, and marketplaces</li>
+            <li>Product teams needing visibility into recurring customer pain points</li>
+            <li>QA and risk teams sampling edge cases and escalations</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" id="contact">
+    <div class="container">
+      <div class="cta-box reveal show">
+        <div class="label">Get started</div>
+        <h2>See Complaint AI on your own complaint data.</h2>
+        <p>We are able to quickly conduct a pilot project using a small sample of complaints, calls, or emails to create an efficient triage and routing system, a complaint classification system that aligns with your business goals, identify common themes and escalation indicators, and provide organized data that can be easily integrated into your existing systems.</p>
+        <div class="cta-actions">
+          <a class="btn btn-primary" href="#">Book a Demo</a>
+          <a class="btn btn-secondary" href="#capabilities">Explore Features</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/call-audit-ai/call-audit-ai.html">Call Audit Ai</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Dataknobs use cases and customers using Knobs</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+  </script>
+
+
+</body></html>

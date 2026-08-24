@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DataKnobs - Practical Applications Developed with Kreate, Kontrols, and AI Agents</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Chosen Palette: Warm Neutral Harmony -->
+<!-- Application Structure Plan: The application is structured as a single-page interactive dashboard. It starts with a high-level overview and key value propositions. The core is divided into three main, navigable sections: 1) 'Solutions Showcase', an interactive, filterable grid of use cases, 2) 'Platform Deep Dive', a visual exploration of the core technology modules, and 3) 'Foundational Strengths', which highlights the data science expertise. This structure was chosen to allow different user personas (e.g., business executive, technical manager) to find relevant information quickly. A business leader can browse solutions by industry, while a tech lead can dive into the platform architecture. This non-linear exploration path is more engaging and user-friendly than a static report. -->
+<!-- Visualization & Content Choices: 
+        - Report Info: Market Growth (Digital Twin, AI in Finance, etc.) -> Goal: Show market opportunity -> Viz: Interactive Bar Chart (Chart.js) -> Interaction: Tooltips on hover show specific values -> Justification: Visually compelling way to contextualize Dataknobs' relevance.
+        - Report Info: Solution Categories & Use Cases -> Goal: Allow exploration -> Presentation: Interactive Cards with modal pop-ups -> Interaction: Filtering by industry/function, clicking a card reveals detailed info in a modal -> Justification: Organizes a large amount of information cleanly, letting users self-select what's relevant.
+        - Report Info: Core Platform Components (Kreate, Kontrols, etc.) -> Goal: Explain architecture -> Viz: Diagram built with HTML/CSS (Flexbox/Grid) -> Interaction: Hovering over a component reveals its description -> Justification: A visual, interactive diagram is more intuitive for understanding system architecture than plain text.
+        - Report Info: Foundational Data Science Techniques (Weak Supervision, etc.) -> Goal: Emphasize core competency -> Presentation: Accordion-style expandable sections -> Interaction: Clicking a title expands to show details -> Justification: Keeps the section clean and allows users to explore complex topics without being overwhelmed.
+    -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #334155;
+            scroll-behavior: smooth;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #4f46e5;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background-color: #4f46e5;
+            transition: width 0.3s, left 0.3s;
+        }
+        .nav-link.active::after, .nav-link:hover::after {
+            width: 100%;
+            left: 0;
+        }
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.06);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 24px -8px rgba(79,70,229,0.18), 0 8px 12px -6px rgba(0,0,0,0.08);
+        }
+        .modal-overlay {
+            background-color: rgba(15, 23, 42, 0.72);
+        }
+        .modal-content {
+            background-color: #ffffff;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .filter-btn {
+            padding: 0.5rem 0.9rem;
+            border-radius: 9999px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: #eef2ff;
+            border-color: #818cf8;
+            color: #4338ca;
+        }
+        .platform-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .platform-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -8px rgba(79,70,229,0.22);
+        }
+        .accordion-item {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .accordion-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            background: #ffffff;
+        }
+        .accordion-content {
+            padding: 0 1.5rem 1.25rem 1.5rem;
+            color: #475569;
+        }
+        .button-big {
+            transition: all 0.3s ease-in-out;
+        }
+        .button-big:hover {
+            transform: scale(1.04);
+            box-shadow: 0 12px 20px -8px rgba(79,70,229,0.28);
+        }
+    </style>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
+		(function (w, d, s, l, i) {
+			w[l] = w[l] || []; w[l].push({
+				'gtm.start':
+					new Date().getTime(), event: 'gtm.js'
+			}); var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head>
+<body class="antialiased">
+<div class="fixed inset-0 z-50 items-center justify-center hidden p-4 modal-overlay" id="modal-container">
+<div class="relative w-full max-w-4xl max-h-full overflow-y-auto rounded-lg shadow-xl modal-content">
+<div class="p-6 md:p-8" id="modal-content-body"></div>
+<button class="absolute top-4 right-4 text-gray-400 hover:text-gray-800" id="modal-close-btn">
+<span class="text-2xl">×</span>
+</button>
+</div>
+</div>
+<header class="bg-white shadow-lg sticky top-0 z-40">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+<a aria-label="DataKnobs home" class="flex items-center" href="https://www.dataknobs.com/">
+<img alt="DataKnobs Logo" class="h-16 sm:h-20 w-auto" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"/>
+</a>
+<nav class="hidden md:flex space-x-6">
+<a class="text-gray-600 hover:text-indigo-600 transition duration-150 font-medium nav-link active" href="#solutions">Solutions</a>
+<a class="text-gray-600 hover:text-indigo-600 transition duration-150 font-medium nav-link" href="#platform">Platform</a>
+<a class="text-gray-600 hover:text-indigo-600 transition duration-150 font-medium nav-link" href="#strengths">Strengths</a>
+<a class="text-gray-600 hover:text-indigo-600 transition duration-150 font-medium" href="https://www.dataknobs.com/customers/" target="_blank">Customers</a>
+<a class="text-gray-600 hover:text-indigo-600 transition duration-150 font-medium" href="https://www.dataknobs.com/agent-ai/" target="_blank">AgentAI</a>
+</nav>
+<button aria-label="Toggle navigation menu" class="md:hidden text-gray-700 focus:outline-none" id="menu-toggle">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<div class="md:hidden hidden bg-white border-t border-slate-200" id="mobile-menu">
+<div class="px-4 py-3 space-y-2">
+<a class="block text-gray-700 hover:text-indigo-600 font-medium" href="#solutions">Solutions</a>
+<a class="block text-gray-700 hover:text-indigo-600 font-medium" href="#platform">Platform</a>
+<a class="block text-gray-700 hover:text-indigo-600 font-medium" href="#strengths">Strengths</a>
+<a class="block text-gray-700 hover:text-indigo-600 font-medium" href="https://www.dataknobs.com/customers/" target="_blank">Customers</a>
+<a class="block text-gray-700 hover:text-indigo-600 font-medium" href="https://www.dataknobs.com/agent-ai/" target="_blank">AgentAI</a>
+</div>
+</div>
+</header>
+<main class="max-w-7xl px-4 py-8 mx-auto md:py-12">
+<section class="text-center mb-16 py-10 md:py-14">
+<h2 class="text-4xl font-bold tracking-tight text-gray-900 md:text-5xl">Create AI applications using Data Products, GenAI, and Agentic Workflows.</h2>
+<p class="max-w-3xl mx-auto mt-6 text-lg text-gray-600">Dataknobs enables businesses to build custom GenAI agents and <a href="https://www.dataknobs.com/data-products/">data products</a>   from privacy compliance monitors and financial analytics copilots to personalized AI assistants for consumers.</p>
+<div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+<a class="button-big px-8 py-4 rounded-full bg-indigo-600 text-white font-bold shadow-lg hover:bg-indigo-700" href="https://www.dataknobs.com/agent-ai/" target="_blank">Explore Agent AI</a>
+<a class="px-8 py-4 rounded-full bg-white text-indigo-700 font-bold border border-indigo-200 hover:border-indigo-400" href="https://www.dataknobs.com/customers/" target="_blank">View Customers</a>
+</div>
+</section>
+<div class="grid grid-cols-1 gap-12 md:grid-cols-3 mb-16">
+<div class="p-6 text-center bg-white rounded-2xl shadow-sm border border-slate-200">
+<h3 class="text-4xl font-bold text-indigo-600">AI Agents For Analysis</h3>
+<p class="mt-2 text-gray-600">AI Agent for eCommerce and Finance   automate sales, revenue, and customer behavior analysis to uncover insights and drive growth</p>
+</div>
+<div class="p-6 text-center bg-white rounded-2xl shadow-sm border border-slate-200">
+<h3 class="text-4xl font-bold text-indigo-600">Automate Compliance</h3>
+<p class="mt-2 text-gray-600">Stay ahead of privacy risks   use <a href="https://www.dataknobs.com/agentic-ai/">AI agents</a> to audit your features and ensure compliance with evolving regulations</p>
+</div>
+<div class="p-6 text-center bg-white rounded-2xl shadow-sm border border-slate-200">
+<h3 class="text-4xl font-bold text-indigo-600">Personalized Assistant</h3>
+<p class="mt-2 text-gray-600">Offer your consumers personalized AI assistants   from financial planners to retirement advisors and diet coaches, tailored guidance at scale.</p>
+</div>
+</div>
+<div class="flex justify-center my-12">
+<img alt="Dataknobs AI Use Cases Overview" class="max-w-full h-auto rounded-2xl shadow-xl border border-slate-200" src="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/slides/dataknobs/images/Slide1200/dataknobs-1.png"/>
+</div>
+<section class="pt-16 mb-16" id="solutions">
+<div class="text-center mb-12">
+<h2 class="text-3xl font-bold text-gray-900">Solutions Showcase</h2>
+<p class="max-w-2xl mx-auto mt-4 text-gray-600">Explore Dataknobs' proven solutions interactively in this section. Utilize the filters to browse use cases by industry or business function, and select any card to view an in-depth analysis of the business challenge, technical implementation, and delivered value.</p>
+</div>
+<div class="flex flex-wrap items-center justify-center gap-4 mb-8">
+<span class="font-semibold text-gray-700">Filter by Industry:</span>
+<div class="flex flex-wrap gap-2" id="filters-container">
+<button class="filter-btn active" data-filter="all">All</button>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" id="solutions-grid">
+</div>
+</section>
+<section class="pt-16 mb-16 bg-white py-16 rounded-3xl shadow-sm border border-slate-200" id="platform">
+<div class="text-center mb-12">
+<h2 class="text-3xl font-bold text-gray-900">Platform Deep Dive</h2>
+<p class="max-w-2xl mx-auto mt-4 text-gray-600">Dataknobs' primary focus is on a cohesive and adaptable platform that allows for the quick creation of tailored, expandable, and regulated AI solutions. Explore each element in the system, starting from data intake to user interaction, by hovering over the components below.</p>
+</div>
+<div class="max-w-4xl mx-auto">
+<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+<div class="md:col-span-3 p-4 text-center font-semibold text-lg bg-indigo-100 text-indigo-800 rounded-t-lg">Kreate Platform</div>
+<div class="grid grid-cols-1 col-span-1 md:col-span-3 md:grid-cols-3 gap-4">
+<div class="platform-card" data-desc="The foundational data engine for ingestion, processing, summarization, and advanced data generation. It builds the high-quality knowledge bases that power all specialized applications." data-title="KreateData">
+<h4 class="font-bold">KreateData</h4>
+<p class="text-sm">Data Engine</p>
+</div>
+<div class="platform-card" data-desc="A no-code/low-code engine for creating sophisticated conversational AI agents, enabling rapid deployment of chatbots and virtual assistants trained on client-specific knowledge." data-title="KreateBots">
+<h4 class="font-bold">KreateBots</h4>
+<p class="text-sm">Conversational AI</p>
+</div>
+<div class="platform-card" data-desc="A no-code tool for the rapid generation of custom websites and web portals, leveraging templates and AI to create SEO-compliant digital presences with integrated AI features." data-title="KreateWebsites">
+<h4 class="font-bold">KreateWebsites</h4>
+<p class="text-sm">Web Deployment</p>
+</div>
+</div>
+<div class="md:col-span-3 p-4 text-center font-semibold text-lg bg-slate-200 text-slate-800">Governance &amp; Optimization</div>
+<div class="grid grid-cols-1 col-span-1 md:col-span-3 md:grid-cols-2 gap-4">
+<div class="platform-card" data-desc="The critical governance layer ensuring all applications adhere to compliance, accuracy, and security standards. Essential for regulated industries like finance and healthcare." data-title="Kontrols">
+<h4 class="font-bold">Kontrols</h4>
+<p class="text-sm">Governance Layer</p>
+</div>
+<div class="platform-card" data-desc="Provides capabilities for A/B testing and optimizing user engagement, allowing clients to empirically validate and continuously improve AI-driven features based on real-world data." data-title="ABExperiment">
+<h4 class="font-bold">ABExperiment</h4>
+<p class="text-sm">Optimization Engine</p>
+</div>
+</div>
+</div>
+<div class="mt-8 p-6 bg-slate-50 rounded-2xl shadow-inner border border-slate-200 min-h-[100px] flex items-center justify-center text-center" id="platform-info">
+<p class="text-gray-500">Hover over a platform component to see details.</p>
+</div>
+</div>
+</section>
+<section class="pt-16 mb-16" id="strengths">
+<div class="text-center mb-12">
+<h2 class="text-3xl font-bold text-gray-900">Foundational Strengths</h2>
+<p class="max-w-2xl mx-auto mt-4 text-gray-600">Dataknobs excels in foundational data science, giving it a major edge over competitors. This section delves into its 'data factory' capabilities, which guarantee the reliability and trustworthiness of each AI solution provided, tackling the issue of data scarcity in enterprise AI.</p>
+</div>
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+<div class="space-y-6">
+<div class="accordion-item">
+<button class="accordion-header">
+<h3 class="text-xl font-semibold">Advanced Data Generation</h3>
+<span class="accordion-icon">+</span>
+</button>
+<div class="accordion-content">
+<p>Dataknobs enhances AI model performance by utilizing an internal 'data factory' to generate and enhance datasets, including creating high-level features such as a server 'health index' from raw data. This speeds up model development and improves accuracy.</p>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-header">
+<h3 class="text-xl font-semibold">Weak Supervision &amp; Active Learning</h3>
+<span class="accordion-icon">+</span>
+</button>
+<div class="accordion-content">
+<p>We utilize Weak Supervision to automatically label large datasets using programmatic rules and heuristics, replacing slow manual labeling. Active Learning is employed to have the AI pinpoint the most uncertain data points, ensuring human experts focus their time on the most informative examples and boosting efficiency significantly.</p>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-header">
+<h3 class="text-xl font-semibold">Optimal Transport Algorithms</h3>
+<span class="accordion-icon">+</span>
+</button>
+<div class="accordion-content">
+<p>In order to enhance the quality of data, we utilize Optimal Transport, a robust mathematical framework. This enables us to strategically generate synthetic data in order to balance datasets, such as increasing instances of a rare equipment failure. This results in more resilient, unbiased models that demonstrate improved performance in practical scenarios.</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-center">
+<div class="chart-container">
+<canvas id="marketGrowthChart"></canvas>
+</div>
+</div>
+</div>
+</section>
+</main>
+<section class="py-16">
+<div class="max-w-6xl mx-auto px-6">
+<div class="rounded-3xl p-10 text-center bg-gradient-to-r from-purple-700 via-purple-600 to-purple-500 text-white shadow-2xl">
+<h2 class="text-3xl md:text-4xl font-bold tracking-tight">
+        Explore More Gen AI Learning Resources
+      </h2>
+<p class="mt-3 text-purple-100 text-base md:text-lg">
+        Dive deeper into LLMs, Generative AI, and Agentic AI concepts
+      </p>
+<div class="mt-8 flex flex-wrap justify-center gap-4">
+<a class="px-6 py-3 rounded-xl bg-white text-purple-800 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-200" href="/generativeai/l0-llms/">
+          LLM Slides
+        </a>
+<a class="px-6 py-3 rounded-xl bg-white text-purple-800 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-200" href="/generativeai/generative-ai-101-slides.html">
+          Gen AI Slides
+        </a>
+<a class="px-6 py-3 rounded-xl bg-white text-purple-800 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-200" href="/agent-ai/">
+          Agentic AI Slides
+        </a>
+</div>
+</div>
+</div>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/agent-cricket-analysis.html">Agent Cricket Analysis</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/agent-earning-call-updated.html">Agent Earning Call Updated</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/complaint-management-ai.html">Complaint Management Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/complaint_management_product_page.html">Complaint Management Product Page</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/dataknobs-kreate-kontrols-knobs-suite.html">Dataknobs Kreate Kontrols Knobs Suite</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/dataknobs-use-cases-page.html">Dataknobs Use Cases Page</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/dataknobs_homepage_flagship.html">Dataknobs Homepage Flagship</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.cog/use-cases/dataknobs_products_overview_page.html">Dataknobs Products Overview Page</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Dataknobs use cases and customers using Knobs</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (menuToggle && mobileMenu) {
+                menuToggle.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            }
+            const solutionsData = [
+                {
+                    category: 'Predictive Maintenance & Data Health',
+                    value: 'Reduce Downtime, Lower Costs, Improve Reliability',
+                    industries: ['Cloud Infrastructure', 'Manufacturing', 'Energy'],
+                    title: 'Data Center Health Score',
+                    client: 'Large Cloud Provider, USA',
+                    challenge: 'The operational uptime of data centers is paramount. Traditional reactive maintenance is inefficient and risky, potentially leading to catastrophic outages, data loss, and financial penalties.',
+                    solution: 'Developed a dynamic "Data Center Health Score" by ingesting vast streams of real-time sensor and log data. The system provides early warning alerts, shifting the operational model from reactive repair to proactive, planned intervention.',
+                    tech: 'Utilized time-series analysis and ML to predict failures. Implemented an Asset Health Index and Remaining Useful Life (RUL) models. Leveraged an "AI Twin" (digital twin) for simulating maintenance strategies.'
+                },
+                {
+                    category: 'Generative AI for Analytics & Compliance',
+                    value: 'Automate Insights, Enhance Compliance, Improve Service',
+                    industries: ['Financial Services', 'E-commerce', 'Customer Service'],
+                    title: 'E-commerce Analytics & Compliance',
+                    client: 'Large Financial Institution, USA',
+                    challenge: 'Needed to extract actionable insights from massive, unstructured data sources, including sales reports and thousands of call center transcripts, to drive revenue and ensure regulatory compliance.',
+                    solution: 'Deployed a dual-purpose AI. An E-commerce Analytics Assistant sifts through sales reports to find trends and drivers. A Call Center Compliance Monitor scans transcripts to detect policy violations and complaint patterns.',
+                    tech: 'Used Large Language Models (LLMs) for parsing and analysis. Fine-tuned models on domain-specific financial and compliance data. Implemented vector databases for semantic search to allow interactive Q&A on the data.'
+                },
+                {
+                    category: 'Financial Services AI Assistants',
+                    value: 'Accelerate Research, Personalize Planning, Augment Productivity',
+                    industries: ['FinTech', 'Wealth Management', 'Tax & Accounting'],
+                    title: 'Tax Research & Financial Planning Assistants',
+                    client: 'FinTech Company, USA',
+                    challenge: 'Financial professionals spend countless hours on manual research in complex tax codes and developing personalized client plans. This limits their ability to scale services and provide in-depth, data-driven advice.',
+                    solution: 'Deployed two assistants: a Tax Research Assistant for instant answers from tax law, and a Financial Planning Assistant to generate personalized plans and forecasts. This augments advisor productivity and enhances service quality.',
+                    tech: 'Built on the KreateBots module with curated knowledge bases from KreateData (tax codes, market data). The Kontrols governance layer ensures advice is compliant and safe.'
+                },
+                {
+                    category: 'Sports Analytics & Content Automation',
+                    value: 'Automate Content, Enhance Fan Engagement, Generate Reports',
+                    industries: ['Sports Media', 'Broadcasting'],
+                    title: 'Cricket Commentary Generator',
+                    client: 'Sports Media',
+                    challenge: 'Creating engaging, real-time content for sports fans requires significant manual effort, especially for generating narrative summaries from live game data.',
+                    solution: 'Developed a system that ingests real-time, ball-by-ball cricket data from APIs and transforms it into human-like commentary, match summaries, and player reports, automating content for web portals and fan experiences.',
+                    tech: 'A sophisticated structured-to-text generation model trained on the specific domain knowledge and terminology of cricket. It converts numerical data (runs, wickets) into a coherent narrative.'
+                },
+                {
+                    category: 'Healthcare & Diet AI Assistants',
+                    value: 'Scale Personalized Guidance, Improve Outcomes, Support Wellness',
+                    industries: ['Health & Fitness', 'Healthcare Providers'],
+                    title: 'Virtual Dietitian & Trainer',
+                    client: 'Health & Fitness Sector',
+                    challenge: 'Scaling personalized health and diet advice is impossible with a purely human-staffed model, limiting the reach and affordability of expert guidance.',
+                    solution: 'Built a virtual coach providing personalized diet plans, nutritional advice, and workout routines based on user goals and health data. This allows wellness providers to scale their expertise to thousands of clients simultaneously.',
+                    tech: 'A conversational AI built with KreateBots, powered by a comprehensive knowledge base from KreateData covering nutrition and exercise science, with the Kontrols layer ensuring advice is safe and aligns with standards.'
+                },
+                {
+                    category: 'Rapid Website & Chatbot Deployment',
+                    value: 'Accelerate Digital Presence, Automate Inquiries, Democratize AI',
+                    industries: ['SMEs', 'Consulting', 'Manufacturing'],
+                    title: 'AI-Powered Websites & Internal Portals',
+                    client: 'Cross-Industry (USA, UK, UAE, India)',
+                    challenge: 'Many businesses, especially SMEs or non-tech departments, lack the resources to build a sophisticated online presence with integrated AI for customer or employee support.',
+                    solution: 'Delivered custom websites with integrated AI assistants for a diverse client base, from a UK consultancy (FAQ bot) to a Dubai manufacturer (internal equipment data bot), enabling rapid deployment of a digital footprint.',
+                    tech: 'Leveraged the KreateWebsites and KreateBots no-code modules. Chatbots are trained on client-specific knowledge bases (product manuals, FAQs) for context-aware support.'
+                }
+                ,
+                {
+                    category: 'AI Agents for Website Operations',
+                    value: 'Automate Website Management, Improve SEO, Reduce Operational Work',
+                    industries: ['Website Owners','SMEs','Digital Businesses'],
+                    title: 'AI Web Master Agent',
+                    client: 'Website Owners & Digital Businesses',
+                    challenge: 'Website owners must constantly update content, monitor SEO, fix broken links, publish blogs, and track performance which requires ongoing manual effort.',
+                    solution: 'AI Web Master Agent monitors website health, updates content, generates blogs, manages SEO optimization, detects broken links, and provides analytics insights automatically.',
+                    tech: 'Autonomous AI agent integrated with CMS platforms, SEO APIs, analytics pipelines, and generative AI content engines.'
+                },
+                {
+                    category: 'AI for Investment & Financial Research',
+                    value: 'Accelerate Market Research, Improve Investment Decisions',
+                    industries: ['Investors','Financial Advisors','CPAs'],
+                    title: 'Stock Research Assistant',
+                    client: 'Investors & CPAs',
+                    challenge: 'Investors must analyze large volumes of financial data, earnings reports, and market news before making decisions.',
+                    solution: 'AI assistant analyzes stock fundamentals, earnings reports, news sentiment, and historical performance to provide summarized research and insights.',
+                    tech: 'Financial data pipelines, LLM-based financial analysis, sentiment analysis, and structured financial datasets.'
+                },
+                {
+                    category: 'AI Decision Support',
+                    value: 'Support Smarter Financial Decisions',
+                    industries: ['Retail Investors','Advisors'],
+                    title: 'AI Investment Decision Assistant',
+                    client: 'Investors',
+                    challenge: 'Retail investors often lack tools to evaluate portfolio risks, diversification, and long-term strategies.',
+                    solution: 'AI assistant evaluates portfolio allocation, risk exposure, macroeconomic signals, and market trends to guide investment decisions.',
+                    tech: 'Portfolio analytics engine, macroeconomic data ingestion, financial modeling, and conversational AI.'
+                },
+                {
+                    category: 'AI Websites for Professional Services',
+                    value: 'Generate Leads, Automate Client Engagement',
+                    industries: ['Tech Consulting Firms'],
+                    title: 'AI Website for Tech Consulting Companies',
+                    client: 'Technology Consulting Firms',
+                    challenge: 'Consulting companies need a professional website that explains services clearly and responds to potential client questions instantly.',
+                    solution: 'AI-powered website with embedded consulting assistant that answers service questions, explains case studies, and captures qualified leads.',
+                    tech: 'Website generation platform with integrated conversational AI assistant trained on company services and case studies.'
+                },
+                {
+                    category: 'AI Websites for Professional Services',
+                    value: 'Automate Client Intake & Tax Guidance',
+                    industries: ['Tax Professionals','CPAs'],
+                    title: 'AI Website for Tax Professionals',
+                    client: 'Tax Professionals & CPA Firms',
+                    challenge: 'Tax professionals spend large amounts of time answering repetitive questions about filings, deductions, and deadlines.',
+                    solution: 'AI assistant embedded into the website to answer tax FAQs, collect client information, and guide users before consultations.',
+                    tech: 'Document-aware AI assistant, tax knowledge base, client intake automation.'
+                },
+                {
+                    category: 'AI Travel Platforms',
+                    value: 'Personalized Trip Planning & Travel Assistance',
+                    industries: ['Travel Agencies','Tour Operators'],
+                    title: 'Travel Website with AI Trip Assistant',
+                    client: 'Travel Businesses',
+                    challenge: 'Travel planning requires comparing destinations, budgets, and schedules which can overwhelm users.',
+                    solution: 'AI travel assistant helps users plan trips, recommend destinations, generate itineraries, and estimate budgets.',
+                    tech: 'Travel data integrations, itinerary generation models, conversational AI.'
+                }
+
+            ];
+
+            const solutionsGrid = document.getElementById('solutions-grid');
+            const filtersContainer = document.getElementById('filters-container');
+            const modalContainer = document.getElementById('modal-container');
+            const modalContentBody = document.getElementById('modal-content-body');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            let allIndustries = new Set();
+            solutionsData.forEach(s => s.industries.forEach(i => allIndustries.add(i)));
+            
+            Array.from(allIndustries).sort().forEach(industry => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.textContent = industry;
+                btn.dataset.filter = industry;
+                filtersContainer.appendChild(btn);
+            });
+            
+            function renderSolutions(filter = 'all') {
+                solutionsGrid.innerHTML = '';
+                const filteredData = filter === 'all' 
+                    ? solutionsData 
+                    : solutionsData.filter(s => s.industries.includes(filter));
+
+                filteredData.forEach((solution, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'p-6 rounded-lg cursor-pointer card fade-in';
+                    card.innerHTML = `
+                        <div class="flex items-center mb-3">
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg mr-4">${solution.category.charAt(0)}</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">${solution.title}</h3>
+                                <p class="text-sm text-gray-500">${solution.category}</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600">${solution.value}</p>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            ${solution.industries.map(i => `<span class="text-xs font-medium text-indigo-800 bg-indigo-100 px-2 py-1 rounded-full">${i}</span>`).join('')}
+                        </div>
+                    `;
+                    card.addEventListener('click', () => openModal(solution));
+                    solutionsGrid.appendChild(card);
+                });
+            }
+
+            function openModal(solution) {
+                modalContentBody.innerHTML = `
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">${solution.title}</h2>
+                    <p class="text-md text-gray-500 mb-6">${solution.client}</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3 border-b-2 border-indigo-500 pb-2">Business Challenge</h4>
+                            <p class="text-gray-600">${solution.challenge}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3 border-b-2 border-indigo-500 pb-2">Dataknobs' Solution</h4>
+                            <p class="text-gray-600">${solution.solution}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-3 border-b-2 border-indigo-500 pb-2">Technical Implementation</h4>
+                            <p class="text-gray-600">${solution.tech}</p>
+                        </div>
+                    </div>
+                `;
+                modalContainer.classList.remove('hidden');
+                modalContainer.classList.add('flex');
+            }
+
+            modalCloseBtn.addEventListener('click', () => {
+                modalContainer.classList.add('hidden');
+                modalContainer.classList.remove('flex');
+            });
+
+            modalContainer.addEventListener('click', (e) => {
+                if (e.target === modalContainer) {
+                    modalContainer.classList.add('hidden');
+                    modalContainer.classList.remove('flex');
+                }
+            });
+
+            filtersContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderSolutions(e.target.dataset.filter);
+                }
+            });
+
+            renderSolutions();
+
+            const platformCards = document.querySelectorAll('.platform-card');
+            const platformInfo = document.getElementById('platform-info');
+            platformCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    platformInfo.innerHTML = `
+                        <div class="fade-in">
+                            <h4 class="text-xl font-bold text-gray-800">${card.dataset.title}</h4>
+                            <p class="mt-2 text-gray-600">${card.dataset.desc}</p>
+                        </div>
+                    `;
+                });
+            });
+
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const icon = item.querySelector('.accordion-icon');
+                content.style.maxHeight = '0px';
+                content.style.overflow = 'hidden';
+                content.style.transition = 'max-height 0.5s ease-out';
+                header.addEventListener('click', () => {
+                    const isOpen = content.style.maxHeight !== '0px';
+                    accordionItems.forEach(i => {
+                        i.querySelector('.accordion-content').style.maxHeight = '0px';
+                        i.querySelector('.accordion-icon').textContent = '+';
+                    });
+                    if (!isOpen) {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.textContent = '-';
+                    }
+                });
+            });
+            
+            const marketGrowthCtx = document.getElementById('marketGrowthChart').getContext('2d');
+            new Chart(marketGrowthCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Digital Twin', 'AI in Finance', 'AI in Healthcare', 'No-Code AI'],
+                    datasets: [{
+                        label: 'Projected Market Size by 2030 ($B)',
+                        data: [40, 190, 6.2, 25],
+                        backgroundColor: ['#F59E0B', '#FBBF24', '#FCD34D', '#FDE68A'],
+                        borderColor: '#D97706',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Key AI Market Growth Projections (USD Billions)',
+                            font: { size: 16 },
+                            color: '#4A4A4A'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.raw} Billion`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Market Size ($B)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 68) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if(link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                });
+            });
+
+        });
+    </script>
+</section></body></html>

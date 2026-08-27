@@ -1,172 +1,356 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Stocks Assistant: Explainer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-	    <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
-	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
-	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
-	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
-	<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
-    <!-- Chosen Palette: Warm Neutrals -->
-    <!-- Application Structure Plan: The SPA is designed as a narrative journey, mirroring the tool's workflow. It starts with the user's problem (dense transcripts), introduces the tool as a solution, and then walks through an interactive, step-by-step demonstration of the analysis process. This structure was chosen over a static feature list to make the tool's value tangible and easy to grasp. The user flows from raw data input to high-level, actionable insights like the Momentum Score, creating a compelling story of transformation. Key interactions include toggling through generated content (Summary, Insights, FAQ) and exploring the historical data that builds the final score, enhancing user engagement and understanding. -->
-    <!-- Visualization & Content Choices: Report Info: Core features of Stocks Assistant. -> Goal: Explain the tool's process and value. -> Viz/Presentation Method: An interactive multi-stage panel. Key metrics are shown in cards, generated text in tabs, and historical performance in a bar chart leading to a final score. -> Interaction: Users click through stages, switch tabs to view different AI outputs, and hover over the chart for details. -> Justification: This multi-faceted approach breaks down a complex AI process into digestible, interactive steps. The bar chart (Chart.js) is the best choice for comparing discrete quarterly performance data (beat/miss), directly feeding into the final Momentum Score, which is presented as a clear, impactful number. -> Library/Method: Vanilla JS for interactivity and state management, Chart.js for the historical performance chart. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #FDFBF8;
-            color: #1a202c;
-        }
-        .tab-btn.active {
-            border-color: #34D399;
-            color: #34D399;
-            font-weight: 600;
-        }
-        .beat {
-            color: #10B981;
-        }
-        .miss {
-            color: #EF4444;
-        }
-        .meet {
-            color: #6B7280;
-        }
-        .momentum-score-circle {
-            transition: background-color 0.5s ease, transform 0.3s ease;
-        }
-    </style>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Stocks Assistant Earnings Intelligence | DataKnobs</title>
+<meta content="See how Stocks Assistant transforms earnings call transcripts into financial metrics, AI-generated insights, FAQs, and an Earnings Momentum Score." name="description"/>
+<meta content="index, follow" name="robots"/>
+<meta content="website" property="og:type"/>
+<meta content="Stocks Assistant Earnings Intelligence | DataKnobs" property="og:title"/>
+<meta content="Transform dense earnings call transcripts into financial metrics, concise AI insights, FAQs, and an Earnings Momentum Score." property="og:description"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="Stocks Assistant Earnings Intelligence | DataKnobs" name="twitter:title"/>
+<meta content="Transform dense earnings call transcripts into financial metrics, concise AI insights, FAQs, and an Earnings Momentum Score." name="twitter:description"/>
+<meta content="#5b21b6" name="theme-color"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Stocks Assistant Earnings Intelligence",
+    "description": "See how Stocks Assistant transforms earnings call transcripts into financial metrics, AI-generated insights, FAQs, and an Earnings Momentum Score."
+  }
+  </script>
+<style>
+    :root{
+      --violet:#7c3aed;
+      --violet-dark:#5b21b6;
+      --indigo:#4f46e5;
+      --purple:#6d28d9;
+      --lavender:#f4ceff;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --line:#e2e8f0;
+      --soft:#f8fafc;
+      --soft-violet:#f5f3ff;
+      --green:#059669;
+      --green-soft:#ecfdf5;
+      --red:#dc2626;
+      --red-soft:#fef2f2;
+      --gray:#6b7280;
+      --shadow:0 18px 48px rgba(15,23,42,.08);
+      --shadow-lg:0 28px 80px rgba(30,41,59,.14);
+      --radius:24px;
+      --max:1220px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:92px}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff;line-height:1.65}
+    a{color:inherit;text-decoration:none}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    img{max-width:100%;height:auto}
+    .wrap{width:min(var(--max),calc(100% - 40px));margin:auto}
 
-		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
-		(function (w, d, s, l, i) {
-			w[l] = w[l] || []; w[l].push({
-				'gtm.start':
-					new Date().getTime(), event: 'gtm.js'
-			}); var f = d.getElementsByTagName(s)[0],
-				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-JF94J1W5MC');
-</script></head>
-<body class="antialiased">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <header class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight">Stocks Assistant</h1>
-            <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Transforming dense earnings call transcripts into actionable investment intelligence.</p>
-        </header>
+    .nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+    .nav-inner{height:78px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .brand{display:flex;align-items:center;gap:14px;min-width:0}
+    .brand img{display:block;width:173px;height:auto}
+    .product-name{padding-left:14px;border-left:1px solid var(--line);font-size:13px;color:#475569;font-weight:700;white-space:nowrap}
+    .nav-links{display:flex;gap:22px;align-items:center;color:#475569;font-size:14px;font-weight:650}
+    .nav-links a:hover{color:var(--violet)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 20px;border-radius:999px;font-weight:750;border:1px solid transparent;transition:.2s ease}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:linear-gradient(135deg,var(--violet),var(--indigo));color:#fff;box-shadow:0 12px 28px rgba(124,58,237,.18)}
+    .btn-secondary{background:#fff;color:#334155;border-color:var(--line)}
 
-        <main>
-            <section class="bg-white rounded-2xl shadow-lg p-6 md:p-10" id="workflow">
-                <div class="text-center mb-10">
-                    <h2 class="text-3xl font-bold text-gray-800">From Transcript to Insight in Seconds</h2>
-                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Utilize our AI-driven analysis to condense complex earnings calls into essential metrics and insights, empowering you to make informed decisions.</p>
-                </div>
+    .hero{position:relative;overflow:hidden;color:#fff;padding:88px 0 78px;background:radial-gradient(circle at 16% 12%,rgba(232,121,249,.18),transparent 25rem),radial-gradient(circle at 86% 10%,rgba(99,102,241,.24),transparent 28rem),linear-gradient(135deg,#2e1065 0%,#5b21b6 50%,#4338ca 100%)}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:7px 12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);border-radius:999px;color:#f5d0fe;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+    .eyebrow-dot{width:8px;height:8px;border-radius:50%;background:#86efac;box-shadow:0 0 0 5px rgba(134,239,172,.12)}
+    h1{font-size:clamp(46px,6.2vw,76px);line-height:1.01;letter-spacing:-.055em;margin:18px 0 22px}
+    h2{font-size:clamp(32px,4.2vw,50px);line-height:1.1;letter-spacing:-.04em;margin:0 0 16px}
+    h3{font-size:22px;line-height:1.25;margin:0 0 10px}
+    h4{font-size:18px;line-height:1.3;margin:0}
+    .hero p{font-size:19px;line-height:1.75;color:#ede9fe;max-width:760px;margin:0}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+    .hero .btn-primary{background:#fff;color:var(--violet-dark)}
+    .hero .btn-secondary{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.28);color:#fff}
+    .hero-flow{padding:24px;border-radius:28px;background:rgba(31,18,74,.78);border:1px solid rgba(255,255,255,.2);box-shadow:0 28px 70px rgba(15,23,42,.3)}
+    .hero-flow-title{font-weight:800;font-size:14px;margin-bottom:16px;color:#fff}
+    .flow-list{display:grid;gap:11px}
+    .flow-item{display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:center;padding:13px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
+    .flow-num{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#7c3aed;font-weight:900;color:#fff}
+    .flow-item strong{display:block;color:#fff;font-size:14px}
+    .flow-item span{display:block;color:#ddd6fe;font-size:12px;line-height:1.45}
 
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-                    <div class="lg:col-span-2">
-                        <div class="sticky top-8">
-                            <div class="bg-gray-50 p-4 rounded-lg h-96 overflow-auto shadow-inner">
-                                <h3 class="font-bold text-gray-700 mb-2">Sample Earnings Call Transcript (Excerpt)</h3>
-                                <p class="text-sm text-gray-600 leading-relaxed">
-                                    <strong>Operator:</strong> Hello and thank you for joining us today. Welcome to the InnovateCorp Q3 2025 Earnings Conference Call. <br/><br/>
-                                    <strong>CEO John Doe:</strong> Thank you all for joining. We are thrilled to report another quarter of exceptional growth. Our strategic initiatives in the AI-driven analytics space have yielded significant results, ahead of schedule. Total revenue for the quarter was $1.2 billion, a 20% increase year-over-year. Our flagship product, 'Synergy AI', saw a 50% increase in enterprise subscriptions, which was the primary driver of this outperformance. We successfully expanded our market share in the APAC region by 150 basis points. Our GAAP earnings per share came in at $1.55. Looking ahead, we are raising our full-year revenue guidance to $4.8 billion from $4.5 billion, reflecting our confidence in the current demand environment. However, we do anticipate some margin compression in Q4 due to increased R&amp;D investments in our next-generation platform... <br/><br/>
-                                    <strong>Analyst Jane Smith:</strong> Could you please elaborate on the margin projections for Q4, John? What level of compression do you expect? <br/><br/>
-                                    <strong>CFO Emily White:</strong> Hello Jane, thank you for your question. We anticipate a sequential compression of around 50 basis points. This is part of our strategic reinvestment plan to drive long-term growth and strengthen our position as a market leader.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="lg:col-span-3">
-                        <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center lg:text-left">AI Analysis &amp; Output</h3>
-                        <div class="space-y-6">
-                            <div class="bg-gray-50 rounded-lg p-6 shadow-sm">
-                                <h4 class="text-lg font-semibold flex items-center"><span class="text-green-500 mr-3">●</span> Key Financial Metrics</h4>
-                                <p class="text-sm text-gray-500 mb-4 ml-7">The AI quickly extracts and compares key figures with analyst predictions.</p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div class="bg-white p-4 rounded-lg border">
-                                        <p class="text-sm text-gray-500">Revenue</p>
-                                        <p class="text-2xl font-bold text-gray-800">$1.2B</p>
-                                        <div class="flex items-center mt-1">
-                                            <span class="text-xs font-semibold beat bg-green-100 px-2 py-1 rounded-full">BEAT</span>
-                                            <p class="text-xs text-gray-500 ml-2">vs $1.15B est.</p>
-                                        </div>
-                                    </div>
-                                    <div class="bg-white p-4 rounded-lg border">
-                                        <p class="text-sm text-gray-500">EPS</p>
-                                        <p class="text-2xl font-bold text-gray-800">$1.55</p>
-                                        <div class="flex items-center mt-1">
-                                            <span class="text-xs font-semibold beat bg-green-100 px-2 py-1 rounded-full">BEAT</span>
-                                            <p class="text-xs text-gray-500 ml-2">vs $1.50 est.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-gray-50 rounded-lg p-6 shadow-sm">
-                                <h4 class="text-lg font-semibold flex items-center"><span class="text-blue-500 mr-3">●</span> AI-Generated Intelligence</h4>
-                                <p class="text-sm text-gray-500 mb-4 ml-7">The transcript is processed to generate concise, easy-to-digest content.</p>
-                                <div>
-                                    <div class="border-b border-gray-200 mb-4">
-                                        <nav aria-label="Tabs" class="-mb-px flex space-x-6">
-                                            <button class="tab-btn active whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm" data-tab="summary">Summary</button>
-                                            <button class="tab-btn whitespace-nowrap py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="insights">Key Insights</button>
-                                            <button class="tab-btn whitespace-nowrap py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm" data-tab="faq">Generated FAQ</button>
-                                        </nav>
-                                    </div>
-                                    <div class="text-sm text-gray-700 leading-relaxed min-h-[150px]" id="tab-content">
-                                        <div id="summary-content">InnovateCorp reported a strong Q3 2025, beating both revenue and EPS estimates. Growth was primarily driven by a 50% increase in subscriptions for its 'Synergy AI' product and market share expansion in the APAC region. The company raised its full-year revenue guidance but cautioned about a slight margin compression in Q4 due to increased R&amp;D spending.</div>
-                                        <div class="hidden" id="insights-content">
-                                            <ul class="list-disc pl-5 space-y-2">
-                                                <li><strong>Positive:</strong> Revenue and EPS beat expectations, signaling strong operational performance.</li>
-                                                <li><strong>Positive:</strong> Full-year revenue guidance was raised, indicating management confidence.</li>
-                                                <li><strong>Key Driver:</strong> The main driver of growth is the 'Synergy AI' product, which has seen a 50% increase in subscriptions.</li>
-                                                <li><strong>Neutral/Risk:</strong> Anticipated margin compression in Q4 from higher R&amp;D investment could impact short-term profitability but is framed as a long-term growth driver.</li>
-                                            </ul>
-                                        </div>
-                                        <div class="hidden" id="faq-content">
-                                            <div class="space-y-3">
-                                                <p><strong>Q: What drove the strong revenue growth this quarter?</strong><br/>A: The growth in revenue was fueled by a 50% rise in enterprise subscriptions for the 'Synergy AI' product and expansion in the APAC region.</p>
-                                                <p><strong>Q: Did the company meet its earnings expectations?</strong><br/>A: The company surpassed EPS expectations with a reported $1.55, beating the estimated $1.50.</p>
-                                                <p><strong>Q: What is the company's outlook for the next quarter?</strong><br/>A: The company raised its full-year revenue guidance but expects a 50 basis point margin compression in Q4 due to R&amp;D investments.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-gray-50 rounded-lg p-6 shadow-sm">
-                                 <h4 class="text-lg font-semibold flex items-center"><span class="text-purple-500 mr-3">●</span> Earnings Momentum Score</h4>
-                                <p class="text-sm text-gray-500 mb-4 ml-7">We assess the earnings performance from the past three quarters to calculate a strong momentum score.</p>
-                                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                                    <div class="w-full md:w-1/2 flex justify-center items-center">
-                                        <div class="momentum-score-circle w-36 h-36 rounded-full flex flex-col justify-center items-center bg-green-100 shadow-inner" id="momentum-score-circle">
-                                            <span class="text-4xl font-bold text-green-700" id="momentum-score">75</span>
-                                            <span class="text-sm font-medium text-green-600">Out of 100</span>
-                                        </div>
-                                    </div>
-                                    <div class="w-full md:w-1/2">
-                                        <div class="chart-container relative h-48 w-full max-w-sm mx-auto">
-                                            <canvas id="momentumChart"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        <footer class="bg-gray-800 text-gray-300">
+    .section{padding:82px 0}
+    .section-alt{background:linear-gradient(180deg,#fafafa,#f8fafc);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .section-head{text-align:center;max-width:820px;margin:0 auto 38px}
+    .kicker{color:var(--violet);font-size:12px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}
+    .section-head p{color:var(--muted);font-size:17px;margin:0}
+
+    .workflow-shell{border:1px solid var(--line);border-radius:30px;background:#fff;box-shadow:var(--shadow-lg);padding:30px}
+    .workflow-grid{display:grid;grid-template-columns:.78fr 1.22fr;gap:28px;align-items:start}
+    .transcript-panel{position:sticky;top:102px}
+    .panel-label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .panel-label h3{font-size:19px;margin:0}
+    .tag{display:inline-flex;padding:6px 10px;border-radius:999px;background:var(--soft-violet);color:var(--violet-dark);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .transcript-box{height:570px;overflow:auto;padding:22px;border-radius:20px;background:#f8fafc;border:1px solid var(--line);box-shadow:inset 0 1px 12px rgba(15,23,42,.04)}
+    .transcript-box p{margin:0;font-size:14px;color:#475569;line-height:1.72}
+    .transcript-box strong{color:#1e293b}
+
+    .analysis-title{font-size:24px;margin:0 0 18px}
+    .analysis-stack{display:grid;gap:18px}
+    .analysis-card{padding:24px;border-radius:22px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
+    .analysis-card-head{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:start;margin-bottom:20px}
+    .analysis-icon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-weight:900;background:var(--soft-violet);color:var(--violet)}
+    .analysis-card-head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+    .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .metric-card{padding:18px;border-radius:17px;background:#fafafa;border:1px solid var(--line)}
+    .metric-label{font-size:12px;color:var(--muted)}
+    .metric-value{font-size:28px;font-weight:850;letter-spacing:-.03em;margin:4px 0 8px}
+    .metric-foot{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:12px}
+    .status{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:850;letter-spacing:.05em}
+    .status.beat{color:#047857;background:#d1fae5}
+    .status.miss{color:#b91c1c;background:#fee2e2}
+    .status.meet{color:#4b5563;background:#e5e7eb}
+
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:12px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+    .tab-btn{border:1px solid transparent;background:transparent;color:#64748b;border-radius:999px;padding:9px 13px;font-size:13px;font-weight:750}
+    .tab-btn:hover{background:#f8fafc;color:#334155}
+    .tab-btn.active{background:var(--soft-violet);border-color:#ddd6fe;color:var(--violet-dark)}
+    .tab-content{min-height:166px;color:#475569;font-size:14px;line-height:1.75}
+    .tab-content ul{margin:0;padding-left:20px}
+    .tab-content li+li{margin-top:8px}
+    .faq p{margin:0 0 13px}
+    .hidden{display:none!important}
+
+    .momentum-wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:24px;align-items:center}
+    .score-area{display:flex;justify-content:center}
+    .momentum-score-circle{width:156px;height:156px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:conic-gradient(#10b981 0 75%,#d1fae5 75% 100%);position:relative;box-shadow:0 14px 34px rgba(5,150,105,.12)}
+    .momentum-score-circle:after{content:"";position:absolute;inset:13px;background:#fff;border-radius:50%}
+    .score-number,.score-caption{position:relative;z-index:1}
+    .score-number{font-size:38px;font-weight:900;color:#047857;line-height:1}
+    .score-caption{font-size:12px;color:#059669;font-weight:750;margin-top:6px}
+    .chart-container{height:230px;position:relative}
+
+    .value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .value-card{padding:26px;border-radius:22px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
+    .value-num{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:var(--soft-violet);color:var(--violet);font-weight:900;margin-bottom:16px}
+    .value-card p{color:var(--muted);font-size:14px;margin:0}
+
+    .cta{padding:76px 0}
+    .cta-box{padding:48px;border-radius:30px;background:linear-gradient(135deg,#5b21b6,#4338ca);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:28px;box-shadow:var(--shadow-lg)}
+    .cta-box h2{font-size:clamp(30px,4vw,46px);margin-bottom:10px}
+    .cta-box p{color:#ede9fe;max-width:720px;margin:0}
+    .cta-box .btn-secondary{background:#fff;color:var(--violet-dark);border-color:#fff;white-space:nowrap}
+
+    footer{padding:38px 0;background:#0f172a;color:#cbd5e1}
+    .footer-grid{display:flex;justify-content:space-between;gap:24px;align-items:flex-start}
+    .footer-brand{font-weight:800;color:#fff}
+    .footer-note{font-size:12px;max-width:720px;color:#94a3b8;line-height:1.65}
+
+    :focus-visible{outline:3px solid #c4b5fd;outline-offset:3px}
+
+    @media(max-width:1020px){
+      .nav-links{display:none}
+      .hero-grid,.workflow-grid,.momentum-wrap{grid-template-columns:1fr}
+      .transcript-panel{position:static}
+      .transcript-box{height:420px}
+      .value-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:700px){
+      .wrap{width:min(var(--max),calc(100% - 24px))}
+      .hero,.section{padding:62px 0}
+      .brand img{width:145px}
+      .product-name{display:none}
+      .nav .btn-primary{display:none}
+      h1{font-size:44px}
+      .workflow-shell{padding:18px;border-radius:22px}
+      .metric-grid{grid-template-columns:1fr}
+      .transcript-box{height:360px}
+      .cta-box,.footer-grid{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+<header class="nav">
+<div class="wrap nav-inner">
+<a aria-label="DataKnobs home" class="brand" href="https://www.dataknobs.com/">
+<img alt="DataKnobs" height="50" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png" width="173"/>
+<span class="product-name">Stocks Assistant</span>
+</a>
+<nav aria-label="Primary navigation" class="nav-links">
+<a href="#workflow">Earnings Intelligence</a>
+<a href="#outputs">AI Output</a>
+<a href="#momentum">Momentum Score</a>
+<a href="https://www.dataknobs.com/">DataKnobs</a>
+</nav>
+<a class="btn btn-primary" href="#workflow">Explore the workflow</a>
+</div>
+</header>
+<main>
+<section class="hero">
+<div class="wrap hero-grid">
+<div>
+<div class="eyebrow"><span class="eyebrow-dot"></span> Earnings Call Intelligence</div>
+<h1>Stocks Assistant</h1>
+<p>Transforming dense earnings call transcripts into actionable investment intelligence.</p>
+<div class="hero-actions">
+<a class="btn btn-primary" href="#workflow">See transcript analysis</a>
+<a class="btn btn-secondary" href="#momentum">See Momentum Score</a>
+</div>
+</div>
+<aside aria-label="Earnings intelligence workflow" class="hero-flow">
+<div class="hero-flow-title">From transcript to investment insight</div>
+<div class="flow-list">
+<div class="flow-item"><div class="flow-num">1</div><div><strong>Read the earnings call</strong><span>Process management commentary, analyst questions, guidance, and financial disclosures.</span></div></div>
+<div class="flow-item"><div class="flow-num">2</div><div><strong>Extract key metrics</strong><span>Identify revenue, EPS, estimates, beats, misses, and headline performance.</span></div></div>
+<div class="flow-item"><div class="flow-num">3</div><div><strong>Generate intelligence</strong><span>Create a summary, key insights, risks, growth drivers, and an easy-to-use FAQ.</span></div></div>
+<div class="flow-item"><div class="flow-num">4</div><div><strong>Measure momentum</strong><span>Compare recent quarters and convert earnings performance into a single score.</span></div></div>
+</div>
+</aside>
+</div>
+</section>
+<section class="section section-alt" id="workflow">
+<div class="wrap">
+<div class="section-head">
+<div class="kicker">AI-powered earnings analysis</div>
+<h2>From Transcript to Insight in Seconds</h2>
+<p>Follow our AI-powered analysis process. We take a lengthy earnings call and distill it into the key metrics and insights you need to make informed decisions.</p>
+</div>
+<div class="workflow-shell">
+<div class="workflow-grid">
+<div class="transcript-panel">
+<div class="panel-label">
+<h3>Sample Earnings Call Transcript</h3>
+<span class="tag">Excerpt</span>
+</div>
+<div class="transcript-box">
+<p>
+<strong>Operator:</strong> Good day, and thank you for standing by. Welcome to the InnovateCorp Q3 2025 Earnings Conference Call...<br/><br/>
+<strong>CEO John Doe:</strong> Thank you all for joining. We are thrilled to report another quarter of exceptional growth. Our strategic initiatives in the AI-driven analytics space have yielded significant results, ahead of schedule. Total revenue for the quarter was $1.2 billion, a 20% increase year-over-year. Our flagship product, 'Synergy AI', saw a 50% increase in enterprise subscriptions, which was the primary driver of this outperformance. We successfully expanded our market share in the APAC region by 150 basis points. Our GAAP earnings per share came in at $1.55. Looking ahead, we are raising our full-year revenue guidance to $4.8 billion from $4.5 billion, reflecting our confidence in the current demand environment. However, we do anticipate some margin compression in Q4 due to increased R&amp;D investments in our next-generation platform...<br/><br/>
+<strong>Analyst Jane Smith:</strong> John, can you provide more color on the margin outlook for Q4? What level of compression are you anticipating?<br/><br/>
+<strong>CFO Emily White:</strong> Hi Jane, thanks for the question. We expect about a 50 basis point compression sequentially. This is a strategic reinvestment to accelerate our long-term growth and solidify our market leadership...
+                </p>
+</div>
+</div>
+<div id="outputs">
+<h3 class="analysis-title">AI Analysis &amp; Output</h3>
+<div class="analysis-stack">
+<article class="analysis-card">
+<div class="analysis-card-head">
+<div class="analysis-icon">$</div>
+<div>
+<h4>Key Financial Metrics</h4>
+<p>The AI instantly extracts and compares headline numbers against analyst estimates.</p>
+</div>
+</div>
+<div class="metric-grid">
+<div class="metric-card">
+<div class="metric-label">Revenue</div>
+<div class="metric-value">$1.2B</div>
+<div class="metric-foot"><span class="status beat">BEAT</span><span>vs $1.15B est.</span></div>
+</div>
+<div class="metric-card">
+<div class="metric-label">EPS</div>
+<div class="metric-value">$1.55</div>
+<div class="metric-foot"><span class="status beat">BEAT</span><span>vs $1.50 est.</span></div>
+</div>
+</div>
+</article>
+<article class="analysis-card">
+<div class="analysis-card-head">
+<div class="analysis-icon">AI</div>
+<div>
+<h4>AI-Generated Intelligence</h4>
+<p>The transcript is processed to generate concise, easy-to-digest content.</p>
+</div>
+</div>
+<div aria-label="AI-generated earnings intelligence" class="tabs" role="tablist">
+<button aria-controls="summary-content" aria-selected="true" class="tab-btn active" data-tab="summary" role="tab" type="button">Summary</button>
+<button aria-controls="insights-content" aria-selected="false" class="tab-btn" data-tab="insights" role="tab" type="button">Key Insights</button>
+<button aria-controls="faq-content" aria-selected="false" class="tab-btn" data-tab="faq" role="tab" type="button">Generated FAQ</button>
+</div>
+<div class="tab-content" id="tab-content">
+<div id="summary-content" role="tabpanel">InnovateCorp reported a strong Q3 2025, beating both revenue and EPS estimates. Growth was primarily driven by a 50% increase in subscriptions for its 'Synergy AI' product and market share expansion in the APAC region. The company raised its full-year revenue guidance but cautioned about a slight margin compression in Q4 due to increased R&amp;D spending.</div>
+<div class="hidden" id="insights-content" role="tabpanel">
+<ul>
+<li><strong>Positive:</strong> Revenue and EPS beat expectations, signaling strong operational performance.</li>
+<li><strong>Positive:</strong> Full-year revenue guidance was raised, indicating management confidence.</li>
+<li><strong>Key Driver:</strong> The 'Synergy AI' product is the core growth engine, with subscriptions up 50%.</li>
+<li><strong>Neutral/Risk:</strong> Anticipated margin compression in Q4 from higher R&amp;D investment could impact short-term profitability but is framed as a long-term growth driver.</li>
+</ul>
+</div>
+<div class="hidden faq" id="faq-content" role="tabpanel">
+<p><strong>Q: What drove the strong revenue growth this quarter?</strong><br/>A: Revenue growth was driven by a 50% increase in enterprise subscriptions for the 'Synergy AI' product and expansion in the APAC region.</p>
+<p><strong>Q: Did the company meet its earnings expectations?</strong><br/>A: Yes, the company beat EPS estimates, reporting $1.55 vs an estimate of $1.50.</p>
+<p><strong>Q: What is the company's outlook for the next quarter?</strong><br/>A: The company raised its full-year revenue guidance but expects a 50 basis point margin compression in Q4 due to R&amp;D investments.</p>
+</div>
+</div>
+</article>
+<article class="analysis-card" id="momentum">
+<div class="analysis-card-head">
+<div class="analysis-icon">M</div>
+<div>
+<h4>Earnings Momentum Score</h4>
+<p>We analyze the last three quarters of earnings performance to generate a single, powerful momentum score.</p>
+</div>
+</div>
+<div class="momentum-wrap">
+<div class="score-area">
+<div aria-label="Earnings Momentum Score" class="momentum-score-circle" id="momentum-score-circle">
+<span class="score-number" id="momentum-score">75</span>
+<span class="score-caption">Out of 100</span>
+</div>
+</div>
+<div class="chart-container">
+<canvas aria-label="Quarterly revenue and EPS earnings performance chart" id="momentumChart"></canvas>
+</div>
+</div>
+</article>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="section">
+<div class="wrap">
+<div class="section-head">
+<div class="kicker">What the explainer demonstrates</div>
+<h2>One earnings call, three levels of intelligence.</h2>
+<p>The workflow turns a long transcript into structured numbers, concise qualitative interpretation, and a historical momentum signal.</p>
+</div>
+<div class="value-grid">
+<article class="value-card"><div class="value-num">01</div><h3>Extract</h3><p>Pull headline financial numbers and compare them with analyst estimates without manually searching the transcript.</p></article>
+<article class="value-card"><div class="value-num">02</div><h3>Understand</h3><p>Summarize management commentary, identify growth drivers and risks, and generate questions and answers from the call.</p></article>
+<article class="value-card"><div class="value-num">03</div><h3>Compare</h3><p>Use recent revenue and EPS outcomes across quarters to create an Earnings Momentum Score for additional context.</p></article>
+</div>
+</div>
+</section>
+<section class="cta">
+<div class="wrap">
+<div class="cta-box">
+<div>
+<div class="kicker" style="color:#e9d5ff"><a href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks Assistant</a> by DataKnobs</div>
+<h2>Turn earnings calls into decision-ready intelligence.</h2>
+<p>Move from a dense transcript to financial metrics, summarized insights, generated FAQs, and a historical earnings momentum view.</p>
+</div>
+<a class="btn btn-secondary" href="#workflow">Review the workflow</a>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 <div>
@@ -196,6 +380,7 @@ gtag('config', 'G-JF94J1W5MC');
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
@@ -216,157 +401,144 @@ gtag('config', 'G-JF94J1W5MC');
 </div>
 </div>
 <div class="mt-8 text-center text-sm text-gray-400">
-<p class="text-sm text-gray-400">Dataknobs use cases and customers using Knobs</p>
+<p class="text-sm text-gray-400">Dataknobs use cases with Knobs for finance and compliance</p>
 </div>
 <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
 <p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
 <div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
 </div>
 </div>
-</footer></main>
-    </div>
+</footer>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const tabContents = {
+        summary: document.getElementById('summary-content'),
+        insights: document.getElementById('insights-content'),
+        faq: document.getElementById('faq-content')
+      };
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const tabs = document.querySelectorAll('.tab-btn');
-            const tabContents = {
-                summary: document.getElementById('summary-content'),
-                insights: document.getElementById('insights-content'),
-                faq: document.getElementById('faq-content'),
-            };
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabName = tab.dataset.tab;
-
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-
-                    Object.values(tabContents).forEach(content => {
-                        content.classList.add('hidden');
-                    });
-                    
-                    if(tabContents[tabName]) {
-                        tabContents[tabName].classList.remove('hidden');
-                    }
-                });
-            });
-
-            const quarterlyData = [
-                { quarter: 'Q1 2025', revenue: 'miss', eps: 'miss' },
-                { quarter: 'Q2 2025', revenue: 'meet', eps: 'beat' },
-                { quarter: 'Q3 2025', revenue: 'beat', eps: 'beat' },
-            ];
-
-            const scoreMap = { 'beat': 2, 'meet': 1, 'miss': -1 };
-            const colorMap = { 'beat': 'rgba(16, 185, 129, 0.7)', 'meet': 'rgba(107, 114, 128, 0.7)', 'miss': 'rgba(239, 68, 68, 0.7)' };
-            const hoverColorMap = { 'beat': 'rgba(16, 185, 129, 1)', 'meet': 'rgba(107, 114, 128, 1)', 'miss': 'rgba(239, 68, 68, 1)' };
-            
-            let rawScore = 0;
-            quarterlyData.forEach(q => {
-                rawScore += scoreMap[q.revenue];
-                rawScore += scoreMap[q.eps];
-            });
-
-            const maxScore = quarterlyData.length * (scoreMap['beat'] * 2); 
-            const minScore = quarterlyData.length * (scoreMap['miss'] * 2);
-            const momentumScore = Math.round(((rawScore - minScore) / (maxScore - minScore)) * 100);
-
-            const scoreEl = document.getElementById('momentum-score');
-            const scoreCircleEl = document.getElementById('momentum-score-circle');
-            
-            scoreEl.textContent = momentumScore;
-            
-            if (momentumScore >= 66) {
-                scoreCircleEl.classList.add('bg-green-100');
-                scoreEl.classList.add('text-green-700');
-                scoreEl.nextElementSibling.classList.add('text-green-600');
-            } else if (momentumScore >= 33) {
-                scoreCircleEl.classList.add('bg-yellow-100');
-                scoreEl.classList.add('text-yellow-700');
-                scoreEl.nextElementSibling.classList.add('text-yellow-600');
-            } else {
-                scoreCircleEl.classList.add('bg-red-100');
-                scoreEl.classList.add('text-red-700');
-                scoreEl.nextElementSibling.classList.add('text-red-600');
-            }
-
-
-            const ctx = document.getElementById('momentumChart').getContext('2d');
-            const momentumChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: quarterlyData.map(q => q.quarter),
-                    datasets: [
-                        {
-                            label: 'Revenue',
-                            data: quarterlyData.map(q => scoreMap[q.revenue]),
-                            backgroundColor: quarterlyData.map(q => colorMap[q.revenue]),
-                            borderColor: quarterlyData.map(q => hoverColorMap[q.revenue]),
-                            borderWidth: 1,
-                            hoverBackgroundColor: quarterlyData.map(q => hoverColorMap[q.revenue]),
-                        },
-                        {
-                            label: 'EPS',
-                            data: quarterlyData.map(q => scoreMap[q.eps]),
-                            backgroundColor: quarterlyData.map(q => colorMap[q.eps]),
-                            borderColor: quarterlyData.map(q => hoverColorMap[q.eps]),
-                            borderWidth: 1,
-                            hoverBackgroundColor: quarterlyData.map(q => hoverColorMap[q.eps]),
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    if (value === 2) return 'Beat';
-                                    if (value === 1) return 'Meet';
-                                    if (value === -1) return 'Miss';
-                                    return '';
-                                },
-                                font: { size: 10 }
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            }
-                        },
-                        x: {
-                           ticks: { font: { size: 10 } },
-                           grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                font: { size: 12 }
-                            }
-                        },
-                        tooltip: {
-                            enabled: true,
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.dataset.label || '';
-                                    const value = context.parsed.y;
-                                    let status = '';
-                                    if (value === 2) status = 'Beat';
-                                    if (value === 1) status = 'Meet';
-                                    if (value === -1) status = 'Miss';
-                                    return `${label}: ${status}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabName = tab.dataset.tab;
+          tabs.forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+          Object.values(tabContents).forEach(content => content.classList.add('hidden'));
+          if (tabContents[tabName]) tabContents[tabName].classList.remove('hidden');
         });
-    </script>
+      });
 
+      const quarterlyData = [
+        { quarter: 'Q1 2025', revenue: 'miss', eps: 'miss' },
+        { quarter: 'Q2 2025', revenue: 'meet', eps: 'beat' },
+        { quarter: 'Q3 2025', revenue: 'beat', eps: 'beat' }
+      ];
 
+      const scoreMap = { beat: 2, meet: 1, miss: -1 };
+      const colorMap = { beat: 'rgba(16, 185, 129, 0.72)', meet: 'rgba(107, 114, 128, 0.72)', miss: 'rgba(239, 68, 68, 0.72)' };
+      const hoverColorMap = { beat: 'rgba(16, 185, 129, 1)', meet: 'rgba(107, 114, 128, 1)', miss: 'rgba(239, 68, 68, 1)' };
+
+      let rawScore = 0;
+      quarterlyData.forEach(q => {
+        rawScore += scoreMap[q.revenue];
+        rawScore += scoreMap[q.eps];
+      });
+
+      const maxScore = quarterlyData.length * (scoreMap.beat * 2);
+      const minScore = quarterlyData.length * (scoreMap.miss * 2);
+      const momentumScore = Math.round(((rawScore - minScore) / (maxScore - minScore)) * 100);
+      const scoreEl = document.getElementById('momentum-score');
+      const scoreCircleEl = document.getElementById('momentum-score-circle');
+      scoreEl.textContent = momentumScore;
+
+      let scoreColor = '#10b981';
+      let scoreSoft = '#d1fae5';
+      if (momentumScore < 33) {
+        scoreColor = '#ef4444';
+        scoreSoft = '#fee2e2';
+      } else if (momentumScore < 66) {
+        scoreColor = '#f59e0b';
+        scoreSoft = '#fef3c7';
+      }
+      scoreCircleEl.style.background = `conic-gradient(${scoreColor} 0 ${momentumScore}%, ${scoreSoft} ${momentumScore}% 100%)`;
+      scoreEl.style.color = scoreColor;
+      scoreEl.nextElementSibling.style.color = scoreColor;
+
+      const canvas = document.getElementById('momentumChart');
+      if (canvas && window.Chart) {
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: quarterlyData.map(q => q.quarter),
+            datasets: [
+              {
+                label: 'Revenue',
+                data: quarterlyData.map(q => scoreMap[q.revenue]),
+                backgroundColor: quarterlyData.map(q => colorMap[q.revenue]),
+                borderColor: quarterlyData.map(q => hoverColorMap[q.revenue]),
+                borderWidth: 1,
+                hoverBackgroundColor: quarterlyData.map(q => hoverColorMap[q.revenue])
+              },
+              {
+                label: 'EPS',
+                data: quarterlyData.map(q => scoreMap[q.eps]),
+                backgroundColor: quarterlyData.map(q => colorMap[q.eps]),
+                borderColor: quarterlyData.map(q => hoverColorMap[q.eps]),
+                borderWidth: 1,
+                hoverBackgroundColor: quarterlyData.map(q => hoverColorMap[q.eps])
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    if (value === 2) return 'Beat';
+                    if (value === 1) return 'Meet';
+                    if (value === -1) return 'Miss';
+                    return '';
+                  },
+                  font: { size: 10 }
+                },
+                grid: { drawOnChartArea: false }
+              },
+              x: {
+                ticks: { font: { size: 10 } },
+                grid: { display: false }
+              }
+            },
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { boxWidth: 12, font: { size: 12 } }
+              },
+              tooltip: {
+                enabled: true,
+                callbacks: {
+                  label: function(context) {
+                    const label = context.dataset.label || '';
+                    const value = context.parsed.y;
+                    let status = '';
+                    if (value === 2) status = 'Beat';
+                    if (value === 1) status = 'Meet';
+                    if (value === -1) status = 'Miss';
+                    return `${label}: ${status}`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    });
+  </script>
 </body></html>

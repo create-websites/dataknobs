@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Dataknobs: An Interactive Partnership Ecosystem Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: "Cool Slate" - A professional palette using slate grays, a deep blue for primary actions, and a teal accent for data highlights. This creates a calm, corporate, and tech-focused feel. -->
+    <!-- Application Structure Plan: The SPA is designed around a central, interactive "Ecosystem Hub" that acts as the primary navigation. Users select a partner from this hub to dynamically display detailed information in an adjacent content panel. This thematic, non-linear structure is chosen over a simple report scroll because it encourages exploration and direct comparison between partners, making the complex relationships easier to understand. A secondary tab allows users to pivot to a "Product-centric" view, which directly addresses the user task of checking product availability across platforms. This dual-view approach provides multiple pathways to explore the same core information, enhancing usability. -->
+    <!-- Visualization & Content Choices: 
+        - Ecosystem Hub (HTML/CSS): Report Info: All partners and their relationship to Dataknobs. -> Goal: Organize/Navigate. -> Viz: Interactive diagram built with Tailwind CSS. -> Interaction: Click a partner logo to update the main content view. -> Justification: More responsive and lightweight than a canvas chart for simple navigation. -> Method: HTML/JS.
+        - Partnership Model Chart (Chart.js Radar Chart): Report Info: Qualitative assessment of each partnership type (Marketplace, Compatibility, etc.). -> Goal: Compare. -> Viz: Radar chart. -> Interaction: Tooltips on hover provide scores. -> Justification: A radar chart is excellent for comparing multiple entities across several qualitative dimensions simultaneously. -> Library: Chart.js.
+        - Product Availability Table (HTML/CSS): Report Info: Which products are on which platforms. -> Goal: Inform. -> Viz: A clear, checkmark-based table. -> Interaction: None needed, clarity is key. -> Justification: A simple table is the most direct and universally understood way to present this matrix of information. -> Method: HTML.
+        - Dynamic Text Panels (HTML/JS): Report Info: Detailed text descriptions for each partnership. -> Goal: Inform. -> Viz: Text blocks. -> Interaction: Content changes based on hub selection. -> Justification: Keeps the UI clean and focused on one topic at a time, preventing information overload. -> Method: JS DOM manipulation.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .partner-logo.active {
+            border-color: #2563eb; /* blue-600 */
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+        .tab.active {
+            border-bottom-color: #2563eb; /* blue-600 */
+            color: #1e3a8a; /* blue-900 */
+            font-weight: 600;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
+		(function (w, d, s, l, i) {
+			w[l] = w[l] || []; w[l].push({
+				'gtm.start':
+					new Date().getTime(), event: 'gtm.js'
+			}); var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
+<body class="text-slate-700">
+
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+        
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-slate-900 tracking-tight">Dataknobs' Strategic Partnership Ecosystem</h1>
+            <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">An interactive analysis of the multi-layered strategy balancing broad market distribution with targeted expert engagement.</p>
+        </header>
+
+        <main>
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                
+                <div class="flex border-b border-slate-200 mb-6">
+                    <button class="tab py-3 px-5 text-slate-500 border-b-2 border-transparent transition-colors duration-200 ease-in-out" id="tab-partners">Partnership View</button>
+                    <button class="tab py-3 px-5 text-slate-500 border-b-2 border-transparent transition-colors duration-200 ease-in-out" id="tab-products">Product View</button>
+                </div>
+
+                <div id="view-partners">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1">
+                            <h2 class="text-xl font-bold text-slate-800 mb-4">Ecosystem Hub</h2>
+                            <p class="text-slate-600 mb-6">Select a partner to explore their role in the Dataknobs ecosystem. Each partnership is tailored to a specific strategic goal, from broad distribution to technology enablement.</p>
+                            <div class="space-y-4" id="ecosystem-hub">
+                                <!-- Partner logos will be dynamically inserted here -->
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 bg-slate-50 rounded-xl p-6 min-h-[400px]" id="partner-details-container">
+                            <!-- Dynamic partner details will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden" id="view-products">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Product Portfolio Availability</h2>
+                    <p class="text-slate-600 mb-6">This table shows the availability of Dataknobs' core products across its key marketplace partners. The strategy emphasizes product parity on major hyperscalers while offering specialized solutions on platforms like Databricks.</p>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-slate-200 rounded-lg">
+                            <thead class="bg-slate-100">
+                                <tr>
+                                    <th class="text-left font-semibold text-slate-700 p-4">Product</th>
+                                    <th class="text-center font-semibold text-slate-700 p-4">Microsoft Azure</th>
+                                    <th class="text-center font-semibold text-slate-700 p-4">Google Cloud (GCP)</th>
+                                    <th class="text-center font-semibold text-slate-700 p-4">Databricks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-table-body">
+                                <!-- Product availability data will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mt-12">
+                <h2 class="text-2xl font-bold text-slate-800 text-center mb-2">Strategic Synthesis</h2>
+                <p class="text-slate-600 text-center max-w-3xl mx-auto mb-8">Dataknobs employs four distinct partnership models. This chart visually compares these models across key strategic dimensions, highlighting the nuanced approach the company takes to its ecosystem.</p>
+                <div class="chart-container">
+                    <canvas id="strategyChart"></canvas>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/partnership/index.htm.bak.html">Index.Htm.Bak</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/partnership/partnership-info.html">Partnership Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/partnership/partnership.html">Partnership</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Dataknobs use cases with Knobs for finance and compliance</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+    </div>
+
+    <script>
+        const appData = {
+            partners: {
+                azure: {
+                    name: "Microsoft Azure",
+                    type: "Marketplace Vendor",
+                    logo: "https://img.icons8.com/color/48/microsoft-azure.png",
+                    summary: "A comprehensive and mature partnership, representing a primary commercial channel with deep integration into the Azure Marketplace.",
+                    details: [
+                        "<strong>Strategic Focus:</strong> Broad enterprise distribution and simplified procurement.",
+                        "<strong>Presence:</strong> Lists a full suite of five core products, indicating a prioritized relationship.",
+                        "<strong>Integration:</strong> Detailed product listings, clear pricing, and technical documentation signal a fully realized sales channel.",
+                        "<strong>Alignment:</strong> Leverages Microsoft's strong enterprise focus and extensive AI service investments."
+                    ],
+                    products: ["Kreate Knowledge", "KreateWebsites", "KreateBots", "AB Experiment", "AI Twin"]
+                },
+                gcp: {
+                    name: "Google Cloud (GCP)",
+                    type: "Marketplace Vendor",
+                    logo: "https://img.icons8.com/color/48/google-cloud.png",
+                    summary: "A deliberate multi-cloud strategy to ensure product parity with Azure, catering to enterprises on Google's robust infrastructure.",
+                    details: [
+                        "<strong>Strategic Focus:</strong> Scalability, reliability, and capturing the multi-cloud enterprise market.",
+                        "<strong>Presence:</strong> Offers the same five flagship products as on Azure, reinforcing a cloud-agnostic philosophy.",
+                        "<strong>Value Proposition:</strong> 'No lock-in' approach de-risks adoption for customers, making Dataknobs a flexible choice regardless of primary cloud vendor.",
+                        "<strong>Market Position:</strong> Establishes Dataknobs as a 'Marketplace Powerhouse' on a second major cloud platform."
+                    ],
+                    products: ["KreateWebsites", "KreateBots", "Kreate Knowledge", "AI Twin", "AB Experiment"]
+                },
+                aws: {
+                    name: "Amazon Web Services (AWS)",
+                    type: "Platform Compatibility",
+                    logo: "https://img.icons8.com/color/48/amazon-web-services.png",
+                    summary: "A strategy of technical assurance and flexibility, ensuring Dataknobs solutions run seamlessly on AWS without a direct marketplace listing.",
+                    details: [
+                        "<strong>Strategic Focus:</strong> Ecosystem compatibility and accessibility for the vast AWS user base.",
+                        "<strong>Presence:</strong> No direct marketplace listing. The partnership is a technical validation, not a commercial channel.",
+                        "<strong>Approach:</strong> A pragmatic allocation of resources, keeping the door open to the AWS ecosystem without the commitment of a full marketplace integration.",
+                        "<strong>Customer Impact:</strong> Provides flexibility for customers with existing AWS infrastructure to adopt Dataknobs solutions."
+                    ],
+                    products: []
+                },
+                nvidia: {
+                    name: "NVIDIA",
+                    type: "Startup Accelerator Program",
+                    logo: "https://img.icons8.com/ios-filled/50/000000/nvidia.png",
+                    summary: "A foundational technology enablement partnership through the NVIDIA Inception Program, providing access to cutting-edge AI hardware and expertise.",
+                    details: [
+                        "<strong>Strategic Focus:</strong> Technology acceleration, innovation, and technical credibility.",
+                        "<strong>Benefits:</strong> Access to cutting-edge GPU technology, technical training (DLI), and NVIDIA's VC network.",
+                        "<strong>Impact:</strong> Directly enables the performance and scalability of computationally intensive products like AI Twin and Predictive Maintenance.",
+                        "<strong>Market Signal:</strong> Aligns Dataknobs with the leader in AI hardware, validating its technical capabilities."
+                    ],
+                    products: []
+                },
+                databricks: {
+                    name: "Databricks",
+                    type: "Marketplace Vendor",
+                    logo: "https://img.icons8.com/fluency/48/databricks.png",
+                    summary: "A highly targeted engagement with the data science and ML community, using a product-led growth strategy on the Databricks Marketplace.",
+                    details: [
+                        "<strong>Strategic Focus:</strong> Targeted expert engagement and bottom-up adoption.",
+                        "<strong>Presence:</strong> Offers two specific, high-value solutions (AB Experiment, Predictive Maintenance) for free.",
+                        "<strong>Strategy:</strong> A 'show, don't tell' approach with sample notebooks and datasets to demonstrate immediate value to a technical audience.",
+                        "<strong>Goal:</strong> Build grassroots credibility and create internal champions within enterprises to drive future commercial sales."
+                    ],
+                    products: ["AB Experiment", "Predictive Maintenance"]
+                }
+            },
+            products: [
+                "KreateWebsites", "KreateBots", "Kreate Knowledge", "AI Twin", "AB Experiment", "Predictive Maintenance"
+            ],
+            strategyData: {
+                labels: ['Broad Distribution', 'Technical Enablement', 'Expert Engagement', 'Procurement Simplicity', 'Innovation Access'],
+                datasets: [
+                    {
+                        label: 'Azure/GCP',
+                        data: [5, 3, 3, 5, 2],
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        borderColor: 'rgba(37, 99, 235, 1)',
+                        pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                    },
+                    {
+                        label: 'AWS',
+                        data: [3, 4, 2, 1, 1],
+                        backgroundColor: 'rgba(255, 153, 0, 0.2)',
+                        borderColor: 'rgba(255, 153, 0, 1)',
+                        pointBackgroundColor: 'rgba(255, 153, 0, 1)',
+                    },
+                    {
+                        label: 'NVIDIA',
+                        data: [1, 5, 4, 1, 5],
+                        backgroundColor: 'rgba(118, 185, 0, 0.2)',
+                        borderColor: 'rgba(118, 185, 0, 1)',
+                        pointBackgroundColor: 'rgba(118, 185, 0, 1)',
+                    },
+                     {
+                        label: 'Databricks',
+                        data: [2, 2, 5, 3, 3],
+                        backgroundColor: 'rgba(255, 64, 129, 0.2)',
+                        borderColor: 'rgba(255, 64, 129, 1)',
+                        pointBackgroundColor: 'rgba(255, 64, 129, 1)',
+                    }
+                ]
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const ecosystemHub = document.getElementById('ecosystem-hub');
+            const detailsContainer = document.getElementById('partner-details-container');
+            const productTableBody = document.getElementById('product-table-body');
+            const tabPartners = document.getElementById('tab-partners');
+            const tabProducts = document.getElementById('tab-products');
+            const viewPartners = document.getElementById('view-partners');
+            const viewProducts = document.getElementById('view-products');
+
+            function renderPartnerDetails(partnerKey) {
+                const partner = appData.partners[partnerKey];
+                if (!partner) return;
+
+                let productListHTML = '';
+                if (partner.products.length > 0) {
+                    productListHTML = `
+                        <h4 class="font-semibold text-slate-700 mt-4 mb-2">Key Products on Platform:</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${partner.products.map(p => `<span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">${p}</span>`).join('')}
+                        </div>
+                    `;
+                } else {
+                    productListHTML = `
+                        <h4 class="font-semibold text-slate-700 mt-4 mb-2">Product Availability:</h4>
+                        <p class="text-sm text-slate-500">This is a platform compatibility or technology enablement partnership, not a direct commercial marketplace.</p>
+                    `;
+                }
+
+                const detailsHTML = `
+                    <div class="fade-in">
+                        <div class="flex items-center mb-4">
+                            <img src="${partner.logo}" alt="${partner.name} Logo" class="w-10 h-10 mr-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-slate-900">${partner.name}</h3>
+                                <p class="text-sm font-semibold text-teal-600">${partner.type}</p>
+                            </div>
+                        </div>
+                        <p class="text-slate-600 mb-4">${partner.summary}</p>
+                        <ul class="space-y-2 text-slate-600 list-disc list-inside">
+                            ${partner.details.map(d => `<li>${d}</li>`).join('')}
+                        </ul>
+                        ${productListHTML}
+                    </div>
+                `;
+                detailsContainer.innerHTML = detailsHTML;
+
+                document.querySelectorAll('.partner-logo').forEach(el => el.classList.remove('active'));
+                document.querySelector(`.partner-logo[data-partner="${partnerKey}"]`).classList.add('active');
+            }
+
+            function setupEcosystemHub() {
+                let hubHTML = '';
+                for (const key in appData.partners) {
+                    const partner = appData.partners[key];
+                    hubHTML += `
+                        <button class="partner-logo w-full text-left flex items-center p-4 bg-white rounded-lg border-2 border-slate-200 hover:border-blue-500 transition-all duration-200" data-partner="${key}">
+                            <img src="${partner.logo}" alt="${partner.name} Logo" class="w-8 h-8 mr-4">
+                            <div>
+                                <span class="font-semibold text-slate-800">${partner.name}</span>
+                                <span class="block text-sm text-slate-500">${partner.type}</span>
+                            </div>
+                        </button>
+                    `;
+                }
+                ecosystemHub.innerHTML = hubHTML;
+
+                ecosystemHub.addEventListener('click', (e) => {
+                    const button = e.target.closest('.partner-logo');
+                    if (button) {
+                        renderPartnerDetails(button.dataset.partner);
+                    }
+                });
+            }
+            
+            function setupProductTable() {
+                let tableHTML = '';
+                const availableOn = (product, partnerKey) => {
+                    const partner = appData.partners[partnerKey];
+                    return partner && partner.products.includes(product);
+                };
+
+                appData.products.forEach(product => {
+                    tableHTML += `
+                        <tr class="border-b border-slate-200 last:border-b-0">
+                            <td class="p-4 font-medium text-slate-800">${product}</td>
+                            <td class="p-4 text-center">${availableOn(product, 'azure') ? '<span class="text-green-500 text-2xl">✓</span>' : '<span class="text-slate-300 text-xl">-</span>'}</td>
+                            <td class="p-4 text-center">${availableOn(product, 'gcp') ? '<span class="text-green-500 text-2xl">✓</span>' : '<span class="text-slate-300 text-xl">-</span>'}</td>
+                            <td class="p-4 text-center">${availableOn(product, 'databricks') ? '<span class="text-green-500 text-2xl">✓</span>' : '<span class="text-slate-300 text-xl">-</span>'}</td>
+                        </tr>
+                    `;
+                });
+                productTableBody.innerHTML = tableHTML;
+            }
+
+            function setupTabs() {
+                tabPartners.addEventListener('click', () => {
+                    viewPartners.classList.remove('hidden');
+                    viewProducts.classList.add('hidden');
+                    tabPartners.classList.add('active');
+                    tabProducts.classList.remove('active');
+                });
+
+                tabProducts.addEventListener('click', () => {
+                    viewPartners.classList.add('hidden');
+                    viewProducts.classList.remove('hidden');
+                    tabPartners.classList.remove('active');
+                    tabProducts.classList.add('active');
+                });
+                
+                tabPartners.classList.add('active');
+            }
+
+            function renderStrategyChart() {
+                const ctx = document.getElementById('strategyChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: appData.strategyData,
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                pointLabels: { font: { size: 12 } },
+                                suggestedMin: 0,
+                                suggestedMax: 5,
+                                ticks: {
+                                    stepSize: 1,
+                                    backdropColor: 'rgba(255, 255, 255, 0.75)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.r !== null) {
+                                            label += context.parsed.r;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            setupEcosystemHub();
+            setupProductTable();
+            setupTabs();
+            renderPartnerDetails('azure');
+            renderStrategyChart();
+        });
+    </script>
+
+
+</body></html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Robotics &amp; AI Compliance Navigator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Chosen Palette: Calm Neutrals -->
+    <!-- Application Structure Plan: The application is structured as a thematic, top-down exploratory tool. It starts with a high-level introduction to establish the 'why' (The Need for Standards). The core is the 'Interactive Landscape Explorer,' which categorizes the complex field into four distinct, user-selectable domains (Industrial, Medical, etc.). This task-oriented design was chosen over a linear report structure because users interested in robotics often have a specific domain in mind. Clicking a domain dynamically updates a 'Key Standards Deep Dive' section, which uses text and a comparative bar chart to provide details. This creates a clear cause-and-effect interaction. Finally, a 'Compliance Process Flow' section visualizes the practical steps, turning abstract standards into a concrete process. This structure guides the user from general awareness to specific knowledge and then to practical application, enhancing usability and comprehension. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Broad domains of robotics standards (Industrial, Medical, Autonomous, AI). -> Goal: Organize & allow user-driven discovery. -> Viz/Method: Interactive cards (HTML/CSS/JS). -> Interaction: Click a card to filter the standards and chart below. -> Justification: Breaks down a complex topic into manageable chunks, preventing information overload and catering to specific user interests. -> Library/Method: Vanilla JS.
+        2. Report Info: Specific standards (ISO 10218, IEC 60601, etc.) and their focus areas. -> Goal: Compare the scope and emphasis of key standards visually. -> Viz/Method: Dynamic horizontal bar chart. -> Interaction: Chart updates based on the selected domain card. -> Justification: A bar chart allows for quick, at-a-glance comparison of abstract concepts (like safety focus areas), which is more effective than reading lengthy descriptions. -> Library/Method: Chart.js (Canvas).
+        3. Report Info: The lifecycle of achieving regulatory compliance. -> Goal: Explain a complex process in simple, sequential steps. -> Viz/Method: A numbered, interactive flowchart diagram. -> Interaction: Clicking a step reveals a detailed description. -> Justification: A linear, visual flow is the most intuitive way to represent a step-by-step process, making it easy to follow and understand. -> Library/Method: HTML/CSS with Tailwind Flexbox and Vanilla JS for interactions.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #3d405b;
+        }
+        .active-tab {
+            background-color: #81b29a;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .inactive-tab {
+            background-color: #e0e0e0;
+            color: #3d405b;
+        }
+        .content-card {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-in-out;
+        }
+        .process-step {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .process-step.active {
+            background-color: #81b29a;
+            color: white;
+        }
+        .process-step-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+    </style>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
+		(function (w, d, s, l, i) {
+			w[l] = w[l] || []; w[l].push({
+				'gtm.start':
+					new Date().getTime(), event: 'gtm.js'
+			}); var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#3d405b] tracking-tight">Robotics &amp; AI Compliance Navigator</h1>
+            <p class="mt-4 text-lg text-[#6b7280] max-w-3xl mx-auto">An interactive guide to the essential standards, testing protocols, and compliance frameworks shaping the future of safe and reliable robotics and Physical AI.</p>
+        </header>
+
+        <main>
+            <section class="mb-16" id="landscape">
+                <h2 class="text-3xl font-bold text-center mb-4">Interactive Landscape Explorer</h2>
+                <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">The world of robotics is vast. Standards and compliance requirements vary significantly depending on the application. Select a domain below to explore the key standards and challenges specific to that area.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <button class="domain-tab p-6 rounded-lg text-left shadow-md transition duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1 active-tab" data-domain="industrial">
+                        <h3 class="text-xl font-semibold">Industrial &amp; Collaborative</h3>
+                        <p class="mt-2 text-sm opacity-90">The bedrock of robotics standards, focusing on operational safety and human-robot interaction in manufacturing and logistics.</p>
+                    </button>
+                    <button class="domain-tab p-6 rounded-lg text-left shadow-md transition duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1 inactive-tab" data-domain="medical">
+                        <h3 class="text-xl font-semibold">Medical &amp; Healthcare</h3>
+                        <p class="mt-2 text-sm opacity-90">High-stakes regulations ensuring patient safety, data privacy (HIPAA), and device efficacy for surgical, diagnostic, and assistive robots.</p>
+                    </button>
+                    <button class="domain-tab p-6 rounded-lg text-left shadow-md transition duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1 inactive-tab" data-domain="autonomous">
+                        <h3 class="text-xl font-semibold">Autonomous Systems</h3>
+                        <p class="mt-2 text-sm opacity-90">Emerging frameworks for drones, autonomous vehicles, and public-facing robots, addressing public safety and operational reliability.</p>
+                    </button>
+                    <button class="domain-tab p-6 rounded-lg text-left shadow-md transition duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1 inactive-tab" data-domain="ai">
+                        <h3 class="text-xl font-semibold">AI &amp; Data Governance</h3>
+                        <p class="mt-2 text-sm opacity-90">Rules for the "mind" of the machine. Focus on ethical AI, algorithmic transparency, data security, and bias mitigation (e.g., GDPR).</p>
+                    </button>
+                </div>
+            </section>
+
+            <section class="content-card p-6 md:p-8 mb-16" id="deep-dive">
+                <h2 class="text-3xl font-bold text-center mb-2">Key Standards Deep Dive</h2>
+                <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto" id="standards-intro">This section provides a detailed look at the primary standards governing the selected domain. The chart below visualizes the primary focus areas for each standard, allowing for easy comparison.</p>
+                <div class="lg:flex lg:space-x-8">
+                    <div class="lg:w-1/3 mb-8 lg:mb-0" id="standards-list">
+                    </div>
+                    <div class="lg:w-2/3">
+                        <div class="chart-container">
+                            <canvas id="standardsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16" id="process">
+                 <h2 class="text-3xl font-bold text-center mb-4">The Compliance Process Flow</h2>
+                 <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Achieving compliance is a systematic journey. This interactive diagram outlines the typical lifecycle for bringing a compliant robotics system to market. Click each step to learn more.</p>
+                <div class="flex flex-col md:flex-row justify-center items-start md:items-center gap-4 md:gap-0">
+                    <div class="flex-1 w-full md:w-auto">
+                        <div class="process-step active border border-gray-300 p-4 rounded-lg text-center" data-step="1">
+                            <div class="font-bold text-lg">1. Design &amp; Development</div>
+                        </div>
+                        <div class="process-step-content p-4 bg-gray-50 rounded-b-lg" id="step-content-1">
+                            <p class="text-sm">This foundational phase involves integrating relevant standards (like ISO 10218) directly into the robot's mechanical, electrical, and software architecture. Safety is designed-in, not bolted-on.</p>
+                        </div>
+                    </div>
+                    <div class="text-gray-400 mx-4 text-2xl font-light hidden md:block">→</div>
+                    <div class="flex-1 w-full md:w-auto">
+                        <div class="process-step border border-gray-300 p-4 rounded-lg bg-white text-center" data-step="2">
+                             <div class="font-bold text-lg">2. Risk Assessment</div>
+                        </div>
+                        <div class="process-step-content p-4 bg-gray-50 rounded-b-lg" id="step-content-2">
+                            <p class="text-sm">A systematic process (guided by standards like ISO 14971 for medical devices) to identify, analyze, and evaluate potential hazards throughout the robot's lifecycle, from normal operation to foreseeable misuse.</p>
+                        </div>
+                    </div>
+                    <div class="text-gray-400 mx-4 text-2xl font-light hidden md:block">→</div>
+                    <div class="flex-1 w-full md:w-auto">
+                        <div class="process-step border border-gray-300 p-4 rounded-lg bg-white text-center" data-step="3">
+                             <div class="font-bold text-lg">3. Testing &amp; Validation</div>
+                        </div>
+                         <div class="process-step-content p-4 bg-gray-50 rounded-b-lg" id="step-content-3">
+                            <p class="text-sm">Rigorous testing of hardware and software to verify that safety functions and mitigations identified in the risk assessment perform as intended under both normal and fault conditions.</p>
+                        </div>
+                    </div>
+                    <div class="text-gray-400 mx-4 text-2xl font-light hidden md:block">→</div>
+                    <div class="flex-1 w-full md:w-auto">
+                        <div class="process-step border border-gray-300 p-4 rounded-lg bg-white text-center" data-step="4">
+                             <div class="font-bold text-lg">4. Certification</div>
+                        </div>
+                        <div class="process-step-content p-4 bg-gray-50 rounded-b-lg" id="step-content-4">
+                            <p class="text-sm">An independent audit by a notified body or accredited lab (e.g., TÜV, UL) that confirms the robot and its documentation meet all requirements of the relevant standards, resulting in a certification mark (e.g., CE, UL).</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-first-ai-security.htm.bak.html">Data First Ai Security.Htm.Bak</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-first-ai-security.html">Data First Ai Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-governance-for-agentic-ai.htm.bak.html">Data Governance For Agentic Ai.Htm.Bak</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-governance-for-agentic-ai.html">Data Governance For Agentic Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-governance-for-ai.html">Data Governance For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-governance-for-llm.html">Data Governance For Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-governance-overview.html">Data Governance Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-ai-assitant.htm.bak.html">Data Lineage Ai Assitant.Htm.Bak</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-ai-assitant.html">Data Lineage Ai Assitant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-for-ai-interactive.htm.bak.html">Data Lineage For Ai Interactive.Htm.Bak</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-for-ai.html">Data Lineage For Ai</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-tutorial.html">Data Lineage Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage.html">Data Lineage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-quality-tutorial.html">Data Quality Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data_governance_for_ai_enhanced.htm.bak.html">Data Governance For Ai Enhanced.Htm.Bak</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/mdr-and-vm.html">Mdr And Vm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/privacy-ai-assistant.htm.bak.html">Privacy Ai Assistant.Htm.Bak</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/privacy-ai-assistant.html">Privacy Ai Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/robotics-ai-compliance-guide.html">Robotics Ai Compliance Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/Robotics-ai-compliance-navigator.htm.bak.html">Robotics Ai Compliance Navigator.Htm.Bak</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Dataknobs use cases with Knobs for finance and compliance</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const data = {
+                industrial: {
+                    intro: 'Industrial robotics safety is well-established, focusing on preventing harm in structured environments. Key concerns include collision forces, emergency stops, and safe human-robot collaboration zones.',
+                    standards: [
+                        { name: 'ISO 10218-1/2', description: 'The fundamental safety standard for industrial robots and robot systems, covering design, integration, and safeguarding.' },
+                        { name: 'RIA R15.06', description: 'The US adoption of ISO 10218, providing a framework for robot system safety.' },
+                        { name: 'ISO 13849-1', description: 'Specifies safety requirements for the design and integration of safety-related parts of control systems.' }
+                    ],
+                    chartData: {
+                        labels: ['ISO 10218', 'RIA R15.06', 'ISO 13849-1'],
+                        datasets: [
+                            { label: 'Mechanical Safety', data: [9, 9, 5], backgroundColor: '#f94144' },
+                            { label: 'Control System Safety', data: [7, 7, 10], backgroundColor: '#f3722c' },
+                            { label: 'Human Collaboration', data: [8, 8, 4], backgroundColor: '#f8961e' },
+                            { label: 'Risk Assessment', data: [10, 10, 8], backgroundColor: '#f9c74f' },
+                        ]
+                    }
+                },
+                medical: {
+                    intro: 'Medical robotics demand the highest level of safety and reliability. Standards address everything from biocompatible materials and sterilization to software validation and the protection of sensitive patient data.',
+                    standards: [
+                        { name: 'IEC 60601 series', description: 'A suite of standards for the safety and essential performance of medical electrical equipment.' },
+                        { name: 'ISO 14971', description: 'Specifies the process for a manufacturer to identify hazards associated with medical devices and to estimate and evaluate the associated risks.' },
+                        { name: 'HIPAA', description: 'U.S. law requiring the protection of sensitive patient health information from being disclosed without the patient\'s consent.' }
+                    ],
+                    chartData: {
+                        labels: ['IEC 60601', 'ISO 14971', 'HIPAA'],
+                        datasets: [
+                            { label: 'Patient Safety', data: [10, 9, 6], backgroundColor: '#43aa8b' },
+                            { label: 'Electrical Safety', data: [9, 4, 0], backgroundColor: '#4d908e' },
+                            { label: 'Data Privacy', data: [5, 3, 10], backgroundColor: '#577590' },
+                            { label: 'Risk Management', data: [8, 10, 7], backgroundColor: '#277da1' },
+                        ]
+                    }
+                },
+                autonomous: {
+                    intro: 'For robots operating in public or uncontrolled spaces, standards are evolving to address complex interactions with the environment and untrained individuals. Key areas include perception system reliability and predictable behavior.',
+                    standards: [
+                        { name: 'ISO 26262', description: 'A standard for functional safety of electrical and electronic systems in production automobiles.' },
+                        { name: 'UL 4600', description: 'Standard for Safety for the Evaluation of Autonomous Products, focusing on creating a safety case.' },
+                        { name: 'ASTM F3200', description: 'Specifies requirements for the design, construction, and operation of Unmanned Aircraft Systems (UAS).' }
+                    ],
+                    chartData: {
+                        labels: ['ISO 26262 (Auto)', 'UL 4600 (General)', 'ASTM F3200 (UAS)'],
+                        datasets: [
+                            { label: 'Functional Safety', data: [10, 8, 7], backgroundColor: '#8e9aaf' },
+                            { label: 'Perception & Sensing', data: [7, 9, 8], backgroundColor: '#cbc0d3' },
+                            { label: 'Operational Domain', data: [8, 10, 9], backgroundColor: '#efc3e6' },
+                            { label: 'Public Interaction', data: [6, 9, 5], backgroundColor: '#f0a6ca' },
+                        ]
+                    }
+                },
+                ai: {
+                    intro: 'AI Governance focuses on the ethical and secure deployment of the software that controls modern robots. This includes ensuring fairness, preventing bias, protecting data, and providing transparency into how AI models make decisions.',
+                    standards: [
+                        { name: 'GDPR', description: 'EU regulation on data protection and privacy, impacting any robot that processes personal data of EU citizens.' },
+                        { name: 'ISO/IEC 27001', description: 'A standard for information security management systems, crucial for securing the data robots collect and process.' },
+                        { name: 'NIST AI RMF', description: 'The AI Risk Management Framework provides a voluntary guide to help manage risks related to artificial intelligence.' }
+                    ],
+                    chartData: {
+                        labels: ['GDPR', 'ISO/IEC 27001', 'NIST AI RMF'],
+                        datasets: [
+                            { label: 'Data Privacy', data: [10, 7, 6], backgroundColor: '#54478c' },
+                            { label: 'Cybersecurity', data: [6, 10, 7], backgroundColor: '#2c699a' },
+                            { label: 'Algorithmic Fairness', data: [5, 3, 9], backgroundColor: '#048ba8' },
+                            { label: 'Transparency', data: [7, 5, 8], backgroundColor: '#0db39e' },
+                        ]
+                    }
+                }
+            };
+
+            const standardsIntro = document.getElementById('standards-intro');
+            const standardsList = document.getElementById('standards-list');
+            const domainTabs = document.querySelectorAll('.domain-tab');
+            const ctx = document.getElementById('standardsChart').getContext('2d');
+            let standardsChart;
+
+            function updateContent(domain) {
+                const domainData = data[domain];
+
+                standardsIntro.textContent = domainData.intro;
+
+                standardsList.innerHTML = domainData.standards.map(std => `
+                    <div class="mb-4 p-4 border rounded-md bg-gray-50">
+                        <h4 class="font-bold text-lg text-[#3d405b]">${std.name}</h4>
+                        <p class="text-sm text-gray-600">${std.description}</p>
+                    </div>
+                `).join('');
+                
+                if (standardsChart) {
+                    standardsChart.destroy();
+                }
+                
+                standardsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: domainData.chartData,
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `Standard Focus Areas for ${domain.charAt(0).toUpperCase() + domain.slice(1)} Robotics`,
+                                font: { size: 16 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw} (relative focus)`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Relative Focus Score'
+                                }
+                            },
+                            y: {
+                                stacked: true
+                            }
+                        }
+                    }
+                });
+
+                domainTabs.forEach(tab => {
+                    if (tab.dataset.domain === domain) {
+                        tab.classList.remove('inactive-tab');
+                        tab.classList.add('active-tab');
+                    } else {
+                        tab.classList.remove('active-tab');
+                        tab.classList.add('inactive-tab');
+                    }
+                });
+            }
+
+            domainTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    updateContent(tab.dataset.domain);
+                });
+            });
+            
+            const processSteps = document.querySelectorAll('.process-step');
+            const stepContents = document.querySelectorAll('.process-step-content');
+
+            processSteps.forEach(step => {
+                step.addEventListener('click', () => {
+                    const stepNumber = step.dataset.step;
+                    const content = document.getElementById(`step-content-${stepNumber}`);
+
+                    const wasActive = step.classList.contains('active');
+                    
+                    processSteps.forEach(s => s.classList.remove('active'));
+                    stepContents.forEach(c => c.style.maxHeight = '0');
+
+                    if (!wasActive) {
+                        step.classList.add('active');
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }
+                });
+            });
+
+
+            updateContent('industrial');
+            const initialActiveStep = document.querySelector('.process-step.active');
+            if (initialActiveStep) {
+                 const initialContent = document.getElementById(`step-content-${initialActiveStep.dataset.step}`);
+                 initialContent.style.maxHeight = initialContent.scrollHeight + "px";
+            }
+        });
+    </script>
+
+
+</body></html>

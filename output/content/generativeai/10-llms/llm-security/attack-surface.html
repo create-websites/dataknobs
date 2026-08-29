@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LLM Security Attack Surface: Risks and Controls</title>
+<meta content="Map the LLM attack surface across interfaces, orchestration, context, models, responses, and tools—with practical security controls for every trust boundary." name="description"/>
+<meta content="LLM security attack surface, prompt injection, indirect prompt injection, RAG security, AI agent security, excessive agency, model poisoning, secure generative AI" name="keywords"/>
+<meta content="Dataknobs" name="author"/>
+<meta content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" name="robots"/>
+<meta content="#4c1d95" name="theme-color"/>
+<meta content="An LLM application exposes five connected security surfaces: interface, orchestration, context, model, and response/tools. Secure systems treat every boundary as untrusted, separate instructions from data, enforce identity and authorization outside the model, validate retrieval and model outputs, minimize tool permissions, require approval for high-impact actions, constrain resource use, and continuously test the complete application—not only the model." name="ai-summary"/>
+<meta content="technical security guide" name="content-type"/>
+<meta content="AI architects, security leaders, developers, risk teams, and enterprise technology teams" name="audience"/>
+<link href="https://prashant.dhingra.website/technology/generativeai/llm-security-attack-surface/" rel="canonical"/>
+<link href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" rel="icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://storage.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<meta content="article" property="og:type"/>
+<meta content="Dataknobs" property="og:site_name"/>
+<meta content="LLM Security Attack Surface: Risks and Controls" property="og:title"/>
+<meta content="Understand attacks and defenses across the complete LLM application—from user input and retrieval to agents, tools, and outputs." property="og:description"/>
+<meta content="https://prashant.dhingra.website/technology/generativeai/llm-security-attack-surface/" property="og:url"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llm/llm-security-attack-surface/images/Slide1000/llm-security-attack-surface-1.png" property="og:image"/>
+<meta content="1000" property="og:image:width"/>
+<meta content="563" property="og:image:height"/>
+<meta content="LLM attack surface across interface, orchestration, context, model, and response and tools" property="og:image:alt"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="LLM Security Attack Surface" name="twitter:title"/>
+<meta content="A defensive guide to the five trust boundaries in an LLM application." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llm/llm-security-attack-surface/images/Slide1000/llm-security-attack-surface-1.png" name="twitter:image"/>
+<meta content="Diagram of the LLM security attack surface and common threats" name="twitter:image:alt"/>
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://prashant.dhingra.website/technology/generativeai/llm-security-attack-surface/#article",
+        "headline": "LLM Security Attack Surface: Risks and Controls",
+        "description": "A practical guide to threats and controls across the interface, orchestration, context, model, response, and tool layers of an LLM application.",
+        "mainEntityOfPage": "https://prashant.dhingra.website/technology/generativeai/llm-security-attack-surface/",
+        "author": {"@type": "Organization", "name": "Dataknobs", "url": "https://www.dataknobs.com/"},
+        "publisher": {"@type": "Organization", "name": "Dataknobs", "url": "https://www.dataknobs.com/"},
+        "image": {
+          "@type": "ImageObject",
+          "url": "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llm/llm-security-attack-surface/images/Slide1000/llm-security-attack-surface-1.png",
+          "width": 1000,
+          "height": 563
+        },
+        "about": ["Large language model security", "Prompt injection", "Retrieval-augmented generation security", "AI agent security", "Secure artificial intelligence"],
+        "keywords": ["LLM attack surface", "prompt injection", "RAG security", "excessive agency", "model poisoning", "improper output handling"],
+        "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["#answer-summary", ".key-recommendation"]}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://prashant.dhingra.website/"},
+          {"@type": "ListItem", "position": 2, "name": "Technology", "item": "https://prashant.dhingra.website/technology/"},
+          {"@type": "ListItem", "position": 3, "name": "Generative AI", "item": "https://prashant.dhingra.website/technology/generativeai/"},
+          {"@type": "ListItem", "position": 4, "name": "LLM Security Attack Surface", "item": "https://prashant.dhingra.website/technology/generativeai/llm-security-attack-surface/"}
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the LLM security attack surface?",
+            "acceptedAnswer": {"@type": "Answer", "text": "The LLM security attack surface is the set of entry points and trust boundaries across an AI application: user interfaces, prompt orchestration, retrieved context and memory, model artifacts and inference, generated responses, and connected tools. Security must cover the complete system rather than the model alone."}
+          },
+          {
+            "@type": "Question",
+            "name": "Why are prompt injections difficult to eliminate?",
+            "acceptedAnswer": {"@type": "Answer", "text": "LLMs handle instructions and untrusted data in the same natural-language channel, making it possible for a malicious instruction to be present in various forms such as user input, documents, webpages, retrieved memory, or tool output. To defend against this, isolation, authorization, constrained tools, validation, and monitoring are necessary, rather than solely relying on a prompt filter."}
+          },
+          {
+            "@type": "Question",
+            "name": "What is the most important control for an AI agent?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Limit access privileges to only what is necessary outside the defined boundaries. Assign specific credentials to each tool, verify all inputs, limit resource access, establish budgets and rate limits, and mandate approval for significant actions."}
+          },
+          {
+            "@type": "Question",
+            "name": "How should organizations test LLM application security?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Evaluate every trust boundary and end-to-end workflow by utilizing adversarial prompts, poisoned documents, unauthorized retrieval attempts, malformed model outputs, tool abuse scenarios, data exfiltration attempts, resource exhaustion, and compromised dependency simulations. Conduct retesting following any modifications to the model, prompts, tools, data, or policies."}
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+<style>
+    :root{--bg:#f8fafc;--surface:#fff;--text:#0f172a;--muted:#475569;--border:#e2e8f0;--violet:#7c3aed;--violet-dark:#5b21b6;--indigo:#4338ca;--hero-a:#4c1d95;--hero-b:#7c3aed;--hero-c:#4338ca;--footer:#1e293b;--footer-text:#cbd5e1;--shadow:0 10px 30px rgba(15,23,42,.08);--shadow-lg:0 18px 50px rgba(15,23,42,.14)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:92px}body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.65}img{max-width:100%;display:block;height:auto}a{color:var(--violet);text-decoration:none}a:hover{text-decoration:underline}a:focus-visible,[tabindex]:focus-visible{outline:3px solid #f59e0b;outline-offset:3px;border-radius:5px}.container{width:100%;max-width:1200px;margin:0 auto;padding:0 24px}.skip-link{position:absolute;left:16px;top:-80px;z-index:2000;padding:12px 16px;background:#fff;color:#4c1d95;font-weight:800;box-shadow:var(--shadow)}.skip-link:focus{top:12px}.site-header{position:sticky;top:0;z-index:1000;border-bottom:1px solid rgba(226,232,240,.85);background:rgba(255,255,255,.94);backdrop-filter:blur(12px)}.site-header-inner{min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:14px;min-width:0}.brand img{height:44px;width:auto}.brand-text{font-size:1.1rem;font-weight:800;color:var(--text);letter-spacing:-.02em}.site-nav{display:flex;align-items:center;gap:20px;flex-wrap:wrap}.site-nav a{font-size:.95rem;font-weight:600;color:#475569}.site-nav a:hover{color:var(--violet);text-decoration:none}
+    .hero{position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,var(--hero-a),var(--hero-b),var(--hero-c))}.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 20%,rgba(255,255,255,.1),transparent 30%),radial-gradient(circle at 80% 10%,rgba(255,255,255,.1),transparent 25%),radial-gradient(circle at 70% 80%,rgba(255,255,255,.07),transparent 30%);pointer-events:none}.hero-inner{position:relative;padding:72px 0 82px;display:grid;gap:25px}.eyebrow{display:inline-flex;width:fit-content;align-items:center;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);padding:8px 14px;border-radius:999px;font-size:.82rem;font-weight:600}.hero h1{margin:0;max-width:1000px;font-size:clamp(2.3rem,5vw,4.4rem);line-height:1.06;letter-spacing:-.04em;font-weight:800}.hero-desc{max-width:940px;font-size:1.1rem;line-height:1.8;color:rgba(255,255,255,.93)}.hero-tags{display:flex;flex-wrap:wrap;gap:12px}.hero-tag{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);padding:10px 14px;border-radius:16px;font-size:.92rem;font-weight:500}
+    .section{padding:72px 0}.section-soft{background:linear-gradient(to bottom,#f8fafc,#fff);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}.section-header{max-width:920px;margin-bottom:34px}.section-kicker{font-size:.82rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--violet);margin-bottom:12px}.section-title{margin:0;font-size:clamp(1.8rem,3vw,3rem);line-height:1.14;letter-spacing:-.03em;font-weight:800}.section-intro{margin-top:14px;color:var(--muted);font-size:1.05rem;line-height:1.8}.visual-card{overflow:hidden;border:1px solid var(--border);background:var(--surface);border-radius:28px;box-shadow:var(--shadow)}.visual-card a{display:block;color:inherit}.visual-card img{width:100%;aspect-ratio:1000/563;object-fit:contain;background:#fff}.caption{padding:18px 22px 24px;font-size:.95rem;font-weight:600;color:#475569}.answer-box{margin:32px 0 0;padding:26px 28px;border:1px solid #ddd6fe;background:linear-gradient(135deg,#faf5ff,#fff,#eef2ff);border-radius:24px;box-shadow:var(--shadow)}.answer-box strong{display:block;margin-bottom:8px;font-size:1.2rem;color:#4c1d95}.answer-box p{margin:0;color:#334155}.article-wrap{margin-top:46px;border-top:1px solid var(--border);padding-top:46px}.article-card{background:var(--surface);border:1px solid var(--border);border-radius:28px;box-shadow:var(--shadow);padding:clamp(22px,4vw,44px)}.article-content{color:#334155;font-size:1.03rem;line-height:1.85;overflow-wrap:anywhere}.article-content h2,.article-content h3{color:var(--text);line-height:1.2;letter-spacing:-.02em;margin-top:1.65em;margin-bottom:.65em;scroll-margin-top:100px}.article-content h2{font-size:clamp(1.65rem,3vw,2rem);font-weight:800}.article-content h3{font-size:1.38rem;font-weight:750}.article-content p,.article-content ul,.article-content ol,.article-content table{margin:1em 0}.article-content ul,.article-content ol{padding-left:1.4em}.article-content li+li{margin-top:.45em}.callout{margin:24px 0;padding:18px 20px;border-left:4px solid #ec4899;background:#fdf2f8;border-radius:12px;color:#831843}.control-callout{border-left-color:#7c3aed;background:#f5f3ff;color:#4c1d95}.layer-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:28px 0}.layer-card{padding:18px 16px;border:1px solid var(--border);border-radius:18px;background:#fff}.layer-card h3{font-size:1rem;margin:0 0 7px}.layer-card p{font-size:.9rem;line-height:1.55;margin:0;color:var(--muted)}.layer-card:nth-child(1){border-top:5px solid #ec5fa4}.layer-card:nth-child(2){border-top:5px solid #5dcede}.layer-card:nth-child(3){border-top:5px solid #ffb640}.layer-card:nth-child(4){border-top:5px solid #d96d9d}.layer-card:nth-child(5){border-top:5px solid #1d9bd1}.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:16px;margin:24px 0}.article-content table{width:100%;min-width:860px;border-collapse:collapse;margin:0;font-size:.93rem}.article-content th,.article-content td{border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:13px 14px;text-align:left;vertical-align:top}.article-content th:last-child,.article-content td:last-child{border-right:0}.article-content tr:last-child td,.article-content tr:last-child th{border-bottom:0}.article-content th{background:#f8fafc;color:var(--text);font-weight:700}.checklist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;padding:0;list-style:none}.checklist li{position:relative;padding:13px 14px 13px 42px;margin:0;border:1px solid var(--border);border-radius:14px;background:#f8fafc}.checklist li:before{content:"✓";position:absolute;left:15px;top:12px;color:#16a34a;font-weight:800}.faq-item{border-top:1px solid var(--border);padding:22px 0}.faq-item:first-of-type{border-top:0}.faq-item h3{margin:0 0 8px;font-size:1.18rem}.faq-item p{margin:0}.key-recommendation{font-weight:600;color:#312e81}.sources{font-size:.96rem}.sources a{font-weight:600}.cta-band{margin-top:40px;padding:28px;border:1px solid #ddd6fe;background:linear-gradient(135deg,#faf5ff,#fff,#eef2ff);border-radius:28px;box-shadow:var(--shadow)}.cta-band h2{margin:0 0 10px;font-size:1.55rem}.cta-band p{margin:0;color:var(--muted)}
+    .site-footer{background:var(--footer);color:var(--footer-text)}.footer-inner{padding:48px 0 34px}.footer-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:30px}.footer-col h2{margin:0 0 14px;color:#fff;font-size:1rem}.footer-col p,.footer-col li{font-size:.95rem;color:var(--footer-text);line-height:1.8}.footer-col ul{list-style:none;padding:0;margin:0}.footer-col li+li{margin-top:6px}.footer-col a{color:var(--footer-text)}.footer-bottom{border-top:1px solid rgba(148,163,184,.22);margin-top:30px;padding-top:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;font-size:.92rem;color:#94a3b8}.footer-links{display:flex;gap:16px;flex-wrap:wrap}.footer-links a{color:#94a3b8}
+    @media(max-width:1050px){.layer-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.layer-card:last-child{grid-column:1/-1}}@media(max-width:899px){.site-nav{display:none}.hero-inner{padding:56px 0 64px}.section{padding:56px 0}.footer-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.checklist{grid-template-columns:1fr}}@media(max-width:640px){.container{padding-left:18px;padding-right:18px}.brand-text{font-size:1rem}.article-card,.cta-band,.answer-box{padding:22px}.layer-grid{grid-template-columns:1fr}.layer-card:last-child{grid-column:auto}.footer-grid{grid-template-columns:1fr}.footer-bottom{flex-direction:column;align-items:flex-start}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header">
+<div class="container site-header-inner">
+<div class="brand">
+<a aria-label="Dataknobs home" href="https://www.dataknobs.com/"><img alt="Dataknobs" height="44" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" width="202"/></a>
+<div class="brand-text">Dataknobs</div>
+</div>
+<nav aria-label="Primary navigation" class="site-nav"><a href="#visual">Visual</a><a href="#layers">Attack layers</a><a href="#controls">Controls</a><a href="#checklist">Checklist</a><a href="#faq">FAQ</a></nav>
+</div>
+</header>
+<main id="main-content">
+<section aria-labelledby="page-title" class="hero">
+<div class="container hero-inner">
+<div class="eyebrow"><a href="https://www.dataknobs.com/generativeai/">Generative AI</a> Security Guide</div>
+<h1 id="page-title">LLM Security Attack Surface</h1>
+<div class="hero-desc">Security is compromised not just by incorrect outputs from the model, but also by AI systems blindly following malicious text, accessing tainted data, compromising information, or utilizing authorized tools in unauthorized ways. It is essential to treat every boundary, from interface to tool execution, as a potential security risk.</div>
+<div aria-label="Topics" class="hero-tags"><div class="hero-tag">Prompt Injection</div><div class="hero-tag">RAG Security</div><div class="hero-tag">Model Integrity</div><div class="hero-tag">Agent &amp; Tool Safety</div></div>
+</div>
+</section>
+<section class="section section-soft" id="visual">
+<div class="container">
+<div class="section-header">
+<div class="section-kicker">Attack surface at a glance</div>
+<h2 class="section-title">Five connected layers, five trust boundaries</h2>
+<p class="section-intro">The image illustrates the passage of adversarial content and excessive privileges through the <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> application stack. Click to view in full size.</p>
+</div>
+<figure class="visual-card">
+<a aria-label="Open the LLM Attack Surface diagram at full size" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llm/llm-security-attack-surface/images/Slide1000/llm-security-attack-surface-1.png" rel="noopener" target="_blank">
+<img alt="Diagram mapping LLM attacks across the interface, orchestration, context, model, and response and tools layers" decoding="async" fetchpriority="high" height="563" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llm/llm-security-attack-surface/images/Slide1000/llm-security-attack-surface-1.png" width="1000"/>
+</a>
+<figcaption class="caption">The range of potential attacks includes direct and indirect injection of prompts, session exploitation, leakage of system prompts, memory poisoning or data retrieval, compromised models, unlimited resource usage, mishandling of outputs, excessive permissions, and data extraction using tools.</figcaption>
+</figure>
+<div class="answer-box" id="answer-summary">
+<strong>Security principle</strong>
+<p class="key-recommendation">Consider all natural-language input, such as retrieved documents, memory, webpages, emails, and tool results, as untrusted data. Do not rely on the LLM for final decisions on identity, authorization, data access, policy enforcement, or approval of consequential actions.</p>
+</div>
+<article aria-labelledby="guide-title" class="article-wrap">
+<div class="section-header">
+<div class="section-kicker">Detailed guide</div>
+<h2 class="section-title" id="guide-title">Threats and defenses across the complete LLM system</h2>
+<p class="section-intro">In a larger application, a model is just one part that requires the security architecture to safeguard data flow, control flow, identities, permissions, dependencies, and actions throughout its lifecycle.</p>
+</div>
+<div class="article-card">
+<div class="article-content">
+<p>The central LLM security problem is a blurred boundary between <em>instructions</em> and <em>data</em>A model may mistakenly treat text in an untrusted document as a command rather than just reference material, potentially resulting in a security incident if the model also has access to credentials or powerful tools.</p>
+<div aria-label="Five LLM security layers" class="layer-grid" id="layers">
+<div class="layer-card"><h3>1. Interface</h3><p>User input, files, identity, sessions, and exposed endpoints.</p></div>
+<div class="layer-card"><h3>2. Orchestration</h3><p>System prompts, templates, memory, routing, and agent logic.</p></div>
+<div class="layer-card"><h3>3. Context</h3><p>RAG sources, indexes, retrieved records, and permissions.</p></div>
+<div class="layer-card"><h3>4. Model</h3><p>Weights, fine-tuning data, hosting, supply chain, and capacity.</p></div>
+<div class="layer-card"><h3>5. Response &amp; Tools</h3><p>Generated output, tool calls, actions, and outbound data.</p></div>
+</div>
+<h2>1. Interface attacks</h2>
+<p>The interface encompasses chat messages, API requests, uploaded files, images, links, authentication flows, browser sessions, and any user-controlled content channels. Prompt injection directly challenges system commands. Jailbreaking employs role-play, encoding, indirection, or multi-turn manipulation to circumvent behavioral limitations. Misuse of accounts and sessions can transform a lawful assistant into an attack proxy.</p>
+<h3>Defensive controls</h3>
+<ul>
+<li>Verify user and service identities, maintain tenant separation, change sessions regularly, and associate important tasks with confirmed identities.</li>
+<li>Before ingestion, make sure to apply limits for file type, size, archive depth, malware, and content processing</li>
+<li>Keep trusted instructions separate from user content within the application structure; avoid inserting raw input directly into a privileged prompt template.</li>
+<li>Enforce rate limiting based on user, tenant, IP, model, endpoint, and cost, in addition to request count</li>
+<li>Identify potentially concerning patterns for surveillance and enhance security measures, acknowledging the possibility of filters being circumvented.</li>
+</ul>
+<div class="callout"><strong>Important:</strong> A classifier prompt is a warning, not a barrier to security. The system should still function safely in the presence of malicious text.</div>
+<h2>2. Orchestration attacks</h2>
+<p>The orchestration layer is responsible for creating prompts, choosing models, accessing memory, directing tasks, calling agents, and determining available tools. Leakage of system prompts could reveal internal instructions or confidential settings. Injecting prompt templates can change the hierarchy of instructions. Malicious content can corrupt long-term memory, impacting future sessions.</p>
+<h3>Defensive controls</h3>
+<ul>
+<li>Do not include secrets, credentials, private keys, or authorization logic in prompts as they may be revealed by the system.</li>
+<li>Employ typed message objects and fixed templates instead of using string concatenation.</li>
+<li>Capture the origin, creator, time stamp, extent, and certainty of memory; validation is mandatory prior to permanent storage.</li>
+<li>Divide memory based on user and tenant, establish expiry guidelines, and offer evaluation and removal processes.</li>
+<li>Limit agent movements, time of execution, token usage, retries, recursive actions, and parallel branches.</li>
+</ul>
+<h2>3. Context and RAG attacks</h2>
+<p>Indirect prompt injection conceals malicious instructions within various types of data, allowing attackers to later retrieve them. By poisoning index entries, manipulating rankings, or exploiting permission filters, unauthorized content can be made to appear legitimate within a document. This makes a file safe for storage but potentially dangerous as executable guidance.</p>
+<h3>Defensive controls</h3>
+<ul>
+<li>Approve and monitor data sources to maintain source identity, version, integrity hash, ownership, classification, and ingestion path.</li>
+<li>Implement row-, document-, tenant-, and field-level authorization checks prior to data reaching the model.</li>
+<li>Identify the obtained text as unreliable evidence and advise the model to disregard any instructions contained within.</li>
+<li>Confirming changes to the index, limiting writing access, detecting unusual data retrieval, and enabling fast reindexing or revocation.</li>
+<li>Provide references and ensure that statements are backed up by the passages cited.</li>
+</ul>
+<div class="control-callout callout"><strong>Trust-boundary rule:</strong> Access control must be enforced within the retrieval service or data layer. Requesting the model to disregard confidential documents does not constitute authorization.</div>
+<h2>4. Model and supply-chain attacks</h2>
+<p>The model layer consists of base weights, adapters, fine-tuning, tokenizers, inference servers, containers, libraries, model registries, and training data. Compromised weights or tainted training samples can result in unexpected behaviors. Uncontrolled usage may deplete tokens, computing power, memory, queues, budgets, or downstream resources.</p>
+<h3>Defensive controls</h3>
+<ul>
+<li>Utilize authorized model databases, validate artifact hashes and signatures, lock in versions, and keep a record of software and model components.</li>
+<li>Record the lineage and licensing information of training data; thoroughly check fine-tuning data for signs of poisoning, secrets, duplication, and unexpected triggers.</li>
+<li>Assess modifications to the model and adapter by comparing them to security, safety, privacy, quality, and regression test suites prior to deployment.</li>
+<li>Establish strict boundaries for tokens, context size, batch size, request duration, concurrency, tool loops, and spending.</li>
+<li>Segregate inference workloads, limit outgoing network traffic, secure caches, and watch for abnormal latency or resource usage.</li>
+</ul>
+<h2>5. Response, agent, and tool attacks</h2>
+<p>When downstream systems mistakenly trust generated text as code, markup, a database query, a shell command, a URL, or a tool argument, it can lead to dangerous consequences. Excessive agency occurs when the system grants the model unnecessary permissions, autonomy, or functionality. Tool calls have the potential to leak data or carry out unauthorized actions on behalf of the user.</p>
+<h3>Defensive controls</h3>
+<ul>
+<li>Consider model output to be untrustworthy. Compare it using strict schemas, only permit certain operations and destinations, clean up displayed content, and utilize parameterized APIs.</li>
+<li>Provide each tool with specific, temporary credentials to limit access; refrain from using the application's general service identity for the model.</li>
+<li>Grant permission for all activities involving the authenticated user, tenant, resource, and current policy, excluding those within the LLM.</li>
+<li>Human confirmation is necessary for financial, legal, destructive, external-communication, permission-changing, or irreversible actions.</li>
+<li>Restrict indiscriminate outbound requests; only permit approved destinations and prevent confidential data from being included in tool inputs and outputs.</li>
+<li>Record the suggested action, standardized parameters, policy determination, authorization, outcome, and status of reversal.</li>
+</ul>
+<h2 id="controls">Control matrix by trust boundary</h2>
+<div aria-label="LLM security control matrix" class="table-wrap" role="region" tabindex="0">
+<table>
+<thead><tr><th scope="col">Boundary</th><th scope="col">Representative threat</th><th scope="col">Prevent</th><th scope="col">Detect</th><th scope="col">Contain and recover</th></tr></thead>
+<tbody>
+<tr><th scope="row">Interface</th><td>Prompt injection, jailbreak, session abuse</td><td>Strong identity, input isolation, file limits, rate limits</td><td>Abuse signals, anomalous sessions, cost spikes</td><td>Revoke sessions, throttle, quarantine uploads</td></tr>
+<tr><th scope="row">Orchestration</th><td>Prompt leakage, template injection, memory poisoning</td><td>No secrets in prompts, typed templates, governed memory writes</td><td>Prompt/version traces, memory change alerts</td><td>Disable affected workflow, purge memory, restore known version</td></tr>
+<tr><th scope="row">Context</th><td>Indirect injection, poisoned index, permission bypass</td><td>Source governance, ACL filtering, provenance, content isolation</td><td>Retrieval drift, unusual source concentration, access denials</td><td>Revoke source, rebuild index, invalidate caches</td></tr>
+<tr><th scope="row">Model</th><td>Compromised weights, poisoned fine-tune, exhaustion</td><td>Signed artifacts, lineage, evaluation gates, quotas</td><td>Behavior regression, integrity checks, resource telemetry</td><td>Rollback model, isolate workload, rotate artifacts</td></tr>
+<tr><th scope="row">Response &amp; tools</th><td>Unsafe output, excessive agency, exfiltration</td><td>Schema validation, least privilege, policy checks, approvals</td><td>Tool-call audit, DLP signals, action anomaly detection</td><td>Cancel or reverse action, revoke token, notify impacted owners</td></tr>
+</tbody>
+</table>
+</div>
+<h2>Secure reference flow</h2>
+<ol>
+<li><strong>Authenticate and classify.</strong> Establish the caller’s identity, tenant, role, intent, and risk tier.</li>
+<li><strong>Retrieve with authorization.</strong> Before content enters context, apply permissions and attach source and classification metadata.</li>
+<li><strong>Construct bounded context.</strong> Distinguish between trusted policies and untrusted evidence, and apply limits to tokens and sources for enforcement.</li>
+<li><strong>Generate without authority.</strong> Allow the model to suggest a response or course of action, without granting itself permission.</li>
+<li><strong>Validate deterministically.</strong> Analyze structured output, verify policies, validate arguments, examine data flow, and assess impact.</li>
+<li><strong>Approve and execute minimally.</strong> Utilize a scoped tool identity, seek confirmation as needed, and ensure actions are either idempotent or reversible.</li>
+<li><strong>Observe and learn safely.</strong> Collect security data, but ensure proper governance before storing model results in long-term memory or training datasets.</li>
+</ol>
+<h2 id="checklist">Production security checklist</h2>
+<ul class="checklist">
+<li>Record all inputs, data flows, trust boundaries, models, tools, and outbound connections.</li>
+<li>Do not include credentials, secrets, or authorization decisions in prompts or model context.</li>
+<li>Ensure that user and tenant permissions are enforced both prior to retrieval and prior to the execution of any tool.</li>
+<li>Monitor the origin and authenticity of documents, memory, embeddings, datasets, weights, and adapters.</li>
+<li>Validate model output with schemas, allowlists, sanitization, and parameterized interfaces.</li>
+<li>Utilize minimal access, temporary credentials and limit outbound network traffic for tools and agents.</li>
+<li>Require approval for high-impact, external, destructive, financial, or irreversible actions.</li>
+<li>Establish strict limits for tokens, steps, retries, duration, concurrency, and expenses.</li>
+<li>Red-team techniques include direct and indirect injection, retrieval of poisoned data, memory attacks, and exfiltration of tools.</li>
+<li>Keep records of activities, response plans, emergency shut-off mechanisms, reversal procedures, and accountability.</li>
+</ul>
+<h2>How to test the attack surface</h2>
+<p>Develop adversarial tests based on actual workflows instead of a standard set of jailbreak prompts. Integrate hostile instructions into various user interfaces, documents, online content, emails, retrieved data, image text, memory, and tool responses. Explore cross-tenant retrieval, unauthorized tool inputs, data leaks, misshaped output, recursive agent loops, resource-intensive requests, and substitution of dependencies.</p>
+<p>Assess if sensitive data was accessed, if policy checks were executed, if actions received proper approval, if tool coverage was adequate yet minimal, and if the system generated valuable alerts. Reevaluate whenever there are modifications to prompts, models, retrievers, embedding models, data sources, agents, tools, permissions, or policies.</p>
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq-item"><h3>What is the LLM security attack surface?</h3><p>Security must encompass all entry points and trust boundaries within an AI application, including user interfaces, prompt orchestration, retrieved context and memory, model artifacts and inference, generated responses, and connected tools, rather than focusing solely on the model itself.</p></div>
+<div class="faq-item"><h3>Why are prompt injections difficult to eliminate?</h3><p>LLMs handle instructions and untrusted data in the same natural-language channel, making it possible for a malicious instruction to be present in various forms such as user input, documents, webpages, retrieved memory, or tool output. To defend against this, isolation, authorization, constrained tools, validation, and monitoring are necessary, rather than solely relying on a prompt filter.</p></div>
+<div class="faq-item"><h3>What is the most important control for an AI agent?</h3><p>Limit access privileges to only what is necessary outside the defined boundaries. Assign specific credentials to each tool, verify all inputs, limit resource access, establish budgets and rate limits, and mandate approval for significant actions.</p></div>
+<div class="faq-item"><h3>How should organizations test LLM application security?</h3><p>Evaluate every trust boundary and end-to-end workflow by utilizing adversarial prompts, poisoned documents, unauthorized retrieval attempts, malformed model outputs, tool abuse scenarios, data exfiltration attempts, resource exhaustion, and compromised dependency simulations. Conduct retesting following any modifications to the model, prompts, tools, data, or policies.</p></div>
+<h2>Authoritative guidance</h2>
+<p class="sources">This guide’s risk coverage aligns with the <a href="https://genai.owasp.org/llm-top-10/?cat=253" rel="noopener">OWASP Top 10 for LLMs and Generative AI Applications (2025)</a>The list includes prompt injection, sensitive information disclosure, supply-chain risk, data and model poisoning, improper output handling, excessive agency, system prompt leakage, vector and embedding weaknesses, misinformation, and unbounded consumption. Governance and lifecycle recommendations are influenced by these factors as well. <a href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" rel="noopener">NIST AI Risk Management Framework: Generative AI Profile</a>.</p>
+</div>
+</div>
+<aside aria-labelledby="cta-title" class="cta-band">
+<h2 id="cta-title">Design for containment, not perfect filtering</h2>
+<p>Expect that malicious commands may reach the model. Restrict the model's visibility, decision-making, and actions to prevent a successful injection from turning into a successful breach.</p>
+</aside>
+</article>
+</div>
+</section>
+</main>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Dataknobs use cases with Knobs for finance and compliance</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Direct vs Indirect Prompt Injection in LLM Security</title>
+<meta content="Compare direct and indirect prompt injection in LLM systems, understand attack paths, and apply practical controls for RAG and AI agents." name="description"/>
+<meta content="LLM injection types, direct prompt injection, indirect prompt injection, RAG security, AI agent security, prompt injection examples, LLM security controls" name="keywords"/>
+<meta content="Dataknobs" name="author"/>
+<meta content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" name="robots"/>
+<meta content="#4c1d95" name="theme-color"/>
+<meta content="Direct prompt injection is delivered by a user who intentionally asks an LLM to ignore or override its governing instructions. Indirect prompt injection is embedded in content the system later retrieves or processes, such as a document, webpage, email, code comment, PDF, tool result, or memory item. Direct attacks are constrained by what the user can already reach; indirect attacks can exploit the assistant's permissions while appearing to originate from an ordinary task. Defenses should combine content provenance, isolation, minimal retrieval, least-privilege tools, deterministic authorization, output validation, approval gates, and end-to-end monitoring." name="ai-summary"/>
+<meta content="technical security explainer" name="content-type"/>
+<meta content="AI architects, security engineers, developers, risk leaders, and enterprise technology teams" name="audience"/>
+<link href="https://prashant.dhingra.website/technology/generativeai/llm-security-injection-types/" rel="canonical"/>
+<link href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" rel="icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://storage.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<meta content="article" property="og:type"/>
+<meta content="Dataknobs" property="og:site_name"/>
+<meta content="Direct vs Indirect Prompt Injection in LLM Security" property="og:title"/>
+<meta content="Learn how direct and indirect prompt injection reach LLM applications, why RAG expands exposure, and which controls reduce impact." property="og:description"/>
+<meta content="https://prashant.dhingra.website/technology/generativeai/llm-security-injection-types/" property="og:url"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llm/llm-security-injection-types/images/Slide1000/llm-security-injection-types-1.png" property="og:image"/>
+<meta content="1000" property="og:image:width"/>
+<meta content="563" property="og:image:height"/>
+<meta content="Side-by-side comparison of direct and indirect prompt injection in LLM systems" property="og:image:alt"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Direct vs Indirect Prompt Injection" name="twitter:title"/>
+<meta content="A practical guide to prompt-injection paths and controls for RAG systems and AI agents." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llm/llm-security-injection-types/images/Slide1000/llm-security-injection-types-1.png" name="twitter:image"/>
+<meta content="Diagram comparing direct and indirect prompt injection" name="twitter:image:alt"/>
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://prashant.dhingra.website/technology/generativeai/llm-security-injection-types/#article",
+        "headline": "Direct vs Indirect Prompt Injection in LLM Security",
+        "description": "A detailed comparison of direct and indirect prompt injection, including attack paths, examples, risk factors, controls, and testing guidance for RAG systems and AI agents.",
+        "mainEntityOfPage": "https://prashant.dhingra.website/technology/generativeai/llm-security-injection-types/",
+        "author": {"@type": "Organization", "name": "Dataknobs", "url": "https://www.dataknobs.com/"},
+        "publisher": {"@type": "Organization", "name": "Dataknobs", "url": "https://www.dataknobs.com/"},
+        "image": {"@type": "ImageObject", "url": "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llm/llm-security-injection-types/images/Slide1000/llm-security-injection-types-1.png", "width": 1000, "height": 563},
+        "about": ["Large language model security", "Direct prompt injection", "Indirect prompt injection", "Retrieval-augmented generation security", "AI agent security"],
+        "keywords": ["LLM injection types", "direct prompt injection", "indirect prompt injection", "RAG security", "AI agent security"],
+        "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["#answer-summary", ".key-recommendation"]}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://prashant.dhingra.website/"},
+          {"@type": "ListItem", "position": 2, "name": "Technology", "item": "https://prashant.dhingra.website/technology/"},
+          {"@type": "ListItem", "position": 3, "name": "Generative AI", "item": "https://prashant.dhingra.website/technology/generativeai/"},
+          {"@type": "ListItem", "position": 4, "name": "LLM Injection Types", "item": "https://prashant.dhingra.website/technology/generativeai/llm-security-injection-types/"}
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {"@type": "Question", "name": "What is direct prompt injection?", "acceptedAnswer": {"@type": "Answer", "text": "Direct prompt injection occurs when a user intentionally places instructions in their input to override system rules, bypass safeguards, reveal restricted information, or make the model act outside the application's intended behavior."}},
+          {"@type": "Question", "name": "What is indirect prompt injection?", "acceptedAnswer": {"@type": "Answer", "text": "Indirect prompt injection happens when malicious commands are hidden within content that the model will read later, like a document, webpage, email, PDF, code comment, database record, tool response, or memory item."}},
+          {"@type": "Question", "name": "What makes indirect prompt injection particularly risky for RAG and AI agents?", "acceptedAnswer": {"@type": "Answer", "text": "The attacker may only need to poison a source that the system retrieves. The payload then runs in the context of a legitimate user's request and may influence an assistant that has access to sensitive data or powerful tools."}},
+          {"@type": "Question", "name": "Which controls reduce prompt-injection risk?", "acceptedAnswer": {"@type": "Answer", "text": "Employ provenance and trust labels, limited retrieval, context isolation, scoped credentials, deterministic authorization, typed tool interfaces, output validation, destination allowlists, human approval for significant actions, monitoring, and adversarial testing."}}
+        ]
+      }
+    ]
+  }
+  </script>
+<style>
+    :root{--bg:#f8fafc;--surface:#fff;--text:#0f172a;--muted:#475569;--border:#e2e8f0;--violet:#7c3aed;--violet-dark:#5b21b6;--indigo:#4338ca;--hero-a:#4c1d95;--hero-b:#7c3aed;--hero-c:#4338ca;--footer:#1e293b;--footer-text:#cbd5e1;--shadow:0 10px 30px rgba(15,23,42,.08);--shadow-lg:0 18px 50px rgba(15,23,42,.14)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:92px}body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.65}img{max-width:100%;display:block;height:auto}a{color:var(--violet);text-decoration:none}a:hover{text-decoration:underline}a:focus-visible,[tabindex]:focus-visible{outline:3px solid #f59e0b;outline-offset:3px;border-radius:5px}.container{width:100%;max-width:1200px;margin:0 auto;padding:0 24px}.skip-link{position:absolute;left:16px;top:-80px;z-index:2000;padding:12px 16px;background:#fff;color:#4c1d95;font-weight:800;box-shadow:var(--shadow)}.skip-link:focus{top:12px}.site-header{position:sticky;top:0;z-index:1000;border-bottom:1px solid rgba(226,232,240,.85);background:rgba(255,255,255,.94);backdrop-filter:blur(12px)}.site-header-inner{min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:14px;min-width:0}.brand img{height:44px;width:auto}.brand-text{font-size:1.1rem;font-weight:800;color:var(--text);letter-spacing:-.02em}.site-nav{display:flex;align-items:center;gap:20px;flex-wrap:wrap}.site-nav a{font-size:.95rem;font-weight:600;color:#475569}.site-nav a:hover{color:var(--violet);text-decoration:none}
+    .hero{position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,var(--hero-a),var(--hero-b),var(--hero-c))}.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 20%,rgba(255,255,255,.1),transparent 30%),radial-gradient(circle at 80% 10%,rgba(255,255,255,.1),transparent 25%),radial-gradient(circle at 70% 80%,rgba(255,255,255,.07),transparent 30%);pointer-events:none}.hero-inner{position:relative;padding:72px 0 82px;display:grid;gap:25px}.eyebrow{display:inline-flex;width:fit-content;align-items:center;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);padding:8px 14px;border-radius:999px;font-size:.82rem;font-weight:600}.hero h1{margin:0;max-width:1050px;font-size:clamp(2.3rem,5vw,4.4rem);line-height:1.06;letter-spacing:-.04em;font-weight:800}.hero-desc{max-width:940px;font-size:1.1rem;line-height:1.8;color:rgba(255,255,255,.93)}.hero-tags{display:flex;flex-wrap:wrap;gap:12px}.hero-tag{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);padding:10px 14px;border-radius:16px;font-size:.92rem;font-weight:500}
+    .section{padding:72px 0}.section-soft{background:linear-gradient(to bottom,#f8fafc,#fff);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}.section-header{max-width:920px;margin-bottom:34px}.section-kicker{font-size:.82rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--violet);margin-bottom:12px}.section-title{margin:0;font-size:clamp(1.8rem,3vw,3rem);line-height:1.14;letter-spacing:-.03em;font-weight:800}.section-intro{margin-top:14px;color:var(--muted);font-size:1.05rem;line-height:1.8}.visual-card{overflow:hidden;border:1px solid var(--border);background:var(--surface);border-radius:28px;box-shadow:var(--shadow)}.visual-card a{display:block;color:inherit}.visual-card img{width:100%;aspect-ratio:1000/563;object-fit:contain;background:#fff}.caption{padding:18px 22px 24px;font-size:.95rem;font-weight:600;color:#475569}.answer-box{margin:32px 0 0;padding:26px 28px;border:1px solid #ddd6fe;background:linear-gradient(135deg,#faf5ff,#fff,#eef2ff);border-radius:24px;box-shadow:var(--shadow)}.answer-box strong{display:block;margin-bottom:8px;font-size:1.2rem;color:#4c1d95}.answer-box p{margin:0;color:#334155}.article-wrap{margin-top:46px;border-top:1px solid var(--border);padding-top:46px}.article-card{background:var(--surface);border:1px solid var(--border);border-radius:28px;box-shadow:var(--shadow);padding:clamp(22px,4vw,44px)}.article-content{color:#334155;font-size:1.03rem;line-height:1.85;overflow-wrap:anywhere}.article-content h2,.article-content h3{color:var(--text);line-height:1.2;letter-spacing:-.02em;margin-top:1.65em;margin-bottom:.65em;scroll-margin-top:100px}.article-content h2{font-size:clamp(1.65rem,3vw,2rem);font-weight:800}.article-content h3{font-size:1.38rem;font-weight:750}.article-content p,.article-content ul,.article-content ol,.article-content table{margin:1em 0}.article-content ul,.article-content ol{padding-left:1.4em}.article-content li+li{margin-top:.45em}.callout{margin:24px 0;padding:18px 20px;border-left:4px solid #ec4899;background:#fdf2f8;border-radius:12px;color:#831843}.control-callout{border-left-color:#7c3aed;background:#f5f3ff;color:#4c1d95}.challenge-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:28px 0}.challenge-card{padding:18px 16px;border:1px solid var(--border);border-radius:18px;background:#fff}.challenge-card h3{font-size:1rem;margin:0 0 7px}.challenge-card p{font-size:.9rem;line-height:1.55;margin:0;color:var(--muted)}.challenge-card:nth-child(1){border-top:5px solid #ec5fa4}.challenge-card:nth-child(2){border-top:5px solid #5dcede}.challenge-card:nth-child(3){border-top:5px solid #ffb640}.challenge-card:nth-child(4){border-top:5px solid #d96d9d}.challenge-card:nth-child(5){border-top:5px solid #1d9bd1}.comparison{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:26px 0}.compare-card{border:1px solid var(--border);border-radius:20px;padding:22px;background:#f8fafc}.compare-card h3{margin-top:0}.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:16px;margin:24px 0}.article-content table{width:100%;min-width:820px;border-collapse:collapse;margin:0;font-size:.93rem}.article-content th,.article-content td{border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:13px 14px;text-align:left;vertical-align:top}.article-content th:last-child,.article-content td:last-child{border-right:0}.article-content tr:last-child td,.article-content tr:last-child th{border-bottom:0}.article-content th{background:#f8fafc;color:var(--text);font-weight:700}.defense-stack{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:24px 0}.defense-card{padding:20px;border:1px solid var(--border);border-radius:18px;background:#fff}.defense-card h3{margin:0 0 8px;font-size:1.1rem}.defense-card p{margin:0;color:var(--muted);font-size:.95rem}.faq-item{border-top:1px solid var(--border);padding:22px 0}.faq-item:first-of-type{border-top:0}.faq-item h3{margin:0 0 8px;font-size:1.18rem}.faq-item p{margin:0}.key-recommendation{font-weight:600;color:#312e81}.sources{font-size:.96rem}.sources a{font-weight:600}.cta-band{margin-top:40px;padding:28px;border:1px solid #ddd6fe;background:linear-gradient(135deg,#faf5ff,#fff,#eef2ff);border-radius:28px;box-shadow:var(--shadow)}.cta-band h2{margin:0 0 10px;font-size:1.55rem}.cta-band p{margin:0;color:var(--muted)}
+    .site-footer{background:var(--footer);color:var(--footer-text)}.footer-inner{padding:48px 0 34px}.footer-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:30px}.footer-col h2{margin:0 0 14px;color:#fff;font-size:1rem}.footer-col p,.footer-col li{font-size:.95rem;color:var(--footer-text);line-height:1.8}.footer-col ul{list-style:none;padding:0;margin:0}.footer-col li+li{margin-top:6px}.footer-col a{color:var(--footer-text)}.footer-bottom{border-top:1px solid rgba(148,163,184,.22);margin-top:30px;padding-top:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;font-size:.92rem;color:#94a3b8}.footer-links{display:flex;gap:16px;flex-wrap:wrap}.footer-links a{color:#94a3b8}
+    @media(max-width:1050px){.challenge-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.challenge-card:last-child{grid-column:1/-1}.defense-stack{grid-template-columns:1fr 1fr}}@media(max-width:899px){.site-nav{display:none}.hero-inner{padding:56px 0 64px}.section{padding:56px 0}.footer-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.comparison,.defense-stack{grid-template-columns:1fr}}@media(max-width:640px){.container{padding-left:18px;padding-right:18px}.brand-text{font-size:1rem}.article-card,.cta-band,.answer-box{padding:22px}.challenge-grid{grid-template-columns:1fr}.challenge-card:last-child{grid-column:auto}.footer-grid{grid-template-columns:1fr}.footer-bottom{flex-direction:column;align-items:flex-start}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header">
+<div class="container site-header-inner">
+<div class="brand"><a aria-label="Dataknobs home" href="https://www.dataknobs.com/"><img alt="Dataknobs" height="44" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" width="202"/></a><div class="brand-text">Dataknobs</div></div>
+<nav aria-label="Primary navigation" class="site-nav"><a href="#visual">Visual</a><a href="#comparison">Compare</a><a href="#attack-paths">Attack paths</a><a href="#defenses">Controls</a><a href="#testing">Testing</a><a href="#faq">FAQ</a></nav>
+</div>
+</header>
+<main id="main-content">
+<section aria-labelledby="page-title" class="hero">
+<div class="container hero-inner">
+<div class="eyebrow"><a href="https://www.dataknobs.com/generativeai/">Generative AI</a> Security Explained</div>
+<h1 id="page-title">Direct and Indirect Prompt Injection</h1>
+<div class="hero-desc">Prompt injection can reach an <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> through two main avenues - a direct injection initiated by the user and an indirect injection embedded within external content that the assistant subsequently processes. The latter path is particularly crucial for retrieval-augmented generation (RAG) and AI agents, as it allows attackers to exploit a document or webpage instead of directly engaging with the assistant.</div>
+<div aria-label="Topics" class="hero-tags"><div class="hero-tag">Direct Injection</div><div class="hero-tag">Indirect Injection</div><div class="hero-tag">RAG Security</div><div class="hero-tag">Agent Controls</div></div>
+</div>
+</section>
+<section class="section section-soft" id="visual">
+<div class="container">
+<div class="section-header"><div class="section-kicker">Two delivery paths</div><h2 class="section-title">Where malicious instructions enter an LLM workflow</h2><p class="section-intro">The visual shows two contrasting scenarios: one where the attacker communicates directly with the model and another where instructions are subtly implanted in content consumed by the model. Click to view the full-size image.</p></div>
+<figure class="visual-card">
+<a aria-label="Open the direct and indirect injection diagram at full size" href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llm/llm-security-injection-types/images/Slide1000/llm-security-injection-types-1.png" rel="noopener" target="_blank"><img alt="Side-by-side diagram showing direct prompt injection from a user and indirect prompt injection hidden in retrieved content" decoding="async" fetchpriority="high" height="563" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llm/llm-security-injection-types/images/Slide1000/llm-security-injection-types-1.png" width="1000"/></a>
+<figcaption class="caption">Direct injection is typically limited by the caller's existing access, while indirect injection may come through various forms of data and exploit the assistant's broader permissions.</figcaption>
+</figure>
+<div class="answer-box" id="answer-summary"><strong>Short answer</strong><p class="key-recommendation">Direct injection is when a user intentionally bypasses the assistant's rules, while indirect injection involves a payload hidden in external content that the assistant reads later on. It is important to treat all retrieved sources as untrustworthy, maintain authorization separate from the model, limit tools and destinations, verify proposed actions, and seek approval for any actions that could compromise data or alter the environment.</p></div>
+<article aria-labelledby="guide-title" class="article-wrap">
+<div class="section-header"><div class="section-kicker">Detailed guide</div><h2 class="section-title" id="guide-title">Understanding LLM injection types</h2><p class="section-intro">The delivery route determines the payload's controller, storage location, activation method, and the most efficient controls.</p></div>
+<div class="article-card">
+<div class="article-content">
+<h2 id="comparison">Direct injection vs indirect injection</h2>
+<div class="comparison">
+<div class="compare-card"><h3>Direct injection</h3><p>The attacker provides instructions through user-controlled inputs like chat, form fields, API requests, aiming to bypass refusal behavior, uncover hidden context, alter tasks, or push the assistant beyond its intended function.</p></div>
+<div class="compare-card"><h3>Indirect injection</h3><p>The attacker injects instructions into the content that the model will come across at a later time, and a legitimate user activates the payload by requesting the assistant to search, summarize, analyze, retrieve, browse, or utilize a tool.</p></div>
+</div>
+<p>Both types capitalize on the same structural flaw: the interaction between trusted policies and untrusted content can impact a language model. The main distinction lies in the source. In a direct attack, the suspicious input and attacker are clearly identified during the active interaction. However, in an indirect attack, the payload could have been implanted days in advance by an individual who never interacts with the assistant.</p>
+<div aria-label="Direct and indirect prompt injection comparison" class="table-wrap" role="region" tabindex="0">
+<table>
+<thead><tr><th scope="col">Dimension</th><th scope="col">Direct injection</th><th scope="col">Indirect injection</th><th scope="col">Security implication</th></tr></thead>
+<tbody>
+<tr><th scope="row">Payload source</th><td>Current user input</td><td>Retrieved or processed content</td><td>Preserve source identity through the entire context pipeline</td></tr>
+<tr><th scope="row">Typical trigger</th><td>User submits the attack text</td><td>Legitimate user asks the system to read affected content</td><td>Do not infer safety from normal user intent</td></tr>
+<tr><th scope="row">Visibility</th><td>Often obvious in the transcript</td><td>It could be concealed, encrypted, visually obscured, or buried within lengthy material.</td><td>Inspect transformed content, metadata, OCR, and tool output</td></tr>
+<tr><th scope="row">Attacker reach</th><td>Usually limited to what the caller can access</td><td>May run with the assistant’s or victim user’s permissions</td><td>Never let the model decide or expand authorization</td></tr>
+<tr><th scope="row">Persistence</th><td>Often session-bound</td><td>Can persist in documents, indexes, memory, caches, and datasets</td><td>Support source quarantine, re-indexing, and memory cleanup</td></tr>
+<tr><th scope="row">Primary controls</th><td>Input controls, role boundaries, refusal testing, rate limits</td><td>Provenance, retrieval isolation, least privilege, action approval</td><td>Combine behavioral defenses with deterministic enforcement</td></tr>
+</tbody>
+</table>
+</div>
+<h2>What direct prompt injection looks like</h2>
+<p>A direct attacker intentionally formulates a request to rival higher-priority commands, with objectives such as obtaining limited output, exposing internal prompts, altering assigned roles, bypassing safety measures, or convincing an agent to utilize an unauthorized tool. While "jailbreaking" is a well-known example, direct injection encompasses a wider range of activities, including efforts to manipulate business regulations, compliance terms, routing protocols, and automation functions.</p>
+<p>Direct attacks are limited in scope as the caller usually does not have access to resources beyond what the application already allows for that identity. However, this limitation can be removed if the application grants shared credentials, cross-tenant retrieval, or unrestricted tools to the attacker.</p>
+<div class="callout"><strong>Design rule:</strong> The user can impact the model's logic, but should not have the ability to affect the authorization context utilized by retrieval services or tools.</div>
+<h3>Direct-injection variants</h3>
+<ul>
+<li><strong>Instruction override:</strong> requests to disregard policy, alter roles, or consider low-trust input as valid.</li>
+<li><strong>Prompt extraction:</strong> tries to uncover guidelines, inner workings, instances, or covert criteria.</li>
+<li><strong>Refusal suppression:</strong> A fictional setup, encoding, or translation intended to undermine security measures.</li>
+<li><strong>Task redirection:</strong> replacing a business meeting with a leisurely stroll</li>
+<li><strong>Tool manipulation:</strong> causing invalid arguments, too many calls, unauthorized scopes, or unintended consequences.</li>
+</ul>
+<h2>What indirect prompt injection looks like</h2>
+<p>Indirect injection transforms regular data into a means of delivery. Malicious commands are hidden within content that the system could access, categorize, search, or transfer between applications. The harmful payload could take various forms such as plain text, small or encrypted text, tags, data about data, code notes, text extracted from an image, or a result from a different service.</p>
+<p>The authorized user could be performing a variety of routine tasks such as summarizing an email, comparing vendor documents, reviewing a support ticket, browsing a website, or requesting a coding assistant to examine a repository. If the assistant reads the contaminated source, they may mistakenly view it as a new directive.</p>
+<div class="control-callout callout"><strong>Why RAG changes the threat model:</strong> Retrieval enhances grounding, yet it also brings in text beyond the prompt author's jurisdiction. Relevance does not equate to trust.</div>
+<h3 id="attack-paths">Common indirect-injection paths</h3>
+<ul>
+<li><strong>Documents and PDFs:</strong> policy files, résumés, reports, invoices, presentations, spreadsheets, and uploaded attachments.</li>
+<li><strong>Web content:</strong> pages, search results, user remarks, organized data, obscured components, and information retrieved from connected sources.</li>
+<li><strong>Communications:</strong> Email content, signatures, help desk tickets, chat messages, event details, and customer relationship management notes.</li>
+<li><strong>Developer content:</strong> repositories, READMEs, issues, pull requests, code comments, package descriptions, logs, and errors.</li>
+<li><strong>System state:</strong> vector indices, memory for the long haul, synopses, stored information, data points, findings from tools, and feedback from a different model or agent.</li>
+<li><strong>Multimodal inputs:</strong> The multimodal model can detect text in images, screenshots, scanned files, audio transcripts, and visual instructions.</li>
+</ul>
+<h2>How an indirect attack propagates</h2>
+<ol>
+<li><strong>Plant:</strong> A hacker inserts a harmful command into a location where the target system could come across it.</li>
+<li><strong>Ingest:</strong> A crawler, uploader, connector, indexer, OCR service, or tool is used to import data from that source.</li>
+<li><strong>Retrieve:</strong> When a regular user makes a request, the system picks the tainted content as the appropriate context.</li>
+<li><strong>Interpret:</strong> the model considers certain content as guidance rather than proof.</li>
+<li><strong>Escalate:</strong> A privileged agent obtains extra information, modifies a strategy, utilizes a tool, or generates a risky outcome.</li>
+<li><strong>Persist:</strong> The altered outcome could be saved to memory, a synopsis, a downstream system, or the context of another agent.</li>
+</ol>
+<p>This chain illustrates the limitations of only scanning the initial user prompt, as risky content may appear after retrieval, within a tool response, or at a later stage in a multi-agent workflow.</p>
+<h2>Risk depends on capability, not only attack success</h2>
+<p>A model limited to drafting text poses less risk compared to one with the ability to access private repositories, send messages, edit records, run code, make payments, or interact with external services. The level of risk increases when four factors align: untrusted content is inputted into the model, the model can impact actions, there are broad credentials, and the workflow lacks independent validation or approval.</p>
+<div aria-label="Prompt injection risk factors" class="table-wrap" role="region" tabindex="0">
+<table>
+<thead><tr><th scope="col">Risk factor</th><th scope="col">Lower-risk design</th><th scope="col">Higher-risk design</th><th scope="col">Recommended boundary</th></tr></thead>
+<tbody>
+<tr><th scope="row">Data access</th><td>User-scoped, minimal retrieval</td><td>Shared or cross-tenant access</td><td>Authorize before retrieval and filter by identity</td></tr>
+<tr><th scope="row">Tools</th><td>Read-only, narrow functions</td><td>Broad write, code, network, or admin tools</td><td>Use typed interfaces and scoped credentials</td></tr>
+<tr><th scope="row">Destinations</th><td>Approved internal resources</td><td>Arbitrary URLs, recipients, or storage</td><td>Apply destination allowlists and data-loss controls</td></tr>
+<tr><th scope="row">Autonomy</th><td>One proposal, user confirms</td><td>Long autonomous loops with retries</td><td>Limit steps, tokens, time, spend, and side effects</td></tr>
+<tr><th scope="row">Output use</th><td>Displayed as untrusted text</td><td>Executed or rendered without validation</td><td>Parse, encode, validate, and policy-check downstream use</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="defenses">Controls for both injection types</h2>
+<div class="defense-stack">
+<div class="defense-card"><h3>Source provenance</h3><p>Documenting the origin, edit permissions, ingestion date, and trustworthiness of each context item.</p></div>
+<div class="defense-card"><h3>Context isolation</h3><p>Precisely define unreliable evidence, eliminate extraneous material, and avoid allowing extracted text to alter policies or tools.</p></div>
+<div class="defense-card"><h3>External authorization</h3><p>Ensure that identity, tenant, resource, and action permissions are enforced in deterministic code prior to retrieval and execution.</p></div>
+<div class="defense-card"><h3>Least-privilege tools</h3><p>Limit access to specific operations using schemas, temporary credentials, predefined endpoints, limits, and controlled network connections.</p></div>
+<div class="defense-card"><h3>Validation and approval</h3><p>Consider model output as unreliable; verify inputs and seek approval for any external, harmful, or confidential tasks.</p></div>
+<div class="defense-card"><h3>Monitoring and response</h3><p>Track the origins of content, data retrieval, prompts, tool requests, approvals, outputs, and documentation to prevent contamination.</p></div>
+</div>
+<h3>Controls that matter most for indirect injection</h3>
+<ul>
+<li>Ensure that content is sanitized and normalized before indexing, while also accounting for the possibility that some malicious instructions may go undetected.</li>
+<li>Structurally separate instructions from evidence by including source labels, trust labels, and purpose constraints in the context.</li>
+<li>Obtain the necessary passages while excluding unauthorized content.</li>
+<li>Prevent retrieved text from choosing tools, modifying permissions, altering recipients, or adding random external destinations.</li>
+<li>Contain browsing, code execution, file processing, and external network calls within sandboxes with limited resources.</li>
+<li>Avoid allowing model-generated summaries and memory to be passively accepted as authoritative instructions during subsequent interactions.</li>
+</ul>
+<h2>A secure execution pattern for RAG and agents</h2>
+<ol>
+<li><strong>Authenticate the request.</strong> Preserve user, tenant, service, and session identity through every step.</li>
+<li><strong>Authorize retrieval.</strong> Filter sources before search results enter model context.</li>
+<li><strong>Assemble minimal context.</strong> Include only necessary passages with provenance and trust labels.</li>
+<li><strong>Let the model propose.</strong> Request a reply or a written plan of action without granting direct authorization for implementation.</li>
+<li><strong>Validate independently.</strong> Implement schemas, policies, ownership rules, destination restrictions, data classification, and rate limits separately from the model.</li>
+<li><strong>Approve by impact.</strong> User or reviewer confirmation is required for sensitive disclosure, external communication, financial activity, deletion, or permission changes.</li>
+<li><strong>Execute narrowly.</strong> Utilize a service tailored for the specific operation and short-term credentials with minimal access.</li>
+<li><strong>Audit and contain.</strong> Document the lineage from source to action and provide support for cancellation, rollback, revocation, quarantine, and re</li>
+</ol>
+<h2 id="testing">How to test injection resilience</h2>
+<p>Evaluate the full application, including advanced features such as adversarial prompts, poisoned content, manipulated outputs, cross-language variations, distractions, multimodal inputs, and complex agent scenarios.</p>
+<ul>
+<li>User text cannot directly override tenant boundaries, retrieval permissions, or tool authorization.</li>
+<li>Content from documents, webpages, images, email, code, or tool output containing instructions is considered untrusted.</li>
+<li>A model is unable to include tools, scopes, recipients, resources, or network destinations within its own execution context.</li>
+<li>Harmful content is unable to trigger the release of sensitive information or prompt any actions without proper verification and approval.</li>
+<li>The model output must undergo validation before being used as executable code, unsafe markup, a query, or tool arguments.</li>
+<li>Injected text cannot linger as reliable data or influence subsequent entities without identifiable origin.</li>
+<li>Security operators have the ability to identify the origin, impacted index entries, alerts, tool activations, data modifications, users, and results.</li>
+</ul>
+<h3>Measure more than attack success rate</h3>
+<p>Monitor if the system complied with the injected instruction, accessed unauthorized information, proposed unsafe actions, was blocked by policy, requested approval, and was detected during the incident. A defense can still be beneficial even if the model is altered, as long as deterministic controls prevent significant harm.</p>
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq-item"><h3>What is direct prompt injection?</h3><p>Prompt injection happens when a user deliberately inserts commands into their input to bypass system rules, circumvent safeguards, expose restricted data, or manipulate the model to behave in ways not intended by the application.</p></div>
+<div class="faq-item"><h3>What is indirect prompt injection?</h3><p>Indirect prompt injection happens when malicious commands are hidden within content that the model will read later, like a document, webpage, email, PDF, code comment, database record, tool response, or memory item.</p></div>
+<div class="faq-item"><h3>What makes indirect prompt injection particularly risky for RAG and AI agents?</h3><p>To compromise the system, the attacker could poison a source accessed by the system, allowing the payload to execute within a legitimate user's request and potentially manipulate a privileged assistant with access to sensitive information or powerful resources.</p></div>
+<div class="faq-item"><h3>Which controls reduce prompt-injection risk?</h3><p>Employ provenance and trust labels, limited retrieval, context isolation, scoped credentials, deterministic authorization, typed tool interfaces, output validation, destination allowlists, human approval for significant actions, monitoring, and adversarial testing.</p></div>
+<h2>Authoritative guidance</h2>
+<p class="sources">This article’s risk model and defense-in-depth guidance align with the <a href="https://genai.owasp.org/llm-top-10/?cat=253" rel="noopener">OWASP Top 10 for LLMs and Generative AI Applications</a>Governance and lifecycle practices are influenced by issues such as prompt injection, inadequate output handling, excessive agency, sensitive information disclosure, and weaknesses in vectors or embeddings. <a href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" rel="noopener">NIST AI Risk Management Framework: Generative AI Profile</a>.</p>
+</div>
+</div>
+<aside aria-labelledby="cta-title" class="cta-band"><h2 id="cta-title">Assume some content will be adversarial</h2><p>Effective defenses can decrease the likelihood of successful injections, but the overall impact is ultimately determined by system boundaries. The model is responsible for interpreting and suggesting solutions, while deterministic services oversee identity verification, access control, destination management, approval processes, and execution protocols.</p></aside>
+</article>
+</div>
+</section>
+</main>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security/attack-surface.html">Attack Surface</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security/llm-security-challenges.html">Llm Security Challenges</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Dataknobs use cases with Knobs for finance and compliance</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+</body></html>

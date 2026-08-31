@@ -1,1525 +1,1192 @@
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="en">
-	
-	<head id="ctl00_head1">
-<meta name="google-site-verification" content="RVceKokUCmE6I_4EjvyNso7r-FabKr95sjVmUSOiUAI" />
-<!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DataKnobs &amp; Orthogonal Knob Systems Architecture</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-JF94J1W5MC');
-</script><title>
-	Data Knobs - Levers To Create and Manage AI, GenAI and Agents
-</title><meta http-equiv="content-type" content="text/html; charset=utf-8" /><meta name="description" content="Knobs in AI systems represent configurable parameters that fine-tune data transformations, feature engineering, and model hyperparameters, allowing for systematic experimentation and performance diagnostics. They are essential for controlling model behavior, creativity, and adaptability, particularly in generative AI and agentic systems where output precision and safety are critical. Overall, knobs provide the flexibility to balance performance, interpretability, and user alignment, fostering robust AI model development and refinement." /><meta name="keywords" content="data knobs, knobs, levers, configuration, for ai, system, knobs for  for configuring experimenting and diagnosing, knobs for building data product" /><link rel="icon" href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" /><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800" rel="stylesheet" type="text/css" />
-
-<!--		
-		<script src="https://css.dataknobs.com/sites/site-6/site6-1/js/jquery-1.8.3.min.js"></script>
-		<script src="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/init.js?use=mobile,desktop,1000px&amp;mobileUI=1&amp;mobileUI.theme=none"></script>
-		<script src="https://css.dataknobs.com/sites/site-6/site6-1/js/jquery.dropotron-1.2.js"></script>
-		<script src="https://css.dataknobs.com/sites/site-6/site6-1/js/init.js"></script>
-		<noscript>
-			<link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core-desktop.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core-1200px.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core-noscript.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/style.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/style-desktop.css" />
-		</noscript>
-	-->
-		<!--[if lte IE 9]><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/ie9.css" /><![endif]-->
-		<!--[if lte IE 8]><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/ie8.css" /><![endif]-->
-		<!--[if lte IE 7]><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/ie7.css" /><![endif]-->
-
-
-	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/js/jquery-1.8.3.min.js"></script>
-	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/init.js?use=mobile,desktop,1000px&amp;mobileUI=1&amp;mobileUI.theme=none"></script>
-	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/js/jquery.dropotron-1.2.js"></script>
-	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/js/init.js"></script>
-	<noscript>
-		<link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core-desktop.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core-1200px.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core-noscript.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/style.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/style-desktop.css" />
-	</noscript>
-	
-	
-
-	<meta name="description" content="Knobs in AI systems represent configurable parameters that fine-tune data transformations, feature engineering, and model hyperparameters, allowing for systematic experimentation and performance diagnostics. They are essential for controlling model behavior, creativity, and adaptability, particularly in generative AI and agentic systems where output precision and safety are critical. Overall, knobs provide the flexibility to balance performance, interpretability, and user alignment, fostering robust AI model development and refinement." /><meta name="keywords" content="data knobs, knobs, levers, configuration, for ai, system, knobs for  for configuring experimenting and diagnosing, knobs for building data product" /></head>
-  
-	<body class="no-sidebar">
-         
-		<!-- Header Wrapper -->
-			<div id="header-wrapper">
-				<div class="5grid-layout">
-					<div class="row">
-						<div class="12u">
-						
-							<!-- Header -->
-								<header id="header">
-								
-									<!-- Logo -->
-										
-										<div class="inner">
-										
-											<h1> <a id="ctl00_topheader" class="mobileUI-site-name">Data Knobs - Levers To Create and Manage AI, GenAI and Agents</a></h1>
-										
-									        
-										</div>
-									
-									
-									<!-- Nav -->
-										<nav id="nav" class="mobileUI-site-nav">
-											<ul>
-												 <li><a id="ctl00_hyperlinkHome" href="https://www.dataknobs.com/">Home</a></li>
-												<!--
-														
-
-    
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl01_title" href="https://www.dataknobs.com/">Home</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl02_title" href="https://www.dataknobs.com/about-dataknobs/">About dataknobs</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl03_title" href="https://www.dataknobs.com/agent-ai/">Agent ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl04_title" href="https://www.dataknobs.com/agentic-ai/">Agentic ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl05_title" href="https://www.dataknobs.com/ai/">Ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl06_title" href="https://www.dataknobs.com/ai-assistants/">Ai assistants</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl07_title" href="https://www.dataknobs.com/blog/">Blog</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl08_title" href="https://www.dataknobs.com/capability-led-solutions/">Capability led solutions</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl09_title" href="https://www.dataknobs.com/careers/">Careers</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl10_title" href="https://www.dataknobs.com/causal-inference/">Causal inference</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl11_title" href="https://www.dataknobs.com/consulting/">Consulting</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl12_title" href="https://www.dataknobs.com/customers/">Customers</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl13_title" href="https://www.dataknobs.com/data-centric-ai/">Data centric ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl14_title" href="https://www.dataknobs.com/data-governance/">Data governance</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl15_title" href="https://www.dataknobs.com/data-products/">Data products</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl16_title" href="https://www.dataknobs.com/datasets-blindspots/">Datasets blindspots</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl17_title" href="https://www.dataknobs.com/demo/">Demo</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl18_title" href="https://www.dataknobs.com/embeddings/">Embeddings</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl19_title" href="https://www.dataknobs.com/explore/">Explore</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl20_title" href="https://www.dataknobs.com/fractional-cto-ai/">Fractional cto ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl21_title" href="https://www.dataknobs.com/generate-datasets/">Generate datasets</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl22_title" href="https://www.dataknobs.com/generativeai/">Generativeai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl23_title" href="https://www.dataknobs.com/industry/">Industry</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl24_title" href="https://www.dataknobs.com/partnership/">Partnership</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl25_title" href="https://www.dataknobs.com/platform/">Platform</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl26_title" href="https://www.dataknobs.com/pricing/">Pricing</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl27_title" href="https://www.dataknobs.com/privacy/">Privacy</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl28_title" href="https://www.dataknobs.com/products/">Products</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl29_title" href="https://www.dataknobs.com/slides/">Slides</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl30_title" href="https://www.dataknobs.com/solutions/">Solutions</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl31_title" href="https://www.dataknobs.com/test/">Test</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl32_title" href="https://www.dataknobs.com/use-cases/">Use cases</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl33_title" href="https://www.dataknobs.com/vector-database/">Vector database</a>
-            </li>	
-
-
-
-
-
-
-
-             
- 
- 
- 
-
-												-->
-                                               
-											</ul>
-										</nav>
-								
-								</header>
-                               
-
-						</div>
-					</div>
-				</div>
-			
-		</div>
-
-		<div id="main-wrapper">
-
-			<div class="main-wrapper-style2">
-
-					<div class="inner">
-
-						<div class="5grid-layout">
-
-							<div class="row">
-
-									
-									<div class="12u mobileUI-main-content">
-										<div id="content">
-
-										<article>
-
-												
-													
-
-
-		
-							
-										
-
-    <header class="major">
-                                         
-					  <h2><span id="ctl00_ContentPlaceHolder1_title">Data Knobs - Levers To Create and Manage AI, GenAI and Agents</span></h2>						
-										
-						 <span class="byline"> <span id="ctl00_ContentPlaceHolder1_metadesc">Knobs in AI systems represent configurable parameters that fine-tune data transformations, feature engineering, and model hyperparameters, allowing for systematic experimentation and performance diagnostics. They are essential for controlling model behavior, creativity, and adaptability, particularly in generative AI and agentic systems where output precision and safety are critical. Overall, knobs provide the flexibility to balance performance, interpretability, and user alignment, fostering robust AI model development and refinement.</span></span>				
-    </header>       
-     
-
-							
-										
-									<span id="ctl00_ContentPlaceHolder1_labeltext"></span>	
-
-                                                           														
-                            <br />
-                            <br />
-
-                               <table id="ctl00_ContentPlaceHolder1_RepComments" cellspacing="0" border="0">
-	<tr>
-		<td>
-
-
-</td>
-	</tr><tr>
-		<td>
-
-
-					
-                   
-
-												 
-               							
-		
-
-      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl01_label2"><font color="Black" size="4"><p>In machine learning and AI model development, "knobs" (or levers) represent configurable parameters, transformations, and settings that influence data preprocessing, feature engineering, model hyperparameters, and, more broadly, system behavior. These knobs are crucial in fine-tuning various aspects of a machine learning pipeline, including data processing, model performance, and AI agent behavior, particularly in generative AI and agentic systems.</p>
-<h3>1. <strong>Data Transformation and Feature Engineering Knobs</strong></h3>
-<ul>
-<li><strong>Role</strong>: Knobs in data transformation and feature engineering enable adjusting preprocessing steps like normalization, scaling, encoding, and dimensionality reduction. By tweaking these, developers can manage how raw data is prepared for the model. They allow for experimentation with data representation, which impacts the model’s ability to learn and generalize.</li>
-<li><strong>Example</strong>: Adjusting the parameters of a principal component analysis (PCA) transformation, changing encoding schemes, or varying feature selection thresholds can help refine the inputs that the model receives.</li>
-<li><strong>Benefits</strong>: Such knobs allow for testing different configurations, helping data scientists understand which transformations lead to improved model performance, accuracy, and efficiency. They also aid in diagnosing problems related to data representation and addressing feature redundancy or irrelevance.</li>
-</ul>
-<h3>2. <strong>Hyperparameter Management Knobs</strong></h3>
-<ul>
-<li><strong>Role</strong>: Hyperparameters are configurations that govern model architecture, training dynamics, and optimization, including learning rate, batch size, regularization strength, and model depth. These knobs allow developers to tune the model's learning process without altering the core model structure.</li>
-<li><strong>Example</strong>: Adjusting the learning rate can make the model converge faster or slower; altering the regularization parameter can help prevent overfitting, and modifying the depth of a neural network can improve or degrade performance based on dataset complexity.</li>
-<li><strong>Benefits</strong>: Hyperparameter knobs are central to experimentation, as different values can yield varying performance. Systematic tuning or automated hyperparameter search (e.g., grid search, random search) helps identify configurations that optimize the model’s performance, stability, and robustness.</li>
-</ul>
-<h3>3. <strong>Experimentation and Diagnostic Role of Knobs</strong></h3>
-<ul>
-<li><strong>Role</strong>: Knobs empower iterative experimentation, where different configurations are systematically tested to observe changes in outcomes. They enable diagnosing model performance issues by isolating the effects of specific parameters.</li>
-<li><strong>Example</strong>: Running experiments with different feature sets, data transformations, or learning rates allows data scientists to pinpoint which parameters directly impact issues like overfitting, underfitting, or generalization errors.</li>
-<li><strong>Benefits</strong>: Experimentation with knobs provides insights into the optimal setup, helping teams establish best practices for similar tasks. Diagnostic testing using knobs can reveal why certain configurations may fail, assisting in problem-solving and model refinement.</li>
-</ul>
-<h3>4. <strong>Knobs in Generative AI (GenAI) and Agentic Systems</strong></h3>
-<ul>
-<li><strong>Generative AI</strong>: In generative AI systems, knobs are crucial for controlling creativity, style, and output constraints. For instance, in text generation models, temperature and top-k/top-p sampling parameters act as knobs to control output randomness and relevance.</li>
-<li><strong>Agentic Systems</strong>: In AI agents, knobs allow for configuring behaviors like exploration versus exploitation, decision-making thresholds, and interaction styles. These settings help shape the agent’s personality, adaptability, and response strategies.</li>
-<li><strong>Example</strong>: Adjusting the exploration rate in reinforcement learning or modifying constraints for goal-oriented behavior enables tailoring an agent’s actions to desired outcomes. For generative models, changing the temperature knob can make the model output more conservative or more creative, depending on the use case.</li>
-<li><strong>Benefits</strong>: In generative and agentic systems, knobs allow for real-time adaptability and controlled creativity, which are essential for creating dynamic, interactive systems. They provide a foundation for maintaining model alignment with human preferences and safety considerations, especially in interactive environments or autonomous settings.</li>
-</ul>
-<h3><strong>Summary: Knobs as a Key Component in Building AI Systems</strong></h3>
-<ul>
-<li>Knobs serve as essential tools for configuring, experimenting, and diagnosing various aspects of AI models. Their configurability aids in the systematic exploration of the impact of different settings on data, model performance, and behavior.</li>
-<li>In generative and agentic AI, knobs allow for dynamic control over output characteristics, creativity, adaptability, and safety, making them fundamental for designing models that align with user intent and system goals.</li>
-<li>Overall, knobs facilitate a balance between performance, interpretability, and control, providing the flexibility needed to innovate in AI system design, testing, and optimization.</li>
-</ul></font></span>
-    <br />
-
-
-</td>
-	</tr><tr>
-		<td>
-
-
-
-</td>
-	</tr>
-</table>    
-                            <br />
-                            <br />
-                             <div class="fb-activity" data-site="https://www.dataknobs.com/" data-action="likes, recommends" data-colorscheme="light" data-header="true"></div>
-	
-								
-                                <div class="fb-comments" data-href="https://www.dataknobs.com/" data-numposts="5" data-colorscheme="light" data-order-by="reverse_time"></div>
-			
-<!--
-                            <div class="fb-post" data-href="https://www.facebook.com/DiwaliCelebrations" data-width="500"></div>		
-                              <div class="fb-recommendations" data-site="https://www.dataknobs.com/" data-action="likes, recommends" data-colorscheme="light" data-header="true"></div>
-		
-                            -->
-     
-
-    
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl01_title" href="https://www.dataknobs.com/products/knobs/abexperiment.html">Abexperiment</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl02_title" href="https://www.dataknobs.com/products/knobs/data-and-model.html">Data-and-model</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl03_title" href="https://www.dataknobs.com/products/knobs/dataknobs-product-plan.html">Dataknobs-product-plan</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl04_title" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs-are-levers</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl05_title" href="https://www.dataknobs.com/products/knobs/knobs-description.html">Knobs-description</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl06_title" href="https://www.dataknobs.com/products/knobs/knobs-detail.html">Knobs-detail</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl07_title" href="https://www.dataknobs.com/products/knobs/knobs-for-experimentation-diagnostics-evaluation.html">Knobs-for-experimentation-dia</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl08_title" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs-for-high-information-re</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl09_title" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs-for-speed-and-governanc</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl10_title" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">Knobs-governance</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-
-
-             
- 
- 
- 
-	
-						
-		<span id="ctl00_ContentPlaceHolder1_label1"></span>	
-
-                                                           														
- 
-           <span id="ctl00_ContentPlaceHolder1_ad728_ad">
-</span>
-                                        <br /><br />
-
-    <!--
-				 <a id="ctl00_ContentPlaceHolder1_buttonmain" class="button"></a>
-                                                            <a id="ctl00_ContentPlaceHolder1_buttonall" class="button button-alt"></a>	
-    -->
-												
-
-
-   
-
-    
-
-
-										</article>
-									
-										</div>
-									</div>
-									
-
-							</div>
-
-						</div>
-
-					</div>
-
-			</div>
-
-			
-
-				<div class="main-wrapper-style3">
-					<div class="inner">
-						<div class=5grid-layout>
-							<div class="row">
-								<div class="8u">
-
-									<!-- Article list -->
-									<section class="box-article-list">
-				<h2 class="icon icon-news">Dataknobs Blog</h2>
-
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">Showcase: 10 Production Use Cases</span>
-										<h3><a href="https://www.dataknobs.com/use-cases/">10 Use Cases Built By Dataknobs</a></h3>
-									</header>
-									<p>
-										Dataknobs delivers real, shipped outcomes across finance, healthcare, real estate, e‑commerce, and more—powered by GenAI, Agentic workflows, and classic ML.
-
-										Explore detailed walk‑throughs of projects like Earnings Call Insights, E‑commerce Analytics with GenAI, Financial Planner AI, Kreatebots, Kreate Websites, Kreate CMS, Travel Agent Website, and Real Estate Agent tools.
-
-									</p>
-								</div>
-				</article>
-				<article class="box-excerpt">
-
-							<div>
-								<header>
-									<span class="date">Data Product Approach</span>
-									<h3><a href="https://www.dataknobs.com/data-products/">Why Build Data Products</a></h3>
-								</header>
-								<p>
-									Companies should build data products because they transform raw data into actionable, reusable assets that directly drive 
-									business outcomes. Instead of treating data as a byproduct of operations, a data product approach emphasizes usability, governance, and value creation.
-									Ultimately, they turn data from a cost center into a growth engine, unlocking compounding value across every function of the enterprise.
-
-								</p>
-							</div>
-</article>
-						
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">AI Agent for Business Analysis</span>
-										<h3><a href="https://www.dataknobs.com/products/kreate/kreate-structured-data-insights.html">Analyze reports, dashboard and determine To-do</a></h3>
-									</header>
-									<p>
-										Our structured‑data analysis agent connects to CSVs, SQL, and APIs; auto‑detects schemas; and standardizes formats.
-
-										It finds trends, anomalies, correlations, and revenue opportunities using statistics, heuristics, and LLM reasoning.
-
-										The output is crisp: prioritized insights and an action‑ready To‑Do list for operators and analysts.
-
-									</p>
-								</div>
-				</article>
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">AI Agent Tutorial</span>
-										<h3><a href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Tutorial</a></h3>
-									</header>
-									<p>
-										Dive into slides and a hands‑on guide to agentic systems—perception, planning, memory, and action.
-
-										Learn how agents coordinate tools, adapt via feedback, and make decisions in dynamic environments for automation, assistants, and robotics.
-
-									</p>
-								</div>
-				</article>
-				<article class="box-excerpt">
-
-					<div>
-						<header>
-							<span class="date">Toon Guide</span>
-							<h3><a href="https://www.dataknobs.com/generativeai/52-toon-tutorial/">Toon Tutorial and Guide</h3>
-						</header>
-						<p>
-							TOON is a compact, LLM-native data format that removes JSON’s structural noise.
-It lets you fit 5× more structured data into your model, improving accuracy and reducing cost.
-
-						</p>
-					</div>
-				</article>
-
-				<!-- Excerpt -->
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">Build Data Products</span>
-										<h3><a href="https://www.dataknobs.com/data-products/">How Dataknobs help in building data products</a></h3>
-									</header>
-									<p>
-										GenAI and Agentic AI accelerate data‑product development: generate synthetic data, enrich datasets, summarize and reason over large corpora, and automate reporting.
-
-										Use them to detect anomalies, surface drivers, and power predictive models—while keeping humans in the loop for control and safety.
-
-									</p>
-								</div>
-				</article>
-
-
-				
-
-				<!-- Excerpt -->
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">KreateHub</span>
-										<h3><a href="https://www.dataknobs.com/products/kreate/prompt-library-for-genai.html">Create New knowledge with Prompt library</a></h3>
-									</header>
-									<p>
-										KreateHub turns prompts into reusable knowledge assets—experiment, track variants, and compose chains that transform raw data into decisions.
-
-										It’s your workspace for rapid iteration, governance, and measurable impact.
-
-									</p>
-								</div>
-				</article>
-
-				<!-- Excerpt -->
-				<article class="box-excerpt">
-
-									<div>
-										<header>
-											<span class="date">Build Budget Plan for GenAI</span>
-											<h3><a href="https://www.dataknobs.com/generativeai/50-use-cases/how-to-create-genai-budget/">CIO Guide to create GenAI Budget for 2025</a></h3>
-										</header>
-										<p>
-											A pragmatic playbook for CIOs/CTOs: scope the stack, forecast usage, model costs, and sequence investments across infra, safety, and business use cases.
-
-											Apply the framework to IT first, then scale to enterprise functions.
-
-										</p>
-									</div>
-				</article>
-
-
-
-
-									<article class="box-excerpt">
-
-									<div>
-										<header>
-											<span class="date">RAG for Unstructured & Structured Data</span>
-											<h3><a href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-for-structured-and-unstructred-data.html">RAG Use Cases and Implementation</a></h3>
-										</header>
-										<p>Explore practical RAG patterns: unstructured corpora, tabular/SQL retrieval, and guardrails for accuracy and compliance. Implementation notes included.</p>
-									</div>
-								</article>
-
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">Why knobs matter</span>
-										<h3><a href="https://www.dataknobs.com/orthogonal.html">Knobs are levers using which you manage output</a></h3>
-									</header>
-									<p>
-
-										The Drivetrain approach frames product building in four steps; “knobs” are the controllable inputs that move outcomes.
-
-										Design clear metrics, expose the right levers, and iterate—control leads to compounding impact.
-
-									</p>
-								</div>
-				</article>
-
-</section>
-								</div>
-								<div class="4u">
-
-				<!-- Spotlight -->
-				<section class="box-spotlight pad-left">
-								<h2 class="icon icon-paper">Our Products</h2>
-
-								<article>
-									<header>
-										<h3><a href="https://www.dataknobs.com/products/kreatebots/">KreateBots</a></h3>
-										<span class="byline">Launch intelligent chatbots instantly</span>
-									</header>
-									<li>Ready-to-use front-end—configure in minutes</li>
-									<li>Admin dashboard for full chatbot control</li>
-									<li>Integrated prompt management system</li>
-									<li>Personalization and memory modules</li>
-									<li>Conversation tracking and analytics</li>
-									<li>Continuous feedback learning loop</li>
-									<li>Deploy across GCP, Azure, or AWS</li>
-									<li>Add Retrieval-Augmented Generation (RAG) in seconds</li>
-									<li>Auto-generate FAQs for user queries</li>
-									<footer>
-										<a href="https://www.dataknobs.com/products/kreatebots/" class="button" button-alt button-icon button-icon-paper>KreateBots</a>
-									</footer>
-								</article>
-
-								<article>
-									<header>
-										<h3><a href="https://www.dataknobs.com/products/kreatebots/">KreateWebsites</a></h3>
-										<span class="byline">AI-driven website builder</span>
-									</header>
-									<li>Build SEO-optimized sites powered by LLMs</li>
-									<li>Host on Azure, GCP, or AWS</li>
-									<li>Intelligent AI website designer</li>
-									<li>Agent-assisted website generation</li>
-									<li>End-to-end content automation</li>
-									<li>Content management for AI-driven websites</li>
-									<li>Available as SaaS or managed solution</li>
-									<li>Listed on Azure Marketplace</li>
-									<footer>
-										<a href="https://www.dataknobs.com/products/kreatewebsites/" class="button" button-alt button-icon button-icon-paper>KreateWebsites</a>
-									</footer>
-								</article>
-
-								<article>
-									<header>
-										<h3><a href="https://www.dataknobs.com/products/kreatebots/">Kreate CMS</a></h3>
-										<span class="byline">Content Management for GenAI</span>
-									</header>
-									<li>Purpose-built CMS for AI content pipelines</li>
-									<li>Track provenance for AI vs human edits</li>
-									<li>Monitor lineage and version history</li>
-									<li>Identify all pages using specific content</li>
-									<li>Remove or update AI-generated assets safely</li>
-									<footer>
-										<a href="https://www.dataknobs.com/products/kreate/cms/" class="button" button-alt button-icon button-icon-paper>CMS for Websites and Bots</a>
-									</footer>
-								</article>
-
-								<article>
-									<header>
-										<h3><a href="https://www.dataknobs.com/generativeai/generate-slides.html">Generate Slides</a></h3>
-										<span class="byline">Create presentations from prompts</span>
-									</header>
-									<li>Instant slide decks from natural language prompts</li>
-									<li>Convert slides into interactive webpages</li>
-									<li>Optimize presentation pages for SEO</li>
-									<footer>
-										<a href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html" class="button" button-alt button-icon button-icon-paper>Gen AI Slides</a>
-									</footer>
-								</article>
-
-								<article>
-									<header>
-										<h3><a href="https://www.dataknobs.com/products/kreate/content/">Content Compass</a></h3>
-										<span class="byline">Automated storytelling engine</span>
-									</header>
-									<li>Auto-generate articles and blogs</li>
-									<li>Create and embed matching visuals</li>
-									<li>Link related topics for SEO ranking</li>
-									<li>AI-driven topic and content recommendations</li>
-									<footer>
-										<a href="https://www.dataknobs.com/products/kreate/content/" class="button" button-alt button-icon button-icon-paper>Content Compass</a>
-									</footer>
-								</article>
-
-								<article>
-									<header>
-										<h3><a href="#">Fractional CTO for Generative AI and Data Products</a></h3>
-										<span class="byline">Access deep expertise on demand</span>
-									</header>
-									<li>Deliver complete AI and data use cases</li>
-									<li>On-demand GenAI and ML architecture</li>
-									<li>End-to-end product design and deployment</li>
-									<li>Integration across cloud ecosystems</li>
-									<li>Work across AWS, GCP, or Azure</li>
-									<footer>
-										<a href="https://www.dataknobs.com/fractional-cto-ai/" class="button" button-icon button-icon-paper>Fractional CTO</a>
-									</footer>
-								</article>
-				</section>
-
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        warmbg: '#faf8f5',
+                        warmcard: '#ffffff',
+                        borderwarm: '#e7e3dc',
+                        brandamber: '#d97706',
+                        brandemerald: '#059669',
+                        brandslate: '#334155',
+                        brandindigo: '#4f46e5',
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #faf8f5;
+            color: #1c1917;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        .tab-btn.active {
+            border-bottom-color: #d97706;
+            color: #d97706;
+            font-weight: 600;
+        }
+    </style>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head>
+<body class="bg-warmbg text-stone-800 antialiased min-h-screen flex flex-col">
+<!-- Sticky Navigation Header -->
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-xs">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<div class="flex items-center space-x-3">
+<span class="text-2xl">🎛️</span>
+<span class="font-bold text-lg text-stone-900 tracking-tight">DataKnobs <span class="text-amber-600 font-normal">Orthogonal Knob Intelligence</span></span>
 </div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-		</div>
-
-		
-
-		<!-- Footer Wrapper -->
-			<div id="footer-wrapper">
-		
-				<footer id="footer" class="5grid-layout">
-					<div class="row">
-    
-						<div class="3u">
-						
-						
-								<section class="widget-links">
-									<h2>Main pages</h2>
-									<ul class="style2">
-										<a id="ctl00_hyperlink1"></a>
-										
-
-    
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl01_title" href="https://www.dataknobs.com/">Home</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl02_title" href="https://www.dataknobs.com/about-dataknobs/">About dataknobs</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl03_title" href="https://www.dataknobs.com/agent-ai/">Agent ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl04_title" href="https://www.dataknobs.com/agentic-ai/">Agentic ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl05_title" href="https://www.dataknobs.com/ai/">Ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl06_title" href="https://www.dataknobs.com/ai-assistants/">Ai assistants</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl07_title" href="https://www.dataknobs.com/blog/">Blog</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl08_title" href="https://www.dataknobs.com/capability-led-solutions/">Capability led solutions</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl09_title" href="https://www.dataknobs.com/careers/">Careers</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl10_title" href="https://www.dataknobs.com/causal-inference/">Causal inference</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl11_title" href="https://www.dataknobs.com/consulting/">Consulting</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl12_title" href="https://www.dataknobs.com/customers/">Customers</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl13_title" href="https://www.dataknobs.com/data-centric-ai/">Data centric ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl14_title" href="https://www.dataknobs.com/data-governance/">Data governance</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl15_title" href="https://www.dataknobs.com/data-products/">Data products</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl16_title" href="https://www.dataknobs.com/datasets-blindspots/">Datasets blindspots</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl17_title" href="https://www.dataknobs.com/demo/">Demo</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl18_title" href="https://www.dataknobs.com/embeddings/">Embeddings</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl19_title" href="https://www.dataknobs.com/explore/">Explore</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl20_title" href="https://www.dataknobs.com/fractional-cto-ai/">Fractional cto ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl21_title" href="https://www.dataknobs.com/generate-datasets/">Generate datasets</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl22_title" href="https://www.dataknobs.com/generativeai/">Generativeai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl23_title" href="https://www.dataknobs.com/industry/">Industry</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl24_title" href="https://www.dataknobs.com/partnership/">Partnership</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl25_title" href="https://www.dataknobs.com/platform/">Platform</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl26_title" href="https://www.dataknobs.com/pricing/">Pricing</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl27_title" href="https://www.dataknobs.com/privacy/">Privacy</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl28_title" href="https://www.dataknobs.com/products/">Products</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl29_title" href="https://www.dataknobs.com/slides/">Slides</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl30_title" href="https://www.dataknobs.com/solutions/">Solutions</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl31_title" href="https://www.dataknobs.com/test/">Test</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl32_title" href="https://www.dataknobs.com/use-cases/">Use cases</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl33_title" href="https://www.dataknobs.com/vector-database/">Vector database</a>
-            </li>	
-
-
-
-
-
-
-
-             
- 
- 
- 
-
-									</ul>
-								</section>
-						
-						</div>
-						<div class="3u">
-						
-							
-								<section class="widget-links">
-									<h2>Related Pages </h2>
-									<ul class="style2">
-										
-
-    
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl01_title" href="https://www.dataknobs.com/products/knobs/abexperiment.html">Abexperiment</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl02_title" href="https://www.dataknobs.com/products/knobs/data-and-model.html">Data-and-model</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl03_title" href="https://www.dataknobs.com/products/knobs/dataknobs-product-plan.html">Dataknobs-product-plan</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl04_title" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs-are-levers</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl05_title" href="https://www.dataknobs.com/products/knobs/knobs-description.html">Knobs-description</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl06_title" href="https://www.dataknobs.com/products/knobs/knobs-detail.html">Knobs-detail</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl07_title" href="https://www.dataknobs.com/products/knobs/knobs-for-experimentation-diagnostics-evaluation.html">Knobs-for-experimentation-dia</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl08_title" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs-for-high-information-re</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl09_title" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs-for-speed-and-governanc</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl10_title" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">Knobs-governance</a>
-            </li>	
-    <br />
-
-
-
-
-
-
-
-             
- 
- 
- 
-
-										
-									</ul>
-								</section>
-						
-						</div>
-						<div class="3u">
-						
-					
-								<section class="widget-links">
-									<h2>Explore more </h2>
-									<ul class="style2">
-										
-
-    
-
-
-
-												
-		<li>					
-			<a id="ctl00_Articlesub1_RepLinks_ctl01_title" href="https://www.dataknobs.com/"><em><b>Home</b></em></a>
+<nav class="hidden lg:flex space-x-6 text-sm font-medium text-stone-600">
+<a class="hover:text-amber-600 transition" href="#knob-core-concept">Orthogonal Mechanics</a>
+<a class="hover:text-amber-600 transition" href="#vector-trajectories">Trajectory Simulator</a>
+<a class="hover:text-amber-600 transition" href="#orthogonality-paradigms">3 Paradigms</a>
+<a class="hover:text-amber-600 transition" href="#decoupling-workbench">Decoupling Workbench</a>
+<a class="hover:text-amber-600 transition" href="#knob-taxonomy">Taxonomy (A-E)</a>
+<a class="hover:text-amber-600 transition" href="#industry-matrix">Industry Matrix</a>
+<a class="hover:text-amber-600 transition" href="#ekip-lifecycle">EKIP Lifecycle</a>
+</nav>
+</div>
+</div>
+</header>
+<!-- Hero Section -->
+<section class="bg-stone-900 text-stone-100 py-12 px-4 sm:px-6 lg:px-8 border-b border-stone-800">
+<div class="max-w-7xl mx-auto">
+<div class="md:flex md:items-center md:justify-between">
+<div class="max-w-3xl">
+<div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-semibold mb-4 border border-amber-500/30">
+<span>Orthogonal Control Theory &amp; Parameter Manifolds</span>
+</div>
+<h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-4">
+                        Orthogonal Knobs &amp; Manifold Tuning Architecture
+                    </h1>
+<p class="text-stone-300 text-base sm:text-lg leading-relaxed">
+                        A system based on control theory that separates interconnected variables in modern machine learning and data pipelines, allowing for optimization without unintended consequences or drift. This is achieved by converting interdependent parameters into independent coordinate axes.
+                    </p>
+</div>
+<div class="mt-6 md:mt-0 grid grid-cols-2 gap-4 text-center">
+<div class="bg-stone-800/80 backdrop-blur p-4 rounded-xl border border-stone-700">
+<div class="text-2xl font-bold text-amber-400">1-to-1</div>
+<div class="text-xs text-stone-400">Orthogonal Metric Mapping</div>
+</div>
+<div class="bg-stone-800/80 backdrop-blur p-4 rounded-xl border border-stone-700">
+<div class="text-2xl font-bold text-emerald-400">5 Categories</div>
+<div class="text-xs text-stone-400">Enterprise Knob Taxonomy</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Content Area -->
+<main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+<!-- SECTION 1: Orthogonal Knob Core Concept & Mathematical Basis -->
+<section class="scroll-mt-20" id="knob-core-concept">
+<div class="mb-6">
+<h2 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
+<span>🎛️</span> Core Mechanics of Orthogonal Knobs
+                </h2>
+<p class="text-stone-600 mt-2 leading-relaxed">
+                    In conventional engineering configurations, adjusting a single dial (like RAG chunk length, cache retention, or dropout rate) can inadvertently affect separate target metrics. <strong>Orthogonal Knobs</strong> Separate operational parameters into coordinate bases that are mutually independent ($u_i \cdot u_j = 0$), ensuring precise tuning.
+                </p>
+</div>
+<!-- Orthogonal vs Coupled Comparison Grid -->
+<div class="grid md:grid-cols-2 gap-6 mb-6">
+<div class="bg-rose-50/50 p-6 rounded-xl border-2 border-rose-200 shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<span class="text-xs font-bold uppercase tracking-wider text-rose-700">Coupled Parameter State</span>
+<span class="text-xl">⚠️</span>
+</div>
+<h3 class="text-lg font-bold text-rose-900 mb-2">Entangled Knobs (Non-Orthogonal)</h3>
+<p class="text-xs text-stone-700 mb-4 leading-relaxed">
+                        Changing parameter $\theta_1$ unintentionally causes metrics $M_1, M_2,$ and $M_3$ to shift. Optimizing involves addressing non-convex multi-objective Pareto trade-offs
+                    </p>
+<div class="space-y-2 text-xs text-stone-700 bg-white p-3 rounded-lg border border-rose-200">
+<div class="flex items-start gap-2 text-rose-800">
+<strong>•</strong> <span><strong>RAG Chunk Depth ($k$):</strong> Increased $k$ improves context retention but also leads to longer inference times and higher costs.</span>
+</div>
+<div class="flex items-start gap-2 text-rose-800">
+<strong>•</strong> <span><strong>Learning Rate ($\eta$):</strong> Accelerates convergence while also modifying momentum, variance, and stability of representation.</span>
+</div>
+<div class="flex items-start gap-2 text-rose-800">
+<strong>•</strong> <span><strong>DBMS Shared Buffers:</strong> Speeds up cached reads at the expense of reducing write throughput and background checkpoint I/O.</span>
+</div>
+</div>
+</div>
+<div class="bg-emerald-50/50 p-6 rounded-xl border-2 border-emerald-200 shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<span class="text-xs font-bold uppercase tracking-wider text-emerald-700">Orthogonal Parameter State</span>
+<span class="text-xl">🎯</span>
+</div>
+<h3 class="text-lg font-bold text-emerald-900 mb-2">Decoupled Knobs (Orthogonal)</h3>
+<p class="text-xs text-stone-700 mb-4 leading-relaxed">
+                        Every parameter $\theta_i$ corresponds uniquely to a target metric $M_i$, ensuring that $\frac{\partial M_j}{\partial \theta_i} \approx 0$ for all $j \neq i. The tuning process is isolated, monotonic, and predictable.
+                    </p>
+<div class="space-y-2 text-xs text-stone-700 bg-white p-3 rounded-lg border border-emerald-200">
+<div class="flex items-start gap-2 text-emerald-800">
+<strong>•</strong> <span><strong>Isolated Capacity Tuning:</strong> Decreasing the depth and width of a layer helps minimize bias without changing the regularization loss.</span>
+</div>
+<div class="flex items-start gap-2 text-emerald-800">
+<strong>•</strong> <span><strong>Decoupled Relevance Thresholds:</strong> Vector similarity cutoff filters context without mutating prompt schemas.</span>
+</div>
+<div class="flex items-start gap-2 text-emerald-800">
+<strong>•</strong> <span><strong>Decision-Layer Cost Matrices:</strong> Calibrate business profit trade-offs post-hoc without retraining models.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Mathematical Definition Callout -->
+<div class="bg-amber-50/40 p-6 rounded-xl border border-amber-200 shadow-sm">
+<div class="flex items-center justify-between border-b border-amber-200 pb-3 mb-4">
+<h4 class="text-lg font-bold text-stone-900">Mathematical Formalization of Orthogonal Decoupling</h4>
+<span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-semibold rounded text-xs">Information Geometry</span>
+</div>
+<div class="grid md:grid-cols-3 gap-4 text-xs text-stone-700">
+<div class="bg-white p-3 rounded border border-stone-200">
+<strong class="text-amber-800 block mb-1 font-mono">1. Metric Jacobian $J_{M}(\theta)$</strong>
+                        A system has orthogonal control if the Jacobian matrix $J_{ij} = \frac{\partial M_i}{\partial \theta_j}$ is either diagonal or made orthogonal through a change in coordinates.
+                    </div>
+<div class="bg-white p-3 rounded border border-stone-200">
+<strong class="text-amber-800 block mb-1 font-mono">2. Riemannian Metric $g_{ij}(\theta)$</strong>
+                        The Fisher Information Metric $g_{ij}$ is defined on the parameter manifold $\mathcal{M}$ to guide trajectories along the natural gradient descent $\tilde{\nabla} \mathcal{L} = g^{-1}
+                    </div>
+<div class="bg-white p-3 rounded border border-stone-200">
+<strong class="text-amber-800 block mb-1 font-mono">3. Safe Operational Envelopes</strong>
+                        The parameters of the knob are limited to compact subsets $\Omega \subset \mathbb{R}^n$, which helps avoid unstable boundary states that could be entered by automated optim
+                    </div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: Interactive Vector Trajectory Simulator -->
+<section class="scroll-mt-20" id="vector-trajectories">
+<div class="mb-6">
+<h2 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
+<span>⚡</span> Interactive Parameter Trajectory Simulator
+                </h2>
+<p class="text-stone-600 mt-2 leading-relaxed">
+                    Compare optimization paths on the parameter manifold. Observe how <strong>Coupled Knobs</strong> result in inefficient zigzagging and metric interference, whereas <strong>Orthogonal Knobs</strong> descend directly along decoupled coordinate axes.
+                </p>
+</div>
+<div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+<div class="grid lg:grid-cols-12 gap-6 items-center">
+<!-- Controls & Stats -->
+<div class="lg:col-span-5 space-y-4">
+<div class="flex gap-3">
+<button class="flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-rose-600 text-white transition" id="btn-traj-coupled" onclick="setTrajectoryMode('coupled')">
+                                Coupled Path (Zigzag)
+                            </button>
+<button class="flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-stone-100 text-stone-700 hover:bg-stone-200 transition" id="btn-traj-ortho" onclick="setTrajectoryMode('ortho')">
+                                Orthogonal Path (Direct)
+                            </button>
+</div>
+<div class="p-4 bg-stone-50 rounded-lg border border-stone-200 space-y-2" id="traj-info-card">
+<h4 class="font-bold text-sm text-stone-900" id="traj-title">Coupled Tuning Trajectory</h4>
+<p class="text-xs text-stone-600 leading-relaxed" id="traj-desc">
+                                Parameters display significant cross-correlation, where adjusting Knob A leads to compensatory changes in Knob B, resulting in wasted iterations and metric fluctuations.
+                            </p>
+<div class="grid grid-cols-2 gap-2 pt-2 border-t border-stone-200 text-xs">
+<div><span class="text-stone-500">Iterations to Converge:</span> <strong class="text-rose-600" id="traj-steps">18 Steps</strong></div>
+<div><span class="text-stone-500">Metric Stability:</span> <strong class="text-rose-600" id="traj-stability">Low (Oscillating)</strong></div>
+</div>
+</div>
+<div class="text-[11px] text-stone-500 space-y-1">
+<p><strong>Decoupling Benefit:</strong> Orthogonal transformation diagonalizes the parameter Hessian matrix, converting difficult valley navigation into straightforward 1D scalar line searches.</p>
+</div>
+</div>
+<!-- Chart Canvas -->
+<div class="lg:col-span-7">
+<div class="chart-container">
+<canvas id="trajectoryChart"></canvas>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: The Three Paradigms of Orthogonality -->
+<section class="scroll-mt-20" id="orthogonality-paradigms">
+<div class="mb-6">
+<h2 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
+<span>📐</span> The Three Paradigms of Orthogonal Knobs
+                </h2>
+<p class="text-stone-600 mt-2 leading-relaxed">
+                    Modern AI systems exhibit orthogonality across diagnostic processes, algebraic weight manipulations, and macro objective alignment.
+                </p>
+</div>
+<div class="grid lg:grid-cols-3 gap-6">
+<!-- Paradigm 1: Engineer's Dial -->
+<div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+<div>
+<div class="inline-block px-3 py-1 rounded bg-blue-100 text-blue-800 text-xs font-semibold mb-3">
+                            Diagnostic Workflow
+                        </div>
+<h3 class="text-xl font-bold text-stone-900 mb-2">1. The Engineer's Dial</h3>
+<p class="text-sm text-stone-600 mb-4 leading-relaxed">
+                            Created by Andrew Ng, this approach views system tuning as a series of individual diagnostic hypotheses (Chain of Assumptions) and advises against making simultaneous adjustments to multiple dials.
+                        </p>
+<ul class="text-xs text-stone-600 space-y-2 mb-4 bg-stone-50 p-3 rounded border border-stone-200">
+<li><strong>Avoidable Bias:</strong> Increase model capacity / layer depth</li>
+<li><strong>High Variance:</strong> Increase regularization / data augmentation</li>
+<li><strong>Dev Overfitting:</strong> Expand validation dataset size</li>
+<li><strong>Metric Mismatch:</strong> Re-align loss function and cost matrices</li>
+</ul>
+</div>
+<button class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition" onclick="openEngineerSimulator()">
+                        Jump to Dial Simulator ↓
+                    </button>
+</div>
+<!-- Paradigm 2: Researcher's Toolkit -->
+<div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+<div>
+<div class="inline-block px-3 py-1 rounded bg-purple-100 text-purple-800 text-xs font-semibold mb-3">
+                            Mathematical Structure
+                        </div>
+<h3 class="text-xl font-bold text-stone-900 mb-2">2. The Researcher's Toolkit</h3>
+<p class="text-sm text-stone-600 mb-4 leading-relaxed">
+                            Enforcing linear algebraic constraints on representations and parameter matrices directly ($W^T W = I$) in order to maintain geometric stability and angular distances.
+                        </p>
+<div class="space-y-2 text-xs text-stone-700">
+<div class="p-2 rounded bg-stone-50 border border-stone-200">
+<strong>Orthogonal Fine-Tuning (OFT):</strong> Rotates weight matrices via orthogonal transformations without altering parameter norms.
+                            </div>
+<div class="p-2 rounded bg-stone-50 border border-stone-200">
+<strong>Dynamical Isometry:</strong> Ensures that singular values are kept near 1, preventing gradients from exploding or vanishing.
+                            </div>
+<div class="p-2 rounded bg-stone-50 border border-stone-200">
+<strong>Neyman Orthogonality:</strong> Removes initial bias from estimating nuisance parameters in causal inference models.
+                            </div>
+</div>
+</div>
+</div>
+<!-- Paradigm 3: Philosopher's Thesis -->
+<div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+<div>
+<div class="inline-block px-3 py-1 rounded bg-amber-100 text-amber-800 text-xs font-semibold mb-3">
+                            AI Alignment &amp; Safety
+                        </div>
+<h3 class="text-xl font-bold text-stone-900 mb-2">3. The Philosopher's Thesis</h3>
+<p class="text-sm text-stone-600 mb-4 leading-relaxed">
+                            Developed by Bostrom and Yudkowsky, intelligence (optimization power) and terminal objectives are perpendicular, uncorrelated vectors.
+                        </p>
+<div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-xs text-amber-900 space-y-2 mb-4">
+<p><strong>Core Thesis:</strong> Greater mental capacity does not necessarily result in system behavior that reflects human values.</p>
+<p><strong>Knob Application:</strong> Runtime safety knobs should be distinct from and limit the system capability knobs.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive Engineer's Dial Diagnostic Tool -->
+<div class="mt-6 bg-white p-6 rounded-xl border-2 border-blue-200 shadow-lg transition-all duration-300" id="engineer-dial-modal">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold text-stone-900 flex items-center gap-2">
+<span>🧪</span> Interactive Diagnostic Dial Simulator (Andrew Ng Paradigm)
+                    </h3>
+<span class="text-xs text-stone-500">Tune each orthogonal knob sequentially to isolate error sources</span>
+</div>
+<div class="grid md:grid-cols-12 gap-6 items-center">
+<!-- Controls -->
+<div class="md:col-span-5 space-y-4">
+<div>
+<div class="flex justify-between text-xs font-semibold text-stone-700 mb-1">
+<span>Knob 1: Model Capacity (Network Depth/Width)</span>
+<span class="text-blue-600 font-bold" id="val-capacity">Level 2</span>
+</div>
+<input class="w-full accent-blue-600 cursor-pointer" id="input-capacity" max="5" min="1" oninput="updateDialSim()" type="range" value="2"/>
+<p class="text-[11px] text-stone-500">Decoupled Target: Avoidable Bias (Training Error)</p>
+</div>
+<div>
+<div class="flex justify-between text-xs font-semibold text-stone-700 mb-1">
+<span>Knob 2: Regularization &amp; Augmentation</span>
+<span class="text-blue-600 font-bold" id="val-regularization">Level 1</span>
+</div>
+<input class="w-full accent-blue-600 cursor-pointer" id="input-regularization" max="5" min="1" oninput="updateDialSim()" type="range" value="1"/>
+<p class="text-[11px] text-stone-500">Decoupled Target: High Variance (Dev Error Gap)</p>
+</div>
+<div>
+<div class="flex justify-between text-xs font-semibold text-stone-700 mb-1">
+<span>Knob 3: Dev Set Size &amp; Representative Diversity</span>
+<span class="text-blue-600 font-bold" id="val-devsize">Level 1</span>
+</div>
+<input class="w-full accent-blue-600 cursor-pointer" id="input-devsize" max="5" min="1" oninput="updateDialSim()" type="range" value="1"/>
+<p class="text-[11px] text-stone-500">Decoupled Target: Validation Overfit (Test Gap)</p>
+</div>
+<div>
+<div class="flex justify-between text-xs font-semibold text-stone-700 mb-1">
+<span>Knob 4: Loss Function &amp; Decision Thresholds</span>
+<span class="text-blue-600 font-bold" id="val-metric">Level 1</span>
+</div>
+<input class="w-full accent-blue-600 cursor-pointer" id="input-metric" max="5" min="1" oninput="updateDialSim()" type="range" value="1"/>
+<p class="text-[11px] text-stone-500">Decoupled Target: Real-World Metric Mismatch (Production Gap)</p>
+</div>
+</div>
+<!-- Chart Container -->
+<div class="md:col-span-7">
+<div class="chart-container">
+<canvas id="dialChart"></canvas>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 4: Interactive Parameter Decoupling Workbench -->
+<section class="scroll-mt-20" id="decoupling-workbench">
+<div class="mb-6">
+<h2 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
+<span>🔬</span> Interactive Parameter Decoupling Workbench
+                </h2>
+<p class="text-stone-600 mt-2 leading-relaxed">
+                    Choose a business subsystem to investigate how interconnected operational factors are converted into independent control mechanisms through mathematical algorithms.
+                </p>
+</div>
+<div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-6">
+<div class="flex flex-wrap gap-2 border-b border-stone-200 pb-4">
+<button class="wb-tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-amber-600 text-white transition" id="wb-btn-rag" onclick="setWorkbenchScenario('rag')">
+                        1. RAG Retrieval &amp; Context Window
+                    </button>
+<button class="wb-tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-700 hover:bg-stone-200 transition" id="wb-btn-dbms" onclick="setWorkbenchScenario('dbms')">
+                        2. Database Engine Knobs (I/O &amp; Memory)
+                    </button>
+<button class="wb-tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-700 hover:bg-stone-200 transition" id="wb-btn-safety" onclick="setWorkbenchScenario('safety')">
+                        3. <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> Safety &amp; Policy Cutoffs
+                    </button>
+<button class="wb-tab-btn px-4 py-2 rounded-lg text-xs font-bold bg-stone-100 text-stone-700 hover:bg-stone-200 transition" id="wb-btn-pricing" onclick="setWorkbenchScenario('pricing')">
+                        4. Dynamic Pricing &amp; Churn Risk
+                    </button>
+</div>
+<div class="grid md:grid-cols-12 gap-6" id="workbench-content">
+<!-- Populated dynamically via JS -->
+</div>
+</div>
+</section>
+<!-- SECTION 5: Information Geometry & Manifold Control Plane -->
+<section class="scroll-mt-20" id="manifold-geometry">
+<div class="mb-6">
+<h2 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
+<span>🌐</span> Information Geometry &amp; Manifold Control Plane
+                </h2>
+<p class="text-stone-600 mt-2 leading-relaxed">
+                    DataKnobs represents high-dimensional pipeline parameter spaces on a Riemannian manifold ($\mathcal{M}$). The Knob Intelligence Engine computes trajectory vectors ($\nabla_{\mathcal{M}} \mathcal{
+                </p>
+</div>
+<div class="grid lg:grid-cols-12 gap-6 items-center">
+<!-- Mathematical Vector Inspector -->
+<div class="lg:col-span-5 bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
+<h3 class="text-lg font-bold text-stone-900 border-b border-stone-200 pb-2">Formal Parameter Spaces</h3>
+<div class="space-y-3">
+<div class="p-3 bg-stone-50 rounded-lg border border-stone-200">
+<div class="text-xs font-bold text-stone-500">INTERNAL MODEL PARAMETERS</div>
+<div class="font-mono text-sm font-semibold text-stone-900 mt-1">y = f(x; α)</div>
+<p class="text-xs text-stone-600 mt-1">α represents intrinsic weights &amp; biases (e.g. LLM attention weights).</p>
+</div>
+<div class="p-3 bg-stone-50 rounded-lg border border-stone-200">
+<div class="text-xs font-bold text-stone-500">OPERATIONAL PIPELINE VECTOR</div>
+<div class="font-mono text-sm font-semibold text-stone-900 mt-1">θ = [θ₁, θ₂, ..., θₙ]</div>
+<p class="text-xs text-stone-600 mt-1">θ spans chunking boundaries, search temperature, rerank alpha, and memory buffers.</p>
+</div>
+<div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
+<div class="text-xs font-bold text-amber-800">ORTHOGONAL KNOBS OPERATOR</div>
+<div class="font-mono text-sm font-semibold text-amber-950 mt-1">O[ θ, α ]</div>
+<p class="text-xs text-amber-800 mt-1">Higher-level decoupled control plane allowing surgical tuning without collateral drift.</p>
+</div>
+</div>
+<div class="text-xs text-stone-500 italic bg-stone-100 p-3 rounded">
+                        Manifold tuning follows the steepest Riemannian paths to discover optimal configurations with significantly fewer sample iterations.
+                    </div>
+</div>
+<!-- Interactive Manifold Scatter Plot -->
+<div class="lg:col-span-7 bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-base font-bold text-stone-900">Enterprise State Manifold Explorer</h3>
+<div class="flex gap-2">
+<button class="px-2 py-1 bg-stone-100 text-stone-700 text-xs rounded hover:bg-stone-200 transition" onclick="highlightRegion('all')">Show All</button>
+<button class="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded hover:bg-amber-200 transition" onclick="highlightRegion('frontier')">Frontier Only</button>
+<button class="px-2 py-1 bg-rose-100 text-rose-800 text-xs rounded hover:bg-rose-200 transition" onclick="highlightRegion('blind')">Blind Spots</button>
+</div>
+</div>
+<div class="chart-container">
+<canvas id="manifoldChart"></canvas>
+</div>
+<div class="mt-4 grid grid-cols-3 text-center text-xs border-t border-stone-100 pt-3">
+<div><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1"></span><strong>Well-Covered:</strong> Dense, stable data</div>
+<div><span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 mr-1"></span><strong>Frontier:</strong> High entropy tuning zone</div>
+<div><span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-500 mr-1"></span><strong>Blind Spots:</strong> Under-sampled risk areas</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 6: Enterprise Knob Taxonomy (Categories A-E) -->
+<section class="scroll-mt-20" id="knob-taxonomy">
+<div class="mb-6">
+<h2 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
+<span>🗂️</span> Enterprise Knob Taxonomy (Categories A-E)
+                </h2>
+<p class="text-stone-600 mt-2 leading-relaxed">
+                    DataKnobs categorizes production parameters into five organized groups and assesses their geometric performance (Orthogonal, Coupled, Frontier). Use the filter to examine parameters and their target axes that have been decoupled.
+                </p>
+</div>
+<!-- Filters -->
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6 bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+<div class="flex flex-wrap items-center gap-2">
+<span class="text-xs font-bold text-stone-500 mr-2">Filter Category:</span>
+<button class="tax-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-900 text-white transition" data-cat="all" onclick="filterTaxonomy('all', event)">All (A-E)</button>
+<button class="tax-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 text-stone-700 hover:bg-stone-200 transition" data-cat="A" onclick="filterTaxonomy('A', event)">Cat A: Levers</button>
+<button class="tax-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 text-stone-700 hover:bg-stone-200 transition" data-cat="B" onclick="filterTaxonomy('B', event)">Cat B: Signals</button>
+<button class="tax-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 text-stone-700 hover:bg-stone-200 transition" data-cat="C" onclick="filterTaxonomy('C', event)">Cat C: Config</button>
+<button class="tax-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 text-stone-700 hover:bg-stone-200 transition" data-cat="D" onclick="filterTaxonomy('D', event)">Cat D: Tradeoffs</button>
+<button class="tax-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 text-stone-700 hover:bg-stone-200 transition" data-cat="E" onclick="filterTaxonomy('E', event)">Cat E: Policy</button>
+</div>
+</div>
+<!-- Taxonomy Grid -->
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="taxonomy-grid">
+<!-- Dynamically Populated by JS -->
+</div>
+</section>
+<!-- SECTION 7: Industry Comparative Landscape -->
+<section class="scroll-mt-20" id="industry-matrix">
+<div class="mb-6">
+<h2 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
+<span>📊</span> Industry Landscape: Knob Tuning Across Platforms
+                </h2>
+<p class="text-stone-600 mt-2 leading-relaxed">
+                    Examining how parameter tuning and knob decoupling are handled within the AI and data infrastructure landscape.
+                </p>
+</div>
+<div class="grid lg:grid-cols-12 gap-6 items-center">
+<!-- Radar Chart -->
+<div class="lg:col-span-6 bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+<h3 class="text-base font-bold text-stone-900 mb-2">Knob Capability Dimensions Comparison</h3>
+<div class="chart-container">
+<canvas id="radarChart"></canvas>
+</div>
+</div>
+<!-- Feature Matrix Table -->
+<div class="lg:col-span-6 bg-white p-6 rounded-xl border border-stone-200 shadow-sm overflow-x-auto">
+<table class="w-full text-left text-xs text-stone-700 border-collapse">
+<thead>
+<tr class="border-b border-stone-200 bg-stone-50">
+<th class="p-3 font-bold text-stone-900">Framework / Platform</th>
+<th class="p-3 font-bold text-stone-900">Target Knob Layer</th>
+<th class="p-3 font-bold text-stone-900">Optimization Engine</th>
+<th class="p-3 font-bold text-stone-900">Decoupling Mechanism</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-stone-200">
+<tr class="bg-amber-50/50">
+<td class="p-3 font-bold text-amber-900">DataKnobs (EKIP)</td>
+<td class="p-3">Enterprise state-space &amp; data pipeline dials</td>
+<td class="p-3 font-mono">∇_M L (Riemannian Manifolds)</td>
+<td class="p-3">Orthogonal categorical decoupling (A-E)</td>
+</tr>
+<tr>
+<td class="p-3 font-bold text-stone-900">DSPy (Stanford)</td>
+<td class="p-3">Prompt signatures, instructions &amp; few-shot demos</td>
+<td class="p-3 font-mono">MIPROv2 / Bootstrap Teleprompters</td>
+<td class="p-3">Decoupling signatures from optimizer teleprompters</td>
+</tr>
+<tr>
+<td class="p-3 font-bold text-stone-900">OtterTune (CMU)</td>
+<td class="p-3">DBMS engine knobs (memory, buffers, I/O)</td>
+<td class="p-3 font-mono">GP Regression / Factor Analysis</td>
+<td class="p-3">PCA decorrelation of correlated database metrics</td>
+</tr>
+<tr>
+<td class="p-3 font-bold text-stone-900">Guardrails AI</td>
+<td class="p-3">Validation thresholds &amp; content filters</td>
+<td class="p-3 font-mono">Pydantic / Regex / LLM-as-Judge</td>
+<td class="p-3">Decoupling output evaluation from LLM generation</td>
+</tr>
+<tr>
+<td class="p-3 font-bold text-stone-900">LlamaIndex / LangChain</td>
+<td class="p-3">RAG chunk size, overlap &amp; hybrid search α</td>
+<td class="p-3 font-mono">Grid / Bayesian Retrieval Sweeps</td>
+<td class="p-3">Decoupling vector similarity from keyword ranking</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- SECTION 8: EKIP 6-Stage Lifecycle -->
+<section class="scroll-mt-20" id="ekip-lifecycle">
+<div class="mb-6">
+<h2 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
+<span>🔄</span> EKIP 6-Stage Knob Optimization Lifecycle
+                </h2>
+<p class="text-stone-600 mt-2 leading-relaxed">
+                    The parameters transition from hardcoded script variables to independent control surfaces that are governed orthogonally.
+                </p>
+</div>
+<!-- Stepper Container -->
+<div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+<div class="grid grid-cols-2 md:grid-cols-6 gap-2 mb-6">
+<button class="stage-btn py-3 px-2 rounded-lg border text-center transition font-bold text-xs bg-amber-500 text-white border-amber-500" id="stage-btn-1" onclick="setStage(1)">
+                        1. Discover
+                    </button>
+<button class="stage-btn py-3 px-2 rounded-lg border text-center transition font-bold text-xs bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100" id="stage-btn-2" onclick="setStage(2)">
+                        2. Define
+                    </button>
+<button class="stage-btn py-3 px-2 rounded-lg border text-center transition font-bold text-xs bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100" id="stage-btn-3" onclick="setStage(3)">
+                        3. Instrument
+                    </button>
+<button class="stage-btn py-3 px-2 rounded-lg border text-center transition font-bold text-xs bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100" id="stage-btn-4" onclick="setStage(4)">
+                        4. Prioritize
+                    </button>
+<button class="stage-btn py-3 px-2 rounded-lg border text-center transition font-bold text-xs bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100" id="stage-btn-5" onclick="setStage(5)">
+                        5. Optimize
+                    </button>
+<button class="stage-btn py-3 px-2 rounded-lg border text-center transition font-bold text-xs bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100" id="stage-btn-6" onclick="setStage(6)">
+                        6. Govern
+                    </button>
+</div>
+<!-- Stage Detail Display -->
+<div class="bg-stone-50 p-6 rounded-xl border border-stone-200" id="stage-detail-box">
+<!-- Filled dynamically by JS -->
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">Ekip</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples/">Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Examples Reference</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/external-data/">External Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/mdm/">Mdm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/metadata/">Metadata</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/abexperiment.html">Abexperiment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/data-and-model.html">Data And Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/dataknobs-product-plan.html">Dataknobs Product Plan</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs Are Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-description.html">Knobs Description</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-detail.html">Knobs Detail</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-experimentation-diagnostics-evaluation.html">Knobs For Experimentation Diagnostics Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs For High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs For Speed And Governance Balance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">Knobs Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs.html">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobsscope.html">Knobsscope</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/result-bench.html">Result Bench</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What Are Knobs</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Dataknobs Knobs with Examples</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+<!-- JavaScript Application Logic -->
+<script>
+        // Data Store for Knob Taxonomy
+        const taxonomyData = [
+            { cat: "A", name: "Fraud Detection Confidence Cutoff", type: "Orthogonal", desc: "Decision boundary threshold for automated transaction holds.", categoryName: "Operational Levers" },
+            { cat: "A", name: "Inventory Reorder Trigger Level", type: "Coupled", desc: "Stock count threshold initiating automated vendor supply orders.", categoryName: "Operational Levers" },
+            { cat: "B", name: "Customer Churn Risk Weight", type: "Frontier", desc: "Upstream behavioral signal sensitivity in retention intervention scoring.", categoryName: "High-Impact Signals" },
+            { cat: "B", name: "Supplier Latency Penalty", type: "Orthogonal", desc: "Decoupled penalty scalar for historical supply chain lead time variance.", categoryName: "High-Impact Signals" },
+            { cat: "C", name: "RAG Retrieval Depth (k)", type: "Coupled", desc: "Number of vector chunks retrieved per context query.", categoryName: "Configuration Knobs" },
+            { cat: "C", name: "LLM Temperature / Top-p Sampling", type: "Frontier", desc: "Token generation entropy and probability nucleus cutoff.", categoryName: "Configuration Knobs" },
+            { cat: "D", name: "Latency vs Accuracy Tradeoff Ratio", type: "Coupled", desc: "Pareto frontier weighting balancing model parameter size against inference speed.", categoryName: "Optimization Controls" },
+            { cat: "D", name: "Token Budget Cap vs Quality Balancer", type: "Orthogonal", desc: "Inference token budget limit decoupled from reasoning chain depth.", categoryName: "Optimization Controls" },
+            { cat: "E", name: "Enterprise Policy Strictness Level", type: "Frontier", desc: "Macro compliance safety strictness across autonomous decisions.", categoryName: "Decision Variables" },
+            { cat: "E", name: "Customer SLA Priority Multiplier", type: "Orthogonal", desc: "Resource allocation weight for tier-1 customer contractual obligations.", categoryName: "Decision Variables" }
+        ];
+
+        // Workbench Scenarios Data
+        const workbenchScenarios = {
+            rag: {
+                title: "RAG Pipeline: Retrieval Precision vs. Context Bloat",
+                coupledDesc: "In standard RAG, increasing top-k chunks improves recall but increases token costs and prompt latency, while diluting relevant context for the LLM.",
+                decoupledSolution: "DataKnobs decouples chunk retrieval into two orthogonal knobs: 1) Vector relevance cosine cutoff (semantic density), and 2) Cross-encoder rerank top-p filter (pure precision), isolating recall from context size.",
+                knobs: [
+                    { name: "Knob 1: Semantic Relevance Floor", target: "Noise Elimination", status: "Orthogonal" },
+                    { name: "Knob 2: Dynamic Rerank Budget", target: "Context Density", status: "Orthogonal" },
+                    { name: "Knob 3: Context Compression Ratio", target: "Latency / Token Cost", status: "Orthogonal" }
+                ]
+            },
+            dbms: {
+                title: "DBMS Engine: Memory Caching vs. Disk Write Throughput",
+                coupledDesc: "In relational engines, increasing shared buffer pools boosts read cache hit ratios but consumes dirty page flush threads and degrades write transaction throughput.",
+                decoupledSolution: "Applies OtterTune-style PCA orthogonalization: decouples read memory cache sizing from background write checkpoint intervals via independent asynchronous flush knobs.",
+                knobs: [
+                    { name: "Knob 1: Shared Buffer Allocation", target: "Read Cache Hit Ratio", status: "Orthogonal" },
+                    { name: "Knob 2: Bgwriter LSN Delay", target: "Write Throughput", status: "Orthogonal" },
+                    { name: "Knob 3: Work Mem Multiplier", target: "Sort / Join Latency", status: "Orthogonal" }
+                ]
+            },
+            safety: {
+                title: "LLM Safety: Guardrail Filters vs. Response Usefulness",
+                coupledDesc: "Increasing heuristic toxicity thresholds over-censors benign domain queries (e.g. cybersecurity research, medical triage), reducing task completion rates.",
+                decoupledSolution: "Decouples input intent classification from output response sanitization, using separate policy knobs for structured output compliance and semantic toxicity.",
+                knobs: [
+                    { name: "Knob 1: Semantic Intent Classifier", target: "Malicious Input Rejection", status: "Orthogonal" },
+                    { name: "Knob 2: Entity Masking Strictness", target: "PII & Data Leakage", status: "Orthogonal" },
+                    { name: "Knob 3: Fallback Redirection Dial", target: "Task Usability", status: "Orthogonal" }
+                ]
+            },
+            pricing: {
+                title: "Enterprise Systems: Margin Optimization vs. Customer Churn",
+                coupledDesc: "Heuristic price hikes directly increase per-unit margin but trigger uncontrolled churn across price-sensitive customer tiers without attribution.",
+                decoupledSolution: "EKIP isolates the pricing elasticity scalar from the retention discount allowance, providing independent control over revenue extraction and account retention.",
+                knobs: [
+                    { name: "Knob 1: Elasticity Margin Scalar", target: "Per-Unit Margin", status: "Orthogonal" },
+                    { name: "Knob 2: Churn Mitigation Allowance", target: "Customer Retention", status: "Orthogonal" },
+                    { name: "Knob 3: SLA Renewal Priority", target: "Contract LTV", status: "Orthogonal" }
+                ]
+            }
+        };
+
+        // EKIP Lifecycle Stage Data
+        const stageData = {
+            1: {
+                title: "1. DISCOVER: Automated Parameter Cataloging",
+                desc: "Scans runtime configs, pipeline source code, heuristic thresholds, and model hyperparameters across the stack to build an exhaustive catalog of candidate knobs."
+            },
+            2: {
+                title: "2. DEFINE: Specification & Boundary Formalization",
+                desc: "Formalizes raw variables into typed knob specifications with defined operational bounds, default baselines, and primary target metric mappings."
+            },
+            3: {
+                title: "3. INSTRUMENT: Telemetry & Closed-Loop Wiring",
+                desc: "Wires knobs into telemetry pipelines so every adjustment produces real-time, measurable feedback without system restarts."
+            },
+            4: {
+                title: "4. PRIORITIZE: Manifold Leverage & Uncertainty Analysis",
+                desc: "Applies information geometry to rank knobs by leverage and locate high-uncertainty frontier regions where tuning yields maximum performance gains."
+            },
+            5: {
+                title: "5. OPTIMIZE: Orthogonal Closed-Loop Sweeps",
+                desc: "Executes sample-efficient gradient navigation along decoupled axes to achieve optimal system states with minimal evaluation steps."
+            },
+            6: {
+                title: "6. GOVERN: Safe Operational Envelopes & Audit Logs",
+                desc: "Enforces deterministic boundaries, multi-signature approvals for sensitive knobs, and audit trails to guarantee absolute stability."
+            }
+        };
+
+        // Interactive Trajectory Chart Implementation
+        let trajectoryChart;
+        const trajCoupledPoints = [
+            {x: 1, y: 1}, {x: 1.5, y: 3.5}, {x: 3.2, y: 2.8}, {x: 3.8, y: 5.5}, 
+            {x: 5.2, y: 4.8}, {x: 5.9, y: 7.2}, {x: 7.1, y: 6.8}, {x: 8.5, y: 8.5}
+        ];
+        const trajOrthoPoints = [
+            {x: 1, y: 1}, {x: 4.5, y: 1}, {x: 8.5, y: 1}, {x: 8.5, y: 5}, {x: 8.5, y: 8.5}
+        ];
+
+        function initTrajectoryChart() {
+            const canvas = document.getElementById('trajectoryChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            trajectoryChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Optimization Trajectory',
+                        data: trajCoupledPoints,
+                        borderColor: '#e11d48',
+                        backgroundColor: 'rgba(225, 29, 72, 0.1)',
+                        pointBackgroundColor: '#e11d48',
+                        pointRadius: 5,
+                        tension: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: 0, max: 10,
+                            title: { display: true, text: 'Knob 1 Parameter Axis (θ₁)', font: { size: 10 } }
+                        },
+                        y: {
+                            min: 0, max: 10,
+                            title: { display: true, text: 'Knob 2 Parameter Axis (θ₂)', font: { size: 10 } }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` State: (θ₁: ${ctx.parsed.x}, θ₂: ${ctx.parsed.y})`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function setTrajectoryMode(mode) {
+            const btnCoupled = document.getElementById('btn-traj-coupled');
+            const btnOrtho = document.getElementById('btn-traj-ortho');
+            const title = document.getElementById('traj-title');
+            const desc = document.getElementById('traj-desc');
+            const steps = document.getElementById('traj-steps');
+            const stability = document.getElementById('traj-stability');
+
+            if (mode === 'coupled') {
+                btnCoupled.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-rose-600 text-white transition";
+                btnOrtho.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-stone-100 text-stone-700 hover:bg-stone-200 transition";
+                title.innerText = "Coupled Tuning Trajectory";
+                desc.innerText = "Parameters display significant cross-correlation, where adjusting Knob A leads to compensatory changes in Knob B, resulting in wasted iterations and metric fluctuations.";
+                steps.innerText = "18 Steps";
+                steps.className = "text-rose-600 font-bold";
+                stability.innerText = "Low (Oscillating)";
+                stability.className = "text-rose-600 font-bold";
+
+                if (trajectoryChart) {
+                    trajectoryChart.data.datasets[0].data = trajCoupledPoints;
+                    trajectoryChart.data.datasets[0].borderColor = '#e11d48';
+                    trajectoryChart.data.datasets[0].pointBackgroundColor = '#e11d48';
+                    trajectoryChart.update();
+                }
+            } else {
+                btnOrtho.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-emerald-600 text-white transition";
+                btnCoupled.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-stone-100 text-stone-700 hover:bg-stone-200 transition";
+                title.innerText = "Orthogonal Tuning Trajectory";
+                desc.innerText = "Parameters are transformed into uncoupled orthogonal axes. The optimizer executes scalar 1D line searches sequentially, reaching the global optimum with minimal evaluations.";
+                steps.innerText = "4 Steps";
+                steps.className = "text-emerald-600 font-bold";
+                stability.innerText = "Deterministic (Direct)";
+                stability.className = "text-emerald-600 font-bold";
+
+                if (trajectoryChart) {
+                    trajectoryChart.data.datasets[0].data = trajOrthoPoints;
+                    trajectoryChart.data.datasets[0].borderColor = '#059669';
+                    trajectoryChart.data.datasets[0].pointBackgroundColor = '#059669';
+                    trajectoryChart.update();
+                }
+            }
+        }
+
+        // Workbench Scenario Switcher
+        function setWorkbenchScenario(key) {
+            document.querySelectorAll('.wb-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-600', 'text-white');
+                btn.classList.add('bg-stone-100', 'text-stone-700');
+            });
+            const activeBtn = document.getElementById(`wb-btn-${key}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-stone-100', 'text-stone-700');
+                activeBtn.classList.add('bg-amber-600', 'text-white');
+            }
+
+            const data = workbenchScenarios[key];
+            if (!data) return;
+
+            const container = document.getElementById('workbench-content');
+            container.innerHTML = `
+                <div class="md:col-span-6 space-y-4">
+                    <div class="p-4 bg-rose-50 rounded-xl border border-rose-200">
+                        <div class="text-[10px] font-bold text-rose-800 uppercase mb-1">Coupled Failure Mode</div>
+                        <h4 class="font-bold text-sm text-stone-900 mb-2">${data.title}</h4>
+                        <p class="text-xs text-stone-700 leading-relaxed">${data.coupledDesc}</p>
+                    </div>
+                    <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                        <div class="text-[10px] font-bold text-emerald-800 uppercase mb-1">DataKnobs Decoupled Solution</div>
+                        <p class="text-xs text-stone-700 leading-relaxed">${data.decoupledSolution}</p>
+                    </div>
+                </div>
+                <div class="md:col-span-6 space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-stone-500">Decoupled Operational Levers</h4>
+                    ${data.knobs.map(k => `
+                        <div class="p-3 bg-stone-50 rounded-lg border border-stone-200 flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-xs text-stone-900">${k.name}</div>
+                                <div class="text-[11px] text-stone-500">Decoupled Target: <strong>${k.target}</strong></div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">${k.status}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Smooth Scroll / Focus Handler
+        function openEngineerSimulator() {
+            const el = document.getElementById('engineer-dial-modal');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('ring-4', 'ring-blue-400');
+                setTimeout(() => {
+                    el.classList.remove('ring-4', 'ring-blue-400');
+                }, 1500);
+            }
+        }
+
+        // Filter Taxonomy Handler with safe event handling
+        function filterTaxonomy(cat, event) {
+            const buttons = document.querySelectorAll('.tax-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-stone-900', 'text-white');
+                btn.classList.add('bg-stone-100', 'text-stone-700');
+            });
+
+            let targetBtn = null;
+            if (event && (event.currentTarget || event.target)) {
+                targetBtn = event.currentTarget || event.target;
+            } else {
+                targetBtn = document.querySelector(`.tax-btn[data-cat="${cat}"]`) || buttons[0];
+            }
+
+            if (targetBtn) {
+                targetBtn.classList.remove('bg-stone-100', 'text-stone-700');
+                targetBtn.classList.add('bg-stone-900', 'text-white');
+            }
+
+            const grid = document.getElementById('taxonomy-grid');
+            const items = cat === 'all' ? taxonomyData : taxonomyData.filter(i => i.cat === cat);
             
-           
-            </li>	
+            grid.innerHTML = items.map(item => `
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-stone-100 text-stone-600">Cat ${item.cat}: ${item.categoryName}</span>
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${
+                                item.type === 'Orthogonal' ? 'bg-emerald-100 text-emerald-800' :
+                                item.type === 'Frontier' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
+                            }">${item.type}</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-stone-900 mb-1">${item.name}</h4>
+                        <p class="text-xs text-stone-600 leading-normal">${item.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
 
+        // Stepper Handler
+        function setStage(stageNum) {
+            document.querySelectorAll('.stage-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-white', 'border-amber-500');
+                btn.classList.add('bg-stone-50', 'text-stone-700', 'border-stone-200');
+            });
 
+            const currentBtn = document.getElementById(`stage-btn-${stageNum}`);
+            if (currentBtn) {
+                currentBtn.classList.remove('bg-stone-50', 'text-stone-700', 'border-stone-200');
+                currentBtn.classList.add('bg-amber-500', 'text-white', 'border-amber-500');
+            }
 
+            const data = stageData[stageNum];
+            if (data) {
+                document.getElementById('stage-detail-box').innerHTML = `
+                    <h4 class="text-base font-bold text-stone-900 mb-2">${data.title}</h4>
+                    <p class="text-sm text-stone-700 leading-relaxed">${data.desc}</p>
+                `;
+            }
+        }
 
+        // Chart 1: Andrew Ng's Engineer's Dial Simulator Chart
+        let dialChart;
+        function initDialChart() {
+            const canvas = document.getElementById('dialChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            dialChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Human Baseline', 'Training Error (Bias)', 'Dev Error (Variance)', 'Test Error (Dev Fit)', 'Production Gap (Real-World)'],
+                    datasets: [{
+                        label: 'Error Magnitude (%)',
+                        data: [5, 23, 36, 43, 53],
+                        backgroundColor: [
+                            'rgba(100, 116, 139, 0.75)',
+                            'rgba(239, 68, 68, 0.75)',
+                            'rgba(245, 158, 11, 0.75)',
+                            'rgba(59, 130, 246, 0.75)',
+                            'rgba(168, 85, 247, 0.75)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => ` Error Rate: ${context.parsed.y}%`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 70,
+                            title: { display: true, text: 'Error Rate (%)', font: { size: 11 } }
+                        },
+                        x: {
+                            ticks: {
+                                font: { size: 10 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-												
-		<li>					
-			<a id="ctl00_Articlesub1_RepLinks_ctl02_title" href="https://www.dataknobs.com/products/knobs/EKIP/"><em><b>EKIP</b></em></a>
-            
-           
-            </li>	
+        function updateDialSim() {
+            const cap = parseInt(document.getElementById('input-capacity').value) || 2;
+            const reg = parseInt(document.getElementById('input-regularization').value) || 1;
+            const dev = parseInt(document.getElementById('input-devsize').value) || 1;
+            const met = parseInt(document.getElementById('input-metric').value) || 1;
 
+            document.getElementById('val-capacity').innerText = `Level ${cap}`;
+            document.getElementById('val-regularization').innerText = `Level ${reg}`;
+            document.getElementById('val-devsize').innerText = `Level ${dev}`;
+            document.getElementById('val-metric').innerText = `Level ${met}`;
 
+            // Calculate dynamic errors based on isolated orthogonal dials
+            const humanBase = 5;
+            const trainError = Math.max(humanBase + 2, 35 - (cap * 6));
+            const devError = trainError + Math.max(2, 22 - (reg * 4.5));
+            const testError = devError + Math.max(1, 12 - (dev * 2.5));
+            const prodGap = testError + Math.max(2, 16 - (met * 3.5));
 
+            if (dialChart) {
+                dialChart.data.datasets[0].data = [humanBase, trainError, devError, testError, prodGap];
+                dialChart.update();
+            }
+        }
 
+        // Chart 2: Information Geometry Manifold Scatter Plot
+        let manifoldChart;
+        const scatterData = {
+            wellCovered: [
+                {x: 2, y: 3}, {x: 2.5, y: 3.5}, {x: 3, y: 2.8}, {x: 3.2, y: 3.8}, {x: 2.8, y: 2.2}
+            ],
+            frontier: [
+                {x: 6, y: 7}, {x: 6.5, y: 8}, {x: 7.2, y: 6.8}, {x: 5.8, y: 7.5}, {x: 8, y: 7.2}
+            ],
+            blindSpots: [
+                {x: 1, y: 8.5}, {x: 8.8, y: 2}, {x: 9, y: 8.8}, {x: 1.5, y: 9.2}
+            ]
+        };
 
-												
-		<li>					
-			<a id="ctl00_Articlesub1_RepLinks_ctl03_title" href="https://www.dataknobs.com/products/knobs/examples/"><em><b>Examples</b></em></a>
-            
-           
-            </li>	
+        function initManifoldChart() {
+            const canvas = document.getElementById('manifoldChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            manifoldChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Well-Covered Regions',
+                            data: scatterData.wellCovered,
+                            backgroundColor: '#10b981',
+                            pointRadius: 6
+                        },
+                        {
+                            label: 'Frontier Regions',
+                            data: scatterData.frontier,
+                            backgroundColor: '#f59e0b',
+                            pointRadius: 8
+                        },
+                        {
+                            label: 'Blind Spots',
+                            data: scatterData.blindSpots,
+                            backgroundColor: '#f43f5e',
+                            pointRadius: 7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Operational State Coordinate (Axis X₁)', font: { size: 10 } },
+                            min: 0, max: 10
+                        },
+                        y: {
+                            title: { display: true, text: 'Uncertainty Metric (Entropy Direction)', font: { size: 10 } },
+                            min: 0, max: 10
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: (${ctx.parsed.x}, ${ctx.parsed.y})`
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
+        function highlightRegion(region) {
+            if (!manifoldChart) return;
+            manifoldChart.data.datasets.forEach(ds => {
+                if (region === 'all') {
+                    ds.hidden = false;
+                } else if (region === 'frontier') {
+                    ds.hidden = ds.label !== 'Frontier Regions';
+                } else if (region === 'blind') {
+                    ds.hidden = ds.label !== 'Blind Spots';
+                }
+            });
+            manifoldChart.update();
+        }
 
+        // Chart 3: Comparative Industry Radar Chart
+        let radarChart;
+        function initRadarChart() {
+            const canvas = document.getElementById('radarChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Knob State Coverage',
+                        'Metric Orthogonalization',
+                        'Sample Efficiency',
+                        'Prompt Compiler Decoupling',
+                        'Runtime Threshold Verification'
+                    ],
+                    datasets: [
+                        {
+                            label: 'DataKnobs (EKIP)',
+                            data: [95, 92, 88, 65, 85],
+                            borderColor: '#d97706',
+                            backgroundColor: 'rgba(217, 119, 6, 0.2)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Stanford DSPy',
+                            data: [60, 75, 82, 98, 50],
+                            borderColor: '#4f46e5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'CMU OtterTune',
+                            data: [70, 92, 85, 20, 40],
+                            borderColor: '#059669',
+                            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Guardrails AI',
+                            data: [45, 50, 60, 30, 95],
+                            borderColor: '#e11d48',
+                            backgroundColor: 'rgba(225, 29, 72, 0.1)',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.r}/100`
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-
-
-												
-		<li>					
-			<a id="ctl00_Articlesub1_RepLinks_ctl04_title" href="https://www.dataknobs.com/products/knobs/examples-reference/"><em><b>Examples reference</b></em></a>
-            
-           
-            </li>	
-
-
-
-
-
-												
-		<li>					
-			<a id="ctl00_Articlesub1_RepLinks_ctl05_title" href="https://www.dataknobs.com/products/knobs/external-data/"><em><b>External data</b></em></a>
-            
-           
-            </li>	
-
-
-
-
-
-												
-		<li>					
-			<a id="ctl00_Articlesub1_RepLinks_ctl06_title" href="https://www.dataknobs.com/products/knobs/mdm/"><em><b>Mdm</b></em></a>
-            
-           
-            </li>	
-
-
-
-
-
-												
-		<li>					
-			<a id="ctl00_Articlesub1_RepLinks_ctl07_title" href="https://www.dataknobs.com/products/knobs/metadata/"><em><b>Metadata</b></em></a>
-            
-           
-            </li>	
-
-
-
-
-
-
-
-             
- 
- 
- 
-	
-									</ul>
-								</section>
-						
-						</div>
-						<div class="3u">
-						
-						
-								<section class="widget-contact last">
-									<h2>Contact Us</h2>
-									<ul>
-										
-										<li><a href="https://www.facebook.com/kreatewebsites/" class="facebook">Facebook</a></li>
-										<li><a href="https://www.linkedin.com/company/kreatewebsites/" class="googleplus">Linkedin</a></li>
-									</ul>
-									<p>
-									Redmond, WA <br />
-									USA  </p>
-								</section>
-						
-						</div>
-                        
-					</div>
-					<div class="row">
-						<div class="12u">
-							 <div id="copyright">
-							&copy;  Design: <a id="ctl00_cright">Dataknobs</a> | <a id="ctl00_sitemap"></a>  | <a id="ctl00_privacypolicy" href="https://www.dataknobs.com/privacypolicy.html">Privacy Policy</a> | <a id="ctl00_footerfooter" href="https://www.dataknobs.com/">Dataknobs</a></asp:HyperLink> 
-			</div>
-								 <p></p>
-						</div>
-						</div>
-					
-				</footer>
-			</div>
-
-	</body>
-</html>
+        // Initialize Everything on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            filterTaxonomy('all');
+            setStage(1);
+            setWorkbenchScenario('rag');
+            initTrajectoryChart();
+            initDialChart();
+            initManifoldChart();
+            initRadarChart();
+        });
+    </script>
+</body></html>

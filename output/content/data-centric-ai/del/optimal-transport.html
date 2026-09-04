@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+    <meta content="Interactive guide to Optimal Transport for data-centric AI: Monge vs. Kantorovich foundations, Wasserstein distance vs. KL-divergence, Sinkhorn and scalable OT algorithms, and a practical toolkit covering WGANs, Wasserstein Barycenters, domain adaptation, Fused Gromov-Wasserstein, coreset selection, and algorithmic fairness." name="description"/>
+    <meta content="optimal transport, Wasserstein distance, Sinkhorn algorithm, Kantorovich, Monge, WGAN, Wasserstein GAN, domain adaptation, data augmentation, Gromov-Wasserstein, algorithmic fairness, coreset selection, data-centric AI" name="keywords"/>
+    <meta content="Dataknobs" name="author"/>
+    <meta content="index, follow" name="robots"/>
+    <meta content="Optimal Transport for Data-Centric AI | Dataknobs" property="og:title"/>
+    <meta content="An interactive framework for Optimal Transport: from Monge-Kantorovich theory and Wasserstein distance to a practical toolkit for generating, aligning, and curating data with WGANs, Barycenters, and Gromov-Wasserstein." property="og:description"/>
+    <meta content="article" property="og:type"/>
+    <meta content="https://www.dataknobs.com/data-centric-ai/optimal-transport.html" property="og:url"/>
+    <meta content="Dataknobs" property="og:site_name"/>
+    <meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" property="og:image"/>
+    <meta content="summary_large_image" name="twitter:card"/>
+    <meta content="Optimal Transport for Data-Centric AI | Dataknobs" name="twitter:title"/>
+    <meta content="An interactive framework for Optimal Transport: from Monge-Kantorovich theory and Wasserstein distance to a practical toolkit for generating, aligning, and curating data." name="twitter:description"/>
+    <meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" name="twitter:image"/>
+    <meta content="optimal transport, Wasserstein distance, Sinkhorn algorithm, Kantorovich duality, Wasserstein GAN, distributional engineering" name="generative-engine-optimization"/>
+    <link href="https://www.dataknobs.com/data-centric-ai/optimal-transport.html" rel="canonical"/>
+    <title>Optimal Transport for Data-Centric AI | Dataknobs</title>
+
+    <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+    <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+    <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
+    <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
+    <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
+
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+
+    <link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production-with-dk-sections.css" rel="stylesheet"/>
+
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-JF94J1W5MC');
+    </script>
+    <!-- Google Tag Manager -->
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Optimal Transport for Data-Centric AI",
+      "description": "An interactive framework for Optimal Transport: from Monge-Kantorovich theory and Wasserstein distance to a practical toolkit for generating, aligning, and curating data with WGANs, Barycenters, and Gromov-Wasserstein.",
+      "author": {"@type": "Organization", "name": "Dataknobs"},
+      "publisher": {"@type": "Organization", "name": "Dataknobs", "logo": {"@type": "ImageObject", "url": "https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg"}},
+      "mainEntityOfPage": "https://www.dataknobs.com/data-centric-ai/optimal-transport.html",
+      "keywords": ["Optimal Transport", "Wasserstein distance", "Sinkhorn algorithm", "Kantorovich duality", "Wasserstein GAN", "Gromov-Wasserstein", "domain adaptation", "algorithmic fairness", "data-centric AI"]
+    }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #FDFBF8; color: #434242; }
+        .nav-link { transition: all 0.3s; border-bottom: 2px solid transparent; }
+        .nav-link.active, .nav-link:hover { color: #A855F7; border-bottom-color: #A855F7; }
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        .chart-container { position: relative; margin: auto; height: 320px; max-height: 40vh; width: 100%; max-width: 600px; }
+        .interactive-card { transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
+        .interactive-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); border-color: #D8B4FE; }
+        #main-nav { overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
+        #main-nav::-webkit-scrollbar { display: none; }
+        select#guide-goal, select#guide-data { cursor: pointer; }
+    </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head>
+<body class="antialiased">
+
+<header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+  <div class="mx-auto max-w-7xl px-6 py-4 lg:px-8">
+    <div class="flex items-center justify-between">
+      <a aria-label="DataKnobs Home" class="flex items-center gap-3" href="https://www.dataknobs.com/">
+        <img alt="DataKnobs AI data products platform logo" class="h-12 w-auto sm:h-14" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png"/>
+      </a>
+
+      <nav aria-label="Primary navigation" class="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#platform">Platform</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#data-flywheel">Data Flywheel</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#capabilities">Capabilities</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#use-cases">Use Cases</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#how-it-works">How It Works</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#knobs-value">Knobs</a>
+        <a class="transition hover:text-violet-700" href="https://www.dataknobs.com/pricing/">Pricing</a>
+        <a class="rounded-full bg-violet-600 px-5 py-2.5 text-white shadow-sm transition hover:bg-violet-700" href="https://www.dataknobs.com/search.html">
+          Search
+        </a>
+      </nav>
+
+      <button aria-controls="mobile-menu" aria-expanded="false" aria-label="Open main menu" class="inline-flex items-center justify-center rounded-xl border border-slate-200 p-2 text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 md:hidden" id="mobile-menu-button" type="button">
+        <svg class="h-6 w-6" fill="none" id="menu-open-icon" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <svg class="hidden h-6 w-6" fill="none" id="menu-close-icon" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+    </div>
+
+    <nav aria-label="Mobile navigation" class="hidden border-t border-slate-200 pt-4 md:hidden" id="mobile-menu">
+      <div class="flex flex-col gap-2 text-sm font-medium text-slate-700">
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#platform">Platform</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#data-flywheel">Data Flywheel</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#capabilities">Capabilities</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#use-cases">Use Cases</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#how-it-works">How It Works</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#knobs-value">Knobs</a>
+        <a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/pricing/">Pricing</a>
+        <a class="mt-2 rounded-full bg-violet-600 px-5 py-3 text-center text-white shadow-sm transition hover:bg-violet-700" href="https://www.dataknobs.com/search.html">
+          Search
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero-bg relative overflow-hidden text-white">
+  <div class="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20 text-center">
+    <div class="mb-6 inline-flex w-fit items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-violet-100 backdrop-blur mx-auto">
+      Data-Centric AI Techniques
+    </div>
+    <h1 class="mx-auto max-w-4xl text-3xl md:text-5xl font-semibold leading-tight tracking-tight">
+      Optimal Transport
+    </h1>
+    <p class="mx-auto mt-6 max-w-3xl text-lg md:text-xl leading-8 text-violet-50/90">
+      A data-centric framework for distributional engineering :  from Monge and Kantorovich's foundations to a practical toolkit for generating, aligning, and curating data.
+    </p>
+  </div>
+</section>
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+
+        <nav class="sticky top-[76px] md:top-[88px] z-40 bg-[#FDFBF8]/90 backdrop-blur-sm border-b border-gray-200 flex justify-center space-x-4 md:space-x-8 py-3 mb-10" id="main-nav">
+            <a class="nav-link font-medium" href="#foundations">Foundations</a>
+            <a class="nav-link font-medium" href="#toolkit">The OT Toolkit</a>
+            <a class="nav-link font-medium" href="#guide">Strategic Guide</a>
+            <a class="nav-link font-medium" href="#future">Future Horizons</a>
+        </nav>
+
+        <main id="main-content">
+
+            <section class="content-section space-y-12" id="foundations">
+                <div>
+                    <h2 class="text-3xl font-bold text-center text-gray-800">Core Concepts</h2>
+                    <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto">Optimal Transport (OT) provides a powerful way to compare probability distributions by finding the most efficient way to morph one into another. This section explores the fundamental ideas that evolved OT from a niche mathematical puzzle into a cornerstone of modern data science.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-2xl font-semibold text-center text-gray-700 mb-6">From a Rigid Map to a Flexible Plan</h3>
+                    <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">The key innovation in OT was relaxing the strict one-to-one mapping of Monge's original problem to the more flexible one-to-many "transport plan" of Kantorovich, which allows for mass splitting.</p>
+                    <div class="grid md:grid-cols-2 gap-8 items-start">
+                        <div class="text-center p-6 bg-gray-50 rounded-lg">
+                            <h4 class="font-bold text-lg text-purple-700">Monge's Transport Map (1781)</h4>
+                            <p class="text-sm text-gray-500 mb-4">A deterministic one-to-one mapping. Fails if mass needs to be split.</p>
+                            <div class="flex justify-around items-center h-40">
+                                <div class="flex flex-col space-y-4">
+                                    <div class="w-8 h-8 bg-blue-300 rounded-full"></div>
+                                    <div class="w-8 h-8 bg-blue-300 rounded-full"></div>
+                                </div>
+                                <div class="text-3xl text-gray-400">→</div>
+                                <div class="flex flex-col space-y-4">
+                                    <div class="w-8 h-8 bg-green-300 rounded-md"></div>
+                                    <div class="w-8 h-8 bg-green-300 rounded-md"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center p-6 bg-gray-50 rounded-lg">
+                            <h4 class="font-bold text-lg text-purple-700">Kantorovich's Transport Plan (1940s)</h4>
+                            <p class="text-sm text-gray-500 mb-4">A probabilistic plan allowing one source point to map to multiple destinations.</p>
+                            <div class="flex justify-around items-center h-40 relative">
+                                <div class="w-8 h-8 bg-blue-300 rounded-full"></div>
+                                <div class="text-3xl text-gray-400">→</div>
+                                <div class="flex flex-col space-y-4">
+                                    <div class="w-8 h-8 bg-green-300 rounded-md"></div>
+                                    <div class="w-8 h-8 bg-green-300 rounded-md"></div>
+                                </div>
+                                <canvas class="absolute top-0 left-0 w-full h-full" id="kantorovich-canvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-2xl font-semibold text-center text-gray-700 mb-6">A Geometric Distance for Distributions</h3>
+                    <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Unlike metrics like KL-divergence, the Wasserstein distance provides a meaningful and smooth measure of distance even for distributions that do not overlap, making it ideal for gradient-based optimization in machine learning.</p>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="text-center">
+                            <h4 class="font-semibold text-gray-600 mb-2">Wasserstein Distance</h4>
+                            <div class="chart-container" style="height: 250px;">
+                                <canvas id="w-dist-chart"></canvas>
+                            </div>
+                             <p class="text-sm text-gray-500 mt-2">Provides a finite distance based on the "work" needed to move one distribution to the other.</p>
+                        </div>
+                        <div class="text-center">
+                             <h4 class="font-semibold text-gray-600 mb-2">KL-Divergence</h4>
+                             <div class="chart-container" style="height: 250px;">
+                                <canvas id="kl-div-chart"></canvas>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Returns infinity for disjoint distributions, providing no useful gradient for optimization.</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-2xl font-semibold text-center text-gray-700 mb-6">Taming Complexity: Scalable OT Algorithms</h3>
+                    <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Solving the exact OT problem is computationally expensive. Modern methods, especially the Sinkhorn algorithm, provide fast, scalable approximations that make OT practical for large datasets.</p>
+                    <div class="chart-container">
+                        <canvas id="algo-complexity-chart"></canvas>
+                    </div>
+                    <p class="text-center text-sm text-gray-500 mt-4">This chart compares the relative computational cost of different OT algorithms, showing the dramatic improvement of modern approximate methods like Sinkhorn and Sliced Wasserstein over exact solvers.</p>
+                </div>
+            </section>
+
+            <section class="content-section" id="toolkit">
+                <h2 class="text-3xl font-bold text-center text-gray-800">The OT Toolkit: Data-Centric Applications</h2>
+                <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto mb-10">Optimal Transport is not just a theoretical concept; it's a versatile toolkit for solving real-world data science problems. Explore how OT is used to generate, augment, align, and curate data.</p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="interactive-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                        <h4 class="font-bold text-purple-700">Generative Modeling (WGANs)</h4>
+                        <p class="text-sm text-gray-600 mt-2">By using the Wasserstein distance as a loss function, WGANs achieve more stable training and avoid common failure modes like mode collapse, leading to higher-quality synthetic data generation.</p>
+                    </div>
+                     <div class="interactive-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                        <h4 class="font-bold text-purple-700">Data Augmentation</h4>
+                        <p class="text-sm text-gray-600 mt-2">Wasserstein Barycenters provide a principled way to "average" data points (like images or text embeddings), creating realistic new samples that lie on the data manifold.</p>
+                    </div>
+                    <div class="interactive-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                        <h4 class="font-bold text-purple-700">Domain Adaptation</h4>
+                        <p class="text-sm text-gray-600 mt-2">OT can learn a mapping to align a labeled source domain with an unlabeled target domain, allowing models to generalize across distributions and reducing domain shift.</p>
+                    </div>
+                     <div class="interactive-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                        <h4 class="font-bold text-purple-700">Multi-Modal Fusion (FGW)</h4>
+                        <p class="text-sm text-gray-600 mt-2">The Fused Gromov-Wasserstein distance aligns data from different modalities (e.g., text and images) by considering both their features and their internal structures.</p>
+                    </div>
+                     <div class="interactive-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                        <h4 class="font-bold text-purple-700">Coreset Selection</h4>
+                        <p class="text-sm text-gray-600 mt-2">OT is used to find a small, representative subset of a large dataset that preserves its overall distribution, enabling more efficient model training.</p>
+                    </div>
+                     <div class="interactive-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                        <h4 class="font-bold text-purple-700">Algorithmic Fairness</h4>
+                        <p class="text-sm text-gray-600 mt-2">OT can align the output distributions of a model across different demographic groups to a common fair target, mitigating bias while minimally impacting accuracy.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="guide">
+                 <h2 class="text-3xl font-bold text-center text-gray-800">Strategic Guide</h2>
+                <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto mb-10">Choosing the right OT method depends on your goal, data, and constraints. Use this interactive guide to find the best approach for your data-building task.</p>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 max-w-4xl mx-auto">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <div>
+                                <label class="font-semibold text-gray-700" for="guide-goal">1. What is your primary objective?</label>
+                                <select class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50" id="guide-goal">
+                                    <option value="generate">Generate or Augment Data</option>
+                                    <option value="align">Align or Fuse Data</option>
+                                    <option value="curate">Curate or Refine a Dataset</option>
+                                </select>
+                            </div>
+                             <div>
+                                <label class="font-semibold text-gray-700" for="guide-data">2. What are your data's characteristics?</label>
+                                <select class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50" id="guide-data">
+                                    <option value="common_space">Data lives in a common space</option>
+                                    <option value="incomparable">Data has different structures (e.g., graphs)</option>
+                                    <option value="multimodal">Data has both features and structure</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 p-6 rounded-lg border border-purple-200" id="recommendation-panel">
+                             <h4 class="font-bold text-purple-800 text-lg mb-2">Recommendation:</h4>
+                             <div aria-live="polite" id="recommendation-content">
+                                <p class="text-gray-700">Your results will appear here...</p>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="future">
+                <h2 class="text-3xl font-bold text-center text-gray-800">Future Horizons</h2>
+                <p class="mt-4 text-lg text-center text-gray-600 max-w-3xl mx-auto mb-10">The intersection of Optimal Transport and AI is a vibrant field of research. While progress has been immense, several key challenges and exciting frontiers remain.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md border-gray-100">
+                         <h4 class="font-semibold text-xl text-gray-700 mb-3">Key Challenges</h4>
+                         <ul class="space-y-3 list-disc list-inside text-gray-600">
+                             <li><b>Scalability in High Dimensions:</b> The "curse of dimensionality" remains a hurdle, requiring more research into dimension-robust OT formulations.</li>
+                             <li><b>Robustness to Outliers:</b> Standard OT is sensitive to noisy data. Unbalanced and partial OT methods are a promising direction for more robust algorithms.</li>
+                              <li><b>Numerical Methods:</b> There is a continuing need for faster, more stable, and more accurate solvers to navigate the speed-accuracy trade-off.</li>
+                         </ul>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md border-gray-100">
+                         <h4 class="font-semibold text-xl text-gray-700 mb-3">Emerging Frontiers</h4>
+                         <ul class="space-y-3 list-disc list-inside text-gray-600">
+                             <li><b>Integration with GNNs:</b> OT is being used to create more expressive pooling layers and loss functions for Graph Neural Networks.</li>
+                              <li><b>Causal Inference:</b> OT provides a framework for estimating causal effects by optimally matching treated and control groups.</li>
+                               <li><b>Continual Learning:</b> OT can help align distributions between sequential tasks, mitigating catastrophic forgetting in continual learning setups.</li>
+                         </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/active-learning-achieve-more-with-less-data.html">Active Learning Achieve More With Less Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/architect-data-sets.html">Architect Data Sets</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/architect-dataset-summary.html">Architect Dataset Summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/data-centric-ai-playbook.html">Data Centric Ai Playbook</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/data-centric-complete.html">Data Centric Complete</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/data-centric-playbook-info.html">Data Centric Playbook Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/optimal-transport-summary-2.html">Optimal Transport Summary 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/optimal-transport-summary.html">Optimal Transport Summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/optimal-transport.html">Optimal Transport</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/weak-supervision-summary.html">Weak Supervision Summary</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/weak-supervision.html">Weak Supervision</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-centric-ai/del/what-is-optimal-transport.html">What Is Optimal Transport</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Dataknobs use cases with Knobs for finance and compliance</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const state = {
+        activeSection: 'foundations',
+        recommendations: {
+            generate: {
+                common_space: { title: "WGANs & Barycenters", text: "For generating novel samples, use a Wasserstein GAN (WGAN). For interpolating between existing data to create augmentations, use Wasserstein Barycenters." },
+                incomparable: { title: "N/A", text: "Generation across different structures is less defined. Consider mapping to a common latent space first." },
+                multimodal: { title: "Generative Models + FGW", text: "Use multi-modal generative models. FGW can be used to measure distance in the latent space." }
+            },
+            align: {
+                common_space: { title: "OT for Domain Adaptation", text: "Use standard Optimal Transport to learn a mapping that aligns the source and target distributions." },
+                incomparable: { title: "Gromov-Wasserstein (GW)", text: "GW is designed specifically to align distributions from different metric spaces by preserving internal structure, ideal for graph matching." },
+                multimodal: { title: "Fused Gromov-Wasserstein (FGW)", text: "FGW is the best choice as it simultaneously aligns based on both structural similarity and feature similarity." }
+            },
+            curate: {
+                common_space: { title: "OT Coreset Selection & Fairness", text: "Use OT-based coreset selection to prune your dataset efficiently, or OT-based fairness methods to align distributions across sensitive groups." },
+                incomparable: { title: "N/A", text: "Curation across different structures is not a standard OT task. Focus on aligning them first with GW." },
+                multimodal: { title: "N/A", text: "Curation for multi-modal data is complex. Focus on aligning them first with FGW." }
+            }
+        }
+    };
+
+    const navLinks = document.querySelectorAll('.nav-link');
+    const contentSections = document.querySelectorAll('.content-section');
+    const guideGoal = document.getElementById('guide-goal');
+    const guideData = document.getElementById('guide-data');
+    const recContent = document.getElementById('recommendation-content');
+
+    function navigateTo(hash) {
+        const targetId = hash ? hash.substring(1) : 'foundations';
+        state.activeSection = targetId;
+
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${targetId}`);
+        });
+
+        contentSections.forEach(section => {
+            section.classList.toggle('active', section.id === targetId);
+        });
+
+        if (targetId === "foundations") {
+            initFoundationsCharts();
+        }
+    }
+
+    document.querySelector('#main-nav').addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') {
+            e.preventDefault();
+            const hash = e.target.getAttribute('href');
+            navigateTo(hash);
+            window.history.pushState(null, null, hash);
+        }
+    });
+
+    let chartsInitialized = false;
+    function initFoundationsCharts() {
+        if(chartsInitialized) return;
+
+        const kantorovichCanvas = document.getElementById('kantorovich-canvas');
+        if (kantorovichCanvas) {
+            const ctx = kantorovichCanvas.getContext('2d');
+            const parent = kantorovichCanvas.parentElement;
+            kantorovichCanvas.width = parent.clientWidth;
+            kantorovichCanvas.height = parent.clientHeight;
+            ctx.strokeStyle = 'rgba(168, 85, 247, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(kantorovichCanvas.width * 0.2, kantorovichCanvas.height / 2);
+            ctx.lineTo(kantorovichCanvas.width * 0.8, kantorovichCanvas.height * 0.25);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(kantorovichCanvas.width * 0.2, kantorovichCanvas.height / 2);
+            ctx.lineTo(kantorovichCanvas.width * 0.8, kantorovichCanvas.height * 0.75);
+            ctx.stroke();
+        }
+
+        const wDistCtx = document.getElementById('w-dist-chart');
+        if(wDistCtx) new Chart(wDistCtx, {
+            type: 'bar',
+            data: { labels: ['Dist A', 'Dist B'], datasets: [{ data: [1, 0] }, { data: [0, 1] }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { display: false } }, plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { onComplete: () => { const ctx = wDistCtx.getContext('2d'); ctx.font = 'bold 24px Inter'; ctx.fillStyle = '#434242'; ctx.textAlign = 'center'; ctx.fillText('Distance: Finite', wDistCtx.width / 2, wDistCtx.height / 2); }} }
+        });
+
+        const klDivCtx = document.getElementById('kl-div-chart');
+        if(klDivCtx) new Chart(klDivCtx, {
+            type: 'bar',
+            data: { labels: ['Dist A', 'Dist B'], datasets: [{ data: [1, 0] }, { data: [0, 1] }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { display: false } }, plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { onComplete: () => { const ctx = klDivCtx.getContext('2d'); ctx.font = 'bold 24px Inter'; ctx.fillStyle = '#434242'; ctx.textAlign = 'center'; ctx.fillText('Distance: ∞', klDivCtx.width / 2, klDivCtx.height / 2); }} }
+        });
+
+        const algoCtx = document.getElementById('algo-complexity-chart');
+        if(algoCtx) new Chart(algoCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Simplex/Interior-Point', 'APDAGD', 'Sinkhorn', 'Sliced Wasserstein'],
+                datasets: [{
+                    label: 'Relative Computational Cost',
+                    data: [100, 70, 20, 10],
+                    backgroundColor: ['#E57373', '#FFB74D', '#81C784', '#64B5F6'],
+                }]
+            },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { callback: (v) => v + '%' } } } }
+        });
+
+        chartsInitialized = true;
+    }
+
+    function updateRecommendation() {
+        const goal = guideGoal.value;
+        const data = guideData.value;
+        const rec = state.recommendations[goal][data];
+        recContent.innerHTML = `
+            <h4 class="font-bold text-purple-800 text-lg mb-2">${rec.title}</h4>
+            <p class="text-gray-700">${rec.text}</p>
+        `;
+        recContent.classList.add('fade-in');
+        setTimeout(() => recContent.classList.remove('fade-in'), 500);
+    }
+
+    if (guideGoal && guideData) {
+        guideGoal.addEventListener('change', updateRecommendation);
+        guideData.addEventListener('change', updateRecommendation);
+        updateRecommendation();
+    }
+
+    // Initial navigation
+    navigateTo(window.location.hash || '#foundations');
+});
+</script>
+
+<script>
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuOpenIcon = document.getElementById('menu-open-icon');
+  const menuCloseIcon = document.getElementById('menu-close-icon');
+
+  if (mobileMenuButton && mobileMenu && menuOpenIcon && menuCloseIcon) {
+    const closeMobileMenu = () => {
+      mobileMenu.classList.add('hidden');
+      mobileMenuButton.setAttribute('aria-expanded', 'false');
+      menuOpenIcon.classList.remove('hidden');
+      menuCloseIcon.classList.add('hidden');
+    };
+
+    const openMobileMenu = () => {
+      mobileMenu.classList.remove('hidden');
+      mobileMenuButton.setAttribute('aria-expanded', 'true');
+      menuOpenIcon.classList.add('hidden');
+      menuCloseIcon.classList.remove('hidden');
+    };
+
+    mobileMenuButton.addEventListener('click', () => {
+      const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+      isExpanded ? closeMobileMenu() : openMobileMenu();
+    });
+
+    mobileMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', closeMobileMenu);
+    });
+  }
+</script>
+
+
+</body></html>

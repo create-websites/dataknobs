@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Comprehensive guide to active learning: human-in-the-loop ML approaches that reduce labeling costs by 50-80%. Learn query strategies, workflow integration, tools, and best practices for data products." name="description"/>
+<meta content="active learning, machine learning, human-in-the-loop, uncertainty sampling, annotation tools, labeling strategy, query-by-committee, Bayesian active learning, data products, MLOps, label efficiency" name="keywords"/>
+<meta content="Active Learning Resources" name="author"/>
+<meta content="Active Learning in Data Products: Reduce Labeling Costs by 50-80%" property="og:title"/>
+<meta content="A complete guide to implementing active learning: query strategies, annotation workflows, tools, cost models, and best practices for production ML systems." property="og:description"/>
+<meta content="article" property="og:type"/>
+<title>Active Learning Guide | Query Strategies &amp; Data Product Integration</title>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0f172a;
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --accent: #06b6d4;
+            --accent-warm: #f97316;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f0f9ff;
+            --bg-white: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-light: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-light);
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--accent) 100%);
+            color: white;
+            padding: 80px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: rgba(6, 182, 212, 0.15);
+            z-index: 0;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: 0%;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: rgba(249, 115, 22, 0.1);
+            z-index: 0;
+        }
+
+        .header-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 3.2em;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            opacity: 0.95;
+            max-width: 800px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .meta {
+            margin-top: 25px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meta-badge {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* NAVIGATION */
+        nav {
+            background: var(--bg-white);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            max-width: 1100px;
+            margin: 0 auto;
+            gap: 35px;
+            overflow-x: auto;
+            padding: 0;
+        }
+
+        nav li {
+            flex-shrink: 0;
+        }
+
+        nav a {
+            display: block;
+            padding: 16px 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+            border-bottom-color: var(--accent);
+        }
+
+        /* MAIN CONTAINER */
+        main {
+            max-width: 1000px;
+            margin: 70px auto;
+            padding: 0 20px;
+        }
+
+        section {
+            margin-bottom: 90px;
+        }
+
+        section h2 {
+            font-size: 2.4em;
+            font-weight: 700;
+            margin-bottom: 35px;
+            color: var(--primary-dark);
+            padding-bottom: 20px;
+            border-bottom: 4px solid var(--accent);
+            display: inline-block;
+            letter-spacing: -0.5px;
+        }
+
+        section h3 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 40px 0 20px 0;
+            color: var(--primary);
+        }
+
+        section p {
+            font-size: 1.05em;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+            line-height: 1.85;
+        }
+
+        /* KEY METRICS */
+        .key-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin: 50px 0;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), rgba(6, 182, 212, 0.05));
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.8em;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-size: 0.95em;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* CARDS GRID */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 28px;
+            margin: 45px 0;
+        }
+
+        .card {
+            background: var(--bg-white);
+            border-radius: 14px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-light);
+            border-left: 5px solid var(--accent);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card.strategy {
+            border-left-color: var(--primary-light);
+        }
+
+        .card.workflow {
+            border-left-color: var(--accent-warm);
+        }
+
+        .card.success {
+            border-left-color: var(--success);
+        }
+
+        .card.warning {
+            border-left-color: var(--warning);
+        }
+
+        .card h4 {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+
+        .card p {
+            font-size: 0.98em;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .card ul {
+            margin: 15px 0 0 20px;
+            color: var(--text-secondary);
+        }
+
+        .card li {
+            margin-bottom: 10px;
+            font-size: 0.98em;
+        }
+
+        /* STRATEGY COMPARISON */
+        .comparison-table {
+            overflow-x: auto;
+            margin: 40px 0;
+            background: var(--bg-white);
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+            border: 1px solid var(--border-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+        }
+
+        th {
+            padding: 18px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+        }
+
+        td {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95em;
+        }
+
+        tbody tr:hover {
+            background: rgba(30, 64, 175, 0.02);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* WORKFLOW STEPS */
+        .workflow-steps {
+            position: relative;
+            padding-left: 50px;
+            margin: 50px 0;
+        }
+
+        .workflow-steps::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--accent), var(--primary));
+            border-radius: 4px;
+        }
+
+        .workflow-step {
+            margin-bottom: 35px;
+            position: relative;
+        }
+
+        .workflow-step::before {
+            content: '';
+            position: absolute;
+            left: -56px;
+            top: 5px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 4px solid var(--bg-white);
+            box-shadow: 0 0 0 3px var(--accent);
+        }
+
+        .workflow-step h4 {
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .workflow-step p {
+            color: var(--text-secondary);
+            font-size: 0.98em;
+        }
+
+        /* BENEFITS SECTION */
+        .benefits {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.08), rgba(6, 182, 212, 0.08));
+            border-radius: 16px;
+            padding: 45px;
+            border-left: 5px solid var(--primary);
+            margin: 50px 0;
+        }
+
+        .benefits h3 {
+            margin-top: 0;
+        }
+
+        .benefit-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .benefit-item {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .benefit-icon {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+
+        .benefit-text {
+            flex: 1;
+        }
+
+        .benefit-text strong {
+            color: var(--primary-dark);
+        }
+
+        .benefit-text p {
+            margin: 0;
+            color: var(--text-secondary);
+        }
+
+        /* HIGHLIGHT BOXES */
+        .highlight {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 22px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .highlight strong {
+            color: var(--primary);
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-right: 8px;
+            margin-bottom: 10px;
+        }
+
+        .badge.primary {
+            background: var(--primary);
+        }
+
+        .badge.warm {
+            background: var(--accent-warm);
+        }
+
+        .badge.success {
+            background: var(--success);
+        }
+
+        /* CHECKLIST */
+        .checklist {
+            background: var(--bg-white);
+            border-radius: 14px;
+            padding: 32px;
+            margin: 40px 0;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+        }
+
+        .checklist-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 18px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .checkbox {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .checklist-text h4 {
+            margin-bottom: 6px;
+            color: var(--primary-dark);
+        }
+
+        .checklist-text p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            padding: 60px 40px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .cta-section h2 {
+            color: white;
+            border-bottom-color: var(--accent);
+        }
+
+        .cta-section p {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.1em;
+            max-width: 600px;
+            margin: 25px auto;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--primary-dark);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        footer p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2em;
+            }
+
+            section h2 {
+                font-size: 1.8em;
+            }
+
+            nav ul {
+                gap: 20px;
+            }
+
+            .key-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .meta {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .checklist {
+                padding: 24px;
+            }
+
+            header {
+                padding: 50px 20px;
+            }
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .card {
+            animation: fadeInUp 0.7s ease-out;
+        }
+    </style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
+<body>
+<!-- HEADER -->
+<header>
+<div class="header-content">
+<h1>Active Learning in Data Products</h1>
+<p class="subtitle">Reduce Labeling Costs by 50–80% with Human-in-the-Loop Machine Learning</p>
+<div class="meta">
+<div class="meta-item">
+<span class="meta-badge">↓ 50-80% fewer labels</span>
+</div>
+<div class="meta-item">
+<span class="meta-badge">Faster model improvement</span>
+</div>
+<div class="meta-item">
+<span class="meta-badge">Production-ready workflows</span>
+</div>
+</div>
+</div>
+</header>
+<!-- NAVIGATION -->
+<nav>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#methods">Methods</a></li>
+<li><a href="#workflow">Workflow</a></li>
+<li><a href="#modalities">Modalities</a></li>
+<li><a href="#tools">Tools</a></li>
+<li><a href="#risks">Risks</a></li>
+<li><a href="#results">Results</a></li>
+<li><a href="#checklist">Checklist</a></li>
+</ul>
+</nav>
+<!-- MAIN CONTENT -->
+<main>
+<!-- OVERVIEW -->
+<section id="overview">
+<h2>What is Active Learning?</h2>
+<p>Active learning is a human-in-the-loop machine learning approach where the model actively selects the most informative unlabeled examples for annotation. By focusing human effort on the examples where the model is most uncertain or that are most representative of the data, active learning dramatically reduces the total number of labels needed to achieve high accuracy.</p>
+<div class="key-metrics">
+<div class="metric">
+<div class="metric-value">50–80%</div>
+<div class="metric-label">Fewer labels needed</div>
+</div>
+<div class="metric">
+<div class="metric-value">5–10x</div>
+<div class="metric-label">Faster learning on rare classes</div>
+</div>
+<div class="metric">
+<div class="metric-value">91%</div>
+<div class="metric-label">Practitioner satisfaction</div>
+</div>
+<div class="metric">
+<div class="metric-value">40–60%</div>
+<div class="metric-label">Industry cost reduction</div>
+</div>
+</div>
+<div class="highlight">
+<strong>Key insight:</strong> Active learning works best when labeling is expensive or data volumes are huge relative to your labeling budget. It combines automated selection strategies (uncertainty sampling, diversity-weighted methods) with human annotation to build better models faster and cheaper.
+            </div>
+<h3>Why Active Learning Matters</h3>
+<div class="benefits">
+<div class="benefit-list">
+<div class="benefit-item">
+<div class="benefit-icon">✓</div>
+<div class="benefit-text">
+<strong>Massive cost savings:</strong>
+<p>Reduce annotation effort by 50–80%, freeing budget for other initiatives.</p>
+</div>
+</div>
+<div class="benefit-item">
+<div class="benefit-icon">✓</div>
+<div class="benefit-text">
+<strong>Faster model improvement:</strong>
+<p>Reach target accuracy with fewer iterations through focused label selection.</p>
+</div>
+</div>
+<div class="benefit-item">
+<div class="benefit-icon">✓</div>
+<div class="benefit-text">
+<strong>Better handling of rare classes:</strong>
+<p>8× fewer samples needed for minority classes like fraud or disease detection.</p>
+</div>
+</div>
+<div class="benefit-item">
+<div class="benefit-icon">✓</div>
+<div class="benefit-text">
+<strong>Reduced annotation fatigue:</strong>
+<p>Annotators focus on challenging, informative cases rather than redundant examples.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- METHODS -->
+<section id="methods">
+<h2>Active Learning Query Strategies</h2>
+<p>The core of active learning is choosing which examples to label next. Different query strategies estimate "informativeness" in different ways:</p>
+<div class="cards-grid">
+<div class="card strategy">
+<h4>Uncertainty Sampling</h4>
+<p><strong>How it works:</strong> Query instances where the model's predicted label confidence is lowest (highest entropy, smallest margin, or lowest max probability).</p>
+<p><strong>Best for:</strong> Simple baseline; text and image classification.</p>
+<p><strong>Trade-off:</strong> Can over-focus on outliers and noisy cases.</p>
+</div>
+<div class="card strategy">
+<h4>Query-by-Committee</h4>
+<p><strong>How it works:</strong> Maintain a committee of diverse models; select instances where the committee disagrees most.</p>
+<p><strong>Best for:</strong> Capturing model uncertainty through disagreement; ensemble methods.</p>
+<p><strong>Trade-off:</strong> Higher computational cost (multiple models).</p>
+</div>
+<div class="card strategy">
+<h4>Density-Weighted Sampling</h4>
+<p><strong>How it works:</strong> Weight informativeness by representativeness. Select examples that are both uncertain AND lie in dense regions of feature space.</p>
+<p><strong>Best for:</strong> Balancing informativeness and coverage; avoiding outlier bias.</p>
+<p><strong>Trade-off:</strong> Requires computing similarity or clustering.</p>
+</div>
+<div class="card strategy">
+<h4>Expected Error Reduction</h4>
+<p><strong>How it works:</strong> Query instances that would most reduce expected future error on the unlabeled pool (decision-theoretic).</p>
+<p><strong>Best for:</strong> Optimal information gain; small to medium datasets where compute allows.</p>
+<p><strong>Trade-off:</strong> Expensive; requires retraining candidates.</p>
+</div>
+<div class="card strategy">
+<h4>Bayesian Active Learning (BALD)</h4>
+<p><strong>How it works:</strong> Use Bayesian models (e.g., MC-dropout in deep nets) to select points maximizing posterior information gain.</p>
+<p><strong>Best for:</strong> Deep learning; image classification with Bayesian CNNs.</p>
+<p><strong>Trade-off:</strong> Requires stochastic forward passes or ensembles.</p>
+</div>
+<div class="card strategy">
+<h4>Hybrid Methods</h4>
+<p><strong>How it works:</strong> Combine strategies (e.g., uncertainty × density, committee + representativeness).</p>
+<p><strong>Best for:</strong> Balancing multiple objectives; production systems.</p>
+<p><strong>Trade-off:</strong> More parameters to tune; added complexity.</p>
+</div>
+</div>
+<div class="comparison-table">
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Computational Cost</th>
+<th>Outlier Sensitivity</th>
+<th>Recommended Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Uncertainty Sampling</strong></td>
+<td>Low</td>
+<td>High</td>
+<td>Baseline for any domain</td>
+</tr>
+<tr>
+<td><strong>Query-by-Committee</strong></td>
+<td>Medium–High</td>
+<td>Low</td>
+<td>Ensemble-based systems</td>
+</tr>
+<tr>
+<td><strong>Density-Weighted</strong></td>
+<td>Medium</td>
+<td>Very Low</td>
+<td>Production systems; heterogeneous data</td>
+</tr>
+<tr>
+<td><strong>Expected Error Reduction</strong></td>
+<td>Very High</td>
+<td>Very Low</td>
+<td>Small datasets; expensive labeling</td>
+</tr>
+<tr>
+<td><strong>Bayesian (BALD)</strong></td>
+<td>Medium</td>
+<td>Low</td>
+<td>Deep learning; GPU-enabled systems</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- WORKFLOW -->
+<section id="workflow">
+<h2>Active Learning Workflow</h2>
+<p>Active learning integrates into your ML pipeline as an iterative select-label-train loop. Here's how it works in practice:</p>
+<div class="workflow-steps">
+<div class="workflow-step">
+<h4>1. Initialize with seed data</h4>
+<p>Start with a small labeled set (random or stratified) to train an initial model.</p>
+</div>
+<div class="workflow-step">
+<h4>2. Score all unlabeled examples</h4>
+<p>Run your AL strategy (uncertainty, QBC, density-weighted) to compute acquisition scores for each unlabeled instance.</p>
+</div>
+<div class="workflow-step">
+<h4>3. Select a batch to label</h4>
+<p>Pick the top-B highest-scoring examples (with diversity constraints if needed) to send for annotation.</p>
+</div>
+<div class="workflow-step">
+<h4>4. Human annotation</h4>
+<p>Domain experts or crowd workers label the selected batch. Use tools like Label Studio or Prodigy.</p>
+</div>
+<div class="workflow-step">
+<h4>5. Update training data</h4>
+<p>Add newly labeled examples to your training set; remove them from the unlabeled pool.</p>
+</div>
+<div class="workflow-step">
+<h4>6. Retrain the model</h4>
+<p>Retrain or incrementally update your model with the expanded labeled set.</p>
+</div>
+<div class="workflow-step">
+<h4>7. Evaluate and iterate</h4>
+<p>Measure validation performance. Stop if target accuracy is reached or labeling budget is exhausted; otherwise, loop back to step 2.</p>
+</div>
+</div>
+<h3>Integration with Production Pipelines</h3>
+<p>In deployed systems, active learning runs as a continuous feedback loop:</p>
+<ul style="margin-left: 20px; color: var(--text-secondary); font-size: 1.05em; line-height: 1.8;">
+<li><strong>Data monitoring:</strong> Capture incoming predictions and model confidence scores.</li>
+<li><strong>Scheduled selection:</strong> Periodically (e.g., daily or weekly) run your AL strategy on recent low-confidence predictions.</li>
+<li><strong>Annotation queue:</strong> Send selected examples to your annotation tool (Label Studio, Prodigy, Scale AI, etc.).</li>
+<li><strong>Automated retraining:</strong> When new labels arrive, trigger retraining via your MLOps pipeline (MLflow, Kubeflow, Jenkins).</li>
+<li><strong>Model deployment:</strong> Test the retrained model and deploy if metrics improve.</li>
+</ul>
+</section>
+<!-- DATA MODALITIES -->
+<section id="modalities">
+<h2>Active Learning Across Data Types</h2>
+<p>Active learning applies across many data modalities. Here's how to adapt strategies to different domains:</p>
+<div class="cards-grid">
+<div class="card workflow">
+<h4>Image Classification</h4>
+<p><strong>Strategy:</strong> Uncertainty sampling with deep learning (MC-dropout, BALD).</p>
+<p><strong>Gain:</strong> 5–10% accuracy improvement per AL round on CIFAR-10/100, MNIST.</p>
+<p><strong>Tool:</strong> Amazon SageMaker Ground Truth, Labelbox for visual labeling.</p>
+</div>
+<div class="card workflow">
+<h4>Text Classification</h4>
+<p><strong>Strategy:</strong> Uncertainty sampling + density weighting; ensemble disagreement.</p>
+<p><strong>Gain:</strong> Significantly reduces redundant document labeling; 50–70% label savings.</p>
+<p><strong>Use case:</strong> Sentiment, spam detection, intent classification.</p>
+</div>
+<div class="card workflow">
+<h4>Named Entity Recognition</h4>
+<p><strong>Strategy:</strong> Token-level uncertainty aggregation (max token uncertainty in sentence).</p>
+<p><strong>Gain:</strong> Dramatic reduction in annotation of long documents; rare entities queried aggressively.</p>
+<p><strong>Use case:</strong> Clinical NLP, legal contracts, domain-specific entity tagging.</p>
+</div>
+<div class="card workflow">
+<h4>Recommendation Systems</h4>
+<p><strong>Strategy:</strong> Query rating queries for cold-start users; select maximally informative items.</p>
+<p><strong>Gain:</strong> Fast user preference learning; offline experiments show strong performance.</p>
+<p><strong>Use case:</strong> E-commerce, streaming platforms (Netflix, Spotify).</p>
+</div>
+<div class="card workflow">
+<h4>Regression / Time Series</h4>
+<p><strong>Strategy:</strong> High predictive variance (Gaussian processes, neural nets).</p>
+<p><strong>Gain:</strong> Query regions of highest forecast uncertainty.</p>
+<p><strong>Use case:</strong> Forecasting, optimal experimental design, sensor calibration.</p>
+</div>
+<div class="card workflow">
+<h4>Detection &amp; Segmentation</h4>
+<p><strong>Strategy:</strong> Uncertain bounding boxes or masks; core-set selection for visual diversity.</p>
+<p><strong>Gain:</strong> Reduced annotation of images; focus on hard cases.</p>
+<p><strong>Tool:</strong> Amazon SageMaker, Prodigy for image regions.</p>
+</div>
+</div>
+</section>
+<!-- TOOLS & PLATFORMS -->
+<section id="tools">
+<h2>Tools, Platforms &amp; Infrastructure</h2>
+<p>Building active learning systems requires careful integration of annotation tools, ML frameworks, and orchestration platforms:</p>
+<h3>Annotation &amp; Labeling Platforms</h3>
+<div class="cards-grid" style="margin-bottom: 40px;">
+<div class="card success">
+<h4>Label Studio</h4>
+<p><strong>Open-source</strong> annotation platform. Supports images, text, audio, video. Built-in active learning support: batch-send uncertain samples to annotators ranked by confidence.</p>
+</div>
+<div class="card success">
+<h4>Prodigy</h4>
+<p><strong>Commercial</strong> active learning tool from Explosion AI. Tight integration with spaCy NLP pipelines. Efficient loop for text &amp; image annotation.</p>
+</div>
+<div class="card success">
+<h4>Scale AI, Labelbox, SuperAnnotate</h4>
+<p><strong>Enterprise platforms</strong> with built-in AL workflows. Managed annotation services (human teams). Dashboard monitoring &amp; integration with ML pipelines.</p>
+</div>
+</div>
+<h3>Python Libraries &amp; Frameworks</h3>
+<div class="cards-grid" style="margin-bottom: 40px;">
+<div class="card success">
+<h4>modAL &amp; ALiPy</h4>
+<p>Pool-based active learning libraries. Modular APIs for uncertainty sampling, QBC, and custom strategies. Compatible with scikit-learn, Keras, PyTorch.</p>
+</div>
+<div class="card success">
+<h4>Snorkel</h4>
+<p>Programmatic labeling framework. Write labeling functions instead of manual labels. Semi-supervised angle; can augment or replace manual AL loops.</p>
+</div>
+<div class="card success">
+<h4>MLflow, Kubeflow</h4>
+<p>MLOps tools for versioning data and models, scheduling retraining pipelines, and orchestrating the AL loop in production.</p>
+</div>
+</div>
+<h3>Model Frameworks</h3>
+<p>For implementing Bayesian methods and uncertainty estimation:</p>
+<ul style="margin-left: 20px; color: var(--text-secondary); font-size: 1.05em; line-height: 1.8;">
+<li><strong>PyTorch:</strong> MC-dropout for Bayesian uncertainty; ensemble methods.</li>
+<li><strong>TensorFlow/Keras:</strong> Bayesian layers; custom uncertainty quantification.</li>
+<li><strong>Scikit-learn:</strong> Classical methods (SVM with distance-to-boundary, ensemble classifiers).</li>
+<li><strong>XGBoost, LightGBM:</strong> Gradient boosting with uncertainty estimates via leaf nodes.</li>
+</ul>
+</section>
+<!-- RISKS & MITIGATION -->
+<section id="risks">
+<h2>Risks, Biases &amp; Mitigation</h2>
+<p>Active learning introduces new challenges that must be carefully managed:</p>
+<div class="cards-grid">
+<div class="card warning">
+<h4>Sampling Bias</h4>
+<p><strong>Risk:</strong> AL skews the training distribution. Model may perform worse on parts of the input space it rarely queries.</p>
+<p><strong>Mitigation:</strong> Periodically mix in random samples. Re-weight examples to correct for bias. Monitor class balance in labeled data.</p>
+</div>
+<div class="card warning">
+<h4>Outlier Over-Focus</h4>
+<p><strong>Risk:</strong> Simple uncertainty sampling repeatedly picks outliers or noisy cases.</p>
+<p><strong>Mitigation:</strong> Use density-weighted or hybrid strategies. Filter obvious noise before selection.</p>
+</div>
+<div class="card warning">
+<h4>Noisy Oracles</h4>
+<p><strong>Risk:</strong> Annotator errors (especially on hard cases) can be amplified by AL.</p>
+<p><strong>Mitigation:</strong> Multiple annotators per item. Majority voting. Quality control via gold-standard validation tasks.</p>
+</div>
+<div class="card warning">
+<h4>Bias Amplification</h4>
+<p><strong>Risk:</strong> If an underrepresented class is initially missed, AL rarely samples it, making bias worse.</p>
+<p><strong>Mitigation:</strong> Ensure each class is queried. Use cost-sensitive selection. Monitor demographic parity.</p>
+</div>
+<div class="card warning">
+<h4>Model Miscalibration</h4>
+<p><strong>Risk:</strong> AL introduces distribution shift; predicted probabilities may no longer reflect true likelihood.</p>
+<p><strong>Mitigation:</strong> Monitor calibration metrics (ECE). Recalibrate on held-out set. Use uncertainty quantification.</p>
+</div>
+<div class="card warning">
+<h4>Privacy Leakage</h4>
+<p><strong>Risk:</strong> Querying uncertain examples might reveal model weaknesses or data patterns.</p>
+<p><strong>Mitigation:</strong> Differential privacy on selection scores. Ensure unlabeled data respects privacy constraints.</p>
+</div>
+</div>
+</section>
+<!-- EMPIRICAL RESULTS -->
+<section id="results">
+<h2>Empirical Results &amp; Industry Impact</h2>
+<p>A wealth of published research and industry deployments demonstrate substantial gains from active learning:</p>
+<div class="benefits">
+<h3>Label Efficiency Gains</h3>
+<div class="benefit-list">
+<div class="benefit-item">
+<div class="benefit-icon">📊</div>
+<div class="benefit-text">
+<strong>20–30% label savings:</strong>
+<p>Simple uncertainty sampling achieves same accuracy with only 20–30% of labels vs. random.</p>
+</div>
+</div>
+<div class="benefit-item">
+<div class="benefit-icon">📊</div>
+<div class="benefit-text">
+<strong>50–80% overall reduction:</strong>
+<p>Well-designed AL pipelines (uncertainty + diversity) require 50–80% fewer labels for target accuracy.</p>
+</div>
+</div>
+<div class="benefit-item">
+<div class="benefit-icon">📊</div>
+<div class="benefit-text">
+<strong>8× savings on rare classes:</strong>
+<p>For imbalanced datasets, AL prioritizes minority examples::up to 8× fewer samples needed.</p>
+</div>
+</div>
+<div class="benefit-item">
+<div class="benefit-icon">📊</div>
+<div class="benefit-text">
+<strong>Industry adoption: 40–60% cost reduction</strong>
+<p>Facebook, Amazon SageMaker, and other platforms report 40–60% reductions in annotation volume.</p>
+</div>
+</div>
+</div>
+</div>
+<h3>Domain-Specific Wins</h3>
+<ul style="margin-left: 20px; color: var(--text-secondary); font-size: 1.05em; line-height: 1.8;">
+<li><strong>Image Classification (Gal et al., 2017):</strong> Deep Bayesian AL significantly outperformed baselines on MNIST and skin-lesion datasets.</li>
+<li><strong>Medical Imaging:</strong> AL cuts expert annotation time dramatically::critical for rare diseases where expert review is expensive.</li>
+<li><strong>Text (NER, Sentiment):</strong> AL reduces redundant document labeling; 5–10% accuracy gain per round.</li>
+<li><strong>Recommendation Systems:</strong> AL accelerates cold-start user preference learning via strategic item selection.</li>
+<li><strong>Fraud Detection:</strong> AL prioritizes uncertain transactions; significantly fewer false positives/negatives.</li>
+</ul>
+<div class="highlight">
+<strong>91% practitioner satisfaction:</strong> One survey found that 91% of practitioners saw AL meet expectations in large-scale projects, confirming real-world effectiveness.
+            </div>
+</section>
+<!-- IMPLEMENTATION CHECKLIST -->
+<section id="checklist">
+<h2>Implementation Checklist &amp; Best Practices</h2>
+<p>Use this checklist to successfully implement active learning in your <a href="https://www.dataknobs.com/data-products/">data products</a>:</p>
+<div class="checklist">
+<div class="checklist-item">
+<div class="checkbox">1</div>
+<div class="checklist-text">
+<h4>Assess Labeling Cost &amp; Scale</h4>
+<p>Estimate cost per label and data volume. If labels are cheap, AL may offer less benefit. AL shines with expensive experts or huge unlabeled pools.</p>
+</div>
+</div>
+<div class="checklist-item">
+<div class="checkbox">2</div>
+<div class="checklist-text">
+<h4>Choose Initial Model &amp; Seed Set</h4>
+<p>Start with a simple model or pre-trained network. Gather a small seed set (random or stratified) to bootstrap training.</p>
+</div>
+</div>
+<div class="checklist-item">
+<div class="checkbox">3</div>
+<div class="checklist-text">
+<h4>Select Query Strategy</h4>
+<p>Start with uncertainty sampling (entropy or margin) as baseline. For diverse data, add density weighting. For deep models, try Bayesian dropout (BALD).</p>
+</div>
+</div>
+<div class="checklist-item">
+<div class="checkbox">4</div>
+<div class="checklist-text">
+<h4>Build the AL Loop</h4>
+<p>Use modAL, ALiPy, or custom code. Integrate with annotation tools (Label Studio, Prodigy). Automate retraining on new labels via MLOps.</p>
+</div>
+</div>
+<div class="checklist-item">
+<div class="checkbox">5</div>
+<div class="checklist-text">
+<h4>Monitor Quality &amp; Bias</h4>
+<p>Track model performance on held-out data. Monitor class balance and calibration. Ensure demographic parity. Use multiple annotators for sensitive data.</p>
+</div>
+</div>
+<div class="checklist-item">
+<div class="checkbox">6</div>
+<div class="checklist-text">
+<h4>Set Stopping Criteria</h4>
+<p>Pre-define target accuracy, labeling budget, or convergence threshold. Stop when goals are met or improvements plateau.</p>
+</div>
+</div>
+<div class="checklist-item">
+<div class="checkbox">7</div>
+<div class="checklist-text">
+<h4>Evaluate &amp; Measure Gains</h4>
+<p>Compare vs. random baseline using learning curves. Report "percentage of labels saved" and impact on business KPIs. Quantify ROI.</p>
+</div>
+</div>
+<div class="checklist-item">
+<div class="checkbox">8</div>
+<div class="checklist-text">
+<h4>Iterate &amp; Refine</h4>
+<p>If gains stagnate, try different strategies or hybrid methods. Tune hyperparameters (batch size, diversity weight). Maintain versioned records.</p>
+</div>
+</div>
+<div class="checklist-item">
+<div class="checkbox">9</div>
+<div class="checklist-text">
+<h4>Document &amp; Version</h4>
+<p>Record strategy, parameters, data versions at each iteration. Version control datasets and models. Enable reproducibility and debugging.</p>
+</div>
+</div>
+<div class="checklist-item">
+<div class="checkbox">10</div>
+<div class="checklist-text">
+<h4>Deploy &amp; Monitor</h4>
+<p>Integrate AL into production pipelines (MLOps, CI/CD). Monitor model drift and annotation efficiency. Keep feedback loop running.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA -->
+<section class="cta-section">
+<h2>Ready to Reduce Labeling Costs?</h2>
+<p>Start with a small pilot project using one of the recommended tools and strategies. Even simple uncertainty sampling can deliver 20–30% label savings. Measure your learning curve and iterate toward your target accuracy::active learning will guide you there faster and cheaper.</p>
+</section>
+</main>
+<!-- FOOTER -->
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Use Cases Built</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">Knobs Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/">Case Studies</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent for trading</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Example</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Slides Tutorials</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html">GenAI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/ai-assistants/tutorials.html">AI Assistant AI Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-engineering-guide.html">Agent AI Engineering Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/">Agentic AI Course</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/">Vector DB Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/">LLM Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/">Data Product Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/guide.html">Data Product Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/tutorial.html">Data Product Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">RAG Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/52-toon-tutorial/toon-slides.html">Toon Slides and Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-models/">LLM Models List </a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/8-tpu-gpu/google-tpus-vs-nvidia-amd-gpus.html">GPU vs TPU</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/pdf-slides/anthropic-models/">Anthropic models</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+<div class="space-y-2">
+<p>Redmond<br/>WA, USA</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">contact@dataknobs.com</a>
+</p>
+<p>
+<a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">+1 (425) 341-1222</a>
+</p>
+<p>
+</p>
+<p>
+</p>
+</div>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/cto/">GenAI for CTO and IT</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/chief-compliance-officer/">GenAI for Compliance Officer</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/vector-database/embeddings/embeddings-tutorial.html">Embeddings Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-quality-tutorial.html">Data Quality Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-governance/data-lineage-tutorial.html">Data Lineage Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/ai-twin/ai-twin-for-industrial-systems.html">AI Twin for Industrial Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/use-cases/predictive-maintenance/predictive-maintenance-with-ai-for-cnc-machines.html">AI Predictive Maintenance -Dataknobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/use-cases/agent-ai-use-cases-for-real-impact.html">Agent AI Use Cases For Real Impact</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-exec-deck.html">Agent Engineering Exec Deck</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agent-ai/agent-engineering-guide.html">Agent Engineering Guide</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2025 Dataknobs, Inc. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0">
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">
+<span class="sr-only">Facebook</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">
+<span class="sr-only">Twitter</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+</svg>
+</a>
+<a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">
+<span class="sr-only">LinkedIn</span>
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill-rule="evenodd"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

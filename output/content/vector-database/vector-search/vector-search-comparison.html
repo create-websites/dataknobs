@@ -1,180 +1,154 @@
 <!DOCTYPE html>
-<html class="scroll-smooth" lang="en"><head>
+<html lang="en"><head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="pgvector, MongoDB Atlas, ChromaDB, and Pinecone compared on architecture, performance, and cost :  with code examples and executive guidance for choosing." name="description"/>
-<meta content="vector database comparison, pgvector, MongoDB Atlas Vector Search, ChromaDB, Pinecone, vector search, ANN search, vector database TCO, RAG infrastructure" name="keywords"/>
-<meta content="Dataknobs" name="author"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Vector Search: pgvector, MongoDB, Chroma &amp; Pinecone</title>
+<meta content="Compare pgvector, MongoDB Vector Search, Chroma and Pinecone by architecture, filtering, scale, operations, cost and RAG workload fit." name="description"/>
+<meta content="vector search comparison, pgvector, MongoDB Vector Search, Chroma, Pinecone, RAG retrieval, vector database, hybrid search" name="keywords"/>
+<meta content="DataKnobs" name="author"/>
 <meta content="index, follow, max-snippet:-1, max-image-preview:large" name="robots"/>
 <link href="https://www.dataknobs.com/vector-search-comparison.html" rel="canonical"/>
 <meta content="article" property="og:type"/>
-<meta content="Dataknobs" property="og:site_name"/>
-<meta content="Vector Database Comparison: pgvector, Mongo, Pinecone | Dataknobs" property="og:title"/>
-<meta content="pgvector, MongoDB Atlas, ChromaDB, and Pinecone compared on architecture, performance, and cost :  with code and executive guidance." property="og:description"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="Vector Search Comparison: pgvector, MongoDB, Chroma, Pinecone" property="og:title"/>
+<meta content="A workload-first decision guide to pgvector, MongoDB Vector Search, Chroma and Pinecone for RAG and semantic search." property="og:description"/>
 <meta content="https://www.dataknobs.com/vector-search-comparison.html" property="og:url"/>
 <meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" property="og:image"/>
+<meta content="DataKnobs" property="og:image:alt"/>
 <meta content="en_US" property="og:locale"/>
 <meta content="summary_large_image" name="twitter:card"/>
-<meta content="Vector Database Comparison: pgvector, Mongo, Pinecone | Dataknobs" name="twitter:title"/>
-<meta content="pgvector, MongoDB Atlas, ChromaDB, and Pinecone compared on architecture, performance, and cost :  with code and executive guidance." name="twitter:description"/>
+<meta content="Vector Search Comparison: pgvector, MongoDB, Chroma, Pinecone" name="twitter:title"/>
+<meta content="Choose vector search by workload fit, data boundary, retrieval quality, operations and total cost—not vendor benchmarks alone." name="twitter:description"/>
 <meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" name="twitter:image"/>
-<!-- GEO (Generative Engine Optimization) -->
-<meta content="true" name="speakable"/>
-<meta content="vector database comparison, pgvector vs Pinecone, pgvector vs MongoDB, ChromaDB vs Pinecone, vector database TCO, vector database vendor lock-in" name="generative-engine-optimization"/>
-<meta content="Vector Database Comparison: pgvector, MongoDB Atlas, ChromaDB, and Pinecone" name="citation_title"/>
-<meta content="Dataknobs" name="citation_author"/>
-<meta content="A comparison of integrated vector search (pgvector, MongoDB Atlas Vector Search) against dedicated vector databases (ChromaDB, Pinecone) across architecture, indexing, performance, operational overhead, cost model, and data consistency, with code examples for each and a decision framework for engineering and executive audiences." name="citation_abstract"/>
-<title>Vector Database Comparison: pgvector, Mongo, Pinecone | Dataknobs</title>
-<script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Organization",
-          "@id": "https://www.dataknobs.com/#organization",
-          "name": "Dataknobs",
-          "url": "https://www.dataknobs.com/",
-          "logo": { "@type": "ImageObject", "url": "https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" }
-        },
-        {
-          "@type": "TechArticle",
-          "@id": "https://www.dataknobs.com/vector-search-comparison.html#article",
-          "headline": "Vector Database Comparison: pgvector, MongoDB Atlas, ChromaDB, and Pinecone",
-          "description": "pgvector, MongoDB Atlas, ChromaDB, and Pinecone compared on architecture, performance, and cost :  with code examples and executive guidance for choosing.",
-          "author": { "@id": "https://www.dataknobs.com/#organization" },
-          "publisher": { "@id": "https://www.dataknobs.com/#organization" },
-          "mainEntityOfPage": "https://www.dataknobs.com/vector-search-comparison.html",
-          "speakable": { "@type": "SpeakableSpecification", "cssSelector": [".hero-summary", ".faq-answer"] }
-        },
-        {
-          "@type": "FAQPage",
-          "@id": "https://www.dataknobs.com/vector-search-comparison.html#faq",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "Do I need a dedicated vector database, or is pgvector enough?",
-              "acceptedAnswer": { "@type": "Answer", "text": "If you're already running PostgreSQL and your scale is in the low millions of vectors, pgvector is usually enough, especially when you need to join vector search against relational data. Move to a dedicated database when query latency at your target scale becomes the bottleneck, or when vector search is the primary workload rather than a feature bolted onto an existing system." }
-            },
-            {
-              "@type": "Question",
-              "name": "Is pgvector fast enough for production workloads?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Yes, with HNSW indexing and proper tuning, pgvector handles production workloads well into the tens of millions of vectors. It requires more manual index tuning than a managed dedicated database, and horizontal scaling is not built in the way it is with Pinecone or MongoDB Atlas." }
-            },
-            {
-              "@type": "Question",
-              "name": "What is the cheapest way to start with vector search?",
-              "acceptedAnswer": { "@type": "Answer", "text": "ChromaDB has the lowest direct cost to start: it is free, open-source, and can run locally with no infrastructure. If you already run PostgreSQL, pgvector is comparably cheap since it adds no new system. Both carry higher indirect cost in engineering time as you scale." }
-            },
-            {
-              "@type": "Question",
-              "name": "Which vector database has the lowest vendor lock-in?",
-              "acceptedAnswer": { "@type": "Answer", "text": "pgvector and ChromaDB are both open-source and self-hostable, making migration away from them a matter of re-exporting data rather than rewriting an integration against a proprietary API. Pinecone's managed, proprietary API creates the most lock-in; MongoDB Atlas sits in between, open-source at the database core but with vector search tied to the managed Atlas product." }
-            },
-            {
-              "@type": "Question",
-              "name": "Can I migrate from ChromaDB to Pinecone later?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Yes, and it's a common path: prototype in ChromaDB, then migrate to a dedicated managed database like Pinecone once you have production scale and latency requirements. The migration is a re-embed-and-reindex operation, not a rewrite of your embedding model or application logic, provided you plan for it rather than discovering the need for it under load." }
-            }
-          ]
-        }
-      ]
-    }
-    </script>
 <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
 <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
 <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
 <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production-with-dk-sections.css" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/>
+<script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@graph":[
+      {
+        "@type":"Organization",
+        "@id":"https://www.dataknobs.com/#organization",
+        "name":"DataKnobs",
+        "url":"https://www.dataknobs.com/",
+        "logo":{"@type":"ImageObject","url":"https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg"}
+      },
+      {
+        "@type":"TechArticle",
+        "@id":"https://www.dataknobs.com/vector-search-comparison.html#article",
+        "headline":"Vector Search Comparison: pgvector, MongoDB Vector Search, Chroma, and Pinecone",
+        "description":"A workload-first comparison of pgvector, MongoDB Vector Search, Chroma and Pinecone for semantic search and retrieval-augmented generation.",
+        "author":{"@id":"https://www.dataknobs.com/#organization"},
+        "publisher":{"@id":"https://www.dataknobs.com/#organization"},
+        "mainEntityOfPage":"https://www.dataknobs.com/vector-search-comparison.html",
+        "about":["Vector search","Retrieval-augmented generation","pgvector","MongoDB Vector Search","Chroma","Pinecone"]
+      },
+      {
+        "@type":"BreadcrumbList",
+        "itemListElement":[
+          {"@type":"ListItem","position":1,"name":"DataKnobs","item":"https://www.dataknobs.com/"},
+          {"@type":"ListItem","position":2,"name":"Vector Search Comparison","item":"https://www.dataknobs.com/vector-search-comparison.html"}
+        ]
+      },
+      {
+        "@type":"FAQPage",
+        "@id":"https://www.dataknobs.com/vector-search-comparison.html#faq",
+        "mainEntity":[
+          {
+            "@type":"Question",
+            "name":"Do I need a dedicated vector database for RAG?",
+            "acceptedAnswer":{"@type":"Answer","text":"Not necessarily. If vectors belong with relational or document data you already operate, integrated search can reduce synchronization and operational complexity. A dedicated service becomes more attractive when retrieval is a primary workload, independent scaling matters, or managed search operations are worth the additional platform dependency."}
+          },
+          {
+            "@type":"Question",
+            "name":"Is pgvector suitable for production vector search?",
+            "acceptedAnswer":{"@type":"Answer","text":"Yes. pgvector supports exact search plus HNSW and IVFFlat approximate indexes. Production suitability depends on dataset size, filter selectivity, concurrency, latency targets, PostgreSQL topology, and how much tuning your team is prepared to own."}
+          },
+          {
+            "@type":"Question",
+            "name":"Is Chroma only for local prototypes?",
+            "acceptedAnswer":{"@type":"Answer","text":"No. Open-source Chroma remains convenient for local and self-hosted development, while Chroma Cloud is a distributed serverless managed offering. Evaluate the deployment mode you actually plan to operate rather than treating Chroma as one architecture."}
+          },
+          {
+            "@type":"Question",
+            "name":"Which vector search system is fastest?",
+            "acceptedAnswer":{"@type":"Answer","text":"There is no defensible universal winner. Measure recall or ranking quality at your target latency and concurrency using your embedding dimension, corpus, metadata filters, update rate, and query distribution. Vendor benchmarks are useful context but should not replace workload-specific testing."}
+          },
+          {
+            "@type":"Question",
+            "name":"What should I benchmark before choosing a vector search platform?",
+            "acceptedAnswer":{"@type":"Answer","text":"Measure retrieval quality such as Recall@k or nDCG, p50 and p95 latency, throughput, freshness after writes, filtered-query performance, ingest and index-build time, failure behavior, and fully loaded cost including engineering operations."}
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+<style>
+    body.vs-page{background:#fff;color:#0f172a}
+    .vs-page .dk-brand-logo{display:block;width:170px;height:54px;background:url('https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png') center/contain no-repeat}
+    .vs-page .vs-subnav{position:sticky;top:73px;z-index:35;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid #e2e8f0}
+    .vs-page .vs-subnav-inner{display:flex;align-items:center;gap:18px;min-height:52px;overflow-x:auto;white-space:nowrap;font-size:.84rem;font-weight:700;color:#475569}
+    .vs-page .vs-subnav a:hover{color:#6d28d9}
+    .vs-page .vs-hero{padding:86px 0 78px}
+    .vs-page .vs-hero-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:48px;align-items:center}
+    .vs-page .vs-kicker{display:inline-flex;padding:.42rem .78rem;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.1);font-size:.75rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#f5d0fe}
+    .vs-page .vs-hero h1{max-width:850px;margin:18px 0 20px;font-size:clamp(2.8rem,5.8vw,5.2rem);line-height:1;letter-spacing:-.055em}
+    .vs-page .vs-hero p{max-width:780px;margin:0;color:#ede9fe;font-size:1.13rem;line-height:1.72}
+    .vs-page .vs-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+    .vs-page .vs-proof{display:flex;flex-wrap:wrap;gap:16px;margin-top:24px;color:#ede9fe;font-size:.82rem}
+    .vs-page .vs-proof span:before{content:'✓';font-weight:900;color:#86efac;margin-right:7px}
+    .vs-page .vs-decision-card{border:1px solid rgba(255,255,255,.17);background:rgba(255,255,255,.10);backdrop-filter:blur(16px);border-radius:26px;padding:22px;color:#fff;box-shadow:0 26px 70px rgba(15,23,42,.25)}
+    .vs-page .vs-decision-card h2{font-size:1.4rem;margin:0 0 6px;color:#fff;letter-spacing:-.025em}
+    .vs-page .vs-decision-card>p{font-size:.9rem;color:#ddd6fe;margin:0 0 16px}
+    .vs-page .vs-route{display:grid;gap:9px}
+    .vs-page .vs-route div{padding:12px 13px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10)}
+    .vs-page .vs-route strong{display:block;font-size:.85rem;color:#fff}.vs-page .vs-route span{display:block;margin-top:3px;font-size:.76rem;color:#ddd6fe}
+    .vs-page .vs-section{padding:78px 0}
+    .vs-page .vs-section.soft{background:#f8fafc;border-block:1px solid #e2e8f0}
+    .vs-page .vs-head{max-width:880px;margin:0 auto 38px;text-align:center}
+    .vs-page .vs-label{font-size:.74rem;font-weight:850;letter-spacing:.17em;text-transform:uppercase;color:#7c3aed}
+    .vs-page .vs-head h2{margin:10px 0 12px;font-size:clamp(2rem,4vw,3.25rem);line-height:1.08;letter-spacing:-.04em}
+    .vs-page .vs-head p{margin:0;color:#64748b;font-size:1.02rem}
+    .vs-page .vs-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    .vs-page .vs-summary{border:1px solid #e2e8f0;background:#fff;border-radius:20px;padding:21px;box-shadow:0 10px 30px rgba(15,23,42,.05)}
+    .vs-page .vs-summary .tag{display:inline-flex;padding:5px 9px;border-radius:999px;background:#f5f3ff;color:#6d28d9;font-size:.7rem;font-weight:850;text-transform:uppercase;letter-spacing:.07em}
+    .vs-page .vs-summary h3{font-size:1.15rem;margin:13px 0 7px}.vs-page .vs-summary p{margin:0;color:#64748b;font-size:.88rem}.vs-page .vs-summary b{display:block;margin-top:13px;font-size:.78rem;color:#334155}
+    .vs-page .vs-update{border:1px solid #ddd6fe;background:linear-gradient(135deg,#faf5ff,#eef2ff);border-radius:24px;padding:26px;margin-top:26px}
+    .vs-page .vs-update h3{margin:0 0 8px;font-size:1.25rem}.vs-page .vs-update p{margin:0;color:#475569}.vs-page .vs-update a{color:#5b21b6;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+    .vs-page .vs-two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .vs-page .vs-card{border:1px solid #e2e8f0;background:#fff;border-radius:24px;padding:26px;box-shadow:0 12px 34px rgba(15,23,42,.055)}
+    .vs-page .vs-card h3{margin:0 0 9px;font-size:1.35rem;letter-spacing:-.025em}.vs-page .vs-card p,.vs-page .vs-card li{color:#64748b}.vs-page .vs-card ul{margin:16px 0 0;padding-left:19px}.vs-page .vs-card li+li{margin-top:8px}
+    .vs-page .vs-pill-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}.vs-page .vs-pill{padding:5px 9px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;font-size:.72rem;font-weight:750;color:#475569}
+    .vs-page .vs-table-wrap{overflow-x:auto;border:1px solid #e2e8f0;border-radius:20px;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.04)}
+    .vs-page table{border-collapse:collapse;width:100%;min-width:980px}.vs-page th,.vs-page td{padding:14px 15px;border-bottom:1px solid #e2e8f0;vertical-align:top;text-align:left;font-size:.82rem}.vs-page th{background:#f8fafc;color:#0f172a;font-size:.78rem}.vs-page td:first-child{font-weight:800;color:#334155}.vs-page tbody tr:last-child td{border-bottom:0}
+    .vs-page .vs-good{font-weight:800;color:#047857}.vs-page .vs-caution{font-weight:800;color:#b45309}
+    .vs-page .vs-benchmark{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .vs-page .vs-metric{border:1px solid #e2e8f0;border-radius:19px;background:#fff;padding:20px}.vs-page .vs-metric strong{display:block;font-size:1rem}.vs-page .vs-metric span{display:block;margin-top:6px;color:#64748b;font-size:.84rem}
+    .vs-page .vs-rule{margin-top:26px;padding:22px;border-left:4px solid #7c3aed;background:#faf5ff;border-radius:0 17px 17px 0;color:#475569}
+    .vs-page .vs-code-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .vs-page .vs-code-card{border:1px solid #e2e8f0;border-radius:20px;overflow:hidden;background:#fff}.vs-page .vs-code-head{padding:14px 17px;border-bottom:1px solid #e2e8f0;font-weight:800;color:#334155}.vs-page pre{margin:0;padding:18px;overflow:auto;background:#0f172a;color:#e2e8f0;font-size:.76rem;line-height:1.55;min-height:240px}.vs-page code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .vs-page .vs-exec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.vs-page .vs-exec{border:1px solid #e2e8f0;background:#fff;border-radius:21px;padding:22px}.vs-page .vs-exec h3{margin:0 0 8px;font-size:1.15rem}.vs-page .vs-exec p{margin:0;color:#64748b;font-size:.88rem}
+    .vs-page .vs-choice{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.vs-page .vs-choice article{border:1px solid #e2e8f0;border-radius:20px;background:#fff;padding:20px}.vs-page .vs-choice h3{margin:0 0 8px;font-size:1.1rem}.vs-page .vs-choice p{margin:0;color:#64748b;font-size:.84rem}.vs-page .vs-choice .best{display:block;margin-top:12px;font-size:.75rem;font-weight:800;color:#6d28d9}
+    .vs-page .vs-image{margin-top:32px;text-align:center}.vs-page .vs-image img{max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:22px;box-shadow:0 16px 44px rgba(15,23,42,.08)}.vs-page .vs-image figcaption{max-width:800px;margin:9px auto 0;color:#64748b;font-size:.78rem}
+    .vs-page .vs-source-list{display:grid;gap:10px;max-width:940px;margin:0 auto}.vs-page .vs-source-list a{display:block;border:1px solid #e2e8f0;border-radius:15px;padding:13px 15px;background:#fff;color:#4338ca;font-weight:700}.vs-page .vs-source-list a span{display:block;margin-top:3px;color:#64748b;font-size:.78rem;font-weight:500}
+    .vs-page .vs-faq{display:grid;gap:10px;max-width:920px;margin:0 auto}.vs-page details{border:1px solid #e2e8f0;border-radius:16px;background:#fff;padding:17px 19px}.vs-page summary{cursor:pointer;font-weight:800;color:#1e293b}.vs-page details p{margin:10px 0 0;color:#64748b}
+    .vs-page .vs-cta{padding:70px 0}.vs-page .vs-cta-box{padding:50px 28px;border-radius:28px;text-align:center;color:#fff;background:linear-gradient(135deg,#4c1d95 0%,#6d28d9 50%,#4338ca 100%)}.vs-page .vs-cta-box h2{margin:0;font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.04em}.vs-page .vs-cta-box p{max-width:760px;margin:13px auto 24px;color:#ede9fe}
+    .vs-page a:focus-visible,.vs-page button:focus-visible,.vs-page summary:focus-visible{outline:3px solid #c4b5fd;outline-offset:3px}
+    @media(max-width:1050px){.vs-page .vs-hero-grid{grid-template-columns:1fr}.vs-page .vs-summary-grid,.vs-page .vs-choice{grid-template-columns:1fr 1fr}.vs-page .vs-benchmark,.vs-page .vs-exec-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:760px){.vs-page .vs-subnav{top:70px}.vs-page .vs-two,.vs-page .vs-code-grid,.vs-page .vs-summary-grid,.vs-page .vs-choice,.vs-page .vs-benchmark,.vs-page .vs-exec-grid{grid-template-columns:1fr}.vs-page .vs-hero{padding:62px 0}.vs-page .vs-section{padding:62px 0}.vs-page .dk-brand-logo{width:145px;height:48px}}
+  </style>
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
 <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-JF94J1W5MC');
-    </script>
-<!-- Google Tag Manager -->
-<script>
-        (function (w, d, s, l, i) {
-            w[l] = w[l] || []; w[l].push({
-                'gtm.start':
-                    new Date().getTime(), event: 'gtm.js'
-            }); var f = d.getElementsByTagName(s)[0],
-                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');
-    </script>
-<!-- End Google Tag Manager -->
-<style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #ffffff; /* White */
-            color: #475569; /* Slate 600 */
-        }
-        .gradient-text {
-            background: linear-gradient(90deg, #4f46e5, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-        .feature-card {
-            background-color: #f8fafc; /* Slate 50 */
-            border: 1px solid #e2e8f0; /* Slate 200 */
-            border-radius: 0.75rem;
-            padding: 2rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 100%;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .table-container {
-            overflow-x: auto;
-        }
-        th, td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        th {
-            background-color: #f8fafc; /* Slate 50 */
-            font-weight: 600;
-            color: #1e293b; /* Slate 800 */
-        }
-        code {
-            background-color: #f1f5f9; /* Slate 100 */
-            color: #1e293b; /* Slate 800 */
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
-        pre {
-            background-color: #f8fafc; /* Slate 50 */
-            border: 1px solid #e2e8f0; /* Slate 200 */
-            border-radius: 0.5rem;
-            padding: 1rem;
-            overflow-x: auto;
-        }
-        pre code {
-            background-color: transparent;
-            padding: 0;
-        }
-        .faq-item { border: 1px solid #e2e8f0; border-radius: 0.75rem; overflow: hidden; }
-        .faq-question { width: 100%; text-align: left; padding: 1.1rem 1.5rem; font-weight: 600; color: #1e293b; background: #fff; border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-        .faq-question:hover { background: #f8fafc; }
-        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.2s; padding: 0 1.5rem; background: #f8fafc; }
-        .faq-item.open .faq-answer { max-height: 600px; padding: 0 1.5rem 1.25rem; }
-        .faq-item.open .faq-icon { transform: rotate(45deg); }
-        .faq-icon { transition: transform 0.2s; }
-    </style>
+    window.dataLayer=window.dataLayer||[];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js',new Date());
+    gtag('config','G-JF94J1W5MC');
+  </script>
 <link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
 <script>
@@ -183,434 +157,248 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-JF94J1W5MC');
 </script></head>
-<body>
-<header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
-<div class="mx-auto max-w-7xl px-6 py-4 lg:px-8">
-<div class="flex items-center justify-between">
-<a aria-label="DataKnobs Home" class="flex items-center gap-3" href="https://www.dataknobs.com/">
-<img alt="DataKnobs AI data products platform logo" class="h-12 w-auto sm:h-14" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png"/>
-</a>
-<nav aria-label="Primary navigation" class="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
-<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#platform">Platform</a>
-<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#data-flywheel">Data Flywheel</a>
-<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#capabilities">Capabilities</a>
-<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#use-cases">Use Cases</a>
-<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#how-it-works">How It Works</a>
-<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/#knobs-value">Knobs</a>
-<a class="transition hover:text-violet-700" href="https://www.dataknobs.com/pricing/">Pricing</a>
-<a class="rounded-full bg-violet-600 px-5 py-2.5 text-white shadow-sm transition hover:bg-violet-700" href="https://www.dataknobs.com/search.html">
-          Search
-        </a>
+<body class="dk-page vs-page">
+<header class="dk-header">
+<div class="dk-container dk-header-inner">
+<div class="dk-header-row">
+<a aria-label="DataKnobs home" class="dk-brand-logo" href="https://www.dataknobs.com/"></a>
+<nav aria-label="Primary navigation" class="dk-nav dk-nav--desktop">
+<a href="https://www.dataknobs.com/">Platform</a>
+<a href="https://www.dataknobs.com/use-cases/">Use Cases</a>
+<a href="https://www.dataknobs.com/customers/">Customers</a>
+<a href="https://www.dataknobs.com/pricing/">Pricing</a>
+<a class="dk-btn dk-btn--primary dk-btn--sm" href="mailto:contact@dataknobs.com?subject=Vector%20Search%20Evaluation">Evaluate with DataKnobs</a>
 </nav>
-<button aria-controls="mobile-menu" aria-expanded="false" aria-label="Open main menu" class="inline-flex items-center justify-center rounded-xl border border-slate-200 p-2 text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 md:hidden" id="mobile-menu-button" type="button">
-<svg class="h-6 w-6" fill="none" id="menu-open-icon" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"></path>
-</svg>
-<svg class="hidden h-6 w-6" fill="none" id="menu-close-icon" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" stroke-linejoin="round"></path>
-</svg>
-</button>
+<button aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation menu" class="dk-menu-button" id="mobile-menu-button" type="button">Menu</button>
 </div>
-<nav aria-label="Mobile navigation" class="hidden border-t border-slate-200 pt-4 md:hidden" id="mobile-menu">
-<div class="flex flex-col gap-2 text-sm font-medium text-slate-700">
-<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#platform">Platform</a>
-<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#data-flywheel">Data Flywheel</a>
-<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#capabilities">Capabilities</a>
-<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#use-cases">Use Cases</a>
-<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#how-it-works">How It Works</a>
-<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/#knobs-value">Knobs</a>
-<a class="rounded-xl px-4 py-3 transition hover:bg-slate-50" href="https://www.dataknobs.com/pricing/">Pricing</a>
-<a class="mt-2 rounded-full bg-violet-600 px-5 py-3 text-center text-white shadow-sm transition hover:bg-violet-700" href="https://www.dataknobs.com/search.html">
-          Search
-        </a>
-</div>
+<nav aria-label="Mobile navigation" class="dk-mobile-nav" id="mobile-menu">
+<a href="https://www.dataknobs.com/">Platform</a>
+<a href="https://www.dataknobs.com/use-cases/">Use Cases</a>
+<a href="https://www.dataknobs.com/customers/">Customers</a>
+<a href="https://www.dataknobs.com/pricing/">Pricing</a>
+<a href="mailto:contact@dataknobs.com?subject=Vector%20Search%20Evaluation">Evaluate with DataKnobs</a>
 </nav>
 </div>
 </header>
-<!-- Page's own in-page nav -->
-<header class="bg-white/80 backdrop-blur-sm sticky top-[76px] md:top-[88px] z-40 border-b border-slate-200">
-<nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-<div class="text-xl font-bold tracking-tighter text-slate-900">
-<span class="gradient-text">Vector Databases Compared</span>
-</div>
-<div class="hidden lg:flex items-center space-x-5 text-slate-700 text-sm">
-<a class="hover:text-violet-500 transition-colors" href="#general-purpose">General Purpose</a>
-<a class="hover:text-violet-500 transition-colors" href="#dedicated">Dedicated</a>
-<a class="hover:text-violet-500 transition-colors" href="#comparison">Comparison</a>
-<a class="hover:text-violet-500 transition-colors" href="#code">Code</a>
-<a class="hover:text-violet-500 transition-colors" href="#executives">For Executives</a>
-<a class="hover:text-violet-500 transition-colors" href="#guidance">Guidance</a>
-<a class="hover:text-violet-500 transition-colors" href="#faq">FAQ</a>
+<nav aria-label="Page navigation" class="vs-subnav">
+<div class="dk-container vs-subnav-inner">
+<a href="#answer">Quick answer</a>
+<a href="#architectures">Architectures</a>
+<a href="#comparison">Comparison</a>
+<a href="#benchmark">Benchmark</a>
+<a href="#code">Code</a>
+<a href="#executives">For leaders</a>
+<a href="#guidance">Decision guide</a>
+<a href="#faq">FAQ</a>
 </div>
 </nav>
-</header>
-<!-- Main Content -->
 <main>
-<!-- Hero Section -->
-<section class="py-20 md:py-24 bg-white">
-<div class="container mx-auto px-6 text-center">
-<h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
-                    Vector Search in the Modern Data Stack
-                </h1>
-<p class="hero-summary text-lg md:text-xl text-slate-600 max-w-4xl mx-auto">
-                    A comparative analysis of PostgreSQL (pgvector), MongoDB Atlas, ChromaDB, and Pinecone :  architecture, performance, and cost, with code for developers and a decision framework for technical leaders and executives choosing a vector search solution.
-                </p>
+<section class="dk-hero dk-hero--purple vs-hero">
+<div class="dk-container vs-hero-grid">
+<div>
+<div class="vs-kicker">Vector search decision guide</div>
+<h1>Choose vector search by <span style="color:#f5d0fe">workload fit</span>, not a benchmark winner.</h1>
+<p>pgvector, MongoDB Vector Search, Chroma, and Pinecone can all support semantic search and RAG. The better question is where vectors belong in your system, what retrieval quality and latency you need, how selective your filters are, and who should own the search infrastructure.</p>
+<div class="vs-actions">
+<a class="dk-btn dk-btn--light" href="#answer">See the quick answer</a>
+<a class="dk-btn dk-btn--ghost-light" href="#benchmark">Build a fair benchmark</a>
+</div>
+<div class="vs-proof"><span>Architecture before vendor</span><span>Quality + latency together</span><span>TCO includes engineering</span></div>
+</div>
+<aside aria-label="Fast routing guide" class="vs-decision-card">
+<h2>Fast routing guide</h2>
+<p>Start with the system boundary you already have.</p>
+<div class="vs-route">
+<div><strong>Already on PostgreSQL?</strong><span>Test pgvector first when SQL, transactions, joins, and data colocation matter.</span></div>
+<div><strong>Already on MongoDB Atlas?</strong><span>Test MongoDB Vector Search when documents, metadata, and vectors belong together.</span></div>
+<div><strong>Developer-first / open-source path?</strong><span>Evaluate Chroma locally or Chroma Cloud depending on the production operating model.</span></div>
+<div><strong>Vector retrieval is a primary managed workload?</strong><span>Evaluate Pinecone for managed, independently scalable retrieval.</span></div>
+</div>
+</aside>
 </div>
 </section>
-<!-- Section 1: General-Purpose Databases -->
-<section class="py-20 bg-slate-50" id="general-purpose">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Vector Capabilities in General-Purpose Databases</h2>
-<p class="text-slate-600 mt-2 max-w-3xl mx-auto">Leveraging existing, mature database platforms offers the advantage of familiar infrastructure, operational expertise, and powerful hybrid query capabilities.</p>
+<section class="vs-section soft" id="answer">
+<div class="dk-container">
+<div class="vs-head"><div class="vs-label">Quick answer</div><h2>Four reasonable choices. Four different system boundaries.</h2><p>There is no universally best <a href="https://www.dataknobs.com/vector-database/">vector database</a>. The strongest default is often the option that minimizes a new operational boundary while still meeting retrieval-quality and latency targets.</p></div>
+<div class="vs-summary-grid">
+<article class="vs-summary"><span class="tag">Integrated · relational</span><h3>PostgreSQL + pgvector</h3><p>Keep vectors beside relational data and combine similarity search with SQL, transactions, joins, and metadata filters.</p><b>Best first test: PostgreSQL-centric applications.</b></article>
+<article class="vs-summary"><span class="tag">Integrated · document</span><h3>MongoDB Vector Search</h3><p>Keep operational JSON documents, metadata, and vectors in Atlas, with dedicated Search Nodes available for workload isolation.</p><b>Best first test: MongoDB-centric applications.</b></article>
+<article class="vs-summary"><span class="tag">Open source + managed cloud</span><h3>Chroma</h3><p>Use the open-source API for local/self-hosted development or Chroma Cloud when you want a distributed serverless operating model.</p><b>Best first test: developer-first retrieval workflows.</b></article>
+<article class="vs-summary"><span class="tag">Managed retrieval</span><h3>Pinecone</h3><p>Use a purpose-built managed retrieval layer with serverless scaling and support for dense, sparse, full-text, filtering, and hybrid patterns.</p><b>Best first test: vector-first managed production search.</b></article>
 </div>
-<div class="grid md:grid-cols-2 gap-12">
-<div class="feature-card bg-white">
-<h3 class="text-2xl font-bold text-slate-800 mb-4">PostgreSQL with pgvector</h3>
-<p class="mb-4">An open-source extension that seamlessly integrates vector storage and search into PostgreSQL's robust, ACID-compliant environment. It allows vector embeddings to be managed alongside traditional relational data.</p>
-<ul class="space-y-2 list-disc list-inside">
-<li><strong>Hybrid Queries:</strong> Combine vector similarity search with the full power of SQL for complex filtering on metadata.</li>
-<li><strong>Indexing:</strong> Supports IVFFlat and HNSW indexing for Approximate Nearest Neighbor (ANN) search, but requires careful tuning for optimal performance.</li>
-<li><strong>Ecosystem:</strong> Leverages PostgreSQL's mature ecosystem for data integrity, recovery, high availability, and observability.</li>
-<li><strong>Operational Cost:</strong> While powerful, requires significant operational expertise to manage indexing, tuning, and scaling.</li>
-</ul>
-</div>
-<div class="feature-card bg-white">
-<h3 class="text-2xl font-bold text-slate-800 mb-4">MongoDB with Atlas Vector Search</h3>
-<p class="mb-4">Integrated vector search capabilities within MongoDB's managed cloud offering, designed for a seamless developer experience with JSON-style documents.</p>
-<ul class="space-y-2 list-disc list-inside">
-<li><strong>Data Colocation:</strong> Stores vector embeddings within the same document as their metadata, eliminating data synchronization complexity.</li>
-<li><strong>Querying:</strong> Uses the powerful <code>$vectorSearch</code> aggregation stage, allowing for pre-filtering and score projection.</li>
-<li><strong>Architecture:</strong> Offers dedicated Search Nodes for workload isolation, preventing resource contention between search and database operations.</li>
-<li><strong>Scalability:</strong> Inherits MongoDB's well-established horizontal scalability through automatic sharding.</li>
-</ul>
-</div>
-</div>
+<div class="vs-update"><h3>What changed from the older comparison?</h3><p>The old page treated Chroma primarily as a single-node prototype database and Pinecone as a simple managed dense-vector service. That framing is now incomplete. Chroma Cloud is distributed and serverless, while Pinecone's current platform spans dense, sparse, full-text, metadata filtering and serverless deployment options. The comparison below evaluates the current deployment models rather than freezing each product at an earlier stage.</p></div>
 </div>
 </section>
-<div class="flex justify-center my-12">
-<img alt="Comparison overview of vector database architectures: integrated versus dedicated" class="max-w-full h-auto rounded-lg shadow-md" loading="lazy" src="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/vector-db/vector-db-101/images/Slide1000/Slide8.png"/>
+<section class="vs-section" id="architectures">
+<div class="dk-container">
+<div class="vs-head"><div class="vs-label">Architecture</div><h2>The first decision is whether vector search is part of your primary database or its own retrieval system.</h2><p>Integrated approaches reduce synchronization boundaries. Dedicated approaches can isolate retrieval scaling and operations. Neither architecture is inherently superior.</p></div>
+<div class="vs-two">
+<article class="vs-card"><h3>Integrated vector search</h3><p>Vectors live with the operational or analytical records your application already uses.</p><ul><li><strong>pgvector:</strong> exact search plus HNSW and IVFFlat ANN indexes inside PostgreSQL.</li><li><strong>MongoDB Vector Search:</strong> vector search within Atlas documents; dedicated Search Nodes can isolate search compute from database compute.</li><li><strong>Advantage:</strong> fewer synchronization and consistency boundaries.</li><li><strong>Watch:</strong> search load may compete with the primary data workload unless you isolate or scale appropriately.</li></ul><div class="vs-pill-row"><span class="vs-pill">SQL / documents</span><span class="vs-pill">metadata filters</span><span class="vs-pill">data colocation</span></div></article>
+<article class="vs-card"><h3>Dedicated retrieval layer</h3><p>Vector retrieval is operated as a distinct service with its own index, scaling model, and API.</p><ul><li><strong>Chroma:</strong> open-source/local deployment and a distributed managed Chroma Cloud path using the same API family.</li><li><strong>Pinecone:</strong> managed vector retrieval with serverless indexes and purpose-built retrieval infrastructure.</li><li><strong>Advantage:</strong> retrieval can scale and evolve independently from the primary database.</li><li><strong>Watch:</strong> you now own a data synchronization and lifecycle boundary between source records and the retrieval index.</li></ul><div class="vs-pill-row"><span class="vs-pill">independent scaling</span><span class="vs-pill">retrieval API</span><span class="vs-pill">sync boundary</span></div></article>
 </div>
-<!-- Section 2: Dedicated Vector Databases -->
-<section class="py-20 bg-white" id="dedicated">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">The Specialized Approach of Dedicated Vector Databases</h2>
-<p class="text-slate-600 mt-2 max-w-3xl mx-auto">Databases designed from the ground up to manage and query vector embeddings at scale, offering purpose-built architectures and performance characteristics.</p>
-</div>
-<div class="grid md:grid-cols-2 gap-12">
-<div class="feature-card">
-<h3 class="text-2xl font-bold text-slate-800 mb-4">ChromaDB</h3>
-<p class="mb-4">An AI-native, open-source embedding database designed for simplicity and developer ergonomics, making it easy to build <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a>-powered applications.</p>
-<ul class="space-y-2 list-disc list-inside">
-<li><strong>Developer-First:</strong> Simple API and tight integration with frameworks like LangChain and LlamaIndex. Ideal for prototyping.</li>
-<li><strong>Self-Hosted:</strong> Can be run locally, in Docker, or as a standalone server, offering full control over the environment.</li>
-<li><strong>Use Case:</strong> Best for small-to-medium scale applications and developer-centric workflows where speed of development is paramount.</li>
-<li><strong>Limitations:</strong> Primarily single-node architecture, which limits horizontal scalability for enterprise-level workloads.</li>
-</ul>
-</div>
-<div class="feature-card">
-<h3 class="text-2xl font-bold text-slate-800 mb-4">Pinecone</h3>
-<p class="mb-4">A proprietary, fully managed, and cloud-native <a href="https://www.dataknobs.com/vector-database/">vector database</a> engineered for extreme performance, low latency, and massive scalability.</p>
-<ul class="space-y-2 list-disc list-inside">
-<li><strong>High Performance:</strong> Delivers consistently low-latency queries across billions of vectors with real-time indexing.</li>
-<li><strong>Managed Service:</strong> Fully managed and serverless, offloading all operational overhead related to scaling, backups, and maintenance.</li>
-<li><strong>Use Case:</strong> The solution of choice for demanding, large-scale production applications with low-latency requirements.</li>
-<li><strong>Trade-Offs:</strong> Higher direct costs and proprietary nature mean less control and flexibility compared to open-source alternatives.</li>
-</ul>
-</div>
-</div>
+<figure aria-labelledby="architecture-slide-caption" class="vs-image">
+<img alt="Original DataKnobs slide comparing integrated and dedicated vector database architectures" decoding="async" loading="lazy" src="https://storage.googleapis.com/5106_gdrive/www.dataknobs.com/input/content/vector-db/vector-db-101/images/Slide1000/Slide8.png"/>
+<figcaption id="architecture-slide-caption">Original DataKnobs vector-database architecture comparison. Use the slide as a conceptual visual; the surrounding text reflects the updated product capabilities and workload-first guidance on this page.</figcaption>
+</figure>
 </div>
 </section>
-<!-- Section 3: Comparative Analysis -->
-<section class="py-20 bg-slate-50" id="comparison">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Comparative Analysis and Strategic Trade-Offs</h2>
-<p class="text-slate-600 mt-2 max-w-3xl mx-auto">Choosing a vector search solution is a critical architectural decision. This section provides a direct comparison across key axes.</p>
-</div>
-<div class="table-container bg-white rounded-lg border border-slate-200 shadow-sm">
-<table class="w-full text-sm md:text-base">
-<thead>
-<tr>
-<th>Attribute</th>
-<th>PostgreSQL (pgvector)</th>
-<th>MongoDB (Atlas)</th>
-<th>ChromaDB</th>
-<th>Pinecone</th>
-</tr>
-</thead>
+<section class="vs-section soft" id="comparison">
+<div class="dk-container">
+<div class="vs-head"><div class="vs-label">Comparison</div><h2>Compare the operating model, not marketing adjectives.</h2><p>Performance depends on data shape, index parameters, filter selectivity, query mix, concurrency, region, hardware, and freshness requirements. Treat labels such as “fast” as hypotheses to test.</p></div>
+<div class="vs-table-wrap">
+<table>
+<thead><tr><th>Decision axis</th><th>pgvector</th><th>MongoDB Vector Search</th><th>Chroma</th><th>Pinecone</th></tr></thead>
 <tbody>
-<tr>
-<td><strong>Architecture</strong></td>
-<td>Integrated (Relational)</td>
-<td>Integrated (Document)</td>
-<td>Dedicated (Open-Source)</td>
-<td>Dedicated (Managed)</td>
-</tr>
-<tr>
-<td><strong>Primary Use Case</strong></td>
-<td>Hybrid apps with strong relational data needs</td>
-<td>Apps on MongoDB needing integrated vector search</td>
-<td>Prototyping, local development, small projects</td>
-<td>High-scale, low-latency production apps</td>
-</tr>
-<tr>
-<td><strong>Scalability</strong></td>
-<td>Vertical; Horizontal via extensions</td>
-<td>Vertical &amp; Horizontal (built-in)</td>
-<td>Vertical (Single-Node)</td>
-<td>Horizontal (Cloud-Native)</td>
-</tr>
-<tr>
-<td><strong>Performance</strong></td>
-<td>High with expert tuning</td>
-<td>Good; excellent with Search Nodes</td>
-<td>Moderate</td>
-<td>Very High, low latency at scale</td>
-</tr>
-<tr>
-<td><strong>Query Interface</strong></td>
-<td>SQL</td>
-<td>MQL (Aggregation)</td>
-<td>SDK</td>
-<td>SDK</td>
-</tr>
-<tr>
-<td><strong>Operational Overhead</strong></td>
-<td class="text-red-600">High (Self-managed)</td>
-<td class="text-green-600">Low (Managed)</td>
-<td class="text-red-600">High (Self-managed)</td>
-<td class="text-green-600">Very Low (Managed)</td>
-</tr>
-<tr>
-<td><strong>Cost Model</strong></td>
-<td>Low direct cost, high indirect cost</td>
-<td>Pay-as-you-go (managed)</td>
-<td>Very low direct cost, high indirect cost</td>
-<td>High direct cost, low indirect cost</td>
-</tr>
-<tr>
-<td><strong>Vendor Lock-In</strong></td>
-<td>Low (open-source, portable)</td>
-<td>Moderate (open core, managed vector layer)</td>
-<td>Low (open-source, portable)</td>
-<td>High (proprietary API)</td>
-</tr>
-<tr>
-<td><strong>Data Consistency</strong></td>
-<td>Strong (ACID Transactions)</td>
-<td>Strong (within document)</td>
-<td>Eventual (if syncing)</td>
-<td>Eventual (if syncing)</td>
-</tr>
+<tr><td>System boundary</td><td>PostgreSQL extension</td><td>Atlas database + search layer</td><td>Open-source Chroma or Chroma Cloud</td><td>Managed retrieval service</td></tr>
+<tr><td>Best contextual fit</td><td>Relational apps already on Postgres</td><td>Document apps already on Atlas</td><td>Developer-first retrieval; local-to-cloud path</td><td>Vector-first managed production retrieval</td></tr>
+<tr><td>ANN / indexing</td><td>HNSW, IVFFlat; exact search also available</td><td>Atlas Vector Search indexes and dedicated Search Nodes</td><td>Deployment-dependent; cloud uses distributed indexing</td><td>Managed serverless indexes; current product also supports sparse/full-text retrieval</td></tr>
+<tr><td>Metadata / structured filters</td><td class="vs-good">Full SQL + relational filters</td><td class="vs-good">Document filters in vector search workflow</td><td>Metadata filtering supported; test complex filter patterns</td><td>Metadata filtering supported; test selectivity and namespace design</td></tr>
+<tr><td>Data consistency boundary</td><td class="vs-good">Vectors can live transactionally with source rows</td><td class="vs-good">Vectors can live with source documents</td><td>Depends on whether Chroma is source-of-truth or synchronized</td><td>Usually synchronized from another source system</td></tr>
+<tr><td>Independent search scaling</td><td>Depends on PostgreSQL deployment/topology</td><td class="vs-good">Dedicated Search Nodes can isolate search</td><td class="vs-good">Chroma Cloud is distributed/serverless</td><td class="vs-good">Serverless managed scaling</td></tr>
+<tr><td>Operations burden</td><td class="vs-caution">Low if Postgres is already well operated; higher for heavy ANN tuning</td><td>Managed Atlas operations; search nodes add a separate cost surface</td><td>High for self-hosted; lower with Chroma Cloud</td><td>Low infrastructure burden; service/API dependency remains</td></tr>
+<tr><td>Portability</td><td class="vs-good">Open source; SQL-centric</td><td>MongoDB data model is portable; Atlas search features are service-specific</td><td class="vs-good">Open-source API plus managed cloud option</td><td>Managed proprietary service; abstraction layer can reduce application coupling</td></tr>
+<tr><td>Cost shape</td><td>Database compute/storage + engineering</td><td>Atlas cluster/search-node consumption + engineering</td><td>Self-host infrastructure or cloud usage + engineering</td><td>Managed storage/read/write usage + engineering</td></tr>
+<tr><td>Do not choose because…</td><td>“It is already there” without testing filtered ANN under load</td><td>“One database” without understanding Search Node economics</td><td>“It is only for prototypes” — that is now stale</td><td>“It is always fastest” — benchmark your workload</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 </section>
-<!-- Section: For Developers -->
-<section class="py-20 bg-white" id="code">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">For Developers: The Same Query, Four Ways</h2>
-<p class="text-slate-600 mt-2 max-w-3xl mx-auto">Insert a vector, then run a similarity search with a metadata filter :  here's what that looks like in each engine's own idiom.</p>
+<section class="vs-section" id="benchmark">
+<div class="dk-container">
+<div class="vs-head"><div class="vs-label">Evaluation framework</div><h2>Benchmark retrieval quality, latency, freshness, and cost together.</h2><p>A vector-search benchmark is useful only when it resembles the production query distribution. A synthetic nearest-neighbor test with no filters can select the wrong architecture for a real RAG application.</p></div>
+<div class="vs-benchmark">
+<div class="vs-metric"><strong>Retrieval quality</strong><span>Recall@k, Precision@k, MRR or nDCG against a labeled or judged retrieval set.</span></div>
+<div class="vs-metric"><strong>Latency distribution</strong><span>p50, p95 and p99—not only average latency—at realistic concurrency.</span></div>
+<div class="vs-metric"><strong>Filtered retrieval</strong><span>Repeat tests across common and highly selective metadata filters.</span></div>
+<div class="vs-metric"><strong>Throughput</strong><span>Queries per second while meeting the target quality and tail-latency SLO.</span></div>
+<div class="vs-metric"><strong>Freshness</strong><span>Time from insert/update to retrievability, including index propagation.</span></div>
+<div class="vs-metric"><strong>Ingestion</strong><span>Bulk-load rate, incremental update behavior, index build/rebuild time and backfill cost.</span></div>
+<div class="vs-metric"><strong>Failure behavior</strong><span>Timeouts, retries, degraded modes, recovery, backup and regional failure assumptions.</span></div>
+<div class="vs-metric"><strong>Fully loaded cost</strong><span>Provider spend plus engineering ownership, observability, backups, migrations and on-call.</span></div>
+<div class="vs-metric"><strong>RAG outcome</strong><span>Evaluate answer correctness and citation support downstream, not retrieval metrics in isolation.</span></div>
 </div>
-<div class="space-y-12">
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">PostgreSQL (pgvector)</h3>
-<pre><code class="language-sql">-- Create
-INSERT INTO items (id, embedding, metadata)
-VALUES (1, '[0.1, 0.2, ..., 0.9]', '{"category": "electronics", "price": 79}');
-
--- Read (similarity search + relational filter, in one query)
-SELECT id, metadata FROM items
-WHERE metadata-&gt;&gt;'category' = 'electronics'
-  AND (metadata-&gt;&gt;'price')::int &lt; 100
-ORDER BY embedding &lt;=&gt; '[0.1, 0.2, ..., 0.9]'
-LIMIT 10;</code></pre>
+<div class="vs-rule"><strong>DataKnobs principle:</strong> model the database, index type, embedding model, chunking strategy, top-k, reranker, metadata filter and freshness policy as <strong>Knobs</strong>. Then compare controlled variants on the same query set instead of debating vendors abstractly.</div>
 </div>
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">MongoDB Atlas Vector Search</h3>
-<pre><code class="language-javascript">// Create
-db.items.insertOne({
-  _id: 1,
-  embedding: [0.1, 0.2, /* ... */ 0.9],
-  category: "electronics",
-  price: 79
-});
+</section>
+<section class="vs-section soft" id="code">
+<div class="dk-container">
+<div class="vs-head"><div class="vs-label">Developer view</div><h2>The application code is similar. The operational behavior is not.</h2><p>These compact examples show the common shape: write a record with a vector, then run similarity search with metadata filtering. Exact SDK syntax can change, so pin and test the vendor version you deploy.</p></div>
+<div class="vs-code-grid">
+<article class="vs-code-card"><div class="vs-code-head">PostgreSQL + pgvector</div><pre><code>-- Vector search plus structured filtering
+SELECT id, title,
+       embedding &lt;=&gt; $1 AS distance
+FROM items
+WHERE tenant_id = $2
+  AND category = 'electronics'
+ORDER BY embedding &lt;=&gt; $1
+LIMIT 10;
 
-// Read (vector search + pre-filter, as an aggregation stage)
-db.items.aggregate([
+-- Example ANN index
+CREATE INDEX items_embedding_hnsw
+ON items USING hnsw
+(embedding vector_cosine_ops);</code></pre></article>
+<article class="vs-code-card"><div class="vs-code-head">MongoDB Vector Search</div><pre><code>db.items.aggregate([
   { $vectorSearch: {
       index: "vector_index",
       path: "embedding",
-      queryVector: [0.1, 0.2, /* ... */ 0.9],
-      filter: { category: "electronics", price: { $lt: 100 } },
+      queryVector: queryVector,
+      filter: {
+        tenant_id: tenantId,
+        category: "electronics"
+      },
       numCandidates: 100,
       limit: 10
+  }},
+  { $project: {
+      title: 1,
+      score: { $meta: "vectorSearchScore" }
   }}
-]);</code></pre>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">ChromaDB</h3>
-<pre><code class="language-python"># Assumes 'collection' is an initialized ChromaDB collection
-# Create
+])</code></pre></article>
+<article class="vs-code-card"><div class="vs-code-head">Chroma</div><pre><code># collection is an initialized Chroma collection
 collection.add(
     ids=["1"],
-    embeddings=[[0.1, 0.2, ..., 0.9]],
-    metadatas=[{"category": "electronics", "price": 79}]
+    embeddings=[embedding],
+    metadatas=[{
+        "tenant_id": "acme",
+        "category": "electronics"
+    }]
 )
 
-# Read (similarity search + metadata filter)
 results = collection.query(
-    query_embeddings=[[0.1, 0.2, ..., 0.9]],
-    where={"category": "electronics"},
+    query_embeddings=[query_embedding],
+    where={"tenant_id": "acme"},
     n_results=10
-)</code></pre>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4">Pinecone</h3>
-<pre><code class="language-python"># Assumes 'index' is an initialized Pinecone index
-# Create
-index.upsert(vectors=[
-    {"id": "1", "values": [0.1, 0.2, ..., 0.9],
-     "metadata": {"category": "electronics", "price": 79}}
-])
+)</code></pre></article>
+<article class="vs-code-card"><div class="vs-code-head">Pinecone</div><pre><code># index is an initialized Pinecone index
+index.upsert(vectors=[{
+    "id": "1",
+    "values": embedding,
+    "metadata": {
+        "tenant_id": "acme",
+        "category": "electronics"
+    }
+}])
 
-# Read (similarity search + metadata filter)
 results = index.query(
-    vector=[0.1, 0.2, ..., 0.9],
-    filter={"category": {"$eq": "electronics"}, "price": {"$lt": 100}},
-    top_k=10
-)</code></pre>
-</div>
-</div>
-<p class="text-center mt-10 max-w-2xl mx-auto text-sm text-slate-500">The query shape is nearly identical across all four. The real differences show up later :  in how each engine indexes, scales, and bills for the millionth query, not the first one.</p>
-</div>
-</section>
-<!-- Section: For Executives -->
-<section class="py-20 bg-slate-50" id="executives">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">For Executives: What This Decision Actually Costs</h2>
-<p class="text-slate-600 mt-2 max-w-3xl mx-auto">A vector database choice looks like an engineering detail. It's really a bet on total cost of ownership, lock-in, and how expensive it is to be wrong.</p>
-</div>
-<div class="grid md:grid-cols-3 gap-6">
-<div class="feature-card bg-white">
-<h3 class="text-xl font-bold text-slate-800 mb-2">Direct Cost Isn't Total Cost</h3>
-<p class="text-sm">ChromaDB and pgvector look free or near-free on the invoice. That cost reappears as engineering time: index tuning, scaling, and on-call ownership that a managed service like Pinecone or Atlas absorbs for a higher direct price. Neither is "cheaper" in the abstract :  it's a transfer between budget lines.</p>
-</div>
-<div class="feature-card bg-white">
-<h3 class="text-xl font-bold text-slate-800 mb-2">Lock-In Is a Real Switching Cost</h3>
-<p class="text-sm">Pinecone's proprietary API is the highest-performance option and the hardest to leave. Open-source options (pgvector, ChromaDB) cost more in ops but keep your exit option open. This is a strategic call, not just a technical one :  weigh it before scale makes the decision for you.</p>
-</div>
-<div class="feature-card bg-white">
-<h3 class="text-xl font-bold text-slate-800 mb-2">The Expensive Mistake Is Migrating Under Load</h3>
-<p class="text-sm">Every team that starts with ChromaDB for prototyping eventually asks whether to move to a dedicated database. Planning that migration path before you need it is materially cheaper than discovering the need for it during a production incident.</p>
-</div>
-</div>
-<div class="mt-10 max-w-3xl mx-auto bg-white feature-card">
-<h3 class="text-lg font-bold text-slate-800 mb-4">Four questions worth asking before signing off</h3>
-<ul class="space-y-3 text-sm">
-<li class="flex gap-3"><span class="font-bold text-violet-600">1.</span><span>What's the fully-loaded cost at 10x current scale :  including the engineering time, not just the invoice?</span></li>
-<li class="flex gap-3"><span class="font-bold text-violet-600">2.</span><span>If this vendor doubles prices or degrades service, what does switching actually cost us?</span></li>
-<li class="flex gap-3"><span class="font-bold text-violet-600">3.</span><span>Who owns index tuning and on-call for this system, and do they have the bandwidth?</span></li>
-<li class="flex gap-3"><span class="font-bold text-violet-600">4.</span><span>Have we tested this choice against our own data and query patterns, or are we trusting a benchmark from someone else's workload?</span></li>
-</ul>
-</div>
-<div class="mt-10 max-w-3xl mx-auto rounded-2xl p-8 text-white text-center" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);">
-<h3 class="text-xl font-semibold">Where Dataknobs fits</h3>
-<p class="mt-3 text-white/90 text-sm">Dataknobs' AbExperiment benchmarks vector database, indexing, and retrieval choices against your own data before you commit budget or engineering time to one, and Kontrols keeps lineage on which database, index configuration, and embedding model is running where :  so the migration question above 10 has an answer.</p>
-<a class="mt-5 inline-flex items-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-violet-700 shadow-sm transition hover:bg-violet-50" href="mailto:contact@dataknobs.com">Talk to Dataknobs →</a>
+    vector=query_embedding,
+    filter={"tenant_id": {"$eq": "acme"}},
+    top_k=10,
+    include_metadata=True
+)</code></pre></article>
 </div>
 </div>
 </section>
-<!-- Section 4: Strategic Guidance -->
-<section class="py-20 bg-white" id="guidance">
-<div class="container mx-auto px-6">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Strategic Guidance &amp; Use-Case Mapping</h2>
-<p class="text-slate-600 mt-2 max-w-3xl mx-auto">The optimal choice is highly dependent on your specific requirements, existing technology stack, team expertise, and strategic priorities.</p>
-</div>
-<div class="space-y-12">
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4 text-center">When to Use an Integrated Solution</h3>
-<div class="grid md:grid-cols-2 gap-8">
-<div class="feature-card bg-slate-50">
-<h4 class="text-xl font-semibold mb-2">Use PostgreSQL (pgvector) when...</h4>
-<ul class="space-y-2 list-disc list-inside text-sm">
-<li>You have a significant existing investment in PostgreSQL.</li>
-<li>You need to perform complex hybrid queries joining vector and relational data.</li>
-<li>Transactional consistency (ACID) is a critical business requirement.</li>
-<li>Minimizing direct costs and avoiding vendor lock-in are primary goals.</li>
-</ul>
-</div>
-<div class="feature-card bg-slate-50">
-<h4 class="text-xl font-semibold mb-2">Use MongoDB Atlas when...</h4>
-<ul class="space-y-2 list-disc list-inside text-sm">
-<li>Your application is already built on MongoDB.</li>
-<li>You require performance isolation via dedicated Search Nodes.</li>
-<li>You prefer a fully managed service to reduce operational burden.</li>
-<li>Your data is naturally represented in a semi-structured document model.</li>
-</ul>
-</div>
-</div>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-slate-800 mb-4 text-center">When to Use a Dedicated Solution</h3>
-<div class="grid md:grid-cols-2 gap-8">
-<div class="feature-card bg-slate-50">
-<h4 class="text-xl font-semibold mb-2">Start with ChromaDB when...</h4>
-<ul class="space-y-2 list-disc list-inside text-sm">
-<li>You are in the prototyping or early development phase.</li>
-<li>You need a free, open-source tool that can be run locally with zero friction.</li>
-<li>Your initial dataset is small to medium in size.</li>
-<li>Your goal is to validate a concept or build a minimum viable product quickly.</li>
-</ul>
-</div>
-<div class="feature-card bg-slate-50">
-<h4 class="text-xl font-semibold mb-2">Choose or Migrate to Pinecone when...</h4>
-<ul class="space-y-2 list-disc list-inside text-sm">
-<li>Your application requires extreme performance and low latency at massive scale.</li>
-<li>You want to completely offload all infrastructure management.</li>
-<li>You require enterprise-grade features like guaranteed uptime and advanced security.</li>
-<li>The premium direct cost is justified by the reduction in operational risk and faster time-to-market.</li>
-</ul>
-</div>
-</div>
-</div>
+<section class="vs-section" id="executives">
+<div class="dk-container">
+<div class="vs-head"><div class="vs-label">For technical and business leaders</div><h2>The expensive decision is not the database. It is the boundary you commit to.</h2><p>Vector-search economics are shaped by infrastructure, engineering ownership, data duplication, migration risk, security review, and the cost of missing your retrieval SLO.</p></div>
+<div class="vs-exec-grid">
+<article class="vs-exec"><h3>1. Colocation vs separation</h3><p>Keeping embeddings with source records simplifies consistency. A separate retrieval service can simplify independent scaling. Decide which boundary creates less organizational friction.</p></article>
+<article class="vs-exec"><h3>2. Invoice vs total cost</h3><p>Open-source software is not operationally free, and managed services are not automatically expensive. Compare fully loaded cost at expected and 10× workload.</p></article>
+<article class="vs-exec"><h3>3. Lock-in vs leverage</h3><p>Vendor-specific APIs and managed features can accelerate delivery. Treat portability as an explicit requirement and test export/rebuild paths before they are urgent.</p></article>
+<article class="vs-exec"><h3>4. Retrieval quality is business quality</h3><p>Lower latency with worse recall can degrade RAG answers. A slower index with materially better retrieval may be the better business system.</p></article>
+<article class="vs-exec"><h3>5. Security follows the data boundary</h3><p>Review tenancy, network isolation, encryption, region, audit, retention, deletion and backup behavior—not only search features.</p></article>
+<article class="vs-exec"><h3>6. Migration should be designed</h3><p>Keep source records and embedding provenance independent enough to rebuild an index. A vector index should not become the only copy of business-critical data.</p></article>
 </div>
 </div>
 </section>
-<!-- FAQ -->
-<section class="py-20 bg-slate-50" id="faq">
-<div class="container mx-auto px-6 max-w-3xl">
-<div class="section-header">
-<h2 class="text-3xl md:text-4xl font-bold text-slate-900">Frequently Asked Questions</h2>
-</div>
-<div class="space-y-3">
-<div class="faq-item">
-<button aria-expanded="false" class="faq-question">Do I need a dedicated vector database, or is pgvector enough?<span class="faq-icon">+</span></button>
-<div class="faq-answer"><p>If you're already running PostgreSQL and your scale is in the low millions of vectors, pgvector is usually enough, especially when you need to join vector search against relational data. Move to a dedicated database when query latency at your target scale becomes the bottleneck, or when vector search is the primary workload rather than a feature bolted onto an existing system.</p></div>
-</div>
-<div class="faq-item">
-<button aria-expanded="false" class="faq-question">Is pgvector fast enough for production workloads?<span class="faq-icon">+</span></button>
-<div class="faq-answer"><p>Yes, with HNSW indexing and proper tuning, pgvector handles production workloads well into the tens of millions of vectors. It requires more manual index tuning than a managed dedicated database, and horizontal scaling is not built in the way it is with Pinecone or MongoDB Atlas.</p></div>
-</div>
-<div class="faq-item">
-<button aria-expanded="false" class="faq-question">What is the cheapest way to start with vector search?<span class="faq-icon">+</span></button>
-<div class="faq-answer"><p>ChromaDB has the lowest direct cost to start: it is free, open-source, and can run locally with no infrastructure. If you already run PostgreSQL, pgvector is comparably cheap since it adds no new system. Both carry higher indirect cost in engineering time as you scale.</p></div>
-</div>
-<div class="faq-item">
-<button aria-expanded="false" class="faq-question">Which vector database has the lowest vendor lock-in?<span class="faq-icon">+</span></button>
-<div class="faq-answer"><p>pgvector and ChromaDB are both open-source and self-hostable, making migration away from them a matter of re-exporting data rather than rewriting an integration against a proprietary API. Pinecone's managed, proprietary API creates the most lock-in; MongoDB Atlas sits in between, open-source at the database core but with vector search tied to the managed Atlas product.</p></div>
-</div>
-<div class="faq-item">
-<button aria-expanded="false" class="faq-question">Can I migrate from ChromaDB to Pinecone later?<span class="faq-icon">+</span></button>
-<div class="faq-answer"><p>Yes, and it's a common path: prototype in ChromaDB, then migrate to a dedicated managed database like Pinecone once you have production scale and latency requirements. The migration is a re-embed-and-reindex operation, not a rewrite of your embedding model or application logic, provided you plan for it rather than discovering the need for it under load.</p></div>
+<section class="vs-section soft" id="guidance">
+<div class="dk-container">
+<div class="vs-head"><div class="vs-label">Decision guide</div><h2>Choose the smallest architectural change that passes your production benchmark.</h2><p>This is a starting hypothesis, not a substitute for testing.</p></div>
+<div class="vs-choice">
+<article><h3>Test pgvector first</h3><p>When PostgreSQL is already a trusted system of record and vector search is one feature inside a relational application.</p><span class="best">Key proof: filtered ANN + concurrency.</span></article>
+<article><h3>Test MongoDB first</h3><p>When your application already lives on Atlas and documents, metadata and embeddings naturally share one model.</p><span class="best">Key proof: Search Node sizing + cost.</span></article>
+<article><h3>Test Chroma first</h3><p>When developer ergonomics and an open-source API matter, with a path from local development to a managed distributed deployment.</p><span class="best">Key proof: target deployment mode + production SLO.</span></article>
+<article><h3>Test Pinecone first</h3><p>When retrieval is a primary managed workload and you prefer to separate vector-search scaling from the operational database.</p><span class="best">Key proof: quality/latency/cost at query mix.</span></article>
 </div>
 </div>
+</section>
+<section class="vs-section" id="sources">
+<div class="dk-container">
+<div class="vs-head"><div class="vs-label">Current product references</div><h2>Verify platform behavior against first-party documentation.</h2><p>Capabilities and pricing models evolve. These sources are useful starting points when turning this decision guide into a production architecture.</p></div>
+<div class="vs-source-list">
+<a href="https://github.com/pgvector/pgvector">pgvector — official project documentation<span>Exact search, HNSW, IVFFlat, filtering and tuning guidance.</span></a>
+<a href="https://www.mongodb.com/docs/vector-search/deployment/deployment-options/">MongoDB Vector Search — deployment options<span>Atlas deployment modes and dedicated Search Nodes for production isolation.</span></a>
+<a href="https://docs.trychroma.com/cloud">Chroma Cloud — official documentation<span>Managed Distributed Chroma, serverless operation and scaling model.</span></a>
+<a href="https://docs.pinecone.io/guides/index-data/indexing-overview">Pinecone — indexing overview<span>Current index model covering dense, sparse, full-text and metadata retrieval.</span></a>
+</div>
+</div>
+</section>
+<section class="vs-section soft" id="faq">
+<div class="dk-container">
+<div class="vs-head"><div class="vs-label">FAQ</div><h2>Common vector-search architecture questions.</h2></div>
+<div class="vs-faq">
+<details open=""><summary>Do I need a dedicated vector database for RAG?</summary><p>Not necessarily. If vectors belong with relational or document data you already operate, integrated search can reduce synchronization and operational complexity. A dedicated service becomes more attractive when retrieval is a primary workload, independent scaling matters, or managed search operations are worth the additional platform dependency.</p></details>
+<details><summary>Is pgvector suitable for production vector search?</summary><p>Yes. pgvector supports exact nearest-neighbor search plus HNSW and IVFFlat approximate indexes. Production suitability depends on dataset size, filter selectivity, concurrency, latency targets, PostgreSQL topology, and how much tuning your team wants to own.</p></details>
+<details><summary>Is Chroma only for local prototypes?</summary><p>No. Open-source Chroma is still useful for local and self-hosted development, while Chroma Cloud is a distributed serverless managed offering. Evaluate the deployment model you actually intend to operate.</p></details>
+<details><summary>Which vector search system is fastest?</summary><p>There is no defensible universal winner. Compare retrieval quality at your target latency and concurrency using your embedding dimension, corpus, metadata filters, update rate, region, and production query distribution.</p></details>
+<details><summary>What should I benchmark before choosing?</summary><p>Measure retrieval quality, p50/p95/p99 latency, throughput, filtered-query behavior, freshness after writes, ingest/index build time, failure behavior, and fully loaded cost. For RAG, also measure the downstream answer quality produced by the retrieved context.</p></details>
+</div>
+</div>
+</section>
+<section class="vs-cta">
+<div class="dk-container">
+<div class="vs-cta-box"><h2>Turn the vector-database choice into an experiment.</h2><p>DataKnobs can treat database, index, embedding, chunking, filter strategy, top-k and reranking as governed Knobs—then compare variants on the same retrieval set and business SLO.</p><a class="dk-btn dk-btn--light" href="mailto:contact@dataknobs.com?subject=Vector%20Search%20Benchmark%20and%20Architecture">Discuss a vector-search evaluation</a></div>
 </div>
 </section>
 </main>
@@ -673,50 +461,13 @@ results = index.query(
 </div>
 </footer>
 <script>
-  const mobileMenuButton = document.getElementById('mobile-menu-button');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const menuOpenIcon = document.getElementById('menu-open-icon');
-  const menuCloseIcon = document.getElementById('menu-close-icon');
-
-  if (mobileMenuButton && mobileMenu && menuOpenIcon && menuCloseIcon) {
-    const closeMobileMenu = () => {
-      mobileMenu.classList.add('hidden');
-      mobileMenuButton.setAttribute('aria-expanded', 'false');
-      menuOpenIcon.classList.remove('hidden');
-      menuCloseIcon.classList.add('hidden');
-    };
-
-    const openMobileMenu = () => {
-      mobileMenu.classList.remove('hidden');
-      mobileMenuButton.setAttribute('aria-expanded', 'true');
-      menuOpenIcon.classList.add('hidden');
-      menuCloseIcon.classList.remove('hidden');
-    };
-
-    mobileMenuButton.addEventListener('click', () => {
-      const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
-      isExpanded ? closeMobileMenu() : openMobileMenu();
-    });
-
-    mobileMenu.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', closeMobileMenu);
-    });
-  }
-
-  // FAQ accordion
-  document.querySelectorAll('.faq-question').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const item = btn.closest('.faq-item');
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach((i) => {
-        i.classList.remove('open');
-        i.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
-      });
-      if (!isOpen) {
-        item.classList.add('open');
-        btn.setAttribute('aria-expanded', 'true');
-      }
-    });
-  });
+(function(){
+  const button=document.getElementById('mobile-menu-button');
+  const menu=document.getElementById('mobile-menu');
+  if(!button||!menu)return;
+  function closeMenu(){menu.classList.remove('is-open');button.setAttribute('aria-expanded','false');}
+  button.addEventListener('click',function(){const open=menu.classList.toggle('is-open');button.setAttribute('aria-expanded',String(open));});
+  menu.querySelectorAll('a').forEach(function(link){link.addEventListener('click',closeMenu);});
+})();
 </script>
 </body></html>

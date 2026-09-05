@@ -1,192 +1,30 @@
 <!DOCTYPE html>
-<html class="scroll-smooth" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>AI Agents for Cricket Match Analysis</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
-<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
-<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
-<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
-<!-- Chosen Palette: Calm Harmony -->
-<!-- Application Structure Plan: The SPA is designed around the temporal flow of a cricket match: Pre-Match, Live-Match, and Post-Match. This intuitive structure allows users to logically navigate the different types of analysis. The "Agent Hub" uses interactive tabs to detail the specific AI agents for each phase. An "Example Match-Up" section provides a practical demonstration of these agents' outputs, using a hypothetical T20 match to showcase predictive analysis, live win probability, and key performance summaries. This makes the abstract capabilities of the agents concrete and understandable. -->
-<!-- Visualization & Content Choices: 
-        - Agent Roles (Agent Hub): Goal: Organize/Explain. Method: Interactive tabs for Pre-, Live-, and Post-Match phases. Interaction: Click to reveal agents and their functions. Justification: Organizes a wide range of agents into a digestible, user-led discovery process.
-        - Head-to-Head (Example Match-Up): Goal: Compare. Method: Bar chart for player form comparison. Interaction: Tooltips. Justification: Provides a quick, visual summary of pre-match predictions for key players. Library: Chart.js.
-        - Win Probability (Example Match-Up): Goal: Show Change. Method: A dynamic line chart. Interaction: Hover to see probability at specific overs. Justification: The most effective way to visualize the narrative and momentum shifts of a live match. Library: Chart.js.
-        - Performance Summary (Example Match-Up): Goal: Inform. Method: KPI cards for top performers. Interaction: None. Justification: Cleanly presents the key takeaways from the post-match analysis without clutter.
-    -->
-<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>AI Cricket Analysis | Match Agents, Signals &amp; Stories</title><meta content="Explore a governed AI cricket-analysis workflow for pre-match context, live probability and momentum signals, post-match impact, and narrative generation." name="description"/><meta content="index, follow" name="robots"/><meta content="DataKnobs" name="author"/>
+<meta content="website" property="og:type"/><meta content="DataKnobs" property="og:site_name"/><meta content="AI Cricket Analysis | Match Agents, Signals &amp; Stories" property="og:title"/><meta content="Explore a governed AI cricket-analysis workflow for pre-match context, live probability and momentum signals, post-match impact, and narrative generation." property="og:description"/><meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" property="og:image"/><meta content="DataKnobs" property="og:image:alt"/>
+<meta content="summary_large_image" name="twitter:card"/><meta content="AI Cricket Analysis | Match Agents, Signals &amp; Stories" name="twitter:title"/><meta content="Explore a governed AI cricket-analysis workflow for pre-match context, live probability and momentum signals, post-match impact, and narrative generation." name="twitter:description"/><meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" name="twitter:image"/>
+<link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/>
 <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #FDFBF8; /* Warm off-white */
-            color: #4A4A4A; /* Soft charcoal */
-        }
-        .accent-color { color: #D97706; } /* Amber/Terracotta */
-        .accent-bg { background-color: #D97706; }
-        .secondary-bg { background-color: #F3F4F6; } /* Light gray */
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
-        }
-        .nav-link {
-            transition: all 0.3s ease;
-        }
-        .nav-link:hover, .nav-link.active {
-            color: #D97706;
-            border-bottom: 2px solid #D97706;
-        }
-        .agent-tab.active {
-            background-color: #D97706;
-            color: white;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-    </style>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-
-		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
-		(function (w, d, s, l, i) {
-			w[l] = w[l] || []; w[l].push({
-				'gtm.start':
-					new Date().getTime(), event: 'gtm.js'
-			}); var f = d.getElementsByTagName(s)[0],
-				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-JF94J1W5MC');
-</script><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+:root{--p:#6d28d9;--i:#4338ca;--b:#1B41F5;--ink:#0f172a;--muted:#5b6475;--line:#e2e8f0;--soft:#f8fafc;--ok:#047857;--warn:#b45309}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:86px}body{margin:0;color:var(--ink);background:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.65}a{color:inherit}.dk-wrap{width:min(1180px,calc(100% - 36px));margin:auto}.site-header{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid rgba(226,232,240,.9)}.site-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 0}.wordmark{display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:900;letter-spacing:-.04em;font-size:20px}.mark{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#7c3aed,#1B41F5);position:relative;box-shadow:0 10px 26px rgba(91,33,182,.24)}.mark:before{content:"";position:absolute;inset:10px 8px 10px 8px;border-radius:10px;border:3px solid #fff;border-left-width:7px}.wordmark em{font-style:normal;color:#6d28d9}.nav{display:flex;align-items:center;gap:20px;font-size:14px;font-weight:700;color:#475569}.nav a{text-decoration:none}.nav a:hover{color:#6d28d9}.nav .cta{background:#6d28d9;color:#fff;padding:10px 16px;border-radius:999px}.menu-btn{display:none;border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 11px;font:inherit}.mobile{display:none;border-top:1px solid var(--line);padding:10px 0 16px}.mobile.open{display:grid}.mobile a{text-decoration:none;padding:10px 2px;font-weight:700;color:#475569}.hero{position:relative;overflow:hidden;color:#fff;background:radial-gradient(circle at 78% 20%,rgba(244,206,255,.28),transparent 29%),radial-gradient(circle at 17% 88%,rgba(167,139,250,.22),transparent 34%),linear-gradient(135deg,#4c1d95 0%,#6d28d9 50%,#4338ca 100%)}.hero-grid{display:grid;grid-template-columns:1.07fr .93fr;gap:54px;align-items:center;padding:82px 0}.eyebrow{display:inline-flex;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);border-radius:999px;padding:7px 13px;font-size:12px;font-weight:850;letter-spacing:.16em;text-transform:uppercase;color:#f5e9ff}.hero h1{font-size:clamp(42px,6vw,72px);line-height:1.02;letter-spacing:-.055em;margin:20px 0}.hero h1 span{color:#f4ceff}.hero p{font-size:18px;line-height:1.75;color:#f3e8ff;max-width:750px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:999px;padding:12px 18px;font-weight:800;border:1px solid #6d28d9;background:#6d28d9;color:#fff;transition:.2s}.btn:hover{transform:translateY(-1px)}.hero .btn{background:#fff;border-color:#fff;color:#5b21b6}.hero .btn.alt{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28);color:#fff}.hero-card{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);backdrop-filter:blur(15px);border-radius:26px;padding:24px;box-shadow:0 26px 70px rgba(17,24,39,.28)}.hero-card h2,.hero-card h3{margin-top:0}.hero-card p{font-size:14px;color:#ede9fe}.mini-flow{display:grid;gap:10px}.mini-step{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);border-radius:15px;padding:14px}.mini-step b{display:block;color:#fff}.mini-step span{display:block;margin-top:3px;color:#e9d5ff;font-size:13px}.section{padding:76px 0}.soft{background:linear-gradient(180deg,#fafafa,#f8fafc)}.dark{background:#111827;color:#fff}.head{max-width:820px;margin:0 auto 40px;text-align:center}.kicker{font-size:12px;font-weight:850;letter-spacing:.18em;text-transform:uppercase;color:#7c3aed}.dark .kicker{color:#e9d5ff}.head h2{font-size:clamp(31px,4.2vw,48px);line-height:1.1;letter-spacing:-.04em;margin:10px 0 12px}.head p{margin:0;color:#64748b;font-size:17px}.dark .head p{color:#cbd5e1}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.card{border:1px solid var(--line);background:#fff;border-radius:22px;padding:25px;box-shadow:0 12px 32px rgba(15,23,42,.055)}.card h3{font-size:21px;line-height:1.25;margin:0 0 9px}.card p{color:#64748b;margin:0}.card ul{color:#475569;padding-left:19px;margin:14px 0 0}.card li+li{margin-top:7px}.dark .card{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);box-shadow:none}.dark .card p,.dark .card li{color:#cbd5e1}.badge{display:inline-flex;border-radius:999px;background:#f5f3ff;color:#6d28d9;padding:5px 9px;font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.08em}.answer{border:1px solid #ddd6fe;background:linear-gradient(135deg,#faf5ff,#eef2ff);border-radius:24px;padding:26px}.answer strong{display:block;font-size:21px;margin-bottom:6px}.answer p{margin:0;color:#475569}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.flow .card{padding:20px}.num{width:38px;height:38px;border-radius:12px;background:#f5f3ff;color:#6d28d9;display:grid;place-items:center;font-weight:900;margin-bottom:13px}.matrix{overflow:auto;border:1px solid var(--line);border-radius:20px;background:#fff}.matrix table{width:100%;border-collapse:collapse;min-width:760px}.matrix th,.matrix td{padding:14px 16px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}.matrix th{background:#f8fafc}.matrix td:first-child{font-weight:800}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.chip{font-size:12px;font-weight:750;border:1px solid var(--line);background:#f8fafc;padding:7px 10px;border-radius:999px}.faq{display:grid;gap:11px;max-width:900px;margin:auto}.faq details{border:1px solid var(--line);background:#fff;border-radius:15px;padding:16px 18px}.faq summary{cursor:pointer;font-weight:800}.faq p{color:#64748b}.cta-box{text-align:center;border-radius:28px;padding:52px 24px;background:linear-gradient(135deg,#5b21b6,#4338ca);color:#fff}.cta-box h2{font-size:clamp(30px,4vw,46px);line-height:1.08;margin:0 0 12px}.cta-box p{color:#ede9fe;max-width:760px;margin:0 auto 22px}.footer{background:#0f172a;color:#cbd5e1}.footer-row{padding:34px 0;display:flex;align-items:center;justify-content:space-between;gap:24px}.footer nav{display:flex;gap:16px;flex-wrap:wrap}.footer a{color:#dbeafe;text-decoration:none;font-size:13px}.note{font-size:13px;color:#64748b;margin-top:14px}.illustrative{border-left:4px solid #7c3aed;background:#faf5ff;padding:12px 15px;border-radius:10px;color:#5b6475;font-size:13px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}.tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;font-weight:800;cursor:pointer}.tab.active{background:#6d28d9;color:#fff;border-color:#6d28d9}.tab-panel{display:none}.tab-panel.active{display:block}.chart-wrap{position:relative;height:300px}.filterbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:0 0 28px}.filter{border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:999px;font-weight:750;cursor:pointer}.filter.active{background:#6d28d9;color:#fff;border-color:#6d28d9}.hidden{display:none!important}.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:1000px){.hero-grid,.grid3,.grid4{grid-template-columns:1fr 1fr}.flow{grid-template-columns:1fr 1fr}.result-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:820px){.nav{display:none}.menu-btn{display:inline-flex}.hero-grid,.grid2{grid-template-columns:1fr}.hero-grid{padding:62px 0}.footer-row{flex-direction:column;align-items:flex-start}}
+@media(max-width:640px){.grid3,.grid4,.flow,.result-grid{grid-template-columns:1fr}.hero h1{font-size:43px}.section{padding:60px 0}.hero-card{padding:19px}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-JF94J1W5MC');</script><script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "name": "AI Cricket Match Analysis", "description": "A governed AI-agent workflow for pre-match, live-match, and post-match cricket intelligence.", "publisher": {"@type": "Organization", "name": "DataKnobs", "url": "https://www.dataknobs.com/"}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is the Titans vs Vipers example a real match?", "acceptedAnswer": {"@type": "Answer", "text": "No. Team names, player names, scores, and probabilities are synthetic and included only to demonstrate how a cricket-intelligence workflow could present outputs."}}, {"@type": "Question", "name": "What data can a cricket-analysis agent use?", "acceptedAnswer": {"@type": "Answer", "text": "Depending on licensing and availability, a workflow may use scorecards, ball-by-ball events, player history, lineups, venue and pitch context, weather, match situation, and editorial rules."}}, {"@type": "Question", "name": "How should live win probability be validated?", "acceptedAnswer": {"@type": "Answer", "text": "Use historical out-of-sample matches, calibration tests, event-level error analysis, reliability plots, and performance broken down by match phase, format, venue, and game state."}}]}]}</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-JF94J1W5MC');
-</script></head>
-<body class="antialiased">
-<header class="sticky top-0 bg-[#FDFBF8]/80 backdrop-blur-sm z-50 shadow-sm">
-<div class="container mx-auto px-4 sm:px-6 lg:px-8">
-<div class="flex items-center justify-between h-16">
-<h1 class="text-xl md:text-2xl font-bold text-gray-800">AI in Cricket Analytics</h1>
-<nav class="hidden md:flex space-x-8">
-<a class="nav-link font-medium text-gray-600 pb-1" href="#overview">Overview</a>
-<a class="nav-link font-medium text-gray-600 pb-1" href="#agents">Agent Hub</a>
-<a class="nav-link font-medium text-gray-600 pb-1" href="#matchup">Example Match-Up</a>
-</nav>
-</div>
-</div>
-</header>
-<main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-<section class="text-center mb-16 md:mb-24" id="overview">
-<h2 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mb-4">Automating Cricket Intelligence</h2>
-<p class="max-w-3xl mx-auto text-lg text-gray-600 mb-10">
-                <a href="https://www.dataknobs.com/agentic-ai/">AI agents</a> can revolutionize cricket analysis by automating everything from pre-match predictions to live-game strategy and post-match storytelling. This framework explores the key agents that power the modern cricket analytics engine.
-            </p>
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-<div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-<h3 class="text-4xl font-bold accent-color mb-2">40+</h3>
-<p class="text-gray-700 font-semibold">Player Attributes Tracked</p>
-<p class="text-sm text-gray-500 mt-1">Includes form, pitch conditions, and historical matchups.</p>
-</div>
-<div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-<h3 class="text-4xl font-bold accent-color mb-2">Live</h3>
-<p class="text-gray-700 font-semibold">Win Prediction Model</p>
-<p class="text-sm text-gray-500 mt-1">Updates ball-by-ball based on game state and momentum.</p>
-</div>
-<div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-<h3 class="text-4xl font-bold accent-color mb-2">Auto</h3>
-<p class="text-gray-700 font-semibold">Narrative Generation</p>
-<p class="text-sm text-gray-500 mt-1">Creates match summaries and identifies turning points.</p>
-</div>
-</div>
-</section>
-<section class="mb-16 md:mb-24" id="agents">
-<div class="text-center mb-12">
-<h2 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">The Cricket Analytics Agent Hub</h2>
-<p class="max-w-2xl mx-auto text-lg text-gray-600 mt-3">
-                    Analysis is automated across three phases of a match. Select a phase to see the specialized agents involved and the functions they automate.
-                </p>
-</div>
-<div class="flex justify-center gap-2 md:gap-4 mb-8 bg-gray-100 p-2 rounded-lg max-w-xl mx-auto">
-<button class="agent-tab text-sm md:text-base font-semibold px-4 py-2 md:px-6 md:py-3 rounded-md transition-all duration-300 ease-in-out w-1/3" data-agent-phase="pre-match">Pre-Match</button>
-<button class="agent-tab text-sm md:text-base font-semibold px-4 py-2 md:px-6 md:py-3 rounded-md transition-all duration-300 ease-in-out w-1/3" data-agent-phase="live-match">Live-Match</button>
-<button class="agent-tab text-sm md:text-base font-semibold px-4 py-2 md:px-6 md:py-3 rounded-md transition-all duration-300 ease-in-out w-1/3" data-agent-phase="post-match">Post-Match</button>
-</div>
-<div class="bg-white p-6 md:p-8 rounded-lg shadow-lg border border-gray-200 min-h-[300px] transition-opacity duration-500" id="agent-details-container">
-<h3 class="text-2xl font-bold text-gray-800 mb-4" id="agent-phase-name"></h3>
-<div class="space-y-6" id="agent-list"></div>
-</div>
-</section>
-<section id="matchup">
-<div class="text-center mb-12">
-<h2 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Example Match-Up: Titans vs. Vipers (T20)</h2>
-<p class="max-w-2xl mx-auto text-lg text-gray-600 mt-3">
-                    A demonstration of the AI agents' outputs for a hypothetical high-stakes T20 encounter.
-                </p>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-<div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-<h3 class="text-xl font-bold text-center text-gray-800 mb-4">Pre-Match: Key Player Form Guide</h3>
-<p class="text-center text-sm text-gray-500 mb-4">Projected performance scores based on recent form and matchups.</p>
-<div class="chart-container h-64 md:h-72">
-<canvas id="playerFormChart"></canvas>
-</div>
-</div>
-<div class="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-<h3 class="text-xl font-bold text-center text-gray-800 mb-4">Live-Match: Win Probability Tracker</h3>
-<p class="text-center text-sm text-gray-500 mb-4">How the chances of winning evolved during the Titans' innings.</p>
-<div class="chart-container h-64 md:h-72">
-<canvas id="winProbabilityChart"></canvas>
-</div>
-</div>
-</div>
-<div class="bg-white p-6 md:p-8 rounded-lg shadow-xl border border-gray-200">
-<h3 class="text-xl font-bold text-center text-gray-800 mb-6">Post-Match: Automated Performance Summary</h3>
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
-<div class="secondary-bg p-4 rounded-lg">
-<p class="text-sm text-gray-500 font-semibold">Player of the Match</p>
-<p class="text-xl font-bold text-gray-800">Rohan Sharma (Titans)</p>
-<p class="text-2xl font-bold accent-color">84* (45)</p>
-</div>
-<div class="secondary-bg p-4 rounded-lg">
-<p class="text-sm text-gray-500 font-semibold">Key Bowling Spell</p>
-<p class="text-xl font-bold text-gray-800">Leo Finch (Vipers)</p>
-<p class="text-2xl font-bold accent-color">4/22 (4 ov)</p>
-</div>
-<div class="secondary-bg p-4 rounded-lg">
-<p class="text-sm text-gray-500 font-semibold">Match Turning Point</p>
-<p class="text-xl font-bold text-gray-800">16th Over</p>
-<p class="text-2xl font-bold accent-color">+24 Runs</p>
-</div>
-</div>
-<div class="mt-6 border-t pt-4">
-<h4 class="font-semibold text-gray-700">Narrative Agent's Summary:</h4>
-<p class="text-gray-600 mt-2">The Titans secured a thrilling victory, largely thanks to a blistering unbeaten 84 from Rohan Sharma. While Leo Finch's exceptional spell kept the Vipers in the game, the match's pivotal moment was the 16th over, where the Titans plundered 24 runs, decisively shifting the win probability from 45% to 75% in their favor. This late assault proved to be the difference-maker in a tightly contested match.</p>
-</div>
-</div>
-</section>
-<footer class="bg-gray-800 text-gray-300">
+</script></head><body><header class="site-header"><div class="dk-wrap site-row"><a aria-label="DataKnobs home" class="wordmark" href="dataknobs_homepage_flagship.html"><span aria-hidden="true" class="mark"></span><span>Data<em>Knobs</em></span></a><nav aria-label="Primary navigation" class="nav"><a href="dataknobs-kreate-kontrols-knobs-suite.html">Platform</a><a href="dataknobs_products_overview_page.html">Products</a><a href="dataknobs-use-cases-page.html">Use Cases</a><a href="https://www.dataknobs.com/customers/">Customers</a><a href="https://www.dataknobs.com/pricing/">Pricing</a><a class="cta" href="mailto:contact@dataknobs.com?subject=DataKnobs%20Demo">Request Demo</a></nav><button aria-controls="mobile-nav" aria-expanded="false" class="menu-btn" id="menu-button">Menu</button></div><nav aria-label="Mobile navigation" class="mobile dk-wrap" id="mobile-nav"><a href="dataknobs-kreate-kontrols-knobs-suite.html">Platform</a><a href="dataknobs_products_overview_page.html">Products</a><a href="dataknobs-use-cases-page.html">Use Cases</a><a href="https://www.dataknobs.com/customers/">Customers</a><a href="https://www.dataknobs.com/pricing/">Pricing</a><a href="mailto:contact@dataknobs.com?subject=DataKnobs%20Demo">Request Demo</a></nav></header><main><section class="hero"><div class="dk-wrap hero-grid"><div><div class="eyebrow">Cricket intelligence with <a href="https://www.dataknobs.com/agentic-ai/">AI agents</a></div><h1>Turn match data into <span>pre-match context, live signals, and post-match stories.</span></h1><p>A cricket-analysis workflow can combine structured match events, historical player context, situational models, and narrative generation to support analysts, media teams, fantasy products, and fan experiences.</p><div class="actions"><a class="btn" href="#agent-hub">Explore the Agent Hub</a><a class="btn alt" href="dataknobs-use-cases-page.html">View More Use Cases</a></div><div class="illustrative" style="margin-top:22px;background:rgba(255,255,255,.1);border-left-color:#f4ceff;color:#f3e8ff">All example teams, players, probabilities, and scores on this page are synthetic demonstrations.</div></div><aside class="hero-card"><h2>Three match phases</h2><div class="mini-flow"><div class="mini-step"><b>Pre-match</b><span>Player form, matchup history, conditions, lineup, and scenario analysis.</span></div><div class="mini-step"><b>Live</b><span>Win probability, momentum, phase performance, tactical signals, and event alerts.</span></div><div class="mini-step"><b>Post-match</b><span>Impact scoring, turning points, summaries, player reports, and content generation.</span></div></div></aside></div></section>
+<section class="section" id="agent-hub"><div class="dk-wrap"><div class="head"><div class="kicker">Agent hub</div><h2>Organize specialized agents around the match lifecycle.</h2><p>Each phase can be evaluated independently, which helps teams distinguish predictive-model errors from narrative or editorial errors.</p></div><div class="tabs"><button class="tab active" data-phase="pre">Pre-match</button><button class="tab" data-phase="live">Live match</button><button class="tab" data-phase="post">Post-match</button></div><div class="card tab-panel active" data-phase-panel="pre"><div class="grid3"><div><h3>Conditions analyst</h3><p>Combines venue, pitch, weather, format, and match context.</p></div><div><h3>Player matchup analyst</h3><p>Compares role, recent form, phase performance, and opponent history.</p></div><div><h3>Scenario modeler</h3><p>Simulates lineup and toss/conditions scenarios with explicit uncertainty.</p></div></div></div><div class="card tab-panel" data-phase-panel="live"><div class="grid3"><div><h3>Win probability</h3><p>Updates calibrated match-state probability from score, wickets, overs, and contextual features.</p></div><div><h3>Momentum tracker</h3><p>Identifies event clusters and phase-level changes without treating momentum as a substitute for probability.</p></div><div><h3>Live analyst</h3><p>Surfaces tactical questions, matchup context, and events worth editorial attention.</p></div></div></div><div class="card tab-panel" data-phase-panel="post"><div class="grid3"><div><h3>Impact scorer</h3><p>Measures contribution relative to match state and role, not only raw runs or wickets.</p></div><div><h3>Turning-point detector</h3><p>Identifies events associated with the largest changes in win probability or match state.</p></div><div><h3>Narrative agent</h3><p>Builds summaries from verified scorecard and event facts with editorial style controls.</p></div></div></div></div></section>
+<section class="section soft"><div class="dk-wrap"><div class="head"><div class="kicker">Illustrative match</div><h2>Titans vs Vipers — synthetic T20 example.</h2><p>The visualizations demonstrate possible outputs. They do not represent actual players, teams, or a historical match.</p></div><div class="grid2"><article class="card"><h3>Pre-match player-form index</h3><div class="chart-wrap"><canvas id="playerForm"></canvas></div><p class="note">Illustrative index combining fictional recent-form inputs.</p></article><article class="card"><h3>Live win-probability path</h3><div class="chart-wrap"><canvas id="winProb"></canvas></div><p class="note">Illustrative probability values. A production model should be calibrated and backtested.</p></article></div><div class="grid3" style="margin-top:20px"><article class="card"><span class="badge">Player impact</span><h3>Opener A</h3><p>Illustrative: 84* from 45 balls, with the largest batting contribution in the final five overs.</p></article><article class="card"><span class="badge">Bowling impact</span><h3>Fast Bowler B</h3><p>Illustrative: four wickets with strong middle-over control.</p></article><article class="card"><span class="badge">Turning point</span><h3>16th over</h3><p>Illustrative: a high-scoring over causes the largest modeled swing in win probability.</p></article></div></div></section>
+<section class="section dark"><div class="dk-wrap"><div class="head"><div class="kicker">Validation</div><h2>Sports intelligence needs calibration, not only compelling visuals.</h2><p>Prediction, ranking, turning-point detection, and narrative generation require different validation methods.</p></div><div class="grid4"><article class="card"><h3>Prediction</h3><p>Out-of-sample accuracy, log loss, Brier score, and calibration by match phase.</p></article><article class="card"><h3>Player projections</h3><p>Error by role, batting position, venue, opposition, and uncertainty band.</p></article><article class="card"><h3>Event intelligence</h3><p>Agreement with analyst-labeled turning points and false-alert burden.</p></article><article class="card"><h3>Narrative</h3><p>Scorecard factuality, event coverage, chronology, terminology, and editorial quality.</p></article></div></div></section>
+<section class="section"><div class="dk-wrap"><div class="head"><div class="kicker">KREATE + KONTROLS + KNOBS</div><h2>Make the sports workflow reusable and governable.</h2></div><div class="grid3"><article class="card"><h3>KREATE</h3><p>Build the match/event data product, analytics services, dashboards, fan experiences, and commentary agents.</p></article><article class="card"><h3>KONTROLS</h3><p>Govern data licensing, source provenance, editorial rules, factuality checks, model versions, and human publishing approval.</p></article><article class="card"><h3>KNOBS</h3><p>Tune lookback windows, feature weighting, probability thresholds, alert frequency, narrative style, detail level, and publishing autonomy.</p></article></div></div></section>
+<section class="section soft"><div class="dk-wrap"><div class="head"><div class="kicker">FAQ</div><h2>Cricket AI questions.</h2></div><div class="faq"><details><summary>Is the Titans vs Vipers example a real match?</summary><p>No. Team names, player names, scores, and probabilities are synthetic and included only to demonstrate how a cricket-intelligence workflow could present outputs.</p></details><details><summary>What data can a cricket-analysis agent use?</summary><p>Depending on licensing and availability, a workflow may use scorecards, ball-by-ball events, player history, lineups, venue and pitch context, weather, match situation, and editorial rules.</p></details><details><summary>How should live win probability be validated?</summary><p>Use historical out-of-sample matches, calibration tests, event-level error analysis, reliability plots, and performance broken down by match phase, format, venue, and game state.</p></details></div></div></section><section class="section"><div class="dk-wrap"><div class="cta-box"><h2>Build a cricket workflow around your licensed data and editorial goals.</h2><p>DataKnobs can help structure match data, model evaluation, agent responsibilities, factuality checks, and publishing controls for a sports-intelligence product.</p><a class="btn" href="mailto:contact@dataknobs.com?subject=Cricket%20AI%20Analysis">Discuss a Cricket Use Case</a></div></div></section></main><footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 <div>
@@ -275,147 +113,29 @@ gtag('config', 'G-JF94J1W5MC');
 <div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
 </div>
 </div>
-</footer></main>
-<section class="py-16">
-<div class="max-w-6xl mx-auto px-6">
-<div class="rounded-3xl p-10 text-center bg-gradient-to-r from-purple-700 via-purple-600 to-purple-500 text-white shadow-2xl">
-<h2 class="text-3xl md:text-4xl font-bold tracking-tight">
-        Explore More Gen AI Learning Resources
-      </h2>
-<p class="mt-3 text-purple-100 text-base md:text-lg">
-        Dive deeper into LLMs, Generative AI, and Agentic AI concepts
-      </p>
-<div class="mt-8 flex flex-wrap justify-center gap-4">
-<a class="px-6 py-3 rounded-xl bg-white text-purple-800 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-200" href="/generativeai/l0-llms/">
-          LLM Slides
-        </a>
-<a class="px-6 py-3 rounded-xl bg-white text-purple-800 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-200" href="/generativeai/generative-ai-101-slides.html">
-          Gen AI Slides
-        </a>
-<a class="px-6 py-3 rounded-xl bg-white text-purple-800 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-200" href="/agent-ai/">
-          Agentic AI Slides
-        </a>
-</div>
-</div>
-</div>
-<script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const agentData = {
-                'pre-match': {
-                    name: 'Pre-Match Analysis Agents',
-                    agents: [
-                        { name: 'Predictive Modeler', desc: 'Analyzes historical data, player form, pitch reports, and weather conditions to forecast match outcomes, player performances (runs, wickets), and key matchups.' },
-                        { name: 'Fantasy Points Projector', desc: 'Automates fantasy sports insights by projecting points for each player based on their role, recent performance, and opposition weaknesses.' },
-                        { name: 'Conditions Analyst', desc: 'Ingests data on pitch type (e.g., spin-friendly, bouncy) and weather forecasts to predict optimal team composition and strategy (e.g., bat or bowl first).' }
-                    ]
-                },
-                'live-match': {
-                    name: 'Live-Match Analysis Agents',
-                    agents: [
-                        { name: 'Win Probability Agent', desc: 'Calculates and updates the win probability for each team on a ball-by-ball basis, factoring in the current score, wickets remaining, and run rate.' },
-                        { name: 'Strategic Advisor Agent', desc: 'Provides real-time tactical suggestions, such as optimal bowling changes, field placements against specific batters, or ideal times to accelerate scoring.' },
-                        { name: 'Momentum Tracker', desc: 'Identifies shifts in game momentum by analyzing run rates, wicket clusters, and boundary frequency, flagging key events as they happen.' }
-                    ]
-                },
-                'post-match': {
-                    name: 'Post-Match Analysis Agents',
-                    agents: [
-                        { name: 'Performance Scorer', desc: 'Goes beyond the basic scorecard to generate an impact score for each player, quantifying their contribution to the match outcome relative to the game situation.' },
-                        { name: 'Turning Point Identifier', desc: 'Scans the match data to pinpoint the specific over or event that had the most significant impact on the final win probability.' },
-                        { name: 'Automated Narrative Writer', desc: 'Generates a concise, readable summary of the match, weaving together key stats, turning points, and top performances into a compelling story.' }
-                    ]
-                }
-            };
-
-            const agentTabs = document.querySelectorAll('.agent-tab');
-            const agentPhaseNameEl = document.getElementById('agent-phase-name');
-            const agentListEl = document.getElementById('agent-list');
-
-            function updateAgentDetails(phaseKey) {
-                const data = agentData[phaseKey];
-                agentPhaseNameEl.textContent = data.name;
-
-                agentListEl.innerHTML = data.agents.map(agent => `
-                    <div class="border-l-4 border-amber-500 pl-4">
-                        <h4 class="font-bold text-lg text-gray-800">${agent.name}</h4>
-                        <p class="text-gray-600">${agent.desc}</p>
-                    </div>
-                `).join('');
-
-                agentTabs.forEach(tab => {
-                    tab.classList.toggle('active', tab.dataset.agentPhase === phaseKey);
-                });
-            }
-
-            agentTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    updateAgentDetails(tab.dataset.agentPhase);
-                });
-            });
-            updateAgentDetails('pre-match');
-
-            // Player Form Chart
-            const playerFormCtx = document.getElementById('playerFormChart').getContext('2d');
-            new Chart(playerFormCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['R. Sharma (BAT)', 'L. Finch (BOWL)', 'A. Khan (BAT)', 'S. Patel (BOWL)'],
-                    datasets: [
-                        { label: 'Titans', data: [85, 0, 65, 0], backgroundColor: '#3B82F6' },
-                        { label: 'Vipers', data: [0, 90, 0, 75], backgroundColor: '#10B981' }
-                    ]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { x: { stacked: true, max: 100, grid: { display: false } }, y: { stacked: true, grid: { color: '#e5e7eb' } } },
-                    plugins: { 
-                        legend: { position: 'bottom' },
-                        tooltip: { callbacks: { label: (c) => ` Score: ${c.raw}` } }
-                    }
-                }
-            });
-
-            // Win Probability Chart
-            const winProbCtx = document.getElementById('winProbabilityChart').getContext('2d');
-            new Chart(winProbCtx, {
-                type: 'line',
-                data: {
-                    labels: [0, 4, 8, 12, 16, 20], // Overs
-                    datasets: [
-                        { label: 'Titans Win %', data: [55, 60, 50, 45, 75, 95], borderColor: '#3B82F6', tension: 0.1, fill: false },
-                        { label: 'Vipers Win %', data: [45, 40, 50, 55, 25, 5], borderColor: '#10B981', tension: 0.1, fill: false }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { 
-                        y: { min: 0, max: 100, ticks: { callback: (value) => value + '%' } },
-                        x: { title: { display: true, text: 'Overs' } }
-                    },
-                    plugins: { legend: { position: 'bottom' } }
-                }
-            });
-            
-            const navLinks = document.querySelectorAll('.nav-link');
-            const sections = document.querySelectorAll('main section');
-            window.addEventListener('scroll', () => {
-                let current = '';
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    if (pageYOffset >= sectionTop - 80) {
-                        current = section.getAttribute('id');
-                    }
-                });
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href').includes(current)) {
-                        link.classList.add('active');
-                    }
-                });
-            });
-        });
-    </script>
-</section></body></html>
+</footer><script>(function(){const b=document.getElementById('menu-button'),m=document.getElementById('mobile-nav');if(b&&m){b.addEventListener('click',()=>{const o=m.classList.toggle('open');b.setAttribute('aria-expanded',String(o))});m.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{m.classList.remove('open');b.setAttribute('aria-expanded','false')}))}})();</script><script>
+(function(){
+  const tabs=document.querySelectorAll('.tab[data-phase]');
+  const panels=document.querySelectorAll('.tab-panel[data-phase-panel]');
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active')});
+      panels.forEach(function(x){x.classList.remove('active')});
+      t.classList.add('active');
+      const panel=document.querySelector('[data-phase-panel="'+t.dataset.phase+'"]');
+      if(panel) panel.classList.add('active');
+    });
+  });
+  if(!window.Chart) return;
+  new Chart(document.getElementById('playerForm'),{
+    type:'bar',
+    data:{labels:['Opener A','Fast Bowler B','Middle-order C','Spinner D'],datasets:[{label:'Illustrative form index',data:[82,76,69,73],backgroundColor:'#6d28d9'}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{min:0,max:100}}}
+  });
+  new Chart(document.getElementById('winProb'),{
+    type:'line',
+    data:{labels:['0','4','8','12','16','20'],datasets:[{label:'Titans',data:[54,59,49,44,72,93],borderColor:'#1B41F5',tension:.25},{label:'Vipers',data:[46,41,51,56,28,7],borderColor:'#6d28d9',tension:.25}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{min:0,max:100,ticks:{callback:function(v){return v+'%'}}},x:{title:{display:true,text:'Overs'}}}}
+  });
+})();
+</script></body></html>

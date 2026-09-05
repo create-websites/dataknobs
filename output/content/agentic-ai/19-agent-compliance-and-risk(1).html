@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Compliance &amp; Risk | DataKnobs</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@500;600;700&amp;family=Piazzolla:ital,wght@0,400;0,500;0,600;1,400&amp;family=Noto+Sans+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --paper:#F0EEEA;
+  --paper2:#E3E0D8;
+  --card:#FAF9F6;
+  --ink:#201E1A;
+  --ink-soft:#605C52;
+  --line:#D2CDC0;
+  --line-strong:#B0A996;
+  --low:#3E7A4F;
+  --low-tint:#DCEBE0;
+  --med:#C08A26;
+  --med-tint:#F2E4C6;
+  --high:#A3342A;
+  --high-tint:#EFD8D4;
+  --navy:#2C3E52;
+  --font-display:'Domine', serif;
+  --font-body:'Piazzolla', serif;
+  --font-mono:'Noto Sans Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:18px;line-height:1.7;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px;}
+img{max-width:100%;display:block;}
+a{color:var(--navy);}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);font-weight:600;}
+
+/* ── risk heat-map divider (signature motif) ──────────────────────── */
+.heatmap{height:44px;position:relative;display:flex;align-items:center;justify-content:center;gap:3px;}
+.heatmap .sq{width:11px;height:11px;border-radius:1px;}
+.heatmap .lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);padding:0 10px;}
+
+/* ── risk-rated frame (signature motif) ───────────────────────────── */
+.risk-frame{position:relative;background:var(--card);border:1px solid var(--line-strong);padding:18px 20px 14px;}
+.risk-rating{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:3px 10px;border-radius:2px;margin-bottom:10px;}
+.risk-rating.low{background:var(--low-tint);color:var(--low);}
+.risk-rating.med{background:var(--med-tint);color:#8A621B;}
+.risk-rating.high{background:var(--high-tint);color:var(--high);}
+.risk-rating .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.frame-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:10px;}
+.frame-label b{color:var(--navy);}
+.risk-frame img{border:1px solid var(--line);}
+
+/* ── nav ──────────────────────────────────────────────────────────── */
+.topnav{position:sticky;top:0;z-index:50;background:rgba(240,238,234,0.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line-strong);}
+.topnav .row{max-width:1120px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.brand{font-family:var(--font-mono);font-weight:500;font-size:13px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px;text-transform:uppercase;}
+.brand::before{content:"◆";color:var(--high);font-size:9px;}
+.navlinks{display:flex;gap:26px;list-style:none;font-family:var(--font-mono);font-size:12.5px;}
+.navlinks a{text-decoration:none;color:var(--ink-soft);position:relative;padding:4px 0;transition:color .2s;}
+.navlinks a.active,.navlinks a:hover{color:var(--navy);}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--navy);}
+@media (max-width:900px){.navlinks{display:none;}}
+
+/* ── hero ─────────────────────────────────────────────────────────── */
+.hero{padding:76px 0 44px;}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--navy);display:inline-block;}
+.hero-title{font-size:clamp(2.4rem,6vw,4.2rem);line-height:1.06;margin-bottom:22px;font-weight:600;}
+.hero-title em{font-style:italic;color:var(--high);}
+.hero-sub{font-size:1.16rem;color:var(--ink-soft);max-width:660px;margin-bottom:32px;}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px;}
+.btn{font-family:var(--font-mono);font-size:13px;padding:13px 22px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);transition:all .2s;}
+.btn-solid{background:var(--navy);color:#fff;border-color:var(--navy);}
+.btn-solid:hover{background:#1C2C3E;}
+.btn-ghost{background:transparent;color:var(--ink);}
+.btn-ghost:hover{background:var(--paper2);}
+
+/* ── quick answer ─────────────────────────────────────────────────── */
+.quick-answer{background:var(--card);border:1px solid var(--line-strong);border-left:4px solid var(--high);padding:28px 30px;margin:56px 0;max-width:920px;}
+.quick-answer .qa-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--high);margin-bottom:10px;display:block;}
+.quick-answer p{font-size:1.04rem;}
+.quick-answer strong{color:var(--ink);}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+section{padding:56px 0;}
+.section-head{max-width:700px;margin-bottom:40px;}
+.section-kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);margin-bottom:12px;}
+.section-title{font-size:clamp(1.75rem,3.2vw,2.4rem);margin-bottom:14px;font-weight:600;}
+.section-lede{color:var(--ink-soft);font-size:1.04rem;}
+
+/* ── brief rows ───────────────────────────────────────────────────── */
+.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:44px 0;}
+.brief-row.reverse .brief-media{order:2;}
+.brief-kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--med);margin-bottom:10px;}
+.brief-title{font-size:1.85rem;margin-bottom:14px;font-weight:600;}
+.brief-text p{font-size:1rem;color:#2C281F;margin-bottom:14px;}
+.brief-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:6px;}
+.brief-list li{padding-left:20px;position:relative;font-size:.94rem;color:var(--ink-soft);}
+.brief-list li::before{content:"◆";position:absolute;left:0;color:var(--navy);font-size:.62rem;top:6px;}
+@media (max-width:900px){.brief-row{grid-template-columns:1fr;gap:30px;}.brief-row.reverse .brief-media{order:0;}}
+
+/* ── RMF grid ─────────────────────────────────────────────────────── */
+.rmf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);margin-top:8px;}
+.rmf-card{background:var(--card);padding:22px 18px;}
+.rmf-card .k{font-family:var(--font-mono);font-size:10.5px;color:var(--navy);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
+.rmf-card h5{font-family:var(--font-display);font-size:1.05rem;margin-bottom:8px;font-weight:600;}
+.rmf-card p{font-size:.85rem;color:var(--ink-soft);}
+@media (max-width:820px){.rmf-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:520px){.rmf-grid{grid-template-columns:1fr;}}
+
+/* ── table ────────────────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border:1px solid var(--line-strong);background:var(--card);}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.92rem;}
+th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper2);border-bottom:1px solid var(--line-strong);}
+td.dim{font-family:var(--font-mono);font-weight:700;color:var(--navy);font-size:.85rem;}
+tr:last-child td{border-bottom:none;}
+.tagpill{font-family:var(--font-mono);font-size:10.5px;padding:3px 9px;border-radius:2px;}
+.tagpill.low{background:var(--low-tint);color:var(--low);}
+.tagpill.high{background:var(--high-tint);color:var(--high);}
+
+/* ── faq ──────────────────────────────────────────────────────────── */
+.faq-item{border-bottom:1px solid var(--line-strong);}
+.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:var(--font-display);font-size:1.1rem;color:var(--ink);padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;font-weight:600;}
+.faq-q .plus{font-family:var(--font-mono);color:var(--high);transition:transform .25s;flex-shrink:0;}
+.faq-item.open .plus{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.faq-a p{padding-bottom:22px;color:var(--ink-soft);font-size:.98rem;max-width:820px;}
+
+/* ── cta ──────────────────────────────────────────────────────────── */
+.cta-band{background:var(--navy);color:var(--paper);padding:64px 0;}
+.cta-band .section-kicker{color:#9FB2C6;}
+.cta-band h2{color:var(--paper);}
+.cta-band p{color:#C9D0D9;max-width:560px;margin-bottom:26px;}
+.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;font-family:var(--font-mono);font-size:.9rem;color:#C9D0D9;}
+.cta-list li::before{content:"✓ ";color:var(--low);}
+.cta-band .btn-solid{background:var(--high);border-color:var(--high);}
+.cta-band .btn-solid:hover{background:#832A22;}
+.cta-band .btn-ghost{border-color:#44566A;color:var(--paper);}
+.cta-band .btn-ghost:hover{background:#243447;}
+
+footer{padding:32px 0;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);}
+</style>
+<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script><link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/><meta content="Measure and govern AI-agent risk with NIST AI RMF, quantitative controls, regulatory readiness, accountability and emerging insurance models." name="description"/><meta content="agent compliance, AI agent risk, NIST AI RMF, AI regulation, agent insurance, agent governance, DataKnobs" name="keywords"/><meta content="Prashant Dhingra, DataKnobs" name="author"/><meta content="index, follow, max-image-preview:large" name="robots"/><meta content="article" property="og:type"/><meta content="DataKnobs" property="og:site_name"/><meta content="Agent Compliance &amp; Risk" property="og:title"/><meta content="Measure and govern AI-agent risk with NIST AI RMF, quantitative controls, regulatory readiness, accountability and emerging insurance models." property="og:description"/><meta content="summary_large_image" name="twitter:card"/><meta content="Agent Compliance &amp; Risk" name="twitter:title"/><meta content="Measure and govern AI-agent risk with NIST AI RMF, quantitative controls, regulatory readiness, accountability and emerging insurance models." name="twitter:description"/><script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Agent Compliance & Risk", "description": "Measure and govern AI-agent risk with NIST AI RMF, quantitative controls, regulatory readiness, accountability and emerging insurance models.", "publisher": {"@type": "Organization", "name": "DataKnobs"}, "author": {"@type": "Person", "name": "Prashant Dhingra"}}</script></head>
+<body class="dk-page dk-agent-page">
+<nav class="topnav">
+<div class="row">
+<a class="brand" href="#top"><img alt="DataKnobs logo" class="dk-agent-brand-logo" height="48" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" width="190"/><span class="dk-agent-brand-label">Agentic AI</span></a>
+<ul class="navlinks" id="navlinks">
+<li><a class="active" href="#overview">Overview</a></li>
+<li><a href="#rmf">NIST AI RMF</a></li>
+<li><a href="#quantify">Quantifying Risk</a></li>
+<li><a href="#insurance">Insurance</a></li>
+<li><a href="#faq">FAQ</a></li>
+<li><a class="dk-all-guides-link" href="https://www.dataknobs.com/agent-ai/">All Guides</a></li></ul>
+</div>
+</nav><div class="dk-agent-breadcrumb"><div class="dk-agent-breadcrumb-inner"><a href="https://www.dataknobs.com/agent-ai/">Agentic AI Guides</a><span>/</span><span>Agent Compliance &amp; Risk: Measuring, Regulating, and Insuring AI Agents in 2026</span></div></div>
+<header class="hero" id="top">
+<div class="wrap">
+<span class="eyebrow">Agentic AI · Risk &amp; Compliance</span>
+<h1 class="hero-title">Agents move faster<br/>than the <em>cycle</em> around them.</h1>
+<p class="hero-sub">Models are validated regularly, agents are constantly active, and governance committees convene monthly, with agents making thousands of small decisions daily. This misalignment is the primary compliance issue in 2026, and adopting a 'wait and see' approach is now the riskiest strategy on the board's list.</p>
+<div class="hero-cta">
+<a class="btn btn-solid" href="#rmf">See NIST AI RMF mapped to agents →</a>
+<a class="btn btn-ghost" href="#insurance">Check the insurance signal</a>
+</div>
+<div class="risk-frame reveal">
+<span class="risk-rating low"><span class="dot"></span>overview</span>
+<span class="frame-label">SLIDE <b>01</b> :  AGENT COMPLIANCE &amp; RISK</span>
+<img alt="Cover slide: Agent Compliance and Risk" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide1000/agent-compliance-and-risk-1.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide600/agent-compliance-and-risk-1.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide700/agent-compliance-and-risk-1.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-1.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide1000/agent-compliance-and-risk-1.png 1000w" width="1000"/>
+</div>
+</div>
+</header>
+<div class="wrap">
+<div class="quick-answer reveal" id="overview">
+<span class="qa-label">Quick answer</span>
+<p><strong>Agent compliance and risk management</strong> field of managing risk associated with autonomous AI agents, which regulators, auditors, and insurers now distinguish from traditional AI risk due to agents' ability to not only generate content, but also carry out actions such as coding, making API calls, modifying databases, processing payments, and communicating with external sources. The focal point of compliance efforts in 2026 is the. <strong>NIST AI Risk Management Framework</strong> (Govern, Map, Measure, Manage) is becoming the go-to operational framework, regardless of jurisdiction, aligned with mandatory regulations such as the. <strong>EU AI Act</strong> and risk-proportional frameworks like Singapore's <strong>Model AI Governance Framework for Agentic AI</strong>. The clearest 2026 signal isn't regulatory :  it's that <strong>insurance carriers have begun excluding AI liability</strong> Due to corporate policies, quantified, monetary risk reporting to the board has become a practical necessity, not just a luxury.</p>
+</div>
+</div>
+<div class="heatmap">
+<span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--med);"></span><span class="lbl">risk matrix</span><span class="sq" style="background:var(--med);"></span><span class="sq" style="background:var(--high);"></span><span class="sq" style="background:var(--high);"></span>
+</div>
+<!-- ═══ SLIDE 2 :  THE STRUCTURAL MISMATCH ═══════════════════════════ -->
+<div class="wrap">
+<div class="brief-row reveal">
+<div class="brief-media risk-frame">
+<span class="risk-rating high"><span class="dot"></span>structural risk</span>
+<span class="frame-label">SLIDE <b>02</b> :  THE STRUCTURAL MISMATCH</span>
+<img alt="The structural mismatch between agent decision speed and traditional governance cycles" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-2.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide600/agent-compliance-and-risk-2.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide700/agent-compliance-and-risk-2.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-2.png 900w" width="900"/>
+</div>
+<div class="brief-text">
+<span class="brief-kicker">Why old controls don't fit new behavior</span>
+<h3 class="brief-title">Static controls, adaptive systems</h3>
+<p>The conventional approach to AI governance involved a model validated periodically, overseen by a governance committee meeting monthly or quarterly, and operating within a rarely revised risk appetite statement. However, an agent disrupts these assumptions by operating continuously, making numerous decisions daily, and adapting behavior beyond the scope of a static risk statement.</p>
+<p>An agent outpacing the compliance cycle exerts significant pressure to speed up the cycle, but rushing professional and regulatory judgment may increase the error risk the cycle aims to detect.</p>
+</div>
+</div>
+</div>
+<div class="heatmap">
+<span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--med);"></span><span class="lbl">risk matrix</span><span class="sq" style="background:var(--med);"></span><span class="sq" style="background:var(--high);"></span><span class="sq" style="background:var(--high);"></span>
+</div>
+<!-- ═══ SLIDE 3 :  WHY 2026 CHANGED EVERYTHING ═══════════════════════ -->
+<div class="wrap">
+<div class="brief-row reverse reveal">
+<div class="brief-media risk-frame">
+<span class="risk-rating high"><span class="dot"></span>inflection point</span>
+<span class="frame-label">SLIDE <b>03</b> :  WHY "WAIT AND SEE" STOPPED WORKING</span>
+<img alt="Why 2026 made wait-and-see the highest-risk compliance strategy" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-3.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide600/agent-compliance-and-risk-3.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide700/agent-compliance-and-risk-3.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-3.png 900w" width="900"/>
+</div>
+<div class="brief-text">
+<span class="brief-kicker">Several shifts, arriving at once</span>
+<h3 class="brief-title">Each one of these is essential. Together, they are indispensable.</h3>
+<p>Big insurance companies have begun excluding AI liability from their corporate policies. Financial regulators have released guidance specifically for AI and are training staff to audit it. OWASP released a Top 10 list for AI applications. Legal documents have surfaced arguing that high-risk AI systems with untraceable drift should not be allowed on the EU market.</p>
+<p>The combined changes rendered the AI compliance programs of 2024 outdated. Ignoring agent compliance as a current issue poses the greatest risk for any board.</p>
+</div>
+</div>
+</div>
+<div class="heatmap">
+<span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--med);"></span><span class="lbl">risk matrix</span><span class="sq" style="background:var(--med);"></span><span class="sq" style="background:var(--high);"></span><span class="sq" style="background:var(--high);"></span>
+</div>
+<!-- ═══ SLIDE 4 :  NIST AI RMF MAPPED TO AGENT CONTROLS ══════════════ -->
+<section id="rmf">
+<div class="wrap">
+<div class="section-head reveal">
+<span class="section-kicker">The operational backbone</span>
+<h2 class="section-title">Govern, Map, Measure, Manage :  for agents specifically</h2>
+<p class="section-lede">The private sector is not required to follow NIST's AI RMF, but it has become the standard language used by regulators, auditors, and cyber-insurance underwriters, making it practically mandatory in practice.</p>
+</div>
+<div class="brief-row reveal">
+<div class="brief-media risk-frame">
+<span class="risk-rating med"><span class="dot"></span>framework</span>
+<span class="frame-label">SLIDE <b>04</b> :  THE NIST AI RMF, MAPPED TO AGENTS</span>
+<img alt="NIST AI RMF's four functions mapped to specific agent controls" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-4.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide600/agent-compliance-and-risk-4.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide700/agent-compliance-and-risk-4.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-4.png 900w" width="900"/>
+</div>
+<div class="brief-text">
+<span class="brief-kicker">Four abstract functions, made concrete</span>
+<h3 class="brief-title">Each function has a specific agent-shaped job</h3>
+<p>The four functions align with agent-specific controls, transforming a broad risk framework into a practical implementation for engineering and compliance teams.</p>
+</div>
+</div>
+<div class="rmf-grid reveal">
+<div class="rmf-card"><div class="k">Govern</div><h5>Assign accountability</h5><p>Policy owners must explicitly name human accountability, approval rules, and exception handling, rather than implying them.</p></div>
+<div class="rmf-card"><div class="k">Map</div><h5>Inventory the estate</h5><p>Each agent, tool, dataset, MCP server, API, user, scope, and high-risk action meticulously documented.</p></div>
+<div class="rmf-card"><div class="k">Measure</div><h5>Track outcomes</h5><p>Denials, approvals, misuse of tools, issuance of credentials, and policy results occur persistently.</p></div>
+<div class="rmf-card"><div class="k">Manage</div><h5>Act on findings</h5><p>Prevent risky behaviors, limit access, terminate sessions, enforce policies, maintain evidence.</p></div>
+</div>
+</div>
+</section>
+<div class="heatmap">
+<span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--med);"></span><span class="lbl">risk matrix</span><span class="sq" style="background:var(--med);"></span><span class="sq" style="background:var(--high);"></span><span class="sq" style="background:var(--high);"></span>
+</div>
+<!-- ═══ SLIDE 5 :  REGULATORY LANDSCAPE, CONVERGING ═══════════════════ -->
+<div class="wrap">
+<div class="brief-row reverse reveal">
+<div class="brief-media risk-frame">
+<span class="risk-rating med"><span class="dot"></span>regulatory map</span>
+<span class="frame-label">SLIDE <b>05</b> :  MULTIPLE FRAMEWORKS, CONVERGING EXPECTATIONS</span>
+<img alt="EU AI Act, Singapore MAS/IMDA, ISO 42001, and AIUC-1 compliance frameworks compared" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-5.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide600/agent-compliance-and-risk-5.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide700/agent-compliance-and-risk-5.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-5.png 900w" width="900"/>
+</div>
+<div class="brief-text">
+<span class="brief-kicker">Different laws, the same shortlist of expectations</span>
+<h3 class="brief-title">Risk-based governance, board accountability, human oversight :  everywhere</h3>
+<p>The EU AI Act enforces mandatory risk-tiered regulations, with penalties reaching seven percent of global annual revenue for prohibited activities. Singapore's Model AI Governance Framework for Agentic AI, developed by the Infocomm Media Development Authority, focuses on four key aspects: managing risks proactively, ensuring human accountability, implementing technical controls, and promoting end-user responsibility. ISO/IEC 42001 outlines formal requirements for AI management systems, while industry-specific frameworks such as AIUC-1 are being developed to address identity, access, and accountability challenges posed by AI agents.</p>
+<p>Regulators from different jurisdictions are aligning on a common shortlist, allowing a single control to satisfy multiple frameworks instead of needing separate compliance programs for each regulator.</p>
+</div>
+</div>
+</div>
+<div class="heatmap">
+<span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--med);"></span><span class="lbl">risk matrix</span><span class="sq" style="background:var(--med);"></span><span class="sq" style="background:var(--high);"></span><span class="sq" style="background:var(--high);"></span>
+</div>
+<!-- ═══ SLIDE 6 :  RISK CLASSIFICATION BEFORE LEGAL CLARITY ══════════ -->
+<div class="wrap">
+<div class="brief-row reveal">
+<div class="brief-media risk-frame">
+<span class="risk-rating high"><span class="dot"></span>classification</span>
+<span class="frame-label">SLIDE <b>06</b> :  CLASSIFY BEFORE THE LAW CATCHES UP</span>
+<img alt="Risk classification for agent use cases even ahead of formal legal classification" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-6.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide600/agent-compliance-and-risk-6.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide700/agent-compliance-and-risk-6.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-6.png 900w" width="900"/>
+</div>
+<div class="brief-text">
+<span class="brief-kicker">Don't rely on a court to inform you of the risk level.</span>
+<h3 class="brief-title">Certain domains earn scrutiny before the paperwork does</h3>
+<p>Security and compliance teams should be prepared for high-risk evidence requirements for agents involved in hiring, credit, regulated reporting, public services, or critical infrastructure, even before a formal legal classification is determined for that specific use case. Relying on definitive legal guidance before establishing the necessary evidence trail for these domains is a risky decision.</p>
+<p>One effective strategy is to limit risk early on by focusing on specific use cases, considering the deployment context along with the model itself, and creating an audit trail assuming the worst-case scenario.</p>
+</div>
+</div>
+</div>
+<div class="heatmap">
+<span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--med);"></span><span class="lbl">risk matrix</span><span class="sq" style="background:var(--med);"></span><span class="sq" style="background:var(--high);"></span><span class="sq" style="background:var(--high);"></span>
+</div>
+<!-- ═══ SLIDE 7 :  QUANTIFYING RISK IN MONETARY TERMS ════════════════ -->
+<section id="quantify">
+<div class="wrap">
+<div class="section-head reveal">
+<span class="section-kicker">From qualitative to quantified</span>
+<h2 class="section-title">"High risk" isn't a number a board can act on</h2>
+<p class="section-lede">The insurance signal is more precise than the regulatory signal, making quantifying risk in monetary terms essential.</p>
+</div>
+<div class="brief-row reveal">
+<div class="brief-media risk-frame">
+<span class="risk-rating med"><span class="dot"></span>board reporting</span>
+<span class="frame-label">SLIDE <b>07</b> :  QUANTIFYING RISK IN MONETARY TERMS</span>
+<img alt="Quantifying AI agent risk in expected annualized monetary terms for board reporting" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-7.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide600/agent-compliance-and-risk-7.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide700/agent-compliance-and-risk-7.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-7.png 900w" width="900"/>
+</div>
+<div class="brief-text">
+<span class="brief-kicker">A number the finance team can work with</span>
+<h3 class="brief-title">Expected annualized loss, not a red-yellow-green sticker</h3>
+<p>Boards now require a specific number: anticipated yearly loss in euros or dollars, rather than a vague 'high' or 'medium' classification that can be interpreted differently by each individual. This numerical value aligns AI risk with the language already used by risk, compliance, technology, and insurance teams for their management practices.</p>
+</div>
+</div>
+</div>
+</section>
+<div class="heatmap">
+<span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--med);"></span><span class="lbl">risk matrix</span><span class="sq" style="background:var(--med);"></span><span class="sq" style="background:var(--high);"></span><span class="sq" style="background:var(--high);"></span>
+</div>
+<!-- ═══ SLIDE 8 :  THE INSURANCE SIGNAL ═══════════════════════════════ -->
+<section id="insurance">
+<div class="wrap">
+<div class="brief-row reveal">
+<div class="brief-media risk-frame">
+<span class="risk-rating high"><span class="dot"></span>market signal</span>
+<span class="frame-label">SLIDE <b>08</b> :  THE INSURANCE SIGNAL</span>
+<img alt="Insurance market shifts on AI liability coverage as a compliance signal" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-8.png" srcset="
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide600/agent-compliance-and-risk-8.png 600w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide700/agent-compliance-and-risk-8.png 700w,
+            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-8.png 900w" width="900"/>
+</div>
+<div class="brief-text">
+<span class="brief-kicker">The market is pricing this faster than the law is</span>
+<h3 class="brief-title">Carriers are voting with exclusions</h3>
+<p>Underfunded governance programs in 2024 are now receiving funding due to the insurance signal being more pronounced than the regulatory one. Leading carriers are now excluding AI liability from corporate policies, indicating a trend towards more exclusions or stricter control requirements before coverage is granted.</p>
+<p>A board in a secure position is able to address three crucial questions: the current status of AI liability insurance coverage, the future market trends, and the necessary controls to enhance coverage. Failure to answer these questions will leave the board vulnerable at renewal time, the most inconvenient moment to realize the gap.</p>
+</div>
+</div>
+</div>
+</section>
+<div class="heatmap">
+<span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--low);"></span><span class="sq" style="background:var(--med);"></span><span class="lbl">risk matrix</span><span class="sq" style="background:var(--med);"></span><span class="sq" style="background:var(--high);"></span><span class="sq" style="background:var(--high);"></span>
+</div>
+<!-- ═══ SLIDE 9 :  EXECUTION GOVERNANCE ═══════════════════════════════ -->
+<div class="wrap">
+<div class="brief-row reverse reveal">
+<div class="brief-media risk-frame">
+<span class="risk-rating high"><span class="dot"></span>execution controls</span>
+<span class="frame-label">SLIDE <b>09</b> :  EXECUTION GOVERNANCE FOR AGENTIC ACTIONS</span>
+<img alt="Mandatory human approval thresholds for high-risk agentic execution" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-9.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide600/agent-compliance-and-risk-9.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide700/agent-compliance-and-risk-9.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-9.png 900w" width="900"/>
+</div>
+<div class="brief-text">
+<span class="brief-kicker">Agents act :  that's the whole compliance problem</span>
+<h3 class="brief-title">Data protection alone won't cover this</h3>
+<p>Conventional AI risk strategies focus on safeguarding data access, while Agentic AI requires additional oversight to manage code execution, API calls, database modifications, email transmissions, and transaction processing. Without proper controls, an agent can serve as an automated privilege-escalation tool, posing a broader risk than just data access.</p>
+<p>Regardless of the agent's confidence level, specific actions such as financial transactions exceeding a set limit, modifications to access controls, data removal, and external communications made on behalf of the organization should always necessitate human approval.</p>
+</div>
+</div>
+</div>
+<!-- ═══ SLIDE 10 :  CONCLUSION ════════════════════════════════════════ -->
+<div class="wrap">
+<div class="brief-row reveal">
+<div class="brief-media risk-frame">
+<span class="risk-rating low"><span class="dot"></span>board summary</span>
+<span class="frame-label">SLIDE <b>10</b> :  WHAT TO TELL THE BOARD</span>
+<img alt="Summary: three things every board needs to hear about AI agent compliance" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide1000/agent-compliance-and-risk-10.png" srcset="
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide600/agent-compliance-and-risk-10.png 600w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide700/agent-compliance-and-risk-10.png 700w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide900/agent-compliance-and-risk-10.png 900w,
+          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-compliance-and-risk/images/Slide1000/agent-compliance-and-risk-10.png 1000w" width="1000"/>
+</div>
+<div class="brief-text">
+<span class="brief-kicker">Three sentences, honestly answered</span>
+<h3 class="brief-title">The estate, the gaps, and the coverage</h3>
+<p>A board must have three key pieces of information: the size and classification of the AI estate along with quantified risk in expected annualized monetary terms, the current status of governance infrastructure compared to relevant frameworks, including identified gaps and treatment plans, and the current state of insurance coverage for AI liability as well as market trends.</p>
+<p>This is not a one-off task, but rather a continuous cycle of growth. Regularly conduct red-team exercises, reassess risks every quarter as use cases develop, and monitor maturity in strategy, risk management, data and technology, governance, and agentic AI governance. Organizations that view this as a future issue in 2026 will be prepared for the challenges of 2027. Those still treating it as a 2024 problem will find themselves scrambling to catch up when their insurance renewal is due and when asked for evidence they are unable to provide.</p>
+</div>
+</div>
+</div>
+<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
+<section id="faq">
+<div class="wrap">
+<div class="section-head reveal">
+<span class="section-kicker">Frequently asked</span>
+<h2 class="section-title">Agent compliance &amp; risk FAQ</h2>
+</div>
+<div class="reveal" id="faq-list">
+<div class="faq-item">
+<button class="faq-q">What makes managing agent risk more challenging compared to traditional AI risk?<span class="plus">+</span></button>
+<div class="faq-a"><p>Agents continuously act and adapt, contrasting with traditional governance that relies on periodic model validation and infrequent risk-appetite revision. A governance committee meeting quarterly cannot effectively keep up with a system that makes thousands of small decisions daily :  the misalignment between governance frequency and agent decision speed is the fundamental issue.</p></div>
+</div>
+<div class="faq-item">
+<button class="faq-q">In what way does the NIST AI RMF specifically relate to AI agents?<span class="plus">+</span></button>
+<div class="faq-a"><p>The four functions of this system correspond to specific agent controls: Governing assigns policy owners and approval rules; Mapping inventories all agents, tools, MCP servers, APIs, and high-risk actions; Measuring continuously tracks denials, approvals, and abnormal tool usage; Managing blocks unsafe actions, restricts credentials, and preserves evidence. While voluntary for private companies, it serves as the default standard referenced by auditors and insurers.</p></div>
+</div>
+<div class="faq-item">
+<button class="faq-q">In 2026, why is insurance more crucial than regulation in addressing AI risk?<span class="plus">+</span></button>
+<div class="faq-a"><p>Major carriers have started excluding AI liability from corporate policies, sending a swift and clear market signal that outpaces regulatory enforcement. A board that cannot articulate its AI liability coverage and understand market trends is vulnerable in a way that regulation cannot fully address.</p></div>
+</div>
+<div class="faq-item">
+<button class="faq-q">What does "execution governance" mean for agentic AI?<span class="plus">+</span></button>
+<div class="faq-a"><p>This involves overseeing the actions an agent can perform, such as running code, accessing APIs, modifying databases, sending messages, and transferring funds, rather than just determining the data it can retrieve. Certain tasks, like high-value financial transactions, altering access controls, deleting data, and communicating externally, should only be carried out with human authorization, regardless of the agent's level of certainty.</p></div>
+</div>
+<div class="faq-item">
+<button class="faq-q">Should risk classification wait for formal legal guidance?<span class="plus">+</span></button>
+<div class="faq-a"><p>Teams should anticipate and prepare for high-risk evidence requirements for agents involved in hiring, credit, regulated reporting, public services, or critical infrastructure, even before a formal legal classification is established for that particular use case. Delaying until there is legal certainty will result in starting the evidence trail too late.</p></div>
+</div>
+<div class="faq-item">
+<button class="faq-q">What are the top three considerations for a board regarding AI agent risk?<span class="plus">+</span></button>
+<div class="faq-a"><p>The AI estate's size and risk classification, along with the quantified expected annualized loss; the progress of governance infrastructure completion against relevant frameworks, including identified gaps and treatment plans; and the current status and future trajectory of insurance coverage for AI liability.</p></div>
+</div>
+</div>
+</div>
+</section>
+<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
+<section class="cta-band">
+<div class="wrap">
+<span class="section-kicker">Get started</span>
+<h2 class="section-title">Ready to quantify and govern your agent risk?</h2>
+<p>Assess your AI infrastructure using the NIST AI RMF's four functions, calculate risks in monetary terms for your finance team, and review insurance coverage prior to your next renewal, not after.</p>
+<ul class="cta-list">
+<li>An AI template for estate inventory designed for Governance, Mapping, Measuring, and Managing</li>
+<li>A monetary risk-quantification worksheet for board reporting</li>
+<li>An execution-governance checklist for high-risk agentic actions</li>
+</ul>
+<div class="hero-cta">
+<a class="btn btn-solid" href="#rmf">Revisit the NIST AI RMF mapping →</a>
+<a class="btn btn-ghost" href="#quantify">Back to quantifying risk</a>
+</div>
+</div>
+</section>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-engineering/">Agent Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-frameworks/">Agent Frameworks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-observability/">Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Ai Development Life Cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/beyond-react/">Beyond React</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/beyond-react-slides/">Beyond React Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/conflict-resolution/">Conflict Resolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/cost-aware-planning/">Cost Aware Planning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/design-patterns/">Design Patterns</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/emergent-behavior/">Emergent Behavior</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/episodic-memory/">Episodic Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/event-vs-goal-agents/">Event Vs Goal Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/fail-safe-agents/">Fail Safe Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/">Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/hierarchical-agents/">Hierarchical Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/mas-simulation/">Mas Simulation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-arch/">Memory Arch</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-compression/">Memory Compression</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-strategies/">Memory Strategies</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/multi-agent-systems/">Multi Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/planning-algorithms/">Planning Algorithms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/planning-vs-reactive/">Planning Vs Reactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/prompt-injection/">Prompt Injection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/sandboxing-agents/">Sandboxing Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/self-evolving-memory/">Self Evolving Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/stateless-stateful-agents/">Stateless Stateful Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/symbolic-llm-reasoning/">Symbolic Llm Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/testing/">Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-chaining/">Tool Chaining</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-hallucination/">Tool Hallucination</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-schema-latency/">Tool Schema Latency</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-selection/">Tool Selection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/uncertainty-handling/">Uncertainty Handling</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/use-cases/">Use Cases</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/17-agent-reliability-engineering.html">17 Agent Reliability Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/18-agent-economics.html">18 Agent Economics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/19-agent-compliance-and-risk.html">19 Agent Compliance And Risk</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Dataknobs - Governance and Speed with AI</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, {threshold:.1});
+  els.forEach(function(el){ io.observe(el); });
+
+  var sections = ['overview','rmf','quantify','insurance','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var links = document.querySelectorAll('.navlinks a');
+  var navIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  sections.forEach(function(s){ navIo.observe(s); });
+
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var btn = item.querySelector('.faq-q');
+    var ans = item.querySelector('.faq-a');
+    btn.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
+      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+    });
+  });
+})();
+</script>
+</body></html>

@@ -2,33 +2,28 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Agent Observability: Tracing, OpenTelemetry and Monitoring | DataKnobs</title>
-
-<meta content="A practical guide to observing AI agents in production with hierarchical traces, OpenTelemetry GenAI semantic conventions, LLM spans, tool spans, memory spans, multi-agent handoffs, cost attribution and failure analysis." name="description"/>
+<title>Agent Observability &amp; Tracing | DataKnobs</title>
+<meta content="Observe AI agents with hierarchical traces, OpenTelemetry GenAI spans, tool and memory spans, multi-agent handoffs, cost attribution and failure analysis." name="description"/>
 <meta content="agent observability, AI agent observability, OpenTelemetry GenAI, agent tracing, LLM monitoring, tool spans, memory spans, multi-agent tracing, AgentOps, production AI monitoring, DataKnobs" name="keywords"/>
 <meta content="Prashant Dhingra, DataKnobs" name="author"/>
 <meta content="index, follow, max-image-preview:large" name="robots"/>
 <link href="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html" rel="canonical"/>
 <meta content="article" property="og:type"/>
 <meta content="DataKnobs" property="og:site_name"/>
-<meta content="Agent Observability: Tracing, OpenTelemetry and Monitoring" property="og:title"/>
-<meta content="Trace model calls, tools, memory, orchestration and multi-agent handoffs using OpenTelemetry-compatible agent observability." property="og:description"/>
+<meta content="Agent Observability &amp; Tracing" property="og:title"/>
+<meta content="Observe AI agents with hierarchical traces, OpenTelemetry GenAI spans, tool and memory spans, multi-agent handoffs, cost attribution and failure analysis." property="og:description"/>
 <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-1.png" property="og:image"/>
 <meta content="https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html" property="og:url"/>
 <meta content="summary_large_image" name="twitter:card"/>
-<meta content="Agent Observability: Tracing, OpenTelemetry and Monitoring" name="twitter:title"/>
-<meta content="A DataKnobs guide to production tracing and observability for AI agents." name="twitter:description"/>
+<meta content="Agent Observability &amp; Tracing" name="twitter:title"/>
+<meta content="Observe AI agents with hierarchical traces, OpenTelemetry GenAI spans, tool and memory spans, multi-agent handoffs, cost attribution and failure analysis." name="twitter:description"/>
 <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-1.png" name="twitter:image"/>
 <meta content="Prashant Dhingra" name="citation_author"/>
 <meta content="Agent Observability: Tracing, OpenTelemetry and Monitoring" name="citation_title"/>
 <meta content="Agent observability, OpenTelemetry GenAI, AI tracing, multi-agent monitoring, cost attribution and production reliability" name="ai-topic"/>
-
-
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
-
-
 <style>
 :root{
   --bg:#f8f7ff;
@@ -253,374 +248,338 @@ footer{
   *{scroll-behavior:auto!important}
 }
 </style>
-
 <link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
 <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
 <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
 <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
 <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
 <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
-
-
-
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-JF94J1W5MC');
-</script></head>
-<body>
-
+</script><link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/><script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Agent Observability & Tracing", "description": "Observe AI agents with hierarchical traces, OpenTelemetry GenAI spans, tool and memory spans, multi-agent handoffs, cost attribution and failure analysis.", "publisher": {"@type": "Organization", "name": "DataKnobs"}, "author": {"@type": "Person", "name": "Prashant Dhingra"}, "url": "https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html", "mainEntityOfPage": "https://www.dataknobs.com/agentic-ai/guide/10-ai-agent-observability.html", "image": "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-1.png"}</script></head>
+<body class="dk-page dk-agent-page">
 <nav class="topnav">
-  <div class="row">
-    <a class="brand" href="https://www.dataknobs.com/">DataKnobs · Agent Observability</a>
-    <ul class="navlinks" id="navlinks">
-      <li><a class="active" href="#overview">Overview</a></li>
-      <li><a href="#spans">Span Types</a></li>
-      <li><a href="#otel">OpenTelemetry</a></li>
-      <li><a href="#platforms">Platforms</a></li>
-      <li><a href="#faq">FAQ</a></li>
-    </ul>
-  </div>
-</nav>
-
+<div class="row">
+<a class="brand" href="https://www.dataknobs.com/"><img alt="DataKnobs logo" class="dk-agent-brand-logo" height="48" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" width="190"/><span class="dk-agent-brand-label">Agentic AI</span></a>
+<ul class="navlinks" id="navlinks">
+<li><a class="active" href="#overview">Overview</a></li>
+<li><a href="#spans">Span Types</a></li>
+<li><a href="#otel">OpenTelemetry</a></li>
+<li><a href="#platforms">Platforms</a></li>
+<li><a href="#faq">FAQ</a></li>
+<li><a class="dk-all-guides-link" href="https://www.dataknobs.com/agent-ai/">All Guides</a></li></ul>
+</div>
+</nav><div class="dk-agent-breadcrumb"><div class="dk-agent-breadcrumb-inner"><a href="https://www.dataknobs.com/agent-ai/">Agentic AI Guides</a><span>/</span><span>Agent Observability: Tracing, OpenTelemetry and Monitoring</span></div></div>
 <header class="hero" id="top">
-  <div class="wrap">
-    <span class="eyebrow">Agentic AI · Production Reliability</span>
-    <h1 class="hero-title">Why did the<br/>agent do <em>that</em>?</h1>
-    <p class="hero-sub">Agent observability involves tracking every model call, tool execution, and reasoning step in a structured, replayable trace to detect failures that may appear as successful outcomes, such as accurate but incorrect outputs, unnecessary tool calls, or a plan deviating off course unnoticed.</p>
-    <div class="hero-cta">
-      <a class="btn btn-solid" href="#spans">See the four span types →</a>
-      <a class="btn btn-ghost" href="#otel">Learn the OpenTelemetry standard</a>
-    </div>
-    <div class="trace-frame reveal">
-      <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>01</b> :  AGENT OBSERVABILITY</span></div>
-      <img alt="Cover slide: Agent Observability" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-1.png" srcset="
+<div class="wrap">
+<span class="eyebrow">Agentic AI · Production Reliability</span>
+<h1 class="hero-title">Why did the<br/>agent do <em>that</em>?</h1>
+<p class="hero-sub">Agent observability involves tracking every model call, tool execution, and reasoning step in a structured, replayable trace to detect failures that may appear as successful outcomes, such as accurate but incorrect outputs, unnecessary tool calls, or a plan deviating off course unnoticed.</p>
+<div class="hero-cta">
+<a class="btn btn-solid" href="#spans">See the four span types →</a>
+<a class="btn btn-ghost" href="#otel">Learn the OpenTelemetry standard</a>
+</div>
+<div class="trace-frame reveal">
+<div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>01</b> :  AGENT OBSERVABILITY</span></div>
+<img alt="Cover slide: Agent Observability" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-1.png" srcset="
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-1.png 600w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-1.png 700w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-1.png 900w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-1.png 1000w" width="1000"/>
-    </div>
-  </div>
+</div>
+</div>
 </header>
-
 <div class="wrap">
-  <div class="quick-answer reveal" id="overview">
-    <span class="qa-label">Quick answer</span>
-    <p><strong>Agent observability</strong> provides comprehensive insight into the actions taken by an AI agent in a production environment, including all model calls, tool selections, decision chains, memory retrievals, and agent-to-agent handoffs, all captured in a structured, hierarchical format that can be replayed. This surpasses traditional monitoring methods, which only confirm the service's availability without verifying if the agent made correct choices, passed accurate arguments, or followed its designated plan. The emerging standard that integrates these features is. <strong>OpenTelemetry's GenAI semantic conventions</strong> :  a vendor-neutral vocabulary of <code>gen_ai.*</code> span and metric attributes that can be emitted by any instrumentation library and ingested by any backend, allowing teams to instrument once and easily switch observability platforms without having to re-instrument each trace point.</p>
-  </div>
+<div class="quick-answer reveal" id="overview">
+<span class="qa-label">Quick answer</span>
+<p><strong>Agent observability</strong> provides comprehensive insight into the actions taken by an AI agent in a production environment, including all model calls, tool selections, decision chains, memory retrievals, and agent-to-agent handoffs, all captured in a structured, hierarchical format that can be replayed. This surpasses traditional monitoring methods, which only confirm the service's availability without verifying if the agent made correct choices, passed accurate arguments, or followed its designated plan. The emerging standard that integrates these features is. <strong>OpenTelemetry's GenAI semantic conventions</strong> :  a vendor-neutral vocabulary of <code>gen_ai.*</code> span and metric attributes that can be emitted by any instrumentation library and ingested by any backend, allowing teams to instrument once and easily switch observability platforms without having to re-instrument each trace point.</p>
 </div>
-
+</div>
 <div class="waterfall">
-  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+<svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
 </div>
-
 <!-- ═══ SLIDE 2 :  WHY TRADITIONAL APM FALLS SHORT ═══════════════════ -->
 <div class="wrap">
-  <div class="brief-row reveal">
-    <div class="brief-media trace-frame">
-      <div class="trace-badge"><span class="pill" style="background:var(--red-tint);color:var(--red);">degraded</span><span class="frame-label">SLIDE <b>02</b> :  WHY TRADITIONAL APM ISN'T ENOUGH</span></div>
-      <img alt="Why traditional application performance monitoring is insufficient for AI agents" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-2.png" srcset="
+<div class="brief-row reveal">
+<div class="brief-media trace-frame">
+<div class="trace-badge"><span class="pill" style="background:var(--red-tint);color:var(--red);">degraded</span><span class="frame-label">SLIDE <b>02</b> :  WHY TRADITIONAL APM ISN'T ENOUGH</span></div>
+<img alt="Why traditional application performance monitoring is insufficient for AI agents" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-2.png" srcset="
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-2.png 600w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-2.png 700w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-2.png 900w" width="900"/>
-    </div>
-    <div class="brief-text">
-      <span class="brief-kicker">A fundamentally different execution shape</span>
-      <h3 class="brief-title">Deterministic monitoring meets non-deterministic execution</h3>
-      <p>Conventional APM monitors the process of a request passing through middleware, interacting with a database, and generating a response with precision in milliseconds. An agent interprets a command, iterates through loops, utilizes various tools, assesses outcomes, and potentially utilizes additional tools before generating an outcome. Each iteration may lead to a different sequence of tools being activated, with task durations varying from 500 milliseconds to several minutes for complex processes.</p>
-      <p>Agents often fail in ways that appear successful, such as providing a polished but incorrect response, executing multiple tool commands unnecessarily to achieve the correct outcome, or performing an action that is technically correct but logically flawed. A dashboard indicating that the agent service is operational does not provide any insight into these potential failures.</p>
-    </div>
-  </div>
 </div>
-
+<div class="brief-text">
+<span class="brief-kicker">A fundamentally different execution shape</span>
+<h3 class="brief-title">Deterministic monitoring meets non-deterministic execution</h3>
+<p>Conventional APM monitors the process of a request passing through middleware, interacting with a database, and generating a response with precision in milliseconds. An agent interprets a command, iterates through loops, utilizes various tools, assesses outcomes, and potentially utilizes additional tools before generating an outcome. Each iteration may lead to a different sequence of tools being activated, with task durations varying from 500 milliseconds to several minutes for complex processes.</p>
+<p>Agents often fail in ways that appear successful, such as providing a polished but incorrect response, executing multiple tool commands unnecessarily to achieve the correct outcome, or performing an action that is technically correct but logically flawed. A dashboard indicating that the agent service is operational does not provide any insight into these potential failures.</p>
+</div>
+</div>
+</div>
 <div class="waterfall">
-  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+<svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
 </div>
-
 <!-- ═══ SLIDE 3 :  FOUR SPAN TYPES ════════════════════════════════════ -->
 <section id="spans">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <span class="section-kicker">The trace hierarchy</span>
-      <h2 class="section-title">Every agent run is a tree of spans</h2>
-      <p class="section-lede">One dialogue exchange can create seven or more layers of nested spans. When this is multiplied by five to ten exchanges, it becomes evident why production agents produce ten to a hundred times more telemetry than a standard API.</p>
-    </div>
-    <div class="brief-row reveal">
-      <div class="brief-media trace-frame">
-        <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>03</b> :  THE FOUR CORE SPAN TYPES</span></div>
-        <img alt="Four core span types in an agent trace: LLM calls, tool executions, memory, orchestration" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-3.png" srcset="
+<div class="wrap">
+<div class="section-head reveal">
+<span class="section-kicker">The trace hierarchy</span>
+<h2 class="section-title">Every agent run is a tree of spans</h2>
+<p class="section-lede">One dialogue exchange can create seven or more layers of nested spans. When this is multiplied by five to ten exchanges, it becomes evident why production agents produce ten to a hundred times more telemetry than a standard API.</p>
+</div>
+<div class="brief-row reveal">
+<div class="brief-media trace-frame">
+<div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>03</b> :  THE FOUR CORE SPAN TYPES</span></div>
+<img alt="Four core span types in an agent trace: LLM calls, tool executions, memory, orchestration" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-3.png" srcset="
             https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-3.png 600w,
             https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-3.png 700w,
             https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-3.png 900w" width="900"/>
-      </div>
-      <div class="brief-text">
-        <span class="brief-kicker">Miss one, get a blind spot</span>
-        <h3 class="brief-title">One span type per failure mode</h3>
-        <p>A basic agent trace schema must capture every potential issue in order to effectively address and fix failures. If certain types of problems are overlooked, such as tool-execution spans, then errors may go undetected, leading to actions being taken based on outdated data without any visible signs of a problem occurring. In such cases, the blame cannot be placed on the tool or the agent, but rather on the outdated information being used.</p>
-      </div>
-    </div>
-    <div class="span-grid reveal">
-      <div class="span-card"><div class="k">gen_ai.chat</div><h5>LLM calls</h5><p>Model name, number of tokens, latency, and completion status for a single model call.</p></div>
-      <div class="span-card"><div class="k">gen_ai.tool</div><h5>Tool executions</h5><p>Name of the tool, its arguments, the raw output it generates, the duration of the tool execution, the</p></div>
-      <div class="span-card"><div class="k">memory.*</div><h5>Memory operations</h5><p>What was obtained, where it came from, and if it was pertinent to the task at hand.</p></div>
-      <div class="span-card"><div class="k">invoke_agent</div><h5>Agent orchestration</h5><p>The plan, the decision taken, and the transfer of control among agents or stages.</p></div>
-    </div>
-  </div>
-</section>
-
-<div class="waterfall">
-  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
 </div>
-
+<div class="brief-text">
+<span class="brief-kicker">Miss one, get a blind spot</span>
+<h3 class="brief-title">One span type per failure mode</h3>
+<p>A basic agent trace schema must capture every potential issue in order to effectively address and fix failures. If certain types of problems are overlooked, such as tool-execution spans, then errors may go undetected, leading to actions being taken based on outdated data without any visible signs of a problem occurring. In such cases, the blame cannot be placed on the tool or the agent, but rather on the outdated information being used.</p>
+</div>
+</div>
+<div class="span-grid reveal">
+<div class="span-card"><div class="k">gen_ai.chat</div><h5>LLM calls</h5><p>Model name, number of tokens, latency, and completion status for a single model call.</p></div>
+<div class="span-card"><div class="k">gen_ai.tool</div><h5>Tool executions</h5><p>Name of the tool, its arguments, the raw output it generates, the duration of the tool execution, the</p></div>
+<div class="span-card"><div class="k">memory.*</div><h5>Memory operations</h5><p>What was obtained, where it came from, and if it was pertinent to the task at hand.</p></div>
+<div class="span-card"><div class="k">invoke_agent</div><h5>Agent orchestration</h5><p>The plan, the decision taken, and the transfer of control among agents or stages.</p></div>
+</div>
+</div>
+</section>
+<div class="waterfall">
+<svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
 <!-- ═══ SLIDE 4 :  OPENTELEMETRY GENAI CONVENTIONS ═══════════════════ -->
 <section id="otel">
-  <div class="wrap">
-    <div class="brief-row reverse reveal">
-      <div class="brief-media trace-frame">
-        <div class="trace-badge"><span class="pill">standard</span><span class="frame-label">SLIDE <b>04</b> :  OPENTELEMETRY GENAI SEMANTIC CONVENTIONS</span></div>
-        <img alt="OpenTelemetry GenAI semantic conventions: a vendor-neutral vocabulary for agent telemetry" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-4.png" srcset="
+<div class="wrap">
+<div class="brief-row reverse reveal">
+<div class="brief-media trace-frame">
+<div class="trace-badge"><span class="pill">standard</span><span class="frame-label">SLIDE <b>04</b> :  OPENTELEMETRY GENAI SEMANTIC CONVENTIONS</span></div>
+<img alt="OpenTelemetry GenAI semantic conventions: a vendor-neutral vocabulary for agent telemetry" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-4.png" srcset="
             https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-4.png 600w,
             https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-4.png 700w,
             https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-4.png 900w" width="900"/>
-      </div>
-      <div class="brief-text">
-        <span class="brief-kicker">The most important development isn't a product</span>
-        <h3 class="brief-title">A shared vocabulary, not another vendor format</h3>
-        <p>Before the adoption of a common standard, switching between observability backends required manually re-instrumenting every trace point. OpenTelemetry's GenAI semantic conventions have eliminated this tedious process by providing a standardized set of conventions. <code>gen_ai.*</code> Both instrumentation libraries can emit span and metric attributes that any OTLP-compatible backend can ingest.</p>
-        <p>After the spec was released, adoption of major agent frameworks quickly followed suit, with many now generating OTel-compliant spans either natively or through a lightweight instrumentation package. Leading backends are now able to read the standard directly. This means that developers only need to instrument once and can easily switch exporters instead of constantly rewriting instrumentation whenever the observability stack evolves.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="waterfall">
-  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
 </div>
-
+<div class="brief-text">
+<span class="brief-kicker">The most important development isn't a product</span>
+<h3 class="brief-title">A shared vocabulary, not another vendor format</h3>
+<p>Before the adoption of a common standard, switching between observability backends required manually re-instrumenting every trace point. OpenTelemetry's GenAI semantic conventions have eliminated this tedious process by providing a standardized set of conventions. <code>gen_ai.*</code> Both instrumentation libraries can emit span and metric attributes that any OTLP-compatible backend can ingest.</p>
+<p>After the spec was released, adoption of major agent frameworks quickly followed suit, with many now generating OTel-compliant spans either natively or through a lightweight instrumentation package. Leading backends are now able to read the standard directly. This means that developers only need to instrument once and can easily switch exporters instead of constantly rewriting instrumentation whenever the observability stack evolves.</p>
+</div>
+</div>
+</div>
+</section>
+<div class="waterfall">
+<svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+</div>
 <!-- ═══ SLIDE 5 :  WHAT EACH SPAN SHOULD CAPTURE ═════════════════════ -->
 <div class="wrap">
-  <div class="brief-row reveal">
-    <div class="brief-media trace-frame">
-      <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>05</b> :  WHAT TO CAPTURE IN EACH SPAN</span></div>
-      <img alt="What each span should capture: model, tokens, latency, tool arguments, retries" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-5.png" srcset="
+<div class="brief-row reveal">
+<div class="brief-media trace-frame">
+<div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>05</b> :  WHAT TO CAPTURE IN EACH SPAN</span></div>
+<img alt="What each span should capture: model, tokens, latency, tool arguments, retries" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-5.png" srcset="
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-5.png 600w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-5.png 700w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-5.png 900w" width="900"/>
-    </div>
-    <div class="brief-text">
-      <span class="brief-kicker">Metadata by default, content by choice</span>
-      <h3 class="brief-title">Enough to answer "why," without over-capturing</h3>
-      <p>Typically, instrumentation primarily captures metadata such as model name, token counts, latency, and finish reason, while intentionally excluding prompt content and tool arguments to avoid sensitive data exposure. Enabling content capture includes full prompt messages, system instructions, tool schemas, and results, which are beneficial for debugging purposes but require cautious handling instead of being enabled by default.</p>
-      <ul class="brief-list">
-        <li>Model stopped generating due to token counts for both input and output.</li>
-        <li>Tool name, arguments, raw output, duration, and retry count</li>
-        <li>Which agent assumed responsibility at every stage, and how was control passed back and forth?</li>
-      </ul>
-    </div>
-  </div>
 </div>
-
+<div class="brief-text">
+<span class="brief-kicker">Metadata by default, content by choice</span>
+<h3 class="brief-title">Enough to answer "why," without over-capturing</h3>
+<p>Typically, instrumentation primarily captures metadata such as model name, token counts, latency, and finish reason, while intentionally excluding prompt content and tool arguments to avoid sensitive data exposure. Enabling content capture includes full prompt messages, system instructions, tool schemas, and results, which are beneficial for debugging purposes but require cautious handling instead of being enabled by default.</p>
+<ul class="brief-list">
+<li>Model stopped generating due to token counts for both input and output.</li>
+<li>Tool name, arguments, raw output, duration, and retry count</li>
+<li>Which agent assumed responsibility at every stage, and how was control passed back and forth?</li>
+</ul>
+</div>
+</div>
+</div>
 <div class="waterfall">
-  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+<svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
 </div>
-
 <!-- ═══ SLIDE 6 :  MULTI-AGENT TRACING ═══════════════════════════════ -->
 <div class="wrap">
-  <div class="brief-row reverse reveal">
-    <div class="brief-media trace-frame">
-      <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>06</b> :  TRACING ACROSS AGENT HANDOFFS</span></div>
-      <img alt="Multi-agent tracing: context propagation across agent-to-agent handoffs" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-6.png" srcset="
+<div class="brief-row reverse reveal">
+<div class="brief-media trace-frame">
+<div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>06</b> :  TRACING ACROSS AGENT HANDOFFS</span></div>
+<img alt="Multi-agent tracing: context propagation across agent-to-agent handoffs" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-6.png" srcset="
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-6.png 600w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-6.png 700w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-6.png 900w" width="900"/>
-    </div>
-    <div class="brief-text">
-      <span class="brief-kicker">One request, many agents, one trace</span>
-      <h3 class="brief-title">Following a request through the whole chain</h3>
-      <p>The majority of production setups are inherently designed to be multi-agent, with a planner assigning tasks to specialized agents that in turn utilize tools and services. The observability must demonstrate the complete journey of a single user request through the entire chain, rather than just focusing on the actions of individual agents in isolation.</p>
-      <p>The method involves context propagation, where trace context is carried with each agent or tool interaction. This allows for a clear visual hierarchy in the trace view: the root agent span is displayed at the top, with child spans for routing, planning, specialist agents, and tool usage nested below. This detailed view highlights the responsible agent at each stage, even when crossing queues and async workers.</p>
-    </div>
-  </div>
 </div>
-
+<div class="brief-text">
+<span class="brief-kicker">One request, many agents, one trace</span>
+<h3 class="brief-title">Following a request through the whole chain</h3>
+<p>The majority of production setups are inherently designed to be multi-agent, with a planner assigning tasks to specialized agents that in turn utilize tools and services. The observability must demonstrate the complete journey of a single user request through the entire chain, rather than just focusing on the actions of individual agents in isolation.</p>
+<p>The method involves context propagation, where trace context is carried with each agent or tool interaction. This allows for a clear visual hierarchy in the trace view: the root agent span is displayed at the top, with child spans for routing, planning, specialist agents, and tool usage nested below. This detailed view highlights the responsible agent at each stage, even when crossing queues and async workers.</p>
+</div>
+</div>
+</div>
 <div class="waterfall">
-  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+<svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
 </div>
-
 <!-- ═══ SLIDE 7 :  COST & TOKEN OBSERVABILITY ═════════════════════════ -->
 <div class="wrap">
-  <div class="brief-row reveal">
-    <div class="brief-media trace-frame">
-      <div class="trace-badge"><span class="pill" style="background:var(--amber-tint);color:#8A5F17;">watch</span><span class="frame-label">SLIDE <b>07</b> :  COST &amp; TOKEN OBSERVABILITY</span></div>
-      <img alt="Cost and token observability: attribution by agent, sub-agent, and customer" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-7.png" srcset="
+<div class="brief-row reveal">
+<div class="brief-media trace-frame">
+<div class="trace-badge"><span class="pill" style="background:var(--amber-tint);color:#8A5F17;">watch</span><span class="frame-label">SLIDE <b>07</b> :  COST &amp; TOKEN OBSERVABILITY</span></div>
+<img alt="Cost and token observability: attribution by agent, sub-agent, and customer" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-7.png" srcset="
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-7.png 600w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-7.png 700w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-7.png 900w" width="900"/>
-    </div>
-    <div class="brief-text">
-      <span class="brief-kicker">Cost hides in places you're not looking</span>
-      <h3 class="brief-title">Attribute cost down to the sub-agent</h3>
-      <p>Agent expenses can frequently be obscured within sub-agents, retries, and external API calls, rather than being directly attributed to the main request. This is why it is crucial for cost attribution to be granular, reaching down to every individual run, prompt, sub-agent, and even customer, instead of just focusing on the top-level agent. A documented real-world scenario resulted in costs exceeding thirteen thousand dollars in a single month. However, after implementing prompt caching, model routing, and redesigning the planning and execution process, the expenses were reduced by over ninety percent.</p>
-      <p>Pricing models can vary in complexity: certain platforms may charge only for LLM spans, while tool, retrieval, and embedding spans are included at no extra cost. This can result in a significantly lower cost for a system with numerous tool calls but few model calls compared to a flat per-span pricing model.</p>
-    </div>
-  </div>
 </div>
-
+<div class="brief-text">
+<span class="brief-kicker">Cost hides in places you're not looking</span>
+<h3 class="brief-title">Attribute cost down to the sub-agent</h3>
+<p>Agent expenses can frequently be obscured within sub-agents, retries, and external API calls, rather than being directly attributed to the main request. This is why it is crucial for cost attribution to be granular, reaching down to every individual run, prompt, sub-agent, and even customer, instead of just focusing on the top-level agent. A documented real-world scenario resulted in costs exceeding thirteen thousand dollars in a single month. However, after implementing prompt caching, model routing, and redesigning the planning and execution process, the expenses were reduced by over ninety percent.</p>
+<p>Pricing models can vary in complexity: certain platforms may charge only for LLM spans, while tool, retrieval, and embedding spans are included at no extra cost. This can result in a significantly lower cost for a system with numerous tool calls but few model calls compared to a flat per-span pricing model.</p>
+</div>
+</div>
+</div>
 <div class="waterfall">
-  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+<svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
 </div>
-
 <!-- ═══ SLIDE 8 :  COMMON FAILURE PATTERNS ════════════════════════════ -->
 <div class="wrap">
-  <div class="brief-row reverse reveal">
-    <div class="brief-media trace-frame">
-      <div class="trace-badge"><span class="pill" style="background:var(--red-tint);color:var(--red);">incident</span><span class="frame-label">SLIDE <b>08</b> :  FAILURE PATTERNS OBSERVABILITY CATCHES</span></div>
-      <img alt="Common production failure patterns caught by agent observability" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-8.png" srcset="
+<div class="brief-row reverse reveal">
+<div class="brief-media trace-frame">
+<div class="trace-badge"><span class="pill" style="background:var(--red-tint);color:var(--red);">incident</span><span class="frame-label">SLIDE <b>08</b> :  FAILURE PATTERNS OBSERVABILITY CATCHES</span></div>
+<img alt="Common production failure patterns caught by agent observability" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-8.png" srcset="
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-8.png 600w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-8.png 700w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-8.png 900w" width="900"/>
-    </div>
-    <div class="brief-text">
-      <span class="brief-kicker">What shows up once real traffic arrives</span>
-      <h3 class="brief-title">The failures that hide without proper tracing</h3>
-      <ul class="brief-list">
-        <li><strong>Retry storms</strong> :  a rate-limit error caused a retry, which in turn triggered another rate limit; the trace-storage bill quadrupled overnight after one documented incident generated 847 spans from a single conversation during a provider outage</li>
-        <li><strong>Invisible stale data</strong> :  the LLM or tool does not make errors apparent when a cached result is retrieved from a outdated connection; only a tool-execution span can uncover this</li>
-        <li><strong>PII leakage into traces</strong> :  Tool parameters and prompts frequently contain customer data, which is automatically sent to the observability backend by standard exporters unless specifically hidden</li>
-      </ul>
-    </div>
-  </div>
 </div>
-
+<div class="brief-text">
+<span class="brief-kicker">What shows up once real traffic arrives</span>
+<h3 class="brief-title">The failures that hide without proper tracing</h3>
+<ul class="brief-list">
+<li><strong>Retry storms</strong> :  a rate-limit error caused a retry, which in turn triggered another rate limit; the trace-storage bill quadrupled overnight after one documented incident generated 847 spans from a single conversation during a provider outage</li>
+<li><strong>Invisible stale data</strong> :  the LLM or tool does not make errors apparent when a cached result is retrieved from a outdated connection; only a tool-execution span can uncover this</li>
+<li><strong>PII leakage into traces</strong> :  Tool parameters and prompts frequently contain customer data, which is automatically sent to the observability backend by standard exporters unless specifically hidden</li>
+</ul>
+</div>
+</div>
+</div>
 <div class="waterfall">
-  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+<svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
 </div>
-
 <!-- ═══ SLIDE 9 :  PLATFORM LANDSCAPE ═════════════════════════════════ -->
 <section id="platforms">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <span class="section-kicker">Tooling</span>
-      <h2 class="section-title">The 2026 observability platform landscape</h2>
-      <p class="section-lede">The OTel standard has led to the commoditization of tracing, with platform differentiation now focused on surfacing failed runs and converting production traces for the next test cycle.</p>
-    </div>
-    <div class="brief-row reveal">
-      <div class="brief-media trace-frame">
-        <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>09</b> :  OBSERVABILITY PLATFORMS COMPARED</span></div>
-        <img alt="Comparison of agent observability platforms in 2026" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-9.png" srcset="
+<div class="wrap">
+<div class="section-head reveal">
+<span class="section-kicker">Tooling</span>
+<h2 class="section-title">The 2026 observability platform landscape</h2>
+<p class="section-lede">The OTel standard has led to the commoditization of tracing, with platform differentiation now focused on surfacing failed runs and converting production traces for the next test cycle.</p>
+</div>
+<div class="brief-row reveal">
+<div class="brief-media trace-frame">
+<div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>09</b> :  OBSERVABILITY PLATFORMS COMPARED</span></div>
+<img alt="Comparison of agent observability platforms in 2026" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-9.png" srcset="
             https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-9.png 600w,
             https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-9.png 700w,
             https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-9.png 900w" width="900"/>
-      </div>
-      <div class="brief-text">
-        <span class="brief-kicker">Pick by deployment model, not by feature list alone</span>
-        <h3 class="brief-title">Self-hosted, managed SDK, or proxy gateway</h3>
-        <p>Organizing options based on their operation style helps simplify decision-making: self-hosted solutions such as Grafana Tempo or open-source Phoenix are ideal for teams seeking complete data control; managed services like Datadog or Honeycomb offer less operational burden in exchange for some control; agent platforms like Braintrust or LangSmith seamlessly integrate tracing into the evaluation and release process.</p>
-      </div>
-    </div>
-  </div>
+</div>
+<div class="brief-text">
+<span class="brief-kicker">Pick by deployment model, not by feature list alone</span>
+<h3 class="brief-title">Self-hosted, managed SDK, or proxy gateway</h3>
+<p>Organizing options based on their operation style helps simplify decision-making: self-hosted solutions such as Grafana Tempo or open-source Phoenix are ideal for teams seeking complete data control; managed services like Datadog or Honeycomb offer less operational burden in exchange for some control; agent platforms like Braintrust or LangSmith seamlessly integrate tracing into the evaluation and release process.</p>
+</div>
+</div>
+</div>
 </section>
-
 <div class="table-wrap reveal" style="margin: 8px 32px 0;max-width:1056px;">
-  <table>
-    <thead><tr><th>Platform</th><th>Best for</th><th>Model</th></tr></thead>
-    <tbody>
-      <tr><td class="dim">Datadog / Honeycomb</td><td>Managed, AI-aware APM with native GenAI span support</td><td><span class="tagpill good">Managed SDK</span></td></tr>
-      <tr><td class="dim">Arize Phoenix</td><td>Open-source, OTel-first tracing plus custom evaluators</td><td><span class="tagpill warn">Self-hosted</span></td></tr>
-      <tr><td class="dim">Langfuse</td><td>Open-source trace store with prompt management built in</td><td><span class="tagpill warn">Self-hosted</span></td></tr>
-      <tr><td class="dim">LangSmith</td><td>Native fit for LangChain / LangGraph agent stacks</td><td><span class="tagpill good">Managed SDK</span></td></tr>
-      <tr><td class="dim">Braintrust</td><td>Trace-to-eval workflow, production failures become test cases</td><td><span class="tagpill bad">Trace-to-eval platform</span></td></tr>
-      <tr><td class="dim">Sentry</td><td>Agent traces unified with errors, replays, and infra traces</td><td><span class="tagpill good">Managed SDK</span></td></tr>
-    </tbody>
-  </table>
+<table>
+<thead><tr><th>Platform</th><th>Best for</th><th>Model</th></tr></thead>
+<tbody>
+<tr><td class="dim">Datadog / Honeycomb</td><td>Managed, AI-aware APM with native GenAI span support</td><td><span class="tagpill good">Managed SDK</span></td></tr>
+<tr><td class="dim">Arize Phoenix</td><td>Open-source, OTel-first tracing plus custom evaluators</td><td><span class="tagpill warn">Self-hosted</span></td></tr>
+<tr><td class="dim">Langfuse</td><td>Open-source trace store with prompt management built in</td><td><span class="tagpill warn">Self-hosted</span></td></tr>
+<tr><td class="dim">LangSmith</td><td>Native fit for LangChain / LangGraph agent stacks</td><td><span class="tagpill good">Managed SDK</span></td></tr>
+<tr><td class="dim">Braintrust</td><td>Trace-to-eval workflow, production failures become test cases</td><td><span class="tagpill bad">Trace-to-eval platform</span></td></tr>
+<tr><td class="dim">Sentry</td><td>Agent traces unified with errors, replays, and infra traces</td><td><span class="tagpill good">Managed SDK</span></td></tr>
+</tbody>
+</table>
 </div>
-
 <div class="waterfall">
-  <svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
+<svg height="42" viewBox="0 0 160 42" width="160"><rect fill="#2464B4" height="7" rx="1" width="120" x="4" y="6"></rect><rect fill="#3E9160" height="7" rx="1" width="60" x="18" y="18"></rect><rect fill="#D98E2B" height="7" rx="1" width="36" x="18" y="30"></rect><rect fill="#3E9160" height="7" rx="1" width="34" x="90" y="18"></rect></svg>
 </div>
-
 <!-- ═══ SLIDE 10 :  CONCLUSION ════════════════════════════════════════ -->
 <div class="wrap">
-  <div class="brief-row reverse reveal">
-    <div class="brief-media trace-frame">
-      <div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>10</b> :  BUILT IN, NOT BOLTED ON</span></div>
-      <img alt="Summary: build agent observability in from the start, not after an outage" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-10.png" srcset="
+<div class="brief-row reverse reveal">
+<div class="brief-media trace-frame">
+<div class="trace-badge"><span class="pill">healthy</span><span class="frame-label">SLIDE <b>10</b> :  BUILT IN, NOT BOLTED ON</span></div>
+<img alt="Summary: build agent observability in from the start, not after an outage" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-10.png" srcset="
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide600/agent-observability-10.png 600w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide700/agent-observability-10.png 700w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide900/agent-observability-10.png 900w,
           https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-observability/images/Slide1000/agent-observability-10.png 1000w" width="1000"/>
-    </div>
-    <div class="brief-text">
-      <span class="brief-kicker">The lesson every team learns the hard way, once</span>
-      <h3 class="brief-title">Minutes from a trace, not hours from log archaeology</h3>
-      <p>Teams that successfully implement tracing often share a common experience: when they can quickly diagnose production failures in minutes using traces instead of spending hours searching through unstructured logs, the benefits of early investment in tracing become clear and tangible.</p>
-      <p>Consider each user request as a standalone trace containing spans for planning, model calls, tool calls, and downstream services starting from the initial deployment, rather than treating it as an instrumentation task that is only addressed after a major outage occurs.</p>
-    </div>
-  </div>
 </div>
-
+<div class="brief-text">
+<span class="brief-kicker">The lesson every team learns the hard way, once</span>
+<h3 class="brief-title">Minutes from a trace, not hours from log archaeology</h3>
+<p>Teams that successfully implement tracing often share a common experience: when they can quickly diagnose production failures in minutes using traces instead of spending hours searching through unstructured logs, the benefits of early investment in tracing become clear and tangible.</p>
+<p>Consider each user request as a standalone trace containing spans for planning, model calls, tool calls, and downstream services starting from the initial deployment, rather than treating it as an instrumentation task that is only addressed after a major outage occurs.</p>
+</div>
+</div>
+</div>
 <!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
 <section id="faq">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <span class="section-kicker">Frequently asked</span>
-      <h2 class="section-title">Agent observability FAQ</h2>
-    </div>
-    <div class="reveal" id="faq-list">
-
-      <div class="faq-item">
-        <button class="faq-q">How is agent observability different from LLM monitoring?<span class="plus">+</span></button>
-        <div class="faq-a"><p>LLM monitoring tracks specific model call metrics like latency, tokens, and errors, while agent observability monitors the entire agent process including multi-step reasoning, tool execution, and agent-to-agent handoffs, providing insight into why an agent may have made more model calls than necessary.</p></div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q">What is OpenTelemetry's role in agent observability?<span class="plus">+</span></button>
-        <div class="faq-a"><p>The GenAI semantic conventions of OpenTelemetry establish a universal set of gen_ai.* attributes for LLM calls, tool invocations, and agent operations. Adhering to this standard allows an agent's telemetry data to seamlessly integrate with any OTLP-compatible backend, simplifying the process of switching observability platforms to just swapping out an exporter instead of redoing all instrumentation in the codebase.</p></div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q">What are the four span types every agent trace needs?<span class="plus">+</span></button>
-        <div class="faq-a"><p>LLM calls cover a range of information including the model, tokens, latency, and finish reason. Tool executions involve details such as the tool name, arguments, output, duration, and retries. Memory operations detail what was retrieved and from where. Agent orchestrations track the plan, decision-making process, and control passing between steps or agents. Failure to capture any of these elements can result in customer complaints.</p></div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q">How can you track a multi-agent system involving agents calling one another?<span class="plus">+</span></button>
-        <div class="faq-a"><p>By propagating context, the trace carries the root agent span at the top followed by nested child spans for routing, planning, specialist agents, and tool usage, even across queues and async worker processes, when one agent calls another agent or a tool.</p></div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q">How do teams keep agent tracing from becoming too expensive?<span class="plus">+</span></button>
-        <div class="faq-a"><p>Limiting the number of retries at the instrumentation level prevents a single failure cascade from creating an excessive number of spans. Tail sampling is used to retain all error traces while only capturing a portion of successful ones. Understanding the pricing model of their platform is important, as some only bill for LLM spans, making tool-heavy agents more cost-effective to observe compared to a flat per-span price.</p></div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-q">Can tracing prompts and tool arguments containing PII be done safely?<span class="plus">+</span></button>
-        <div class="faq-a"><p>By default, standard OTel exporters will gladly send complete prompts and tool-argument content to an observability backend if content capture is turned on. Due to this, most instrumentations only capture metadata such as model, tokens, and latency by default; enabling full content capture should include explicit masking or redaction for any sensitive fields.</p></div>
-      </div>
-
-    </div>
-  </div>
+<div class="wrap">
+<div class="section-head reveal">
+<span class="section-kicker">Frequently asked</span>
+<h2 class="section-title">Agent observability FAQ</h2>
+</div>
+<div class="reveal" id="faq-list">
+<div class="faq-item">
+<button class="faq-q">How is agent observability different from LLM monitoring?<span class="plus">+</span></button>
+<div class="faq-a"><p>LLM monitoring tracks specific model call metrics like latency, tokens, and errors, while agent observability monitors the entire agent process including multi-step reasoning, tool execution, and agent-to-agent handoffs, providing insight into why an agent may have made more model calls than necessary.</p></div>
+</div>
+<div class="faq-item">
+<button class="faq-q">What is OpenTelemetry's role in agent observability?<span class="plus">+</span></button>
+<div class="faq-a"><p>The GenAI semantic conventions of OpenTelemetry establish a universal set of gen_ai.* attributes for LLM calls, tool invocations, and agent operations. Adhering to this standard allows an agent's telemetry data to seamlessly integrate with any OTLP-compatible backend, simplifying the process of switching observability platforms to just swapping out an exporter instead of redoing all instrumentation in the codebase.</p></div>
+</div>
+<div class="faq-item">
+<button class="faq-q">What are the four span types every agent trace needs?<span class="plus">+</span></button>
+<div class="faq-a"><p>LLM calls cover a range of information including the model, tokens, latency, and finish reason. Tool executions involve details such as the tool name, arguments, output, duration, and retries. Memory operations detail what was retrieved and from where. Agent orchestrations track the plan, decision-making process, and control passing between steps or agents. Failure to capture any of these elements can result in customer complaints.</p></div>
+</div>
+<div class="faq-item">
+<button class="faq-q">How can you track a multi-agent system involving agents calling one another?<span class="plus">+</span></button>
+<div class="faq-a"><p>By propagating context, the trace carries the root agent span at the top followed by nested child spans for routing, planning, specialist agents, and tool usage, even across queues and async worker processes, when one agent calls another agent or a tool.</p></div>
+</div>
+<div class="faq-item">
+<button class="faq-q">How do teams keep agent tracing from becoming too expensive?<span class="plus">+</span></button>
+<div class="faq-a"><p>Limiting the number of retries at the instrumentation level prevents a single failure cascade from creating an excessive number of spans. Tail sampling is used to retain all error traces while only capturing a portion of successful ones. Understanding the pricing model of their platform is important, as some only bill for LLM spans, making tool-heavy agents more cost-effective to observe compared to a flat per-span price.</p></div>
+</div>
+<div class="faq-item">
+<button class="faq-q">Can tracing prompts and tool arguments containing PII be done safely?<span class="plus">+</span></button>
+<div class="faq-a"><p>By default, standard OTel exporters will gladly send complete prompts and tool-argument content to an observability backend if content capture is turned on. Due to this, most instrumentations only capture metadata such as model, tokens, and latency by default; enabling full content capture should include explicit masking or redaction for any sensitive fields.</p></div>
+</div>
+</div>
+</div>
 </section>
-
 <!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
 <section class="cta-band">
-  <div class="wrap">
-    <span class="section-kicker">Get started</span>
-    <h2 class="section-title">Ready to see inside your agent's execution?</h2>
-    <p>From day one, ensure the four core span types are aligned with OpenTelemetry GenAI conventions, and choose an observability platform based on deployment model rather than feature checklist alone.</p>
-    <ul class="cta-list">
-      <li>A minimum-viable trace schema covering all four span types</li>
-      <li>A platform comparison worksheet by deployment model and cost structure</li>
-      <li>A PII-masking checklist for safe content capture in production traces</li>
-    </ul>
-    <div class="hero-cta">
-      <a class="btn btn-solid" href="#otel">Revisit the OpenTelemetry standard →</a>
-      <a class="btn btn-ghost" href="#platforms">Back to platform comparison</a>
-    </div>
-  </div>
+<div class="wrap">
+<span class="section-kicker">Get started</span>
+<h2 class="section-title">Ready to see inside your agent's execution?</h2>
+<p>From day one, ensure the four core span types are aligned with OpenTelemetry GenAI conventions, and choose an observability platform based on deployment model rather than feature checklist alone.</p>
+<ul class="cta-list">
+<li>A minimum-viable trace schema covering all four span types</li>
+<li>A platform comparison worksheet by deployment model and cost structure</li>
+<li>A PII-masking checklist for safe content capture in production traces</li>
+</ul>
+<div class="hero-cta">
+<a class="btn btn-solid" href="#otel">Revisit the OpenTelemetry standard →</a>
+<a class="btn btn-ghost" href="#platforms">Back to platform comparison</a>
+</div>
+</div>
 </section>
-
 <footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -735,7 +694,6 @@ gtag('config', 'G-JF94J1W5MC');
 </div>
 </div>
 </footer>
-
 <script>
 (function(){
   var els = document.querySelectorAll('.reveal');
@@ -768,7 +726,4 @@ gtag('config', 'G-JF94J1W5MC');
   });
 })();
 </script>
-
-
-
 </body></html>

@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>LLM Intermediate Tutorial: Practical Use of LLMs</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="Practical LLM tutorial: building LLM apps, embeddings and vector databases, RAG and chunking, evaluating outputs, prompt engineering, and AI agents." name="description"/>
+  <meta content="index, follow" name="robots"/>
+
+  <link href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" rel="icon"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  
+    <link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --violet: #7c3aed;
+      --violet-dark: #5b21b6;
+      --indigo: #4338ca;
+      --hero-a: #4c1d95;
+      --hero-b: #7c3aed;
+      --hero-c: #4338ca;
+      --footer: #1e293b;
+      --footer-text: #cbd5e1;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 50px rgba(15, 23, 42, 0.14);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+      height: auto;
+    }
+
+    a {
+      color: var(--violet);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .site-header-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand img {
+      height: 44px;
+      width: auto;
+    }
+
+    .brand-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .site-nav a {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #475569;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav a:hover {
+      color: var(--violet);
+      text-decoration: none;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: linear-gradient(135deg, var(--hero-a), var(--hero-b), var(--hero-c));
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.10), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(255,255,255,0.10), transparent 25%),
+        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.07), transparent 30%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      padding: 72px 0 82px;
+      display: grid;
+      gap: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.10);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 960px;
+      font-size: clamp(2.3rem, 5vw, 4.4rem);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-desc {
+      max-width: 900px;
+      font-size: 1.08rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.92);
+      white-space: pre-line;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .hero-tag {
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.95);
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .section {
+      padding: 72px 0;
+    }
+
+    .section-soft {
+      background: linear-gradient(to bottom, #f8fafc, #ffffff);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header {
+      max-width: 860px;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      line-height: 1.14;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .section-intro {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+
+    .gallery-grid {
+      display: grid;
+      gap: 28px;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .gallery-item a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      background: white;
+    }
+
+    .caption {
+      padding: 18px 22px 24px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #334155;
+      letter-spacing: 0.02em;
+    }
+
+    .article-wrap {
+      margin-top: 46px;
+      border-top: 1px solid var(--border);
+      padding-top: 34px;
+    }
+
+    .article-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+    }
+
+    .article-content {
+      color: #334155;
+      font-size: 1.03rem;
+      line-height: 1.85;
+      overflow-wrap: anywhere;
+    }
+
+    .article-content h2,
+    .article-content h3,
+    .article-content h4 {
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-top: 1.6em;
+      margin-bottom: 0.65em;
+    }
+
+    .article-content h2 {
+      font-size: 1.9rem;
+      font-weight: 800;
+    }
+
+    .article-content h3 {
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .article-content h4 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .article-content p,
+    .article-content ul,
+    .article-content ol,
+    .article-content blockquote,
+    .article-content table {
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+
+    .article-content ul,
+    .article-content ol {
+      padding-left: 1.4em;
+    }
+
+    .article-content li + li {
+      margin-top: 0.45em;
+    }
+
+    .article-content blockquote {
+      margin-left: 0;
+      padding: 14px 18px;
+      border-left: 4px solid #c4b5fd;
+      background: #f5f3ff;
+      border-radius: 12px;
+      color: #4c1d95;
+    }
+
+    .article-content code {
+      background: #f1f5f9;
+      padding: 0.15em 0.35em;
+      border-radius: 6px;
+      font-size: 0.92em;
+    }
+
+    .article-content pre {
+      overflow-x: auto;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 14px;
+    }
+
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+    }
+
+    .article-content th,
+    .article-content td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .article-content th {
+      background: #f8fafc;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .cta-band {
+      margin-top: 44px;
+      padding: 28px;
+      border: 1px solid #ddd6fe;
+      background: linear-gradient(135deg, #faf5ff, #ffffff, #eef2ff);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .cta-band h3 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+      line-height: 1.2;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .cta-band p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .site-footer {
+      background: var(--footer);
+      color: var(--footer-text);
+      margin-top: 0;
+    }
+
+    .footer-inner {
+      padding: 48px 0 34px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 30px;
+    }
+
+    .footer-col h4 {
+      margin: 0 0 14px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .footer-col p,
+    .footer-col li {
+      font-size: 0.95rem;
+      color: var(--footer-text);
+      line-height: 1.8;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-col li + li {
+      margin-top: 6px;
+    }
+
+    .footer-col a {
+      color: var(--footer-text);
+    }
+
+    .footer-col a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(148, 163, 184, 0.22);
+      margin-top: 30px;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+      color: #94a3b8;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: #94a3b8;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    @media (min-width: 900px) {
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 899px) {
+      .site-nav {
+        display: none;
+      }
+
+      .hero-inner {
+        padding: 56px 0 64px;
+      }
+
+      .section {
+        padding: 56px 0;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .brand-text {
+        font-size: 1rem;
+      }
+
+      .article-card,
+      .cta-band {
+        padding: 22px;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="brand">
+        <a aria-label="Dataknobs Home" href="https://www.dataknobs.com/">
+          <img alt="Dataknobs" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"/>
+        </a>
+        <div class="brand-text">Dataknobs</div>
+      </div>
+
+      <nav aria-label="Primary navigation" class="site-nav">
+        <a href="#slides">Slides</a>
+        <a href="#article">Article</a>
+        <a href="https://www.dataknobs.com/use-cases/">Use Cases</a>
+        <a href="https://www.dataknobs.com/data-products/">Data Products</a>
+        <a href="https://www.dataknobs.com/search.html">Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="eyebrow">Dataknobs Visual Storytelling</div>
+
+      <h1>LLM Intermediate Tutorial: Practical Use of LLMs</h1>
+
+      <div class="hero-desc">Practical LLM tutorial: building LLM apps, embeddings and vector databases, RAG and chunking, evaluating outputs, prompt engineering, and AI agents.</div>
+
+      <div class="hero-tags">
+        <div class="hero-tag">Slides as Web Pages</div>
+        <div class="hero-tag">SEO-Friendly Content</div>
+        <div class="hero-tag">Structured Visual Knowledge</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-soft" id="slides">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-kicker">Slides</div>
+        <h2 class="section-title">Visual walkthrough</h2>
+        <div class="section-intro">
+          Browse the slides below. Each image can be opened directly for a larger view.
+        </div>
+      </div>
+
+      <div class="gallery-grid">
+        <section class="gallery-item">
+  <a href="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1200/llm-tutorial-2.png" rel="noopener" target="_blank">
+    <img alt="Slide titled LLM Intermediate Topics showing six numbered modules: building simple LLM apps, embeddings and vector databases, retrieval-augmented generation, evaluation of LLM outputs, prompt engineering techniques, and building agents" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1200/llm-tutorial-2.png"/>
+  </a>
+  <div class="caption">The six intermediate LLM topics covered in this tutorial.</div>
+</section>
+      </div>
+
+      <div class="cta-band">
+        <h3>LLM Intermediate Tutorial: Practical Use of LLMs</h3>
+        <p>
+          
+        </p>
+      </div>
+
+      <div class="article-wrap" id="article">
+        <div class="section-header">
+          <div class="section-kicker">Article</div>
+          <h2 class="section-title">Detailed explanation</h2>
+          <div class="section-intro">
+            The content below expands on the slides with structured HTML article content.
+          </div>
+        </div>
+
+        <div class="article-card">
+          <div class="article-content">
+            <p class="lede">Beginner material explains what a large language model is. This tutorial is about making one do useful work. It covers six practical areas in order: building a simple LLM application, embeddings and vector databases, retrieval-augmented generation, evaluating what the model produces, the prompt engineering techniques that matter in production, and building agents. It assumes you know what tokens, context windows, and system prompts are, and that you can write code in some language.</p>
+
+<h2>Part 1 :  Building Simple LLM Apps</h2>
+<p>Almost every LLM product, however elaborate, is built from one primitive: an HTTP request carrying messages, returning generated text. Get comfortable with that request and everything else is composition.</p>
+
+<h3>How to call an LLM API</h3>
+<p>The major providers :  OpenAI, Anthropic, Google, Mistral, and the hosting services that serve open-weight models :  have converged on a similar shape. You send a model identifier, a list of messages, and some generation parameters. You get back generated text plus token usage.</p>
+<p>A typical request body looks close to this:</p>
+<pre><code>{
+  "model": "some-model-identifier",
+  "max_tokens": 1024,
+  "temperature": 0.2,
+  "system": "You are a concise technical assistant.",
+  "messages": [
+    { "role": "user", "content": "Summarize this changelog in three bullets." }
+  ]
+}</code></pre>
+<p>Details vary. Some providers carry the system prompt as a top-level field, others as the first message in the array. Some require max tokens, others default it. Authentication is a bearer token or an API key header in essentially all of them. Use the official SDK rather than raw HTTP where one exists :  it handles retries, streaming, and response parsing that you would otherwise write yourself.</p>
+<p>Four things to get right from the first request:</p>
+<ul>
+  <li><strong>Keep keys server-side.</strong> An API key in client-side JavaScript or a mobile binary is a key someone else will spend. Route calls through your own backend.</li>
+  <li><strong>Handle failure properly.</strong> Rate limits, overload responses, and timeouts are normal operating conditions, not exceptions. Retry with exponential backoff and jitter, and cap the retries.</li>
+  <li><strong>Stream for anything interactive.</strong> Streaming responses arrive token by token over server-sent events. Time-to-first-token is what users perceive as speed, and it is dramatically better than waiting for a complete response.</li>
+  <li><strong>Log usage from the start.</strong> Every response reports input and output token counts. Record them alongside the request so cost attribution exists before you need it, not after a surprising invoice.</li>
+</ul>
+
+<h3>Chat vs. completions endpoints</h3>
+<p>You will meet two API styles, and the distinction is partly historical.</p>
+<p>The older <strong>completions</strong> endpoint takes a single string and continues it. You send raw text, the model appends more text. There are no roles and no conversational structure :  any structure you want, you build by hand inside the prompt string. It maps directly onto what a base model does.</p>
+<p>The <strong>chat</strong> endpoint takes a structured list of messages, each tagged system, user, or assistant, and returns an assistant message. This matches how instruction-tuned models were actually trained, which is why it produces better results on nearly every task. It is also what tool calling, structured output, and multimodal input are built on.</p>
+<p>For new work, use the chat endpoint. Completions endpoints are deprecated or de-emphasized almost everywhere and are only worth reaching for in narrow cases :  raw text continuation, or fill-in-the-middle code completion where a specialized model expects a prefix and suffix rather than a conversation.</p>
+<p>A related distinction worth knowing: several providers now offer a stateful "responses"-style endpoint that retains conversation server-side so you send only the new turn rather than the whole history. It reduces bandwidth and simplifies client code, at the price of storing conversation state with the provider. The stateless chat endpoint remains the portable default.</p>
+
+<h3>Basic conversation memory</h3>
+<p>The model is stateless. It has no recollection of the previous turn. Conversational continuity is an illusion you create by resending the history on every request:</p>
+<pre><code>messages = [
+  { "role": "user",      "content": "What is HNSW?" },
+  { "role": "assistant", "content": "HNSW is a graph-based index for..." },
+  { "role": "user",      "content": "How is it different from IVF?" }
+]</code></pre>
+<p>That second question is only answerable because the first exchange rides along with it. Which means conversation memory is fundamentally a context-budget problem: every turn makes the next request longer, slower, and more expensive, until the history no longer fits.</p>
+<p>Four strategies, in ascending order of sophistication:</p>
+<ul>
+  <li><strong>Sliding window.</strong> Keep the system prompt plus the last N turns and discard the rest. Trivial to implement, and adequate for short task-focused sessions. The failure is abrupt: something said early simply vanishes.</li>
+  <li><strong>Summarization.</strong> When history exceeds a threshold, have the model compress older turns into a running summary and prepend that. Retains the gist at a fraction of the tokens. Details erode with each round of compression, so keep the most recent turns verbatim.</li>
+  <li><strong>Structured state extraction.</strong> Rather than summarizing prose, extract the facts that matter :  user name, chosen plan, open ticket ID :  into a small JSON object injected into the system prompt. Far more token-efficient and far more reliable than hoping a summary preserved the right detail. This is the right answer for most task-oriented assistants.</li>
+  <li><strong>Retrieval over history.</strong> Store past turns, embed them, and fetch only the ones relevant to the current message. This is RAG applied to conversation, and it is how long-lived assistants recall something from weeks ago. Covered in Parts 2 and 3.</li>
+</ul>
+<p>Whichever you choose, count tokens before sending rather than discovering the limit through an error, and keep the system prompt outside whatever gets trimmed.</p>
+
+<h2>Part 2 :  Embeddings and Vector Databases</h2>
+
+<h3>Why embeddings matter</h3>
+<p>An embedding model converts text into a vector :  a list of numbers, typically several hundred to a few thousand long :  positioned so that semantically similar text lands close together. "How do I cancel my plan" and "ending your subscription" share almost no keywords but sit near each other in the space.</p>
+<p>That property is what keyword search cannot give you. Lexical search matches strings; embedding search matches meaning, across synonyms, paraphrase, and often across languages. The applications follow directly: semantic search over documentation, clustering support tickets by theme, deduplicating near-identical catalogue entries, recommending related content, classifying by nearest labelled example, and :  the dominant use :  retrieving relevant passages to feed a generative model.</p>
+<p>Three properties matter operationally. Embedding models are small, fast, and cheap relative to chat models, often by two orders of magnitude. Their output is fixed-length regardless of input length, which is what makes indexing tractable. And vectors from different models are mutually meaningless :  change your embedding model and you must re-embed the entire corpus, so treat that choice as a migration, not a config flag.</p>
+
+<h3>How vector search works</h3>
+<p>Given a query vector, you want the stored vectors closest to it. Closeness is usually <strong>cosine similarity</strong> :  the angle between vectors, which ignores magnitude :  or dot product, which does not. Most embedding models are trained for one or the other; use what the model card specifies.</p>
+<p>Comparing a query against every stored vector is exact but linear in corpus size, which stops being viable in the millions. Production systems therefore use <strong>approximate nearest neighbour</strong> search, trading a small amount of recall for a very large speedup. The dominant index is <strong>HNSW</strong>, a navigable small-world graph: vectors become nodes linked to their neighbours, arranged in layers, and a query descends from a coarse layer to progressively finer ones, following edges that reduce distance. Alternatives include IVF, which partitions the space into clusters and searches only the nearest few, and various quantization schemes that compress vectors to cut memory. HNSW is fast and accurate but memory-hungry :  a practical planning figure is several gigabytes of RAM per million vectors at typical dimensions, so sizing matters before you scale.</p>
+<p>Two refinements that separate a demo from a working system:</p>
+<ul>
+  <li><strong>Metadata filtering.</strong> Real queries are rarely "find similar text" alone :  they are "find similar text where tenant equals this customer and the document is not archived". Filter support, and specifically whether filtering happens before or during the graph traversal, varies significantly between engines and materially affects both correctness and latency.</li>
+  <li><strong>Hybrid search.</strong> Pure vector search is weak precisely where keyword search is strong: exact identifiers, product codes, rare proper nouns, error strings. Hybrid search runs both lexical (BM25 or similar) and vector retrieval and fuses the rankings, commonly with reciprocal rank fusion. For most document corpora this is a larger quality improvement than any amount of prompt tuning, and it is the single most under-used lever in early RAG systems.</li>
+</ul>
+<p>A <strong>reranking model</strong> is the usual final stage: retrieve twenty candidates cheaply, then score each against the query with a small cross-encoder that reads query and document together, and keep the best five. Slower per document, much more accurate, and applied to a short list it costs little.</p>
+
+<h3>Comparing Pinecone, Weaviate, and Chroma</h3>
+<p>These three are the most commonly evaluated stores, and they occupy genuinely different positions. Specific features move quickly, so weigh the shape of each rather than any feature checklist.</p>
+<ul>
+  <li><strong>Pinecone</strong> is fully managed and proprietary, serving from the vendor's cloud with no infrastructure for you to run. Its serverless model removes capacity planning and scales with usage, and it carries the enterprise apparatus :  compliance certifications, uptime commitments, and options for deployment into your own cloud account. Choose it when you want to ship product rather than operate a database, and accept that your vectors live with a vendor and pricing is theirs to set.</li>
+  <li><strong>Weaviate</strong> is open-source with a managed cloud option, and its distinguishing strength is native hybrid search :  vector, keyword, and metadata filtering as one query rather than something you assemble. It runs self-hosted, which matters when data cannot leave your boundary, and it suits enterprise workloads with complex filtering. The cost is operational: you are running a database.</li>
+  <li><strong>Chroma</strong> is developer-first and local-first. It runs embedded in your process with no server at all, which makes it the fastest path from idea to working prototype, and its cloud offering has matured for lightweight production. Choose it for development, notebooks, and small-to-medium workloads; reassess when scale or multi-tenancy grows serious.</li>
+</ul>
+<p>Two options outside the slide deserve mention because they are frequently the correct answer. <strong>pgvector</strong> adds vector search to PostgreSQL, so if you already run Postgres you may need no new system at all :  a compelling position below roughly a hundred million vectors, and it keeps vectors transactionally consistent with the rows they describe. <strong>Qdrant</strong> is a fast Rust-based engine with a strong self-hosted story and good filtered-search performance, often chosen as an open alternative to Pinecone with a lighter operational footprint than Weaviate.</p>
+<p>The honest guidance: at small scale all of these work, and retrieval quality is dominated by your chunking, your embedding model, and whether you use hybrid search :  not by which engine stores the vectors. Prototype on Chroma or pgvector, and choose a production store based on your scale, your compliance constraints, and what your team can actually operate. Migration between them is real work but not exotic; over-engineering the choice on day one is the more common mistake.</p>
+
+<h2>Part 3 :  Retrieval-Augmented Generation</h2>
+
+<h3>The RAG pipeline explained</h3>
+<p>RAG grounds a model in your own documents without retraining anything. It has two phases, and conflating them is a common source of confusion.</p>
+<p><strong>Indexing, done ahead of time:</strong></p>
+<ol>
+  <li><strong>Load.</strong> Pull documents from their sources :  PDFs, wikis, ticket systems, databases. Extraction quality dominates everything downstream; a PDF parser that scrambles table columns guarantees bad answers no matter how good the rest of the pipeline is.</li>
+  <li><strong>Chunk.</strong> Split each document into passages sized for retrieval.</li>
+  <li><strong>Embed.</strong> Convert each chunk to a vector with your embedding model.</li>
+  <li><strong>Store.</strong> Write vectors plus the original text plus metadata (source, section, date, permissions) into your vector store.</li>
+</ol>
+<p><strong>Querying, at request time:</strong></p>
+<ol>
+  <li><strong>Embed the query</strong> with the same model used for indexing.</li>
+  <li><strong>Retrieve</strong> the top candidates, applying metadata filters, ideally via hybrid search.</li>
+  <li><strong>Rerank</strong> the candidates and keep the best few.</li>
+  <li><strong>Assemble the prompt</strong>: system instructions, the retrieved passages clearly delimited and labelled with their sources, then the user's question.</li>
+  <li><strong>Generate</strong>, instructing the model to answer only from the supplied passages, to cite which passage each claim came from, and to say plainly when the passages do not contain the answer.</li>
+</ol>
+<p>When a RAG system gives a bad answer, diagnose in that order. Print the retrieved chunks before blaming the model. In practice the overwhelming majority of RAG failures are retrieval failures :  the right passage was never fetched :  and no amount of prompt refinement fixes a passage that is not in the context.</p>
+<p>Two upgrades worth knowing once the basic loop works. <strong>Query rewriting</strong> uses a cheap model call to turn a conversational follow-up ("what about the enterprise tier?") into a standalone search query, which matters enormously in multi-turn chat. And <strong>contextual retrieval</strong> prepends a short model-generated description of each chunk's place in its parent document before embedding it, which measurably reduces failures caused by chunks that are unintelligible in isolation.</p>
+
+<h3>Chunking strategies</h3>
+<p>Chunking is the highest-leverage and most neglected decision in the pipeline. Too large and a chunk contains mostly irrelevant text, diluting the embedding and wasting context. Too small and it loses the surrounding meaning that made it answerable.</p>
+<ul>
+  <li><strong>Fixed-size with overlap.</strong> Split every N tokens with a 10–20% overlap so a sentence spanning a boundary appears whole in one of them. Crude, universal, and a reasonable baseline :  roughly 300 to 800 tokens per chunk suits most prose.</li>
+  <li><strong>Recursive character splitting.</strong> Split on the largest natural boundary that fits :  paragraphs, then sentences, then words. Respects structure far better than fixed-size at essentially no extra cost. This should be your default.</li>
+  <li><strong>Document-structure-aware.</strong> Split on the document's own skeleton: markdown headings, HTML sections, slide boundaries, function definitions in code. When your corpus has reliable structure, this is clearly best :  and carrying the heading path into each chunk's text ("Billing &gt; Refunds &gt; Partial refunds") sharply improves retrieval.</li>
+  <li><strong>Semantic chunking.</strong> Embed sentences and cut where consecutive sentences diverge in meaning. Elegant, sometimes better on unstructured prose, and meaningfully more expensive to build. Try it only after the simpler options are tuned.</li>
+  <li><strong>Small-to-big (parent-document) retrieval.</strong> Embed and search over small precise chunks, but pass the larger parent section to the model. This resolves the central tension :  small chunks retrieve accurately, large chunks answer completely :  and is one of the highest-return patterns available.</li>
+</ul>
+<p>Some content resists all of this. Tables should be kept intact with their headers repeated, since a table split mid-body becomes unreadable. Code should be split on function or class boundaries. Conversational transcripts often chunk best by speaker turn or topic shift rather than length.</p>
+<p>There is no universally correct chunk size. Build an evaluation set of twenty real questions with known correct sources, then measure retrieval recall across two or three chunking configurations. An afternoon of that beats weeks of intuition.</p>
+
+<h3>Choosing embedding models</h3>
+<p>Judge candidates on five axes:</p>
+<ul>
+  <li><strong>Retrieval quality on your data.</strong> Public benchmarks are a starting filter, not an answer :  they are heavily optimized against and rarely resemble your domain. Take fifty real queries with known correct documents and measure recall at five and ten for each candidate model.</li>
+  <li><strong>Dimensionality.</strong> Larger vectors capture more nuance and cost more in storage, memory, and query time. Several current models support truncating dimensions with graceful quality loss, letting you trade explicitly rather than choosing a model by size.</li>
+  <li><strong>Maximum input length.</strong> Embedding models have their own token limits, often smaller than you expect. Text beyond the limit is truncated silently, which produces a subtly broken index rather than an error.</li>
+  <li><strong>Domain and language fit.</strong> A general model handles general prose well and may do poorly on legal, clinical, or code corpora, or on languages underrepresented in its training. Multilingual models exist specifically for the last case.</li>
+  <li><strong>Hosting and cost.</strong> Hosted APIs are simple and priced per token. Open-weight embedding models are small enough to self-host on modest hardware, which is often the decisive option when documents cannot leave your environment :  and at high volume, cheaper.</li>
+</ul>
+<p>One asymmetric consideration: switching embedding models means re-embedding and re-indexing everything. Weigh that against the cost of staying on a weaker model, and prefer models with a credible maintenance story over whichever one currently tops a leaderboard.</p>
+
+<h2>Part 4 :  Evaluation of LLM Outputs</h2>
+<p>The habit that separates teams shipping reliable LLM features from teams shipping unpredictable ones is systematic evaluation. Reading two or three outputs and forming an impression feels like testing and is close to worthless, because output varies run to run.</p>
+
+<h3>Hallucination detection</h3>
+<p>Hallucination is confident, fluent, false output. In a grounded system there is a sharper and more tractable definition: a claim in the answer that the retrieved passages do not support. That version can be measured.</p>
+<ul>
+  <li><strong>Groundedness checking.</strong> Decompose the answer into individual claims, then check each against the supplied context with a separate model call. The output is a proportion :  what fraction of claims are supported :  which you can track as a metric and alert on.</li>
+  <li><strong>Citation enforcement.</strong> Require the model to attach a source identifier to each claim, then verify programmatically that every identifier exists and that the cited passage actually contains the assertion. Unverifiable citations become a visible failure instead of a silent one.</li>
+  <li><strong>Self-consistency sampling.</strong> Generate the same answer several times at non-zero temperature. Facts the model actually retained stay stable; fabrications vary between runs. Effective, and costs several times the tokens.</li>
+  <li><strong>Uncertainty signals.</strong> Where token log-probabilities are exposed, low confidence across a span correlates loosely with fabrication. A weak signal on its own, useful combined with others.</li>
+  <li><strong>Structural prevention.</strong> Cheaper than detection: supply the source material, permit "I don't know" explicitly, lower the temperature, and keep the answer scoped to what was retrieved.</li>
+</ul>
+<p>Note that a hallucination check is itself a model call and can be wrong. Treat these as instruments with known error bars, not oracles.</p>
+
+<h3>Automatic evaluation</h3>
+<p>Three generations of technique coexist, and knowing which is appropriate matters.</p>
+<p><strong>N-gram overlap metrics :  BLEU and ROUGE.</strong> These predate LLMs. BLEU, from machine translation, measures how much of the generated text's word sequences appear in a reference translation. ROUGE, from summarization, measures the inverse :  how much of the reference appears in the generated text :  with variants for unigrams, bigrams, and longest common subsequence. Both are fast, deterministic, and free. Both are also blind to meaning: a perfect paraphrase using different words scores poorly, and a fluent nonsense answer reusing the reference's vocabulary scores well. They remain reasonable for tasks with tight reference outputs, such as translation or extraction, and are poor proxies for open-ended generation quality. Embedding-based metrics like BERTScore address the paraphrase problem partially by comparing meaning rather than exact tokens.</p>
+<p><strong>RAG-specific frameworks :  RAGAS and its peers.</strong> These decompose a RAG system into components and score each, which is what makes them useful for debugging rather than just grading. The standard dimensions are <em>faithfulness</em> (is the answer supported by the retrieved context), <em>answer relevancy</em> (does it address the question asked), <em>context precision</em> (are the retrieved passages actually relevant), and <em>context recall</em> (did retrieval find everything needed). The last two isolate retrieval from generation, so a poor score tells you which half to fix. Many of these metrics are computed by model calls under the hood, so they cost tokens and carry the judge's own noise.</p>
+<p><strong>LLM-as-judge.</strong> A model scores output against explicit written criteria. This is now the workhorse for open-ended tasks because it is the only automatic method that handles "is this a good explanation for a non-technical reader". It works acceptably for coarse judgements and poorly for fine ones. Known biases are worth designing around: judges favour longer answers, favour text from the same model family, and are sensitive to option ordering in pairwise comparisons. Mitigate with an explicit rubric rather than "rate 1-10", pairwise comparison instead of absolute scoring, position randomization, and periodic calibration of the judge against human labels.</p>
+<p>Alongside all of these, keep the cheap deterministic checks: does the output parse as valid JSON, does it match the schema, is it within length bounds, does it avoid a forbidden-terms list. These catch a surprising share of real failures at zero token cost.</p>
+
+<h3>Human-in-the-loop review</h3>
+<p>Automatic metrics tell you whether something changed. Humans tell you whether it is good. You need both, and the practical question is where to spend scarce human attention.</p>
+<ul>
+  <li><strong>Build a golden set.</strong> Fifty to two hundred representative inputs with human-reviewed ideal outputs or explicit acceptance criteria, including the awkward edge cases. This is the asset your evaluation rests on; it is worth real effort and it should grow every time production surfaces a new failure mode.</li>
+  <li><strong>Review by sampling, not exhaustively.</strong> Once live, sample a small percentage of traffic for human review, stratified so that low-confidence and unusual cases are over-represented rather than reviewing a random slice of easy successes.</li>
+  <li><strong>Capture implicit signals.</strong> Thumbs up and down, copy events, edits users make to generated text, and abandonment all indicate quality at volumes no review panel can match. Edits are especially rich :  the diff tells you exactly what was wrong.</li>
+  <li><strong>Gate high-stakes output.</strong> Where a mistake is expensive :  anything customer-facing, financial, medical, legal, or irreversible :  a person approves before it takes effect. Design the review surface to make approval fast, showing the sources alongside the claim.</li>
+  <li><strong>Close the loop.</strong> Every human correction is a future test case. Feed disagreements back into the golden set and into your judge's calibration.</li>
+</ul>
+<p>Run the whole evaluation suite on every prompt change, model change, and retrieval change, and track scores over time. Regressions should be visible in a dashboard, not discovered by a customer.</p>
+
+<h2>Part 5 :  Prompt Engineering Techniques</h2>
+
+<h3>Structured output prompting</h3>
+<p>Prose is fine for humans; software needs parseable data. Getting reliable JSON out of a model has progressed through three stages, and you should use the strongest one your provider supports.</p>
+<ul>
+  <li><strong>Prompt-only.</strong> Ask for JSON, supply an example, and parse what comes back. It mostly works and fails in irritating ways :  a markdown code fence around the JSON, an explanatory sentence before it, a trailing comma, a hallucinated extra field.</li>
+  <li><strong>JSON mode.</strong> A provider flag constraining the output to syntactically valid JSON. It guarantees parseability but not <em>your</em> shape :  you still get valid JSON with wrong field names if the prompt is vague.</li>
+  <li><strong>Schema-constrained generation.</strong> You supply a JSON Schema and the decoder is restricted at each step to tokens that keep the output conformant. This guarantees structure, including required fields, enums, and types. Where available it is strictly better, and it makes downstream parsing code straightforward rather than defensive.</li>
+</ul>
+<p>Practical notes regardless of mechanism. Name fields descriptively, because field names are part of the prompt and <code>refund_reason_category</code> steers the model better than <code>field3</code>. Prefer flat schemas; deep nesting degrades reliability. Use enums to constrain classification rather than hoping for consistent free text. Provide an explicit representation for absence :  null, or an "unknown" enum member :  or the model will invent plausible values to fill required fields. And always validate after parsing: schema conformance does not mean semantic correctness.</p>
+
+<h3>Tools and function calling</h3>
+<p>Tool calling lets the model reach outside its own text. You describe available functions with a name, a description, and a parameter schema. The model, when it judges a call useful, returns a structured request naming the function and its arguments. Your code executes it :  the model never does :  and returns the result as a tool-result message. The model continues with that result in context.</p>
+<p>The loop, concretely: send messages plus tool definitions; receive either a final answer or a tool-use request; if a request, execute it, append both the request and its result to the message list, and send again; repeat until the model answers.</p>
+<p>This is the mechanism underneath essentially every genuinely useful LLM feature: live data lookups, database queries, exact arithmetic via a calculator or code interpreter, and actions in real systems. Design guidance that saves real debugging time:</p>
+<ul>
+  <li><strong>The description is the prompt.</strong> Tool selection is driven almost entirely by name and description quality. Say what the tool does, when to use it, and when not to.</li>
+  <li><strong>Keep the toolset small.</strong> Selection accuracy degrades as the count grows. Past roughly a dozen or two, group tools and expose only the relevant subset for the task at hand.</li>
+  <li><strong>Return errors as text the model can act on.</strong> "No customer found with that ID; try searching by email" is useful. A raw stack trace is not.</li>
+  <li><strong>Validate arguments before executing.</strong> The model produces plausible arguments, not guaranteed-valid ones. Never pass them into a query, a shell, or a filesystem path unchecked.</li>
+  <li><strong>Separate read from write.</strong> Reads can run freely. Writes, payments, deletions, and sends should require confirmation, a policy check, or a human, because a model that can act can act wrongly.</li>
+  <li><strong>Mind prompt injection.</strong> If a tool returns untrusted content :  a web page, an email, an uploaded document :  instructions hidden in it may be followed. Never let retrieved content authorize a privileged action.</li>
+</ul>
+<p>The Model Context Protocol has emerged as a standard for exposing tools to models across vendors, which is worth knowing about if you are building tools that several applications will share.</p>
+
+<h3>Chain-of-thought prompting</h3>
+<p>Asking a model to reason step by step before answering improves accuracy on multi-step problems, because each intermediate step becomes context for the next. Compressing a hard problem into a single answer token gives the model no room to work.</p>
+<p>Variants in ascending cost:</p>
+<ul>
+  <li><strong>Zero-shot chain of thought.</strong> Append an instruction to work through it step by step. Nearly free, often effective.</li>
+  <li><strong>Few-shot chain of thought.</strong> Provide worked examples that show the reasoning, not just the answers. The model imitates the reasoning style, which is the point.</li>
+  <li><strong>Self-consistency.</strong> Sample several reasoning paths at moderate temperature and take the majority answer. A solid accuracy gain on arithmetic and logic, at several times the cost.</li>
+  <li><strong>Decomposition.</strong> Break the problem into explicit sub-questions answered in sequence, each feeding the next. More controllable and more debuggable than one long chain, because you can inspect and test each stage.</li>
+</ul>
+<p>Three cautions. Reasoning-tuned models do this internally and may perform <em>worse</em> when you also push hard on explicit chain-of-thought prompting :  check the provider's guidance rather than assuming. Visible reasoning consumes output tokens, which is the expensive side of the bill, so keep it off simple tasks. And reasoning text is not a faithful audit trail: a model can produce sound-looking steps and a wrong answer, or the right answer through invalid steps. Useful for accuracy, not to be presented to users as an explanation of how the conclusion was reached.</p>
+<p>When you need the reasoning without showing it, ask for the working inside a delimited block followed by the final answer in a separate field, and strip the block before display.</p>
+
+<h2>Part 6 :  Building Agents</h2>
+<p>An agent is a model given a goal, a set of tools, and a loop in which it decides what to do next, observes the result, and continues until the task is done. The step up from a single tool call is autonomy :  the model, not your code, chooses the sequence.</p>
+
+<h3>Tools, actions, and planning</h3>
+<p>Three components, each with its own failure modes.</p>
+<p><strong>Tools</strong> are the agent's capabilities, defined exactly as in Part 5. For agents specifically, granularity matters: a few well-designed composite tools outperform many fine-grained ones, because every additional step is another chance to go wrong. Tools should be idempotent where possible, since agents retry.</p>
+<p><strong>Actions</strong> are executions of those tools, and this is where agents stop being a prompt engineering exercise. An agent that can send email, modify records, or spend money needs boundaries that are enforced in your code rather than requested in the prompt: allowlists of permitted operations, spending and rate caps, hard step limits to stop runaway loops, dry-run modes, and approval gates on anything destructive or irreversible. Frameworks orchestrate behaviour; none of them enforces policy for you.</p>
+<p><strong>Planning</strong> is how the agent decides the sequence. Two broad approaches. <em>Plan-then-execute</em> has the model draft a full plan upfront and work through it :  predictable, auditable, cheaper, and brittle when reality diverges from the plan. <em>Interleaved</em> planning decides the next step after each observation :  adaptive, recovers from surprises, and prone to drift and loops. Hybrids are common: an upfront plan with explicit replanning when a step fails.</p>
+<p>Also give the agent a way to finish. Define what done looks like, a hard cap on steps, and a path to escalate to a human. Agents that cannot recognize completion will keep going.</p>
+
+<h3>Agent frameworks</h3>
+<p>Frameworks supply the loop, state management, tool plumbing, and tracing you would otherwise build. The landscape consolidated noticeably through 2025 and 2026, so check current status rather than trusting older tutorials.</p>
+<ul>
+  <li><strong>LangChain and LangGraph.</strong> LangChain remains the broadest integration ecosystem :  model providers, vector stores, loaders, and evaluators :  and is the most widely adopted by a wide margin. For agents specifically, LangGraph is now the recommended path within that ecosystem: it models the agent as an explicit state graph with cycles, giving durable state, checkpointing, and first-class human-in-the-loop interrupts instead of an opaque loop. LangSmith provides the tracing and evaluation layer. The trade-off is surface area; the abstractions are extensive and take time to learn well.</li>
+  <li><strong>Semantic Kernel and Microsoft Agent Framework.</strong> Semantic Kernel was Microsoft's LLM orchestration SDK, notable for multi-language support and fitting .NET and Azure environments. It has since been consolidated with AutoGen into <strong>Microsoft Agent Framework</strong>, which reached general availability with graph-based workflows and Python and .NET runtimes. If you are on the Microsoft stack, that is now the path; Semantic Kernel documentation you find online may predate the consolidation.</li>
+  <li><strong>LlamaIndex.</strong> Strongest where the agent is a knowledge worker over your data. Its document parsing, indexing, and retrieval primitives are its core investment, and its event-driven workflow layer handles document-heavy agentic pipelines. Choose it when retrieval quality over a large corpus is the hard part of your problem.</li>
+</ul>
+<p>Two further notes. Model providers now ship their own lighter agent SDKs, and a visible strand of opinion holds that these plus the Model Context Protocol are displacing heavyweight frameworks for straightforward use cases :  MCP in particular standardizes tool exposure across vendors, which removes a large part of what frameworks were needed for. And for a single-agent loop with three tools, no framework at all is a legitimate and often superior choice: the loop is about thirty lines, and you keep full visibility into what is happening. Reach for a framework when you need durable state, multi-agent coordination, checkpointing, or the tracing infrastructure.</p>
+
+<h3>Common agent patterns</h3>
+<ul>
+  <li><strong>ReAct (reason + act).</strong> The foundational pattern: the model alternates between a reasoning step and an action, observing each result before deciding the next move. Simple, general, and the basis of most agent implementations, whether or not they use the name. Its weakness is drift on long tasks :  without periodic re-anchoring to the original goal, agents wander.</li>
+  <li><strong>Autonomous goal-seeking loops.</strong> The AutoGPT-style pattern :  give a high-level objective and let the system generate and pursue its own subtasks indefinitely :  was enormously influential in demonstrating what agents could be, and proved unreliable in production. Long unsupervised loops accumulate errors, spiral in cost, and get stuck. The field has moved toward bounded, checkpointed, and supervised designs. Know the pattern; do not build on it unsupervised.</li>
+  <li><strong>Plan-and-execute.</strong> Decompose into an explicit plan, then execute the steps, replanning on failure. More predictable and cheaper than open-ended looping, and much easier to audit.</li>
+  <li><strong>Reflection.</strong> The agent critiques its own output against the goal and revises. A meaningful quality gain on writing and code, with diminishing returns after one or two rounds :  and a separate critic instance with explicit criteria works better than asking a model to grade itself informally.</li>
+  <li><strong>Multi-agent.</strong> Specialized agents with distinct roles and tools, coordinated by a supervisor or by handoffs. Genuinely useful when subtasks need different tools or contexts, and often just an expensive way to add latency and failure modes when a single agent would do. Try one agent first.</li>
+  <li><strong>Human-in-the-loop checkpoints.</strong> The agent pauses at defined points for approval before proceeding. The most important production pattern on this list, and the one most often skipped.</li>
+</ul>
+<p>Start narrow. A single agent, three tools, a tight scope, a step cap, and full tracing will teach you more than an ambitious multi-agent system that fails in ways you cannot diagnose.</p>
+
+<h2>Putting It Together</h2>
+<p>A realistic build order for an intermediate project, each step producing something that works:</p>
+<ol>
+  <li>A single API call behind your own backend endpoint, with streaming, retries, and token logging.</li>
+  <li>Multi-turn conversation with a sliding window, then structured state extraction when the window starts hurting.</li>
+  <li>Embed a modest document set into Chroma or pgvector and build semantic search over it :  no generation yet, just retrieval you can inspect.</li>
+  <li>Wrap retrieval in a RAG loop with source citation and an explicit "not in the documents" path.</li>
+  <li>Build a golden set of fifty questions with known sources. Measure retrieval recall. Fix chunking until it stops being the bottleneck.</li>
+  <li>Add hybrid search and a reranker. Re-measure :  this is usually the largest single quality jump.</li>
+  <li>Add structured output and one tool call. Validate everything the model produces.</li>
+  <li>Add an agent loop only when a task genuinely requires multiple dependent steps, with a step cap and tracing from the first run.</li>
+</ol>
+<p>Instrument throughout: log every prompt, response, retrieved chunk, tool call, and token count. When something goes wrong in an LLM system, the trace is the only thing that tells you where.</p>
+
+<h2>Glossary</h2>
+<ul>
+  <li><strong>ANN</strong> :  approximate nearest neighbour search; trades exactness for speed at scale.</li>
+  <li><strong>HNSW</strong> :  hierarchical navigable small world, the dominant graph-based vector index.</li>
+  <li><strong>Hybrid search</strong> :  combining keyword (BM25) and vector retrieval, fusing the rankings.</li>
+  <li><strong>Reranker</strong> :  a cross-encoder that rescores retrieved candidates against the query.</li>
+  <li><strong>RAG</strong> :  retrieval-augmented generation; retrieving passages and supplying them as context.</li>
+  <li><strong>Chunking</strong> :  splitting documents into retrieval-sized passages.</li>
+  <li><strong>Small-to-big retrieval</strong> :  searching over small chunks but passing the larger parent section to the model.</li>
+  <li><strong>Query rewriting</strong> :  converting a conversational follow-up into a standalone search query.</li>
+  <li><strong>Groundedness / faithfulness</strong> :  whether an answer's claims are supported by the retrieved context.</li>
+  <li><strong>BLEU / ROUGE</strong> :  n-gram overlap metrics from translation and summarization; meaning-blind.</li>
+  <li><strong>RAGAS</strong> :  a RAG evaluation framework scoring faithfulness, answer relevancy, context precision and recall.</li>
+  <li><strong>LLM-as-judge</strong> :  using a model to score output against written criteria.</li>
+  <li><strong>Golden set</strong> :  a curated set of inputs with known-good outputs, used as a regression suite.</li>
+  <li><strong>JSON mode / schema-constrained generation</strong> :  provider features forcing output to valid JSON or a supplied schema.</li>
+  <li><strong>Function calling / tool use</strong> :  the model requesting execution of a described function, with your code executing it.</li>
+  <li><strong>MCP</strong> :  Model Context Protocol, a standard for exposing tools to models across vendors.</li>
+  <li><strong>Chain of thought</strong> :  prompting the model to reason step by step before answering.</li>
+  <li><strong>Self-consistency</strong> :  sampling multiple reasoning paths and taking the majority answer.</li>
+  <li><strong>ReAct</strong> :  the reason-then-act agent loop.</li>
+  <li><strong>Prompt injection</strong> :  hidden instructions in untrusted input being followed by the model.</li>
+</ul>
+
+<h2>Frequently Asked Questions</h2>
+<h3>Should I use the chat endpoint or the completions endpoint?</h3>
+<p>Use the chat endpoint for all new work. It matches how instruction-tuned models were trained and is the basis for tool calling, structured output, and multimodal input. Completions endpoints are deprecated or de-emphasized almost everywhere.</p>
+<h3>How do I give an LLM conversation memory?</h3>
+<p>Resend the conversation history with each request, since the model is stateless. Manage growth with a sliding window, periodic summarization, structured extraction of key facts into the system prompt, or retrieval over past turns for long-lived assistants.</p>
+<h3>Which vector database should I choose?</h3>
+<p>Pinecone for fully managed zero-ops production, Weaviate for native hybrid search and self-hosting, Chroma for local development and lightweight production. Consider pgvector if you already run PostgreSQL, or Qdrant for fast self-hosted deployment. Retrieval quality depends far more on chunking, embedding model, and hybrid search than on which engine you pick.</p>
+<h3>Why is my RAG system giving wrong answers?</h3>
+<p>Check retrieval before blaming the model. Print the chunks that were actually retrieved for the failing query. Most RAG failures are retrieval failures :  the right passage was never fetched :  and prompt changes cannot fix a passage that is absent from the context.</p>
+<h3>What chunk size should I use for RAG?</h3>
+<p>Start with recursive splitting on natural boundaries at roughly 300 to 800 tokens with 10–20% overlap, and split on document structure where reliable structure exists. Then measure retrieval recall on real questions across a few configurations, because there is no universally correct size.</p>
+<h3>Are BLEU and ROUGE useful for evaluating LLM output?</h3>
+<p>Only for tasks with tight reference outputs, such as translation or extraction. Both measure n-gram overlap and are blind to meaning, so a correct paraphrase scores poorly. For open-ended generation, use RAG-specific metrics, LLM-as-judge with an explicit rubric, or human review.</p>
+<h3>Is Semantic Kernel still current?</h3>
+<p>Semantic Kernel has been consolidated with AutoGen into Microsoft Agent Framework, which reached general availability with graph-based workflows and Python and .NET runtimes. For Microsoft-stack projects that is now the path, and older Semantic Kernel tutorials may predate the change.</p>
+<h3>Do I need an agent framework?</h3>
+<p>Not for a single-agent loop with a few tools :  that is roughly thirty lines of code, and writing it yourself keeps full visibility. Reach for a framework when you need durable state, checkpointing, multi-agent coordination, or production tracing and evaluation infrastructure.</p>
+<h3>Why do autonomous agent loops fail in production?</h3>
+<p>Errors compound across steps, costs escalate quietly, and agents get stuck repeating actions or drift from the original goal. Bounded designs with step caps, explicit completion criteria, checkpointing, and human approval on consequential actions are substantially more reliable than open-ended autonomy.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-advanced-tutorial.html">Llm Advanced Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-enterprise-tutorial.html">Llm Enterprise Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-intermediate-tutorial.html">Llm Intermediate Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-tutorial-for-beginners.html">Llm Tutorial For Beginners</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs Flywheel for Data Products </p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Data Knobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+</body></html>

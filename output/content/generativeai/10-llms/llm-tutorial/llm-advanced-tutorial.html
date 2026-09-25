@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>LLM Advanced Tutorial: Production RAG, Fine-Tuning, Monitoring and Multimodal Apps</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="Advanced LLM tutorial: production-ready RAG, fine-tuning with LoRA and QLoRA, observability and safety, JSON extraction pipelines, and multimodal AI apps." name="description"/>
+  <meta content="index, follow" name="robots"/>
+
+  <link href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" rel="icon"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  
+    <link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --violet: #7c3aed;
+      --violet-dark: #5b21b6;
+      --indigo: #4338ca;
+      --hero-a: #4c1d95;
+      --hero-b: #7c3aed;
+      --hero-c: #4338ca;
+      --footer: #1e293b;
+      --footer-text: #cbd5e1;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 50px rgba(15, 23, 42, 0.14);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+      height: auto;
+    }
+
+    a {
+      color: var(--violet);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .site-header-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand img {
+      height: 44px;
+      width: auto;
+    }
+
+    .brand-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .site-nav a {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #475569;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav a:hover {
+      color: var(--violet);
+      text-decoration: none;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: linear-gradient(135deg, var(--hero-a), var(--hero-b), var(--hero-c));
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.10), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(255,255,255,0.10), transparent 25%),
+        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.07), transparent 30%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      padding: 72px 0 82px;
+      display: grid;
+      gap: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.10);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 960px;
+      font-size: clamp(2.3rem, 5vw, 4.4rem);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-desc {
+      max-width: 900px;
+      font-size: 1.08rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.92);
+      white-space: pre-line;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .hero-tag {
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.95);
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .section {
+      padding: 72px 0;
+    }
+
+    .section-soft {
+      background: linear-gradient(to bottom, #f8fafc, #ffffff);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header {
+      max-width: 860px;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      line-height: 1.14;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .section-intro {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+
+    .gallery-grid {
+      display: grid;
+      gap: 28px;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .gallery-item a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      background: white;
+    }
+
+    .caption {
+      padding: 18px 22px 24px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #334155;
+      letter-spacing: 0.02em;
+    }
+
+    .article-wrap {
+      margin-top: 46px;
+      border-top: 1px solid var(--border);
+      padding-top: 34px;
+    }
+
+    .article-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+    }
+
+    .article-content {
+      color: #334155;
+      font-size: 1.03rem;
+      line-height: 1.85;
+      overflow-wrap: anywhere;
+    }
+
+    .article-content h2,
+    .article-content h3,
+    .article-content h4 {
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-top: 1.6em;
+      margin-bottom: 0.65em;
+    }
+
+    .article-content h2 {
+      font-size: 1.9rem;
+      font-weight: 800;
+    }
+
+    .article-content h3 {
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .article-content h4 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .article-content p,
+    .article-content ul,
+    .article-content ol,
+    .article-content blockquote,
+    .article-content table {
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+
+    .article-content ul,
+    .article-content ol {
+      padding-left: 1.4em;
+    }
+
+    .article-content li + li {
+      margin-top: 0.45em;
+    }
+
+    .article-content blockquote {
+      margin-left: 0;
+      padding: 14px 18px;
+      border-left: 4px solid #c4b5fd;
+      background: #f5f3ff;
+      border-radius: 12px;
+      color: #4c1d95;
+    }
+
+    .article-content code {
+      background: #f1f5f9;
+      padding: 0.15em 0.35em;
+      border-radius: 6px;
+      font-size: 0.92em;
+    }
+
+    .article-content pre {
+      overflow-x: auto;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 14px;
+    }
+
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+    }
+
+    .article-content th,
+    .article-content td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .article-content th {
+      background: #f8fafc;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .cta-band {
+      margin-top: 44px;
+      padding: 28px;
+      border: 1px solid #ddd6fe;
+      background: linear-gradient(135deg, #faf5ff, #ffffff, #eef2ff);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .cta-band h3 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+      line-height: 1.2;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .cta-band p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .site-footer {
+      background: var(--footer);
+      color: var(--footer-text);
+      margin-top: 0;
+    }
+
+    .footer-inner {
+      padding: 48px 0 34px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 30px;
+    }
+
+    .footer-col h4 {
+      margin: 0 0 14px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .footer-col p,
+    .footer-col li {
+      font-size: 0.95rem;
+      color: var(--footer-text);
+      line-height: 1.8;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-col li + li {
+      margin-top: 6px;
+    }
+
+    .footer-col a {
+      color: var(--footer-text);
+    }
+
+    .footer-col a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(148, 163, 184, 0.22);
+      margin-top: 30px;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+      color: #94a3b8;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: #94a3b8;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    @media (min-width: 900px) {
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 899px) {
+      .site-nav {
+        display: none;
+      }
+
+      .hero-inner {
+        padding: 56px 0 64px;
+      }
+
+      .section {
+        padding: 56px 0;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .brand-text {
+        font-size: 1rem;
+      }
+
+      .article-card,
+      .cta-band {
+        padding: 22px;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="brand">
+        <a aria-label="Dataknobs Home" href="https://www.dataknobs.com/">
+          <img alt="Dataknobs" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"/>
+        </a>
+        <div class="brand-text">Dataknobs</div>
+      </div>
+
+      <nav aria-label="Primary navigation" class="site-nav">
+        <a href="#slides">Slides</a>
+        <a href="#article">Article</a>
+        <a href="https://www.dataknobs.com/use-cases/">Use Cases</a>
+        <a href="https://www.dataknobs.com/data-products/">Data Products</a>
+        <a href="https://www.dataknobs.com/search.html">Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="eyebrow">Dataknobs Visual Storytelling</div>
+
+      <h1>LLM Advanced Tutorial: Production RAG, Fine-Tuning, Monitoring and Multimodal Apps</h1>
+
+      <div class="hero-desc">Advanced LLM tutorial: production-ready RAG, fine-tuning with LoRA and QLoRA, observability and safety, JSON extraction pipelines, and multimodal AI apps.</div>
+
+      <div class="hero-tags">
+        <div class="hero-tag">Slides as Web Pages</div>
+        <div class="hero-tag">SEO-Friendly Content</div>
+        <div class="hero-tag">Structured Visual Knowledge</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-soft" id="slides">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-kicker">Slides</div>
+        <h2 class="section-title">Visual walkthrough</h2>
+        <div class="section-intro">
+          Browse the slides below. Each image can be opened directly for a larger view.
+        </div>
+      </div>
+
+      <div class="gallery-grid">
+        <section class="gallery-item">
+  <a href="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1200/llm-tutorial-3.png" rel="noopener" target="_blank">
+    <img alt="Slide titled LLM Advance Topics showing five columns: build production ready RAG, fine tuning and customizing models, evaluating and monitoring LLM apps, JSON extraction pipelines, and building multi model AI apps" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1200/llm-tutorial-3.png"/>
+  </a>
+  <div class="caption">The five advanced LLM topics covered in this tutorial.</div>
+</section>
+      </div>
+
+      <div class="cta-band">
+        <h3>LLM Advanced Tutorial: Production RAG, Fine-Tuning, Monitoring and Multimodal Apps</h3>
+        <p>
+          
+        </p>
+      </div>
+
+      <div class="article-wrap" id="article">
+        <div class="section-header">
+          <div class="section-kicker">Article</div>
+          <h2 class="section-title">Detailed explanation</h2>
+          <div class="section-intro">
+            The content below expands on the slides with structured HTML article content.
+          </div>
+        </div>
+
+        <div class="article-card">
+          <div class="article-content">
+            <p class="lede">Intermediate material gets a system working. This tutorial is about the gap between working and production :  the part where latency budgets, unit economics, telemetry, schema guarantees, and failure recovery decide whether a feature survives contact with real traffic. It covers five areas: hardening a RAG system for scale, fine-tuning and customizing models, evaluating and monitoring live applications, building extraction pipelines that produce trustworthy structured data, and assembling multimodal applications from OCR, vision, and voice components. It assumes you have built a working RAG prototype and understand tool calling, chunking, and evaluation basics.</p>
+
+<h2>Part 1 :  Building Production-Ready RAG</h2>
+<p>A RAG demo and a production RAG system differ less in architecture than in everything surrounding it: how documents get in and stay current, what the pipeline costs per query, and how much of that work can be avoided entirely.</p>
+
+<h3>Indexing large document sets</h3>
+<p>At a thousand documents, indexing is a script. At ten million chunks it is a pipeline with its own operational surface, and the decisions below are expensive to reverse.</p>
+<ul>
+  <li><strong>Make ingestion incremental.</strong> Full re-indexing stops scaling almost immediately. Hash each source document's content and store the hash alongside its chunks; on each run, re-process only what changed and delete chunks belonging to removed documents. Without deletion handling, your index slowly fills with answers to questions about material that no longer exists.</li>
+  <li><strong>Treat extraction as the quality ceiling.</strong> Everything downstream inherits the parser's mistakes. Scanned PDFs need OCR, multi-column layouts need reading-order reconstruction, and tables need structure-preserving extraction rather than flattened text. Budget real effort here: it typically has a larger effect on answer quality than any model choice in the stack.</li>
+  <li><strong>Carry metadata from the start.</strong> Source, title, section path, author, timestamp, language, and :  critically :  access control identifiers. Retrofitting permissions onto an index that lacks them means a full rebuild, and a retrieval system that returns documents a user is not entitled to see is a data breach with extra steps. Filter by permission at query time, in the vector store, not after retrieval.</li>
+  <li><strong>Batch and parallelize embedding.</strong> Embedding APIs accept batches; per-item calls waste most of the available throughput. Run a bounded worker pool, respect rate limits with backoff, and checkpoint progress so a failure at 80% does not restart from zero. For very large corpora, self-hosting a small embedding model on a GPU is often far cheaper than an API.</li>
+  <li><strong>Separate the write path from the read path.</strong> Bulk index builds compete with query traffic for memory and CPU. Build into a new index or namespace, verify it, then switch reads over atomically. This also gives you a rollback when a re-index degrades quality.</li>
+  <li><strong>Plan memory before you need it.</strong> Graph indexes such as HNSW hold vectors in RAM, and at typical dimensions a few million vectors is already tens of gigabytes. Quantization and dimension truncation trade a little recall for large memory savings; measure the recall cost on your own queries rather than accepting a vendor's benchmark.</li>
+  <li><strong>Isolate tenants deliberately.</strong> Multi-tenant systems need either per-tenant namespaces or a hard metadata filter applied server-side on every query. Relying on application code to remember the filter is a leak waiting for its first bug.</li>
+</ul>
+<p>Version your index alongside the configuration that produced it :  embedding model, chunking parameters, extraction version. When quality regresses, the first question is what changed in the pipeline, and without versioning that question has no answer.</p>
+
+<h3>Latency and cost optimization</h3>
+<p>Start by measuring where the time and money actually go. A typical RAG request decomposes into query embedding, vector search, reranking, prompt assembly, and generation. Generation usually dominates both budgets, but not always :  an unoptimized reranker over fifty candidates, or a synchronous chain of model calls for query rewriting, can quietly become the bottleneck.</p>
+<p><strong>Latency levers, roughly in order of return:</strong></p>
+<ul>
+  <li><strong>Stream the response.</strong> Time to first token is what users experience as speed. A streamed answer beginning in 400ms feels faster than a complete one delivered in 2s, even though the latter finished sooner.</li>
+  <li><strong>Parallelize independent work.</strong> Query embedding, metadata lookups, and permission checks can run concurrently. Anything not on the critical path should not be on the critical path.</li>
+  <li><strong>Shrink the rerank pool.</strong> Reranking is a cross-encoder pass per candidate. Retrieve fifty and rerank fifty and you have bought accuracy with latency; retrieving twenty and reranking twenty is usually indistinguishable in quality.</li>
+  <li><strong>Cut context length.</strong> Prefill time scales with input tokens. Passing eight passages when three suffice costs latency on every request and often reduces answer quality through dilution.</li>
+  <li><strong>Route by difficulty.</strong> Send simple classification and routing decisions to a small fast model; reserve the frontier model for the generation that actually needs it. This is simultaneously the largest latency and cost lever available.</li>
+  <li><strong>Cap output length.</strong> Generation is sequential, so output tokens translate almost linearly into wall-clock time. An instruction to answer in under 150 words is a latency optimization.</li>
+  <li><strong>Move work off the request path.</strong> Query rewriting, summarization of history, and safety scoring can often run asynchronously, speculatively, or on the previous turn.</li>
+</ul>
+<p><strong>Cost levers</strong> overlap heavily. Model routing dominates. Beyond it: trim fixed prompt overhead, since a long system prompt and five few-shot examples are billed on every request forever; constrain output, which is the expensive side of the ledger; batch non-interactive work through a provider's batch API where available, often at a substantial discount; and self-host the small, high-volume components :  embedding and reranking especially :  where unit economics favour it.</p>
+<p>Instrument cost per request, not just aggregate spend. Cost per resolved ticket or per document processed is the number that tells you whether the feature is economically viable; a monthly total tells you only that it is expensive.</p>
+
+<h3>Caching strategies</h3>
+<p>The cheapest model call is the one you do not make. Four distinct caches operate at different layers, and mature systems use all of them.</p>
+<ul>
+  <li><strong>Exact-match response cache.</strong> Hash the fully assembled prompt and store the response. Trivially correct, zero risk of semantic drift, and effective wherever traffic repeats :  FAQ-style queries, retries, and automated callers. Key on everything that affects output, including model identifier, temperature, and retrieved context, or you will serve responses generated under different conditions.</li>
+  <li><strong>Semantic cache.</strong> Embed the incoming query and return a cached answer when an earlier query is close enough. This catches paraphrase, which exact matching misses entirely, and it introduces a genuine correctness risk: "how do I upgrade my plan" and "how do I downgrade my plan" are semantically adjacent and have opposite answers. Set the similarity threshold conservatively, scope caches per tenant and per permission set, and never apply semantic caching to queries whose answers depend on time or user state.</li>
+  <li><strong>Prompt (prefix) caching.</strong> Providers cache the processed prefix of a prompt, so a large fixed system prompt, tool definitions, or a stable document reused across requests is billed and computed at a steep discount on subsequent calls. This is often the single highest-return optimization available and requires only that you structure prompts with the stable content first and the variable content last. Cache entries expire after minutes, so it rewards steady traffic.</li>
+  <li><strong>Component caches.</strong> Embeddings for unchanged text, retrieval results for repeated queries, reranker scores for a query-document pair, and parsed document structures are all deterministic given their inputs and worth caching independently of the generation layer.</li>
+</ul>
+<p>Invalidation is where caches turn into bugs. Tie cache keys to the versions of everything upstream :  index version, prompt version, model identifier :  so that a deployment invalidates naturally rather than serving yesterday's answers from today's system. Track hit rate as a first-class metric: a cache nobody measures is a cache nobody knows has stopped working.</p>
+
+<h2>Part 2 :  Fine-Tuning and Customizing Models</h2>
+<p>Before anything in this section: fine-tuning is the third thing to try, not the first. Prompt engineering is free and immediate. RAG handles knowledge, which changes. Fine-tuning handles <em>behaviour</em> :  consistent format, domain tone, a classification boundary the model keeps getting wrong, or compressing a long elaborate prompt into a small fast model. Fine-tuning to teach facts is the classic expensive mistake: the facts go stale, the model states them confidently anyway, and you cannot update them without retraining.</p>
+
+<h3>Prompt-based fine-tuning and instruction tuning</h3>
+<p>Supervised fine-tuning takes a base or instruct model and trains it further on your own prompt-and-completion pairs. The model learns to produce your kind of output for your kind of input. Format the training data exactly as production requests will arrive :  same system prompt, same message structure, same delimiters :  because a mismatch between training and serving format is the most common cause of a fine-tune that performs worse than the model it started from.</p>
+<p>What fine-tuning reliably buys you:</p>
+<ul>
+  <li><strong>Format adherence</strong> without a long instruction block, so output shape becomes a property of the model rather than something re-negotiated each request.</li>
+  <li><strong>Domain voice and conventions</strong> that are tedious to specify and easy to demonstrate.</li>
+  <li><strong>Cost and latency collapse</strong> :  a small tuned model matching a large prompted one on a narrow task, often at a fraction of the price. This is frequently the real business case.</li>
+  <li><strong>Edge-case behaviour</strong> that prompting keeps failing on, taught by example instead of by rule.</li>
+</ul>
+<p>Beyond supervised tuning, <strong>preference tuning</strong> methods such as DPO train on pairs of better and worse responses rather than single correct answers. They suit subjective qualities :  helpfulness, tone, refusal behaviour :  where you can more easily say which of two outputs is better than write the ideal one. They need preference data, which is a heavier collection effort.</p>
+<p>Always hold out a test set before training, and always compare against a well-engineered prompt on the base model. A fine-tune that does not beat a good prompt is a maintenance burden you have chosen to take on.</p>
+
+<h3>LoRA and QLoRA</h3>
+<p>Full fine-tuning updates every parameter, which requires memory for the weights, their gradients, and optimizer state :  in practice many times the model's own size, putting it out of reach for most teams on anything but small models.</p>
+<p><strong>LoRA</strong> (low-rank adaptation) sidesteps this. It freezes the original weights and injects small trainable matrices alongside selected layers, exploiting the observation that the weight update needed for adaptation has low intrinsic rank. Typically well under 1% of parameters are trained. The consequences are practical:</p>
+<ul>
+  <li>Memory requirements fall dramatically, bringing meaningful models within reach of a single GPU.</li>
+  <li>The resulting adapter is small :  megabytes, not gigabytes :  so you can store many, and serve multiple adapters against one shared base model, swapping per request. This makes per-customer or per-task customization economically sane.</li>
+  <li>Adapters can be merged into the base weights for deployment when you prefer a single artifact with no inference overhead.</li>
+</ul>
+<p>Two hyperparameters matter most: the <strong>rank</strong>, which sets adapter capacity (low ranks suffice for style and format; raise it for genuinely new behaviour), and the <strong>scaling factor</strong>, commonly set to a small multiple of the rank. Which layers receive adapters also matters :  attention projections are the usual target, and extending to the feed-forward layers helps on harder adaptations at some extra cost.</p>
+<p><strong>QLoRA</strong> goes further by quantizing the frozen base model to 4-bit precision while training the adapters in higher precision, with the base dequantized on the fly during computation. Memory drops far enough that models which would otherwise demand a multi-GPU node fit on a single consumer or workstation card. The costs are modest but real: training is slower because of dequantization overhead, and quality sits very close to LoRA but not always identically. For most teams QLoRA is what makes fine-tuning possible at all, and the right default when hardware is the binding constraint.</p>
+<p>Operationally, remember that serving a quantized base with an adapter is a different deployment from serving merged full-precision weights, and evaluate the configuration you will actually ship rather than the one you trained on.</p>
+
+<h3>Dataset creation best practices</h3>
+<p>Dataset quality dominates every other choice in fine-tuning. A thousand carefully constructed examples routinely beat fifty thousand scraped ones.</p>
+<ul>
+  <li><strong>Start smaller than you think.</strong> For format and style adaptation, a few hundred to a few thousand high-quality examples is often sufficient. Build a small set, train, evaluate, and let the measured gap tell you whether more data is the answer :  frequently the answer is better data, not more.</li>
+  <li><strong>Match production distribution.</strong> Your training inputs should look like real traffic, including the messy, ambiguous, and adversarial cases. A dataset of clean examples produces a model that is confident and wrong on everything else.</li>
+  <li><strong>Enforce consistency ruthlessly.</strong> Inconsistent labels or formats teach inconsistency, and the model will reproduce your dataset's contradictions faithfully. Write an explicit annotation guideline, and measure agreement between annotators before scaling up.</li>
+  <li><strong>Balance and deduplicate.</strong> Over-represented classes bias output. Near-duplicate examples inflate the count without adding signal and encourage memorization.</li>
+  <li><strong>Use synthetic data carefully.</strong> Generating training data with a stronger model is legitimate and widespread :  and unreviewed synthetic data bakes the generator's errors and quirks into your model permanently. Human-review a meaningful sample, filter aggressively, and check the provider's terms regarding training on outputs.</li>
+  <li><strong>Include negative and refusal examples.</strong> If the model should decline, ask for clarification, or return a null result, that behaviour must appear in the data. Otherwise it will confidently answer everything.</li>
+  <li><strong>Split before you touch anything.</strong> Hold out a test set at the start, keep it untouched, and check for leakage between splits. Near-duplicates spanning train and test produce excellent metrics and a disappointing deployment.</li>
+  <li><strong>Version datasets like code.</strong> Record which dataset version produced which model, with the changes between them. Without that lineage, a regression is unattributable.</li>
+</ul>
+<p>Finally, plan for drift. Production language, product vocabulary, and user behaviour move. A fine-tune is a snapshot, so schedule periodic re-evaluation against fresh production samples rather than assuming a model tuned last quarter still fits this quarter's traffic.</p>
+
+<h2>Part 3 :  Evaluating and Monitoring LLM Apps</h2>
+<p>Offline evaluation tells you whether a change is safe to ship. Monitoring tells you what is happening to real users right now. Production LLM systems need both, and the second is the one teams usually skip.</p>
+
+<h3>Logging, telemetry, and observability</h3>
+<p>LLM applications break traditional monitoring assumptions. The same input produces different outputs, so you cannot reproduce an incident without having captured the exact input, model, and parameters at the time. Cost and latency track token counts rather than request counts. And a request is rarely one call :  it is a chain of retrieval, reranking, tool calls, and generation, any link of which can be the fault.</p>
+<p><strong>Trace, don't just log.</strong> Model the whole request as a distributed trace: a parent span for the request, child spans for each retrieval, rerank, tool call, and model invocation, nested to reflect actual structure. For agents, the span tree <em>is</em> the reasoning chain, and it is the only practical way to answer "why did it do that".</p>
+<p>The ecosystem has been converging on a standard here. OpenTelemetry's GenAI special interest group has defined semantic conventions for generative AI :  standard <code>gen_ai.*</code> attribute names covering model, token usage, finish reason, tool calls, and agent steps :  so telemetry works across backends without custom parsing. Coverage has expanded from LLM client calls to agent orchestration, tool calling, content capture, and quality evaluation. Much of it remains experimental, and attribute names have shifted between versions, so pin your instrumentation version and use the stability opt-in mechanism when migrating. Auto-instrumentation exists for the major SDKs and frameworks, which is the fastest path to useful traces.</p>
+<p>What to capture per request: model identifier and version, all generation parameters, input and output token counts, computed cost, latency broken down by stage, finish reason, retrieved chunk identifiers and scores, tool calls with arguments and results, prompt template version, cache hit or miss, error class on failure, and a correlation identifier tying it to your application's user session.</p>
+<p>Handle content carefully. Prompts and completions routinely contain personal or confidential data, and storing full prompt text in indexed span attributes is an anti-pattern :  attributes have size limits and expose content throughout your observability backend. The conventions put content in span events instead, which can be filtered or dropped at the collector without touching application code. Redact before export, sample content capture rather than storing everything, and set retention deliberately.</p>
+<p>Alert on the things that actually indicate trouble: error and timeout rates, p95 latency by stage, cost per request trending upward, token usage anomalies, cache hit rate collapse, retrieval returning zero or low-scoring results, schema validation failure rate, and refusal or fallback rate. A dashboard nobody looks at is not monitoring; thresholds with owners are.</p>
+<p>The tooling landscape includes open platforms such as Langfuse, Arize Phoenix, MLflow's tracing layer, and OpenLLMetry, alongside vendor offerings like LangSmith and Helicone, and general APM vendors that now ingest GenAI conventions. Prefer whatever emits and consumes the open conventions, so your traces remain portable.</p>
+
+<h3>Safety filters</h3>
+<p>Safety in production is layered, and no single layer is sufficient.</p>
+<ul>
+  <li><strong>Input filtering.</strong> Screen incoming text for policy-violating content, and detect prompt injection attempts :  particularly in any input that originated from a document, a web page, or an email rather than being typed by the user. Classify rather than pattern-match; regex lists are trivially evaded.</li>
+  <li><strong>PII handling.</strong> Detect and redact personal data before it reaches the model or your logs, or tokenize it and restore values after generation. Decide this before launch, because retrofitting redaction across a telemetry backend already full of personal data is painful.</li>
+  <li><strong>Output filtering.</strong> Screen generated text before it reaches the user for policy violations, leaked system-prompt content, leaked credentials, and claims outside the retrieved context. Output filtering is the last gate before a mistake becomes visible.</li>
+  <li><strong>Grounding checks.</strong> In RAG systems, score whether the answer is supported by the retrieved passages, and degrade gracefully :  withhold, caveat, or escalate :  when it is not.</li>
+  <li><strong>Action gating.</strong> For anything that writes, sends, spends, or deletes, enforce policy in your own code: allowlists, rate and spend caps, and explicit approval for consequential or irreversible operations. Frameworks orchestrate behaviour; they do not evaluate a tool call against policy before it executes. That layer is yours to build.</li>
+  <li><strong>Topic and scope constraints.</strong> A support assistant answering questions about geopolitics is a reputational risk with no upside. Constrain scope explicitly and handle out-of-scope requests with a defined response.</li>
+</ul>
+<p>Every filter has false positives, so log blocks with enough context to review them, give users a path when they are wrongly blocked, and treat filter thresholds as tunable parameters with their own evaluation set. Red-team before launch: have people actively try to break the system, and keep their successful attacks as regression tests.</p>
+
+<h3>A/B testing prompts</h3>
+<p>Offline evaluation on a golden set is necessary and insufficient :  it measures what you thought to measure on inputs you chose. Online experimentation measures what real users do.</p>
+<ul>
+  <li><strong>Version prompts as artifacts.</strong> Prompts belong in version control or a prompt registry with identifiers, not embedded as string literals across the codebase. Every trace should record which version produced it, or your experiment has no readable results.</li>
+  <li><strong>Randomize at the right unit.</strong> Assign by user or session, not by request. A user flipping between two prompt variants mid-conversation gets an incoherent experience and pollutes your data.</li>
+  <li><strong>Pick a primary metric before launching.</strong> Task completion, resolution without escalation, edit distance between generated and sent text, explicit thumbs, or downstream conversion. Choose one, and keep guardrail metrics alongside it :  latency, cost per request, error rate, safety-filter trigger rate :  so you notice when a quality win was purchased with a cost or latency regression.</li>
+  <li><strong>Respect statistics.</strong> LLM output metrics are noisy. Compute the sample size you need beforehand, resist stopping the moment results look good, and use sequential testing methods if you genuinely need to peek. Most disappointing "wins" are early-stopping artifacts.</li>
+  <li><strong>Change one thing.</strong> A variant that alters the prompt, the model, and the retrieval depth together tells you only that something changed.</li>
+  <li><strong>Keep rollback instant.</strong> Prompt and model selection should be runtime configuration, not a deployment. When a variant misbehaves at 2am, the fix should be a flag flip.</li>
+</ul>
+<p>Also run shadow evaluations: send a sample of production traffic to a candidate configuration without showing users the result, score both offline, and compare. It gives you real-distribution evidence at zero user risk, which is especially valuable for model upgrades.</p>
+
+<h2>Part 4 :  JSON Extraction Pipelines</h2>
+<p>Extraction is where LLMs deliver the most unglamorous value: turning invoices, emails, contracts, forms, and support threads into structured records. It is also where "mostly right" is not good enough, because the output feeds systems that expect valid data.</p>
+
+<h3>Parsing structured data from messy inputs</h3>
+<p>Real inputs are inconsistent in ways rule-based parsers handle badly: fifty vendors' invoice layouts, dates in every regional format, amounts with varying currency conventions, scanned pages with OCR noise, multilingual documents, and fields that are sometimes absent and sometimes implied.</p>
+<p>A workable pipeline stages the problem rather than asking one model call to do everything:</p>
+<ol>
+  <li><strong>Normalize the input.</strong> Convert to text with layout preserved where it carries meaning. For PDFs, keep reading order and table structure; for HTML, strip chrome but retain headings and table markup. Poor normalization is the most common root cause of extraction failure, and it is invisible unless you look at the intermediate text.</li>
+  <li><strong>Segment before extracting.</strong> Long documents extract better when split into regions :  header, line items, totals, terms :  and processed separately. It shortens context, sharpens the instruction, and makes failures localized rather than total.</li>
+  <li><strong>Extract with a schema.</strong> One model call per region with an explicit output schema, as described next.</li>
+  <li><strong>Normalize the output.</strong> Dates to ISO format, amounts to decimal with an explicit currency code, identifiers trimmed and case-normalized, enums mapped to your canonical values. Do this in code, deterministically, rather than asking the model to be consistent about it.</li>
+  <li><strong>Attach provenance.</strong> For each extracted field, record where it came from :  page, region, or the verbatim source span. This makes human review fast and disputes resolvable, and it is the single most useful thing you can add to an extraction system.</li>
+</ol>
+<p>Design for absence explicitly. Give every field a defined representation for "not present in the document", and instruct the model to use it. Without that, required fields get filled with plausible inventions :  the most dangerous failure mode in extraction, because it is silent and well-formatted.</p>
+
+<h3>Enforcing schemas</h3>
+<p>Asking politely for JSON is not a guarantee, and defensive parsing of free-form output is a maintenance sink. Use the strongest available mechanism:</p>
+<ul>
+  <li><strong>Schema-constrained decoding.</strong> You supply a JSON Schema and the decoder is restricted at each step to tokens that keep the output conformant. Structure becomes a hard guarantee rather than a hope :  required fields present, types correct, enums respected. Where a provider or serving stack supports it, this is strictly the right choice, and open-weight serving stacks offer equivalent grammar-constrained generation.</li>
+  <li><strong>JSON mode.</strong> Guarantees syntactic validity but not your shape. Better than nothing; still needs schema validation after parsing.</li>
+  <li><strong>Prompt-only.</strong> The fallback. Expect code fences, preambles, and trailing commas, and write a tolerant extraction step around the parse.</li>
+</ul>
+<p>Schema design has a large effect on accuracy, because the schema is part of the prompt:</p>
+<ul>
+  <li>Name fields descriptively and use the description properties :  <code>invoice_total_including_tax</code> with a one-line description outperforms <code>total</code>.</li>
+  <li>Prefer flat structures; deeply nested objects degrade reliability noticeably.</li>
+  <li>Use enums wherever the value space is closed, which converts a generation problem into a classification problem.</li>
+  <li>Keep types strict and simple :  strings for identifiers that may have leading zeros, explicit decimal strings for money if your consumers are picky about floats.</li>
+  <li>Include a confidence or evidence field per extracted value when you plan to route low-confidence records to review.</li>
+</ul>
+<p>Validate after parsing regardless. Conformance to a schema says nothing about semantic correctness: dates can be structurally valid and impossible, line items can sum to something other than the stated total, and identifiers can be well-formed and nonexistent.</p>
+
+<h3>Correction loops and validation</h3>
+<p>A production extraction pipeline is not one model call; it is an attempt followed by checks followed by targeted repair.</p>
+<ul>
+  <li><strong>Layer the checks.</strong> Schema validation first, then type and format validation, then business rules (line items sum to the total, dates fall in plausible ranges, the tax rate matches the jurisdiction), then cross-referencing against systems of record (does this vendor exist, does this purchase order number resolve).</li>
+  <li><strong>Repair narrowly.</strong> When validation fails, send the model the original input, its previous output, and the <em>specific</em> error :  not a generic "try again". A targeted message ("line_items total 4,820.00 but invoice_total is 4,280.00; re-check the line items") resolves most recoverable failures in one retry.</li>
+  <li><strong>Bound the loop.</strong> Two retries, then escalate. Models that fail twice on the same input rarely succeed on the fifth attempt, and unbounded correction loops are a cost incident waiting to happen.</li>
+  <li><strong>Escalate with context.</strong> A failed record should reach a human with the source document, the extracted values, the validation errors, and the provenance spans :  so review takes seconds rather than a full re-read.</li>
+  <li><strong>Use consensus where stakes justify it.</strong> Extract twice, ideally with different prompts or models, and compare. Agreement is a strong correctness signal; disagreement routes straight to review. It roughly doubles cost and is usually worth it on financially consequential fields only.</li>
+  <li><strong>Close the loop with corrections.</strong> Every human fix is a labelled example. Accumulate them into an evaluation set, and eventually into fine-tuning data for a smaller, cheaper extraction model.</li>
+</ul>
+<p>Track field-level accuracy, not document-level. "94% of documents correct" hides which field fails and why; per-field precision and recall tells you exactly where to spend effort, and usually reveals that one or two fields account for most of the error.</p>
+
+<h2>Part 5 :  Building Multi-Model AI Apps</h2>
+<p>Sophisticated applications stop being one model behind one prompt. They become pipelines where specialized components :  OCR, vision, speech, embedding, generation :  each do what they are best at, coordinated by your code.</p>
+
+<h3>The OCR to JSON to LLM pipeline</h3>
+<p>The canonical document-processing architecture has three stages, each with a clear contract:</p>
+<ol>
+  <li><strong>OCR / document understanding.</strong> Convert the image or scanned PDF into text with layout :  words, their positions, reading order, table structure. Modern document-AI services return structured layout rather than a flat string, and that structure is worth preserving because it disambiguates which number belongs to which label.</li>
+  <li><strong>Structured extraction.</strong> An LLM call with a schema turns that layout-aware text into validated JSON, with the correction loop from Part 4 around it.</li>
+  <li><strong>Reasoning and action.</strong> Downstream, a model or ordinary business logic consumes the structured record :  summarizing, comparing against policy, routing for approval, writing to a system of record.</li>
+</ol>
+<p>The value of the separation is that each stage is independently testable, cacheable, and replaceable. OCR output caches permanently for a given document. Extraction can be re-run with an improved schema without re-OCRing. And you can measure accuracy at each boundary, which is what makes the pipeline debuggable :  when the final answer is wrong, you can tell whether the text was wrong, the extraction was wrong, or the reasoning was wrong.</p>
+
+<h3>Vision models for extraction</h3>
+<p>Multimodal models that accept images directly offer an alternative: skip explicit OCR and hand the page to the model. Each approach wins in different places.</p>
+<p><strong>Vision-direct</strong> is stronger on visually complex documents where layout carries meaning :  forms with checkboxes, documents where position determines which label a value belongs to, charts, screenshots, handwriting, and anything where a linearized text dump loses the plot. It is simpler to build, with fewer moving parts.</p>
+<p><strong>OCR-first</strong> is stronger on dense text where accuracy per character matters, is typically cheaper at volume, produces text you can index and search independently, and gives you character-level confidence scores that vision models generally do not expose. It is also more auditable.</p>
+<p>A hybrid is frequently best: OCR for the text layer, the page image supplied alongside it, and the model given both. Practical cautions for the vision path :  images consume input tokens, often a lot, and resolution drives that count, so downscale deliberately and check how your provider tokenizes images. Split multi-page documents rather than sending twenty pages at once. And verify extracted numbers rather than trusting them: vision models read dense tables and small print less reliably than they read prose, and a misread digit in a financial field is a serious error delivered with total confidence.</p>
+
+<h3>Audio and voice interfaces</h3>
+<p>Voice applications follow one of two architectures, and the choice is mostly about latency versus control.</p>
+<p>The <strong>cascaded</strong> pipeline runs speech-to-text, then the LLM, then text-to-speech. Each stage is separately swappable, testable, and loggable; you get a transcript for free, which matters for compliance and evaluation; and you can apply text-domain safety filters between stages. The cost is accumulated latency, and information loss :  tone, emotion, and emphasis vanish at the first stage.</p>
+<p>The <strong>speech-native</strong> approach uses models that accept audio and emit audio directly, preserving prosody and cutting latency substantially. It gives up the intermediate transcript and much of the stage-level control, though most such APIs can emit transcripts alongside audio.</p>
+<p>What actually determines whether a voice interface feels good:</p>
+<ul>
+  <li><strong>Latency budget.</strong> Conversational turn-taking tolerates only a few hundred milliseconds of silence before it feels broken. Stream everything, start speaking before generation completes, and measure time-to-first-audio, not total response time.</li>
+  <li><strong>Turn detection.</strong> Knowing when the user has finished speaking, rather than merely paused, is the difference between a natural exchange and constant interruption. Voice activity detection plus a semantic endpointing check works better than a silence timer alone.</li>
+  <li><strong>Barge-in.</strong> Users interrupt. Stop playback immediately, and truncate the conversation history to what was actually heard, not what was generated :  otherwise the model believes it said things the user never received.</li>
+  <li><strong>Transcription errors propagate.</strong> Names, addresses, and identifiers are the common failures. Confirm critical values explicitly, and bias recognition toward your known vocabulary where the API supports it.</li>
+  <li><strong>Write for the ear.</strong> Prompts must instruct shorter sentences, no markdown, no bulleted lists, and spelled-out numbers where clarity demands it. Text that reads well is often unbearable to listen to.</li>
+</ul>
+<p>Voice also raises consent and retention questions that text does not. Recording rules vary by jurisdiction, so decide early what audio you keep, for how long, and with what disclosure.</p>
+
+<h3>Orchestrating multiple models</h3>
+<p>Beyond modality, mature applications route across models deliberately. A small fast model classifies intent and decides where a request goes. An embedding model retrieves. A reranker orders. A mid-tier model handles the bulk of generation. A frontier model handles the minority of genuinely hard cases. A separate judge model scores a sample of output for quality.</p>
+<p>Build this behind an internal abstraction so that model selection is configuration rather than code, with a defined fallback when a provider degrades and per-stage cost and latency tracked independently. The gains are substantial :  typically most of the quality at a fraction of the cost :  and so is the added failure surface, so add stages only when measurement shows they earn their place.</p>
+
+<h2>Production Readiness Checklist</h2>
+<ol>
+  <li>Ingestion is incremental, handles deletions, and carries permissions into the index.</li>
+  <li>Index builds happen out of band with an atomic switchover and a rollback path.</li>
+  <li>Latency and cost are measured per stage and per request, not just in aggregate.</li>
+  <li>Prefix caching is in use, prompts are ordered stable-first, and cache hit rate is monitored.</li>
+  <li>Model routing sends easy work to cheap models and hard work to capable ones.</li>
+  <li>Every request emits a trace with standard attributes; content is redacted and retained deliberately.</li>
+  <li>Input, output, and action-level safety layers exist, with red-team findings as regression tests.</li>
+  <li>Prompts are versioned artifacts, experiments randomize by user, and rollback is a config change.</li>
+  <li>Structured output is schema-constrained, validated semantically, and repaired in a bounded loop.</li>
+  <li>Human escalation paths exist with full context, and corrections feed back into the evaluation set.</li>
+  <li>Fine-tunes, if any, beat a well-engineered prompt on a held-out test set and are re-evaluated on a schedule.</li>
+</ol>
+
+<h2>Glossary</h2>
+<ul>
+  <li><strong>Incremental indexing</strong> :  re-processing only changed documents, including deletions.</li>
+  <li><strong>Prefix / prompt caching</strong> :  provider-side reuse of a processed prompt prefix at reduced cost and latency.</li>
+  <li><strong>Semantic cache</strong> :  returning a cached answer when a new query is embedding-similar to an earlier one.</li>
+  <li><strong>Model routing</strong> :  directing requests to different models by difficulty or task type.</li>
+  <li><strong>SFT</strong> :  supervised fine-tuning on prompt-and-completion pairs.</li>
+  <li><strong>DPO</strong> :  direct preference optimization; training on better/worse response pairs.</li>
+  <li><strong>LoRA</strong> :  low-rank adaptation; training small injected matrices with base weights frozen.</li>
+  <li><strong>QLoRA</strong> :  LoRA over a 4-bit quantized base model, cutting memory further.</li>
+  <li><strong>Rank</strong> :  the capacity parameter of a LoRA adapter.</li>
+  <li><strong>Adapter merging</strong> :  folding a trained adapter into base weights for deployment.</li>
+  <li><strong>Span / trace</strong> :  the unit and tree of distributed telemetry for one request.</li>
+  <li><strong>GenAI semantic conventions</strong> :  OpenTelemetry's standard <code>gen_ai.*</code> attributes for LLM telemetry.</li>
+  <li><strong>Shadow evaluation</strong> :  running a candidate configuration on real traffic without showing users the result.</li>
+  <li><strong>Guardrail metric</strong> :  a metric watched during an experiment to catch regressions outside the primary goal.</li>
+  <li><strong>Schema-constrained decoding</strong> :  restricting generation so output conforms to a supplied schema.</li>
+  <li><strong>Provenance</strong> :  the recorded source location of each extracted value.</li>
+  <li><strong>Correction loop</strong> :  bounded re-prompting with specific validation errors after a failed extraction.</li>
+  <li><strong>Cascaded voice pipeline</strong> :  speech-to-text, then LLM, then text-to-speech as separate stages.</li>
+  <li><strong>Barge-in</strong> :  a user interrupting playback mid-response.</li>
+  <li><strong>Endpointing</strong> :  detecting that a speaker has finished their turn.</li>
+</ul>
+
+<h2>Frequently Asked Questions</h2>
+<h3>How do I keep a large RAG index up to date?</h3>
+<p>Make ingestion incremental: hash source documents, re-process only what changed, and explicitly delete chunks for removed documents. Build into a new index or namespace and switch reads atomically so you can verify before cutover and roll back afterward.</p>
+<h3>What is the cheapest way to cut LLM costs in production?</h3>
+<p>Model routing usually wins :  send simple work to a small model and reserve the frontier model for hard cases. After that, provider prefix caching with prompts structured stable-content-first, trimming fixed prompt overhead, and capping output length, which is the expensive side of the bill.</p>
+<h3>When should I fine-tune instead of using RAG?</h3>
+<p>Fine-tune for behaviour :  consistent format, domain tone, a classification boundary, or compressing a long prompt into a small fast model. Use RAG for knowledge, which changes and needs to be updatable. Fine-tuning to teach facts produces a model that states stale information confidently.</p>
+<h3>What is the difference between LoRA and QLoRA?</h3>
+<p>LoRA freezes the base model and trains small injected matrices, cutting memory enormously versus full fine-tuning. QLoRA additionally quantizes the frozen base to 4-bit, cutting memory further so larger models fit on a single GPU, at the cost of slower training and a small quality risk.</p>
+<h3>How much data do I need to fine-tune a model?</h3>
+<p>Far less than most people expect for format and style adaptation :  often a few hundred to a few thousand high-quality, consistently formatted examples. Quality and distribution match matter more than volume; a thousand curated examples routinely beat fifty thousand scraped ones.</p>
+<h3>What should I log for an LLM application?</h3>
+<p>Trace the whole request with spans for retrieval, reranking, tool calls, and generation. Capture model and parameters, token counts, computed cost, per-stage latency, finish reason, retrieved chunk IDs and scores, prompt version, and cache status. Redact content before export and keep prompts out of indexed span attributes.</p>
+<h3>How do I A/B test prompts safely?</h3>
+<p>Version prompts as artifacts recorded in every trace, randomize by user or session rather than per request, fix a primary metric plus guardrail metrics for cost, latency, and safety beforehand, size the sample properly, and keep model and prompt selection as runtime configuration so rollback is instant.</p>
+<h3>How do I guarantee valid JSON from an LLM?</h3>
+<p>Use schema-constrained decoding where available, which restricts generation to tokens that keep output conformant. JSON mode guarantees syntax but not your shape. In all cases, validate semantically after parsing :  structurally valid output can still be business-logic wrong.</p>
+<h3>Should I use OCR or a vision model for document extraction?</h3>
+<p>Vision-direct suits visually complex documents where layout carries meaning :  forms, checkboxes, charts, handwriting. OCR-first suits dense text, costs less at volume, yields searchable text and confidence scores, and is more auditable. A hybrid that supplies both OCR text and the page image is often best.</p>
+<h3>What makes a voice interface feel natural?</h3>
+<p>Latency above all :  stream and measure time-to-first-audio. Then reliable turn detection so the system knows when the user finished rather than merely paused, immediate barge-in handling with history truncated to what was actually heard, and prompts written for the ear: short sentences, no markdown, no lists.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-advanced-tutorial.html">Llm Advanced Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-enterprise-tutorial.html">Llm Enterprise Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-intermediate-tutorial.html">Llm Intermediate Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-tutorial-for-beginners.html">Llm Tutorial For Beginners</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs Flywheel for Data Products </p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Data Knobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+</body></html>

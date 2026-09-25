@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>LLM Tutorial for Beginners: Learn LLM Basics</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="Learn LLM basics: how large language models work, prompting with system and few-shot prompts, tokens, context windows, cost estimation, and model types." name="description"/>
+  <meta content="index, follow" name="robots"/>
+
+  <link href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" rel="icon"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  
+    <link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --violet: #7c3aed;
+      --violet-dark: #5b21b6;
+      --indigo: #4338ca;
+      --hero-a: #4c1d95;
+      --hero-b: #7c3aed;
+      --hero-c: #4338ca;
+      --footer: #1e293b;
+      --footer-text: #cbd5e1;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 50px rgba(15, 23, 42, 0.14);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+      height: auto;
+    }
+
+    a {
+      color: var(--violet);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .site-header-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand img {
+      height: 44px;
+      width: auto;
+    }
+
+    .brand-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .site-nav a {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #475569;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav a:hover {
+      color: var(--violet);
+      text-decoration: none;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: linear-gradient(135deg, var(--hero-a), var(--hero-b), var(--hero-c));
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.10), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(255,255,255,0.10), transparent 25%),
+        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.07), transparent 30%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      padding: 72px 0 82px;
+      display: grid;
+      gap: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.10);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 960px;
+      font-size: clamp(2.3rem, 5vw, 4.4rem);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-desc {
+      max-width: 900px;
+      font-size: 1.08rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.92);
+      white-space: pre-line;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .hero-tag {
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.95);
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .section {
+      padding: 72px 0;
+    }
+
+    .section-soft {
+      background: linear-gradient(to bottom, #f8fafc, #ffffff);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header {
+      max-width: 860px;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      line-height: 1.14;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .section-intro {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+
+    .gallery-grid {
+      display: grid;
+      gap: 28px;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .gallery-item a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      background: white;
+    }
+
+    .caption {
+      padding: 18px 22px 24px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #334155;
+      letter-spacing: 0.02em;
+    }
+
+    .article-wrap {
+      margin-top: 46px;
+      border-top: 1px solid var(--border);
+      padding-top: 34px;
+    }
+
+    .article-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+    }
+
+    .article-content {
+      color: #334155;
+      font-size: 1.03rem;
+      line-height: 1.85;
+      overflow-wrap: anywhere;
+    }
+
+    .article-content h2,
+    .article-content h3,
+    .article-content h4 {
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-top: 1.6em;
+      margin-bottom: 0.65em;
+    }
+
+    .article-content h2 {
+      font-size: 1.9rem;
+      font-weight: 800;
+    }
+
+    .article-content h3 {
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .article-content h4 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .article-content p,
+    .article-content ul,
+    .article-content ol,
+    .article-content blockquote,
+    .article-content table {
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+
+    .article-content ul,
+    .article-content ol {
+      padding-left: 1.4em;
+    }
+
+    .article-content li + li {
+      margin-top: 0.45em;
+    }
+
+    .article-content blockquote {
+      margin-left: 0;
+      padding: 14px 18px;
+      border-left: 4px solid #c4b5fd;
+      background: #f5f3ff;
+      border-radius: 12px;
+      color: #4c1d95;
+    }
+
+    .article-content code {
+      background: #f1f5f9;
+      padding: 0.15em 0.35em;
+      border-radius: 6px;
+      font-size: 0.92em;
+    }
+
+    .article-content pre {
+      overflow-x: auto;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 14px;
+    }
+
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+    }
+
+    .article-content th,
+    .article-content td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .article-content th {
+      background: #f8fafc;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .cta-band {
+      margin-top: 44px;
+      padding: 28px;
+      border: 1px solid #ddd6fe;
+      background: linear-gradient(135deg, #faf5ff, #ffffff, #eef2ff);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .cta-band h3 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+      line-height: 1.2;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .cta-band p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .site-footer {
+      background: var(--footer);
+      color: var(--footer-text);
+      margin-top: 0;
+    }
+
+    .footer-inner {
+      padding: 48px 0 34px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 30px;
+    }
+
+    .footer-col h4 {
+      margin: 0 0 14px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .footer-col p,
+    .footer-col li {
+      font-size: 0.95rem;
+      color: var(--footer-text);
+      line-height: 1.8;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-col li + li {
+      margin-top: 6px;
+    }
+
+    .footer-col a {
+      color: var(--footer-text);
+    }
+
+    .footer-col a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(148, 163, 184, 0.22);
+      margin-top: 30px;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+      color: #94a3b8;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: #94a3b8;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    @media (min-width: 900px) {
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 899px) {
+      .site-nav {
+        display: none;
+      }
+
+      .hero-inner {
+        padding: 56px 0 64px;
+      }
+
+      .section {
+        padding: 56px 0;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .brand-text {
+        font-size: 1rem;
+      }
+
+      .article-card,
+      .cta-band {
+        padding: 22px;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="brand">
+        <a aria-label="Dataknobs Home" href="https://www.dataknobs.com/">
+          <img alt="Dataknobs" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"/>
+        </a>
+        <div class="brand-text">Dataknobs</div>
+      </div>
+
+      <nav aria-label="Primary navigation" class="site-nav">
+        <a href="#slides">Slides</a>
+        <a href="#article">Article</a>
+        <a href="https://www.dataknobs.com/use-cases/">Use Cases</a>
+        <a href="https://www.dataknobs.com/data-products/">Data Products</a>
+        <a href="https://www.dataknobs.com/search.html">Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="eyebrow">Dataknobs Visual Storytelling</div>
+
+      <h1>LLM Tutorial for Beginners: Learn LLM Basics</h1>
+
+      <div class="hero-desc">Learn LLM basics: how large language models work, prompting with system and few-shot prompts, tokens, context windows, cost estimation, and model types.</div>
+
+      <div class="hero-tags">
+        <div class="hero-tag">Slides as Web Pages</div>
+        <div class="hero-tag">SEO-Friendly Content</div>
+        <div class="hero-tag">Structured Visual Knowledge</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-soft" id="slides">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-kicker">Slides</div>
+        <h2 class="section-title">Visual walkthrough</h2>
+        <div class="section-intro">
+          Browse the slides below. Each image can be opened directly for a larger view.
+        </div>
+      </div>
+
+      <div class="gallery-grid">
+        <section class="gallery-item">
+  <a href="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1200/llm-tutorial-1.png" rel="noopener" target="_blank">
+    <img alt="Slide titled LLM Beginner-Level Topics showing four numbered modules: what is an LLM, prompting basics, tokens and context windows and costs, and model types" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1200/llm-tutorial-1.png"/>
+  </a>
+  <div class="caption">The four beginner-level LLM topics covered in this tutorial.</div>
+</section>
+      </div>
+
+      <div class="cta-band">
+        <h3>LLM Tutorial for Beginners: Learn LLM Basics</h3>
+        <p>
+          
+        </p>
+      </div>
+
+      <div class="article-wrap" id="article">
+        <div class="section-header">
+          <div class="section-kicker">Article</div>
+          <h2 class="section-title">Detailed explanation</h2>
+          <div class="section-intro">
+            The content below expands on the slides with structured HTML article content.
+          </div>
+        </div>
+
+        <div class="article-card">
+          <div class="article-content">
+            <p class="lede">Large language models have gone from research curiosity to everyday tool in a remarkably short span, and the gap between casually using one and actually understanding it is where most beginners get stuck. This tutorial closes that gap. It covers four foundations in order: what an LLM is and how it works, how to prompt one properly, how tokens and context windows govern both quality and cost, and how to tell the available types of model apart. No machine learning background is assumed.</p>
+
+<h2>Part 1 :  What Is an LLM?</h2>
+<p>A large language model is a program that has learned the statistical structure of human language by reading an enormous quantity of text. Underneath every chat interface and every API is a single narrow skill: given a stretch of text, predict what is most likely to come next.</p>
+<p>That one skill generalizes further than it has any right to. Predicting the next word in a legal contract requires absorbing something about contracts. Continuing a Python function correctly requires absorbing something about Python. Finishing "the capital of Japan is" requires having retained a fact. Because language is the medium in which humans record nearly everything they know, a system that models language well ends up modelling a great deal of the world as a side effect.</p>
+<p>The word "large" is carrying weight. These models hold billions of adjustable numbers, called parameters, and are trained on text measured in trillions of words. Language models are decades old; what changed recently was scale, an architecture that scales efficiently, and hardware capable of training at that size. Abilities nobody explicitly programmed :  translation, summarization, working code, coherent conversation :  emerged as the models grew.</p>
+<p>The rest of this section opens the box at a high level: how text becomes tokens, how tokens become meaning, and how the transformer architecture turns that into a prediction.</p>
+
+<h3>Step one: tokenization</h3>
+<p>A model never sees letters or words. Input text is first chopped into <strong>tokens</strong> :  chunks sitting between a character and a word. "Hello" is usually a single token. "Tokenization" splits into three or four. An unusual name or a technical term can fragment into many. Spaces and punctuation typically attach to neighbouring tokens.</p>
+<p>Each distinct token maps to an ID number in a fixed vocabulary, often 50,000 to 200,000 entries. So the first thing that happens to your prompt is conversion into a list of integers. Everything downstream operates on those integers, never on your original characters.</p>
+<p>This explains a class of failure that otherwise looks baffling. Ask a model how many times the letter "r" appears in a word and it may get it wrong :  it never saw the letters, only two or three opaque chunks. Character-level puzzles, precise spelling manipulation, and arithmetic on long digit strings are all harder than they appear for exactly this reason. Part 3 returns to tokens in depth, because they also govern limits and cost.</p>
+
+<h3>Step two: embeddings</h3>
+<p>Token IDs are arbitrary :  the number assigned to "cat" tells you nothing about cats. So each token ID is converted into a list of numbers called a <strong>vector</strong>, or an <strong>embedding</strong>, often several thousand numbers long. These values are learned during training rather than assigned by hand.</p>
+<p>The property that makes embeddings valuable is that geometric closeness corresponds to semantic closeness. The vectors for "physician" and "doctor" land near each other. "Paris" sits near "London" and "Tokyo" along one axis and near "France" along another. Relationships become consistent directions through the space, which is why the well-known arithmetic :  king minus man plus woman arrives near queen :  works at all.</p>
+<p>Embeddings are not purely an internal detail. They are sold as a product in their own right and power semantic search, clustering, deduplication, and recommendation. Part 4 covers embedding models as a distinct category.</p>
+
+<h3>Step three: the transformer</h3>
+<p>Nearly every modern LLM is built on the <strong>transformer</strong> architecture, introduced in a 2017 research paper. You do not need the mathematics to use these systems well, but the core idea is intuitive and explains a lot of behaviour.</p>
+<p>The central mechanism is <strong>attention</strong>. As the model processes each token, it looks across the other tokens present and decides how much weight to give each when interpreting the current position. Take the sentence: "The trophy did not fit in the suitcase because it was too large." To resolve "it", the model must attend strongly to "trophy" rather than "suitcase". Swap "large" for "small" and the correct target flips. That context-dependent resolution is what attention buys, and it is why transformers handle long-range dependencies far better than what came before.</p>
+<p>A transformer stacks this operation dozens of times. Each layer refines every token's representation using information drawn from all the others, and layers tend to specialize :  earlier ones on surface structure, later ones on abstract relationships. Crucially, attention across the input runs in parallel rather than strictly word by word, which is what made training at today's scale economically feasible.</p>
+<p>After the final layer, the model produces a probability score for every token in its vocabulary, representing how likely each is to come next. One token is selected, appended to the text, and the whole process repeats. This is why responses stream in rather than appearing at once :  you are watching the loop run.</p>
+
+<h3>How a model is trained</h3>
+<p>Three stages, each doing something different:</p>
+<ul>
+  <li><strong>Pretraining.</strong> The model is shown vast quantities of text and repeatedly asked to predict the next token, with its parameters nudged whenever it guesses wrong. This consumes the overwhelming majority of the compute and produces a model that is knowledgeable but unhelpful :  ask it a question and it may well continue with more questions.</li>
+  <li><strong>Instruction tuning.</strong> Further training on curated instruction-and-response pairs teaches the model the format of being useful: when given a request, answer it. This converts a text-continuation engine into an assistant.</li>
+  <li><strong>Preference training.</strong> Human reviewers compare candidate outputs and mark which they prefer; those judgements steer the model toward responses people find more helpful, accurate, and safe. Reinforcement learning from human feedback, or RLHF, is the best-known method.</li>
+</ul>
+<p>Two consequences follow directly. Every model has a <strong>training cutoff</strong>, a date beyond which it has seen nothing :  it will not know about later events and may state outdated information confidently. And the model's tone and sense of a good answer are not neutral properties of language; they result from choices made during tuning.</p>
+
+<h3>What an LLM is not</h3>
+<p>It is not a database and holds no lookup table of facts. It has no internet access unless the surrounding system provides a search tool. It retains no memory of you between sessions unless a developer built one. And it does not know things the way a person does :  it produces text that is statistically plausible given what it absorbed. Usually plausible and true coincide. When they diverge you get <strong>hallucination</strong>: fluent, confident, well-formatted content that is simply false. Invented citations, non-existent software functions, and plausible-but-wrong dates are all common. Verify anything involving numbers, dates, quotes, or references, and treat the model's confident tone as carrying no evidential weight at all :  it reads identically whether the content is solid or fabricated.</p>
+
+<h2>Part 2 :  Prompting Basics</h2>
+<p>Prompting is simply writing input that reliably produces the output you want. It is less mystical than commonly presented, and a handful of techniques account for most of the achievable gain.</p>
+
+<h3>Role prompts vs. system prompts</h3>
+<p>Chat APIs do not take one undifferentiated block of text. They take a sequence of messages, each tagged with a <strong>role</strong>:</p>
+<ul>
+  <li><strong>System.</strong> Sets persistent behaviour, identity, constraints, and output rules. It applies across the whole conversation and generally carries more weight than instructions buried in a user turn.</li>
+  <li><strong>User.</strong> Carries the actual request and any material to work on.</li>
+  <li><strong>Assistant.</strong> Holds the model's previous replies. You send these back on each turn, which is how a conversation maintains continuity :  the model is stateless and reconstructs context purely from the messages you supply.</li>
+</ul>
+<p>The practical rule: anything durable belongs in the system message, anything specific to this request belongs in the user message. If you are building a support assistant, "You are a support assistant for an accounting product. Never speculate about pricing. If you do not know, say so and offer to escalate." goes in the system prompt once, not appended to every user question.</p>
+<p>A common beginner confusion is worth naming. "Role prompting" also refers to the technique of assigning the model a persona :  "You are an experienced technical editor." That is a content choice, usually placed inside the system message. The system message is the <em>channel</em>; the persona is one thing you might put in it. Persona framing helps most when it genuinely narrows the space of good answers (an editor knows what to cut) and helps least when it is decorative (calling the model a world-class genius changes little).</p>
+
+<h3>Prompt structure best practices</h3>
+<p>A prompt that works reliably usually contains most of these elements, roughly in this order: the task, the context or source material, the constraints, the output format, and then any examples.</p>
+<ul>
+  <li><strong>State the task specifically.</strong> "Summarize this" leaves length, audience, and emphasis to chance. "Summarize this in five bullet points for a non-technical executive, focusing on cost implications" removes the guesswork.</li>
+  <li><strong>Name the audience and the format.</strong> Who reads this, how long should it be, what shape should it take :  bullets, a table, JSON, prose.</li>
+  <li><strong>Say what to exclude.</strong> Negative constraints are as useful as positive ones: no preamble, no caveats, no marketing language, do not mention the source document.</li>
+  <li><strong>Separate instructions from data.</strong> When you paste in a document, delimit it clearly with headers or tags so the model does not confuse content with commands. This also reduces the risk that instructions hidden inside untrusted text get followed.</li>
+  <li><strong>Put instructions at the edges.</strong> Models use material at the very start and very end of a long input more reliably than material buried in the middle. Place critical rules there.</li>
+  <li><strong>Ask for reasoning on hard problems.</strong> For multi-step work, having the model reason through the steps before answering improves accuracy, because each step becomes context for the next. Newer reasoning models do this internally and need less prompting for it.</li>
+  <li><strong>Give the model an out.</strong> Explicitly permitting "I don't know" or "the source does not contain this" measurably reduces invented content. Without that permission, the pull toward a plausible-looking answer is strong.</li>
+  <li><strong>Iterate.</strong> Treat the first prompt as a draft. Find where the output misses, add a constraint addressing that specific miss, run again. For anything heading to production, keep a small set of test inputs and check changes against all of them :  a tweak that fixes one case routinely breaks another.</li>
+</ul>
+
+<h3>Zero-shot, one-shot, and few-shot prompting</h3>
+<p>These three terms describe how many worked examples you include in the prompt. The "shots" are demonstrations, and supplying them is sometimes called in-context learning :  the model adapts from the examples without any change to its parameters.</p>
+<ul>
+  <li><strong>Zero-shot.</strong> Instructions only, no examples. "Classify the sentiment of this review as positive, negative, or neutral." Fast, cheap, and usually sufficient for tasks the model already understands well.</li>
+  <li><strong>One-shot.</strong> A single demonstration. Useful when the task is clear but the exact format is not: show one input with its ideal output, and the model copies the shape.</li>
+  <li><strong>Few-shot.</strong> Typically two to five demonstrations. This is the most reliable technique available for pinning down structure, tone, edge-case handling, and labelling conventions. Three good examples beat three paragraphs describing the format.</li>
+</ul>
+<p>Some practical guidance on examples. Make them representative of real inputs, including at least one awkward or ambiguous case, since that is where the model needs the most steering. Keep the formatting of every example rigorously identical :  inconsistency teaches inconsistency. Balance the classes if you are classifying, because a set of examples that is mostly "positive" biases the output toward positive. And remember that examples consume input tokens on every single request, so there is a real cost trade-off: start zero-shot, add examples only where output quality actually demands it.</p>
+
+<h2>Part 3 :  Tokens, Context Windows, and Costs</h2>
+
+<h3>What tokens are</h3>
+<p>Part 1 introduced tokens as the unit a model reads. Here is what you need operationally.</p>
+<p>A useful estimate for English is that one token is about four characters, or roughly three-quarters of a word. A thousand words of English prose lands near 1,300 tokens. That ratio degrades for other content: code tokenizes less efficiently because of punctuation and indentation, non-Latin scripts often need several tokens per character, and text dense with unusual proper nouns fragments heavily. If your workload is code or non-English, assume meaningfully more tokens per unit of content than the English rule of thumb suggests.</p>
+<p>Both directions count. <strong>Input tokens</strong> cover your system prompt, conversation history, pasted documents, and few-shot examples. <strong>Output tokens</strong> cover what the model generates. They are counted separately and priced differently.</p>
+<p>Every major provider publishes a tokenizer you can run on your own text. Ten minutes pasting real prompts into one is the fastest way to build intuition for what your application will cost.</p>
+
+<h3>How token limits impact responses</h3>
+<p>The <strong>context window</strong> is the total number of tokens the model can consider at once :  system prompt, conversation so far, attached documents, and the response being generated, all counted together. Contemporary models range from tens of thousands of tokens to over a million.</p>
+<p>The context window is the model's entire working memory. Anything outside it does not exist. This produces several effects you will meet in practice:</p>
+<ul>
+  <li><strong>Conversations forget.</strong> When a long chat exceeds the limit, earlier turns must be dropped or summarized. This is why an assistant can appear to lose track of something you said an hour ago :  it is not in the window any more.</li>
+  <li><strong>Long documents get truncated.</strong> Paste in more than fits and the tail is silently cut. Answers about the missing portion will be confidently wrong.</li>
+  <li><strong>Output gets cut off mid-sentence.</strong> There is usually a separate <em>maximum output tokens</em> setting, often much smaller than the context window. Hitting it truncates the response abruptly :  a very common source of confusing bug reports.</li>
+  <li><strong>Middles get neglected.</strong> Models do not attend equally across a long input. Material at the beginning and the end is used more reliably than material in the middle, an effect usually described as "lost in the middle". Position matters, not just inclusion.</li>
+  <li><strong>Everything slows down.</strong> Attention compares tokens against each other, so work grows faster than linearly with input length. Long contexts mean slower responses.</li>
+</ul>
+<p>The implication is that a bigger window is not automatically better. Supplying the right few thousand tokens generally outperforms supplying everything you have. When your material genuinely exceeds what fits, the standard answer is retrieval: index your documents, fetch only the passages relevant to the current question, and pass just those. That pattern is called retrieval-augmented generation, or RAG, and it is the usual next topic after these fundamentals.</p>
+
+<h3>Cost estimation basics</h3>
+<p>Commercial APIs price per million tokens, with input and output billed at different rates :  output is typically several times more expensive, because generating tokens costs more compute than reading them. The arithmetic is straightforward:</p>
+<p><code>cost per request = (input tokens ÷ 1,000,000 × input rate) + (output tokens ÷ 1,000,000 × output rate)</code></p>
+<p>Work a concrete example. Suppose a support-summarization feature sends a 400-token system prompt, three few-shot examples totalling 900 tokens, and a 700-token ticket, then generates a 300-token summary. That is 2,000 input tokens and 300 output tokens per request. At an illustrative $3 per million input and $15 per million output, one request costs $0.006 of input plus $0.0045 of output, roughly $0.0105 :  about a cent. Ten thousand tickets a month lands near $105.</p>
+<p>The structure of that calculation matters more than the specific rates, which change frequently. Notice that the few-shot examples are 45% of the input, paid on every single request forever. Notice that 300 output tokens cost nearly as much as 2,000 input tokens. Those two observations drive most real cost optimization:</p>
+<ul>
+  <li><strong>Trim the fixed overhead.</strong> Long system prompts and generous example sets are charged on every call. Cutting three examples to one, if quality holds, removes a third of your input bill.</li>
+  <li><strong>Constrain output length.</strong> Asking for five bullets instead of an open-ended summary saves on the expensive side of the ledger.</li>
+  <li><strong>Watch conversation growth.</strong> Every turn resends the whole history, so a long chat gets progressively more expensive. Summarize or truncate older turns.</li>
+  <li><strong>Route by difficulty.</strong> The spread between a provider's small model and its frontier model is often an order of magnitude. Sending simple classification to the cheap model and reserving the expensive one for hard reasoning is the single highest-leverage optimization available.</li>
+  <li><strong>Check for prompt caching.</strong> Most providers now offer a discount on repeated prefixes, which is substantial when a large fixed system prompt precedes a small variable input.</li>
+  <li><strong>Set hard limits before you need them.</strong> Runaway loops and oversized contexts produce expensive surprises. Spending caps and per-request token limits are cheap insurance.</li>
+</ul>
+
+<h2>Part 4 :  Model Types</h2>
+<p>"LLM" is used loosely to cover several distinct categories of model that do different jobs. Knowing which is which prevents a lot of wasted effort.</p>
+
+<h3>Chat models vs. embedding models</h3>
+<p>These are the two you will use most, and they are not interchangeable.</p>
+<p>A <strong>chat model</strong> :  also called a generative or completion model :  takes messages and produces text. It writes, summarizes, answers, classifies, codes, and reasons. It is what people mean colloquially by "an LLM". It is comparatively large, comparatively slow, and priced per token in both directions.</p>
+<p>An <strong>embedding model</strong> takes text and produces a vector of numbers :  the representation described in Part 1. It generates no text at all. Its output is only useful in comparison to other vectors: how close is this question to that paragraph. Embedding models are small, fast, and dramatically cheaper, often by two orders of magnitude, and are typically priced on input only.</p>
+<p>Choose by the question you are asking. If the answer is text a person will read, you need a chat model. If the answer is "which of these items is most similar", you need an embedding model. Semantic search, clustering support tickets by theme, deduplicating a catalogue, and retrieving relevant passages for a RAG pipeline are all embedding tasks. A common architecture uses both: an embedding model finds the relevant documents, then a chat model writes the answer from them. Two further notes :  embeddings must be generated by the same model on both sides of a comparison, since vectors from different models are not comparable, and storing them at scale requires a vector index or a database extension that supports one.</p>
+<p>You will also encounter <strong>reranking models</strong>, a narrower category that scores how well a document answers a query and is used to refine embedding search results, and <strong>reasoning models</strong>, chat models tuned to spend extra tokens working through a problem before answering :  more accurate on hard analytical tasks, slower and more expensive on easy ones.</p>
+
+<h3>Open-weight vs. proprietary models</h3>
+<p>The other major division is how you get access.</p>
+<p><strong>Proprietary models</strong> are reached through a hosted API. The provider runs the infrastructure; you send requests and pay per token. You get frontier capability with no operational work, immediate access to improvements, and an uptime commitment. You give up control: your data leaves your environment, the model can change or be deprecated underneath you, pricing is not yours to set, and you are exposed to rate limits and outages.</p>
+<p><strong>Open-weight models</strong> publish their trained parameters for download. You can run them on your own hardware or through a hosting provider of your choice. You get data residency :  input never leaves your boundary, which can be decisive under regulatory constraints :  plus version stability, freedom to fine-tune, and potentially much lower unit cost at high volume. You take on GPU provisioning, serving infrastructure, scaling, and evaluation.</p>
+<p>A note on terminology: "open-weight" and "open-source" are not synonyms. Most publicly released models publish weights without publishing training data or full training code, and many carry licences with usage restrictions. Read the licence before building a business on one.</p>
+<p>A reasonable default for beginners is to prototype against a hosted API, since it removes every infrastructure question from the learning curve, then evaluate open-weight options once you know your actual volume, latency needs, and data constraints. Many mature systems run both :  a hosted frontier model for the hard tenth of traffic and a self-hosted smaller model for the routine remainder.</p>
+
+<h3>Multimodal LLMs</h3>
+<p>Early language models handled text alone. <strong>Multimodal models</strong> accept, and sometimes produce, more than one kind of input :  most commonly images alongside text, increasingly audio and video too.</p>
+<p>The underlying trick is consistent with Part 1: other modalities are converted into the same kind of vector representation the model already uses for text, so an image becomes a sequence of embeddings the transformer can attend to alongside words. From the model's perspective it is all one stream.</p>
+<p>This opens up work that was previously out of reach: asking questions about a screenshot, extracting structured data from a scanned invoice or a photographed receipt, describing a chart, reviewing an interface mockup, reading handwriting, or debugging from an error screenshot. Voice interfaces built on audio input and speech output are the other large category.</p>
+<p>Two practical notes. Images consume input tokens, often a substantial number depending on resolution, so a prompt carrying several high-resolution images can be expensive :  check how your provider counts them. And treat image understanding as strong but imperfect: models read charts, dense tables, and small text less reliably than they read prose, so verify extracted figures rather than trusting them.</p>
+<p>Keep one distinction clear as well. A multimodal <em>understanding</em> model takes an image as input and answers in text. An image <em>generation</em> model produces pictures from a description and is a different kind of system, even when both are offered behind a single product.</p>
+
+<h2>Putting It Together: A Practical First Week</h2>
+<p>Reading about LLMs has sharply diminishing returns compared with using them. A concrete progression through the four parts above:</p>
+<ol>
+  <li><strong>Day 1.</strong> Take a task you already do :  drafting a reply, summarizing notes, cleaning a list :  and do it with a chat assistant. Note where the first output misses.</li>
+  <li><strong>Day 2.</strong> Rewrite that prompt three times, adding audience, format, and exclusion constraints. Compare the results side by side.</li>
+  <li><strong>Day 3.</strong> Convert it to a proper system-plus-user structure. Move the durable rules into the system message.</li>
+  <li><strong>Day 4.</strong> Run your text through a tokenizer. Count the tokens, then estimate what a thousand requests would cost using the formula in Part 3.</li>
+  <li><strong>Day 5.</strong> Build a few-shot prompt that returns valid JSON every time. Then remove examples one at a time and see how far you can go before quality drops.</li>
+  <li><strong>Day 6.</strong> Paste a long document into the context and ask questions against it. Notice what happens to answers about material near the middle.</li>
+  <li><strong>Day 7.</strong> Assemble twenty test inputs for your task and score your prompt against all of them. You now have an evaluation set, which puts you ahead of many people shipping LLM features.</li>
+</ol>
+<p>From here, the natural next topics are retrieval-augmented generation for grounding models in your own documents, tool use and function calling for letting a model reach live data and take actions, and systematic evaluation for keeping quality stable as you change things.</p>
+
+<h2>Glossary</h2>
+<ul>
+  <li><strong>Token</strong> :  the unit of text a model processes; roughly three-quarters of an English word.</li>
+  <li><strong>Tokenization</strong> :  splitting text into tokens and mapping them to vocabulary IDs.</li>
+  <li><strong>Parameter</strong> :  one of the billions of learned numbers that constitute the model.</li>
+  <li><strong>Embedding</strong> :  a numeric vector representing meaning, where proximity implies similarity.</li>
+  <li><strong>Transformer</strong> :  the neural network architecture underpinning modern LLMs.</li>
+  <li><strong>Attention</strong> :  the mechanism letting each token draw on relevant other tokens.</li>
+  <li><strong>Context window</strong> :  the total tokens a model can consider at once.</li>
+  <li><strong>System prompt</strong> :  the message setting persistent behaviour and constraints for a conversation.</li>
+  <li><strong>Zero-shot / one-shot / few-shot</strong> :  prompting with no examples, one example, or several.</li>
+  <li><strong>In-context learning</strong> :  adapting behaviour from examples in the prompt, without changing parameters.</li>
+  <li><strong>Pretraining</strong> :  the initial large-scale next-token training phase.</li>
+  <li><strong>Fine-tuning</strong> :  additional training on a narrower dataset to specialize behaviour.</li>
+  <li><strong>RLHF</strong> :  reinforcement learning from human feedback, used to align output with human preferences.</li>
+  <li><strong>Training cutoff</strong> :  the date beyond which a model has seen no data.</li>
+  <li><strong>Hallucination</strong> :  confident, fluent, false output.</li>
+  <li><strong>Chat model</strong> :  a model that takes messages and generates text.</li>
+  <li><strong>Embedding model</strong> :  a model that converts text into vectors for comparison, generating no text.</li>
+  <li><strong>Open-weight model</strong> :  a model whose trained parameters are published for download.</li>
+  <li><strong>Multimodal model</strong> :  a model accepting more than one input type, such as images with text.</li>
+  <li><strong>RAG</strong> :  retrieval-augmented generation; fetching relevant documents and supplying them as context.</li>
+</ul>
+
+<h2>Frequently Asked Questions</h2>
+<h3>Do I need a machine learning background to use an LLM?</h3>
+<p>No. Using an LLM through a chat interface or an API requires no machine learning knowledge. Clear writing, a habit of verifying output, and ordinary programming skill cover the great majority of applications.</p>
+<h3>What is the difference between a system prompt and a user prompt?</h3>
+<p>The system prompt sets persistent behaviour, role, and constraints for the whole conversation. The user prompt carries the specific request for one turn. Durable rules belong in the system message so they do not have to be repeated.</p>
+<h3>When should I use few-shot instead of zero-shot prompting?</h3>
+<p>Start zero-shot. Add examples when output format is inconsistent, when edge cases are handled wrongly, or when you need a specific tone or labelling convention. Examples are charged on every request, so add them only where they demonstrably improve quality.</p>
+<h3>How do I estimate what an LLM feature will cost?</h3>
+<p>Count input tokens (system prompt plus examples plus user content) and expected output tokens for a typical request, divide each by a million, multiply by the provider's respective rates, and add them. Then multiply by expected monthly volume. Fixed overhead such as few-shot examples is charged every single time.</p>
+<h3>Is a larger context window always better?</h3>
+<p>No. Long contexts cost more, respond slower, and models use material in the middle of a long input less reliably than material at either end. Supplying the right few thousand tokens usually beats supplying everything.</p>
+<h3>What is the difference between a chat model and an embedding model?</h3>
+<p>A chat model generates text for a person to read. An embedding model produces vectors used to measure similarity between pieces of text, and generates no text at all. Search and clustering need embeddings; writing and answering need a chat model. Many systems use both together.</p>
+<h3>Should I use an open-weight model or a hosted API?</h3>
+<p>Prototype on a hosted API, which removes all infrastructure work from the learning curve. Consider open-weight models once you know your volume, latency requirements, and data-residency constraints :  particularly if input data cannot leave your environment, or if high volume makes self-hosting cheaper.</p>
+<h3>Why does the model give a different answer each time?</h3>
+<p>Token selection samples from a probability distribution rather than choosing deterministically. Lowering the temperature setting reduces variation considerably, though it does not guarantee byte-identical output.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-advanced-tutorial.html">Llm Advanced Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-enterprise-tutorial.html">Llm Enterprise Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-intermediate-tutorial.html">Llm Intermediate Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-tutorial-for-beginners.html">Llm Tutorial For Beginners</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs Flywheel for Data Products </p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Data Knobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+</body></html>

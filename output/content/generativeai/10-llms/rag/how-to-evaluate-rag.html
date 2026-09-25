@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>How to Evaluate RAG Systems: Retrieval, Groundedness &amp; RAG Metrics | Dataknobs</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+  <meta content="Learn how to evaluate RAG systems across retrieval, reranking, groundedness, answer quality, latency, cost and production drift using a practical enterprise RAG evaluation framework." name="description"/>
+  <meta content="RAG evaluation, RAG evaluation metrics, how to evaluate RAG, retrieval evaluation, groundedness evaluation, RAG quality metrics, RAG testing, RAGAS metrics, RAG monitoring" name="keywords"/>
+  <meta content="Dataknobs" name="author"/>
+  <meta content="index, follow" name="robots"/>
+  <meta content="2026-09-21" name="revised"/>
+  <link href="https://www.dataknobs.com/generativeai/10-llms/rag/how-to-evaluate-rag.html" rel="canonical"/>
+
+  <!-- Open Graph -->
+  <meta content="How to Evaluate RAG Systems: Retrieval, Groundedness &amp; RAG Metrics | Dataknobs" property="og:title"/>
+  <meta content="Learn how to evaluate RAG systems across retrieval, reranking, groundedness, answer quality, latency, cost and production drift using a practical enterprise RAG evaluation framework." property="og:description"/>
+  <meta content="article" property="og:type"/>
+  <meta content="https://www.dataknobs.com/generativeai/10-llms/rag/reference/how-to-evaluate-rag.html" property="og:url"/>
+  <meta content="Dataknobs" property="og:site_name"/>
+  <meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" property="og:image"/>
+
+  <!-- Twitter Card -->
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="How to Evaluate RAG Systems: Retrieval, Groundedness &amp; RAG Metrics | Dataknobs" name="twitter:title"/>
+  <meta content="Learn how to evaluate RAG systems across retrieval, reranking, groundedness, answer quality, latency, cost and production drift using a practical enterprise RAG evaluation framework." name="twitter:description"/>
+  <meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" name="twitter:image"/>
+
+  <!-- Generative Engine Optimization -->
+  <meta content="RAG evaluation, RAG evaluation metrics, how to evaluate RAG, retrieval evaluation, groundedness evaluation, RAG quality metrics, RAG testing, RAGAS metrics, RAG monitoring" name="generative-engine-optimization"/>
+  <meta content="RAG evaluation cannot be reduced to whether the final answer was good, because a wrong answer can come from a retrieval miss, a ranking failure, a chunk that omitted a critical sentence, a filter selecting an outdated policy, a reranker promoting irrelevant evidence, or a model inventing a conclusion from correct evidence. Evaluate three levels: retrieval, generation, and end-to-end task success. Retrieval metrics are Recall@K, Precision@K, MRR and NDCG, and should be measured on the final context that actually reaches the model rather than the initial candidate set. Groundedness asks whether claims are supported by retrieved evidence, and is distinct from correctness, since a response can faithfully repeat an outdated document. Measure relevance, completeness, correctness, groundedness and citation quality separately. Build a golden dataset with queries, expected answers, relevant documents, required facts, forbidden sources and expected citations, include hard negatives such as old policies and another tenant's data, and slice results by document type, language, jurisdiction and date. Track freshness from source update to searchable update, permission correctness, latency by stage, and cost per successful grounded answer." name="ai-summary"/>
+  <meta content="AI-assisted draft, human-reviewed." name="ai-content-declaration"/>
+  <meta content="Embeddings / Vector Databases / RAG + AI Evaluation / RAG Evaluation / Retrieval Quality / Grounded Generation" name="topic"/>
+  <meta content="How to Evaluate RAG Systems: Retrieval Quality, Groundedness, and End-to-End Metrics" name="citation_title"/>
+  <meta content="Dataknobs" name="citation_author"/>
+  <meta content="2026-09-21" name="citation_publication_date"/>
+
+  <link href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" rel="icon"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+
+  <link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "How to Evaluate RAG Systems: Retrieval Quality, Groundedness, and End-to-End Metrics",
+  "description": "Learn how to evaluate RAG systems across retrieval, reranking, groundedness, answer quality, latency, cost and production drift using a practical enterprise RAG evaluation framework.",
+  "author": {
+    "@type": "Organization",
+    "name": "Dataknobs"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Dataknobs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg"
+    }
+  },
+  "datePublished": "2026-09-21",
+  "dateModified": "2026-09-21",
+  "mainEntityOfPage": "https://www.dataknobs.com/generativeai/10-llms/rag/reference/how-to-evaluate-rag.html",
+  "image": "https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg",
+  "articleSection": "Embeddings / Vector Databases / RAG + AI Evaluation",
+  "keywords": [
+    "RAG evaluation",
+    "RAG evaluation metrics",
+    "how to evaluate RAG",
+    "retrieval evaluation",
+    "groundedness evaluation",
+    "RAG quality metrics",
+    "RAG testing",
+    "RAGAS metrics",
+    "RAG monitoring"
+  ]
+}
+  </script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is RAG evaluation?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Measuring both how well the system retrieves relevant evidence and how well the model uses that evidence to produce a correct, relevant, and grounded answer."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the most important RAG metrics?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Retrieval metrics such as Recall@K, Precision@K, MRR, and NDCG plus generation metrics such as groundedness, correctness, relevance, completeness, and citation quality."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How often should RAG be evaluated?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Before important configuration changes and continuously in production."
+      }
+    }
+  ]
+}
+  </script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.dataknobs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Generativeai",
+      "item": "https://www.dataknobs.com/generativeai/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "10 Llms",
+      "item": "https://www.dataknobs.com/generativeai/10-llms/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "Rag",
+      "item": "https://www.dataknobs.com/generativeai/10-llms/rag/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "Reference",
+      "item": "https://www.dataknobs.com/generativeai/10-llms/rag/reference/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 6,
+      "name": "RAG Evaluation / Retrieval Quality / Grounded Generation",
+      "item": "https://www.dataknobs.com/generativeai/10-llms/rag/reference/how-to-evaluate-rag.html"
+    }
+  ]
+}
+  </script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --violet: #7c3aed;
+      --violet-dark: #5b21b6;
+      --indigo: #4338ca;
+      --hero-a: #4c1d95;
+      --hero-b: #7c3aed;
+      --hero-c: #4338ca;
+      --footer: #1e293b;
+      --footer-text: #cbd5e1;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 50px rgba(15, 23, 42, 0.14);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    img { max-width: 100%; display: block; height: auto; }
+
+    a { color: var(--violet); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .site-header-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .brand img { height: 44px; width: auto; }
+
+    .brand-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .site-nav { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+
+    .site-nav a {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #475569;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav a:hover { color: var(--violet); text-decoration: none; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: linear-gradient(135deg, var(--hero-a), var(--hero-b), var(--hero-c));
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.10), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(255,255,255,0.10), transparent 25%),
+        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.07), transparent 30%);
+      pointer-events: none;
+    }
+
+    .hero-inner { position: relative; padding: 72px 0 82px; display: grid; gap: 28px; }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.10);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 960px;
+      font-size: clamp(2.3rem, 5vw, 4.4rem);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-desc {
+      max-width: 900px;
+      font-size: 1.08rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+
+    .hero-tag {
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.95);
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+
+    .section { padding: 72px 0; }
+
+    .section-soft {
+      background: linear-gradient(to bottom, #f8fafc, #ffffff);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header { max-width: 860px; margin-bottom: 34px; }
+
+    .section-kicker {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      line-height: 1.14;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .section-intro {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+
+    /* On-this-page */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 22px 26px;
+      margin-bottom: 34px;
+    }
+
+    .toc h2 {
+      margin: 0 0 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--violet);
+    }
+
+    .toc-links { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .toc-links a {
+      display: inline-block;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      border-radius: 999px;
+      padding: 8px 15px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #334155;
+      transition: all 0.2s ease;
+    }
+
+    .toc-links a:hover {
+      border-color: #c4b5fd;
+      background: #f5f3ff;
+      color: var(--violet-dark);
+      text-decoration: none;
+    }
+
+    .article-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 34px;
+    }
+
+    .article-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      align-items: center;
+      padding-bottom: 20px;
+      margin-bottom: 26px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .article-meta strong { color: var(--text); font-weight: 700; }
+
+    .article-content {
+      color: #334155;
+      font-size: 1.03rem;
+      line-height: 1.85;
+      overflow-wrap: anywhere;
+    }
+
+    .article-content h2,
+    .article-content h3,
+    .article-content h4 {
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-top: 1.6em;
+      margin-bottom: 0.65em;
+    }
+
+    .article-content h2 { font-size: 1.9rem; font-weight: 800; }
+    .article-content h3 { font-size: 1.45rem; font-weight: 700; }
+    .article-content h4 { font-size: 1.15rem; font-weight: 700; }
+
+    .article-content > h2:first-child { margin-top: 0; }
+
+    .article-content p,
+    .article-content ul,
+    .article-content ol,
+    .article-content blockquote,
+    .article-content table { margin-top: 1em; margin-bottom: 1em; }
+
+    .article-content ul,
+    .article-content ol { padding-left: 1.4em; }
+
+    .article-content li + li { margin-top: 0.45em; }
+
+    .article-content blockquote {
+      margin-left: 0;
+      padding: 14px 18px;
+      border-left: 4px solid #c4b5fd;
+      background: #f5f3ff;
+      border-radius: 12px;
+      color: #4c1d95;
+    }
+
+    .article-content code {
+      background: #f1f5f9;
+      padding: 0.15em 0.35em;
+      border-radius: 6px;
+      font-size: 0.92em;
+    }
+
+    .article-content pre {
+      overflow-x: auto;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 14px;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin: 1.3em 0;
+      background: var(--surface);
+    }
+
+    .table-scroll table { margin: 0; border: 0; }
+
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+    }
+
+    .article-content th,
+    .article-content td {
+      border: 1px solid var(--border);
+      padding: 11px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .article-content th {
+      background: #f8fafc;
+      color: var(--text);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .article-content td.num, .article-content th.num { text-align: right; white-space: nowrap; }
+
+    .table-scroll tbody tr:nth-child(even) td { background: #fcfcfd; }
+
+    .table-note {
+      margin-top: -0.4em;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    /* Formula block */
+    .formula {
+      margin: 1.3em 0;
+      padding: 22px 24px;
+      border: 1px solid #ddd6fe;
+      background: linear-gradient(135deg, #faf5ff, #ffffff);
+      border-radius: 20px;
+      text-align: center;
+    }
+
+    .formula .expr {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--violet-dark);
+      letter-spacing: -0.01em;
+    }
+
+    .formula .expr + .expr { margin-top: 10px; }
+
+    .formula .label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 10px;
+    }
+
+    /* Metric grid */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 1.3em 0;
+    }
+
+    .metric-card {
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      border-radius: 18px;
+      padding: 18px 20px;
+    }
+
+    .metric-card h4 {
+      margin: 0 0 6px !important;
+      font-size: 0.8rem !important;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--violet);
+    }
+
+    .metric-card p { margin: 0 !important; font-size: 0.97rem; line-height: 1.7; }
+
+    /* Two-column pros/cons */
+    .split-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      margin: 1.3em 0;
+    }
+
+    .split-card {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 24px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .split-card.tpu { border-color: #ddd6fe; background: linear-gradient(160deg, #faf5ff, #ffffff); }
+    .split-card.gpu { border-color: #c7d2fe; background: linear-gradient(160deg, #eef2ff, #ffffff); }
+
+    .split-card h3 { margin-top: 0 !important; font-size: 1.2rem !important; }
+    .split-card ul { margin-bottom: 0 !important; }
+
+    /* Steps */
+    .steps { display: grid; gap: 14px; margin: 1.3em 0; counter-reset: stepcount; }
+
+    .step {
+      position: relative;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 18px 22px 18px 64px;
+      box-shadow: var(--shadow);
+    }
+
+    .step::before {
+      counter-increment: stepcount;
+      content: counter(stepcount);
+      position: absolute;
+      left: 20px;
+      top: 18px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--violet), var(--indigo));
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .step h4 { margin: 0 0 4px !important; font-size: 1.05rem !important; }
+    .step p { margin: 0 !important; font-size: 0.97rem; }
+
+    /* Callout */
+    .callout {
+      margin: 1.4em 0;
+      padding: 20px 24px;
+      border-left: 5px solid var(--violet);
+      background: #f5f3ff;
+      border-radius: 0 18px 18px 0;
+      color: #4c1d95;
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.75;
+    }
+
+    /* Related links */
+    .related {
+      margin-top: 1.6em;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+    }
+
+    .related h4 {
+      margin: 0 0 12px !important;
+      font-size: 0.82rem !important;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--violet);
+    }
+
+    .related ul { margin: 0 !important; padding-left: 1.2em; }
+
+    /* FAQ */
+    .faq-list { display: grid; gap: 14px; }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 22px 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .faq-item h3 {
+      margin: 0 0 8px;
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .faq-item p { margin: 0; color: #334155; line-height: 1.8; }
+
+    .cta-band {
+      margin-top: 44px;
+      padding: 32px;
+      border: 1px solid #ddd6fe;
+      background: linear-gradient(135deg, #faf5ff, #ffffff, #eef2ff);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .cta-band h3 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+      line-height: 1.2;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .cta-band p { margin: 0; color: var(--muted); line-height: 1.8; }
+
+    .cta-link {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--violet), var(--indigo));
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .cta-link:hover { text-decoration: none; opacity: 0.92; }
+
+    .source-note {
+      margin-top: 30px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .site-footer { background: var(--footer); color: var(--footer-text); margin-top: 0; }
+
+    .footer-inner { padding: 48px 0 34px; }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 30px;
+    }
+
+    .footer-col h4 { margin: 0 0 14px; color: white; font-size: 1rem; font-weight: 700; }
+
+    .footer-col p,
+    .footer-col li { font-size: 0.95rem; color: var(--footer-text); line-height: 1.8; }
+
+    .footer-col ul { list-style: none; padding: 0; margin: 0; }
+    .footer-col li + li { margin-top: 6px; }
+    .footer-col a { color: var(--footer-text); }
+    .footer-col a:hover { color: white; text-decoration: underline; }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(148, 163, 184, 0.22);
+      margin-top: 30px;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+      color: #94a3b8;
+    }
+
+    .footer-links { display: flex; gap: 16px; flex-wrap: wrap; }
+    .footer-links a { color: #94a3b8; }
+    .footer-links a:hover { color: white; }
+
+
+    @media (max-width: 899px) {
+      .site-nav { display: none; }
+      .hero-inner { padding: 56px 0 64px; }
+      .section { padding: 56px 0; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .split-grid { grid-template-columns: 1fr; }
+      .metric-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .container { padding-left: 18px; padding-right: 18px; }
+      .brand-text { font-size: 1rem; }
+      .article-card, .cta-band, .toc { padding: 22px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+      .article-content h2 { font-size: 1.6rem; }
+    }
+    /* Pitfalls */
+    .pitfalls { display: grid; gap: 12px; margin: 1.3em 0; }
+
+    .pitfall {
+      position: relative;
+      border: 1px solid #fecdd3;
+      background: linear-gradient(160deg, #fff1f2, #ffffff);
+      border-radius: 16px;
+      padding: 16px 20px 16px 56px;
+    }
+
+    .pitfall::before {
+      content: "\00d7";
+      position: absolute;
+      left: 18px;
+      top: 15px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #e11d48;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .pitfall p { margin: 0 !important; font-size: 0.98rem; }
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="brand">
+        <a aria-label="Dataknobs Home" href="https://www.dataknobs.com/">
+          <img alt="Dataknobs" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"/>
+        </a>
+        <div class="brand-text">Dataknobs</div>
+      </div>
+
+      <nav aria-label="Primary navigation" class="site-nav">
+        <a href="#three-levels-of-rag-evaluation">Three levels of RAG evaluation</a><a href="#why-final-answer-accuracy-is-not-enough">Why final-answer accuracy is not enough</a><a href="#retrieval-metrics">Retrieval metrics</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://www.dataknobs.com/products/knobs/">KNOBS</a>
+        <a href="https://www.dataknobs.com/search.html">Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="eyebrow">RAG Evaluation · Retrieval Quality and Grounded Generation</div>
+
+      <h1>How to Evaluate RAG Systems: Retrieval Quality, Groundedness, and End-to-End Metrics</h1>
+
+      <div class="hero-desc">Learn how to evaluate RAG systems across retrieval, reranking, groundedness, answer quality, latency, cost and production drift using a practical enterprise RAG evaluation framework.</div>
+
+      <div class="hero-tags">
+<div class="hero-tag">Retrieval, generation, end-to-end</div><div class="hero-tag">Groundedness vs correctness</div><div class="hero-tag">Cost per successful answer</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-soft">
+    <div class="container">
+
+      <div aria-label="On this page" class="toc">
+        <h2>On this page</h2>
+        <div class="toc-links">
+<a href="#three-levels-of-rag-evaluation">Three levels of RAG evaluation</a><a href="#why-final-answer-accuracy-is-not-enough">Why final-answer accuracy is not enough</a><a href="#retrieval-metrics">Retrieval metrics</a><a href="#ground-truth-vs-no-ground-truth">Ground truth vs no ground truth</a><a href="#evaluate-final-context">Evaluate final context</a><a href="#groundedness">Groundedness</a><a href="#groundedness-vs-correctness">Groundedness vs correctness</a><a href="#relevance-and-completeness">Relevance and completeness</a><a href="#citation-evaluation">Citation evaluation</a><a href="#evaluate-chunking">Evaluate chunking</a><a href="#evaluate-overlap">Evaluate overlap</a><a href="#evaluate-embedding-models">Evaluate embedding models</a><a href="#dense-sparse-and-hybrid-retrieval">Dense, sparse, and hybrid retrieval</a><a href="#evaluate-reranking">Evaluate reranking</a><a href="#evaluate-top-k">Evaluate Top-K</a><a href="#evaluate-metadata-filters">Evaluate metadata filters</a><a href="#measure-freshness">Measure freshness</a><a href="#evaluate-temporal-correctness">Evaluate temporal correctness</a><a href="#evaluate-permission-correctness">Evaluate permission correctness</a><a href="#build-a-rag-golden-dataset">Build a RAG golden dataset</a><a href="#include-hard-negatives">Include hard negatives</a><a href="#slice-results">Slice results</a><a href="#evaluate-tables-separately">Evaluate tables separately</a><a href="#structured-data-rag">Structured-data RAG</a><a href="#use-deterministic-checks-when-possible">Use deterministic checks when possible</a><a href="#use-llm-judges-carefully">Use LLM judges carefully</a><a href="#measure-latency-by-stage">Measure latency by stage</a><a href="#measure-cost-per-successful-answer">Measure cost per successful answer</a><a href="#build-a-rag-scorecard">Build a RAG scorecard</a><a href="#treat-rag-configuration-as-knobs">Treat RAG configuration as knobs</a><a href="#run-controlled-experiments">Run controlled experiments</a><a href="#regression-test-before-changes">Regression test before changes</a><a href="#continuous-monitoring">Continuous monitoring</a><a href="#ragops-loop">RAGOps loop</a><a href="#bottom-line">Bottom line</a>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-meta">
+          <span><strong>Dataknobs</strong> · Embeddings / Vector Databases / RAG + AI Evaluation</span>
+          <span>Updated 21 September 2026</span>
+          <span>RAG Evaluation / Retrieval Quality / Grounded Generation</span>
+        </div>
+
+        <div class="article-content">
+<p>A RAG system can produce a wrong answer for many different reasons.</p>
+<p>The correct document may not be retrieved. It may rank too low. A chunk may omit a critical sentence. A filter may select an outdated policy. A reranker may promote irrelevant evidence. Or the LLM may receive the right evidence and still invent a conclusion.</p>
+<p>That is why RAG evaluation cannot be reduced to:</p>
+<div class="callout">Was the final answer good?</div>
+<p>A better framework asks:</p>
+<div class="callout">Did the system retrieve the right evidence, rank it correctly, use it faithfully, answer completely, and operate within acceptable latency, cost, freshness, and governance constraints?</div>
+<p>The practical chain is:</p>
+<div class="formula"><div class="expr">Query → Retrieval → Ranking → Context → Generation → Business Outcome</div></div>
+<h2 id="three-levels-of-rag-evaluation">Three levels of RAG evaluation</h2>
+<div class="table-scroll"><table><thead><tr><th scope="col">Level</th><th scope="col">Main question</th></tr></thead><tbody><tr><th scope="row">Retrieval</th><td>Did we retrieve the right evidence?</td></tr><tr><th scope="row">Generation</th><td>Did the model use evidence correctly?</td></tr><tr><th scope="row">End-to-end</th><td>Did the system solve the task?</td></tr></tbody></table></div>
+<p>If retrieval fails, prompt engineering cannot recover information the model never received.</p>
+<h2 id="why-final-answer-accuracy-is-not-enough">Why final-answer accuracy is not enough</h2>
+<p>A wrong answer can come from a retrieval miss, ranking failure, stale source, or generation failure.</p>
+<p>Each requires a different fix.</p>
+<h2 id="retrieval-metrics">Retrieval metrics</h2>
+<h3>Recall@K</h3>
+<p>Did the top K contain the evidence required to answer?</p>
+<h3>Precision@K</h3>
+<p>How much retrieved material was actually relevant?</p>
+<h3>MRR</h3>
+<p>How highly ranked was the first relevant result?</p>
+<h3>NDCG</h3>
+<p>How well were results ordered when relevance has multiple levels?</p>
+<h2 id="ground-truth-vs-no-ground-truth">Ground truth vs no ground truth</h2>
+<p>When relevance labels exist, use deterministic ranking metrics.</p>
+<p>When they do not, use human or model-based relevance judgments while gradually building labeled ground truth.</p>
+<h2 id="evaluate-final-context">Evaluate final context</h2>
+<p>Retrieval candidates and final model context are not always the same.</p>
+<p>A system may retrieve 50, filter, rerank, compress, and send only eight chunks.</p>
+<p>Evaluate what actually reaches the model.</p>
+<h2 id="groundedness">Groundedness</h2>
+<p>Groundedness asks:</p>
+<div class="callout">Are the claims in the answer supported by the retrieved evidence?</div>
+<p>A response can be fluent and relevant but still contain unsupported claims.</p>
+<h2 id="groundedness-vs-correctness">Groundedness vs correctness</h2>
+<p>A response can faithfully repeat an outdated document. It is grounded but incorrect relative to current truth.</p>
+<p>Evaluate both.</p>
+<h2 id="relevance-and-completeness">Relevance and completeness</h2>
+<p>A grounded response may still fail to answer the question or may omit a required condition.</p>
+<p>Measure relevance, completeness, correctness, and groundedness separately.</p>
+<h2 id="citation-evaluation">Citation evaluation</h2>
+<p>Measure citation correctness, completeness, authority, and location.</p>
+<p>A fabricated citation can create false trust.</p>
+<h2 id="evaluate-chunking">Evaluate chunking</h2>
+<p>Test multiple chunk sizes and strategies, then compare Recall@K, Precision@K, context tokens, answer correctness, latency, and cost.</p>
+<h2 id="evaluate-overlap">Evaluate overlap</h2>
+<p>Overlap can preserve boundary information but increases duplicate vectors and context. Measure whether it helps.</p>
+<h2 id="evaluate-embedding-models">Evaluate embedding models</h2>
+<p>Public benchmarks may not match your domain. Compare embedding models using domain-specific query-document pairs.</p>
+<h2 id="dense-sparse-and-hybrid-retrieval">Dense, sparse, and hybrid retrieval</h2>
+<p>Test dense only, sparse only, and multiple hybrid weights.</p>
+<p>Hybrid retrieval is often useful when semantic concepts and exact identifiers both matter.</p>
+<h2 id="evaluate-reranking">Evaluate reranking</h2>
+<p>A reranker can improve final evidence quality at extra cost and latency. Measure whether the benefit justifies the overhead.</p>
+<h2 id="evaluate-top-k">Evaluate Top-K</h2>
+<p>Too small may miss evidence. Too large may introduce noise.</p>
+<p>Choose the minimum K that provides sufficient evidence.</p>
+<h2 id="evaluate-metadata-filters">Evaluate metadata filters</h2>
+<p>Benchmarks without realistic tenant, region, date, permission, product, or jurisdiction filters can be misleading.</p>
+<h2 id="measure-freshness">Measure freshness</h2>
+<p>Track:</p>
+<div class="formula"><div class="expr">source update → searchable update latency</div></div>
+<p>This is crucial for policy, regulation, pricing, inventory, and customer records.</p>
+<h2 id="evaluate-temporal-correctness">Evaluate temporal correctness</h2>
+<p>The newest document is not always correct for a historical question. Include historical and future-effective cases.</p>
+<h2 id="evaluate-permission-correctness">Evaluate permission correctness</h2>
+<p>Unauthorized information should not appear in retrieval candidates.</p>
+<p>Authorization belongs before the model.</p>
+<h2 id="build-a-rag-golden-dataset">Build a RAG golden dataset</h2>
+<p>Useful fields include query, expected answer, relevant documents, required facts, forbidden sources, expected citations, and segment.</p>
+<p>This supports retrieval, ranking, answer, citation, freshness, and security evaluation.</p>
+<h2 id="include-hard-negatives">Include hard negatives</h2>
+<p>Use plausible but wrong documents such as old policies, similar products, adjacent regulations, or another tenant's data.</p>
+<h2 id="slice-results">Slice results</h2>
+<p>Aggregate metrics can hide failures. Slice by document type, language, product, jurisdiction, date, table vs prose, and scanned vs digital content.</p>
+<h2 id="evaluate-tables-separately">Evaluate tables separately</h2>
+<p>Measure extraction, row/column preservation, retrieval, and numeric answer correctness.</p>
+<h2 id="structured-data-rag">Structured-data RAG</h2>
+<p>For SQL, graph, API, or data-product retrieval, evaluate field selection, query correctness, filters, row completeness, and computation accuracy.</p>
+<h2 id="use-deterministic-checks-when-possible">Use deterministic checks when possible</h2>
+<p>Examples include correct document retrieved, correct limit in answer, valid citation ID, unauthorized document absent, and valid output schema.</p>
+<p>Use judges for more subjective dimensions.</p>
+<h2 id="use-llm-judges-carefully">Use LLM judges carefully</h2>
+<p>LLM judges are useful for relevance, completeness, and faithfulness, but should be calibrated against human-reviewed examples.</p>
+<h2 id="measure-latency-by-stage">Measure latency by stage</h2>
+<p>Break out query transformation, retrieval, reranking, context assembly, generation, and validation.</p>
+<p>Optimize the actual bottleneck.</p>
+<h2 id="measure-cost-per-successful-answer">Measure cost per successful answer</h2>
+<p>A cheap query can be expensive overall if it fails often and requires human intervention.</p>
+<p>Use:</p>
+<div class="callout">cost per successful grounded answer</div>
+<h2 id="build-a-rag-scorecard">Build a RAG scorecard</h2>
+<p>Useful dimensions include Recall@5, NDCG@10, grounded answer rate, correctness, citation correctness, permission leakage, freshness SLA, P95 latency, and cost per successful answer.</p>
+<h2 id="treat-rag-configuration-as-knobs">Treat RAG configuration as knobs</h2>
+<p>Important variables include parser, chunk strategy, chunk size, overlap, embedding model, index, similarity metric, hybrid weight, Top-K, reranker, filters, prompt, LLM, and grounding threshold.</p>
+<h2 id="run-controlled-experiments">Run controlled experiments</h2>
+<p>Compare configurations on the same dataset and measure:</p>
+<div class="formula"><div class="expr">retrieval quality × answer quality × latency × cost</div></div>
+<h2 id="regression-test-before-changes">Regression test before changes</h2>
+<p>Embedding, chunking, retrieval, reranking, prompt, model, and metadata changes can all alter behavior.</p>
+<h2 id="continuous-monitoring">Continuous monitoring</h2>
+<p>Track unanswered questions, low-grounding responses, retrieval misses, user corrections, citation clicks, escalations, stale-source incidents, latency, and cost.</p>
+<p>When an important production failure appears, add it to the evaluation set.</p>
+<h2 id="ragops-loop">RAGOps loop</h2>
+<p>A mature loop is:</p>
+<div class="formula"><div class="expr">Observe → Evaluate → Diagnose → Change a knob → Experiment → Deploy → Observe again</div></div>
+<h2 id="bottom-line">Bottom line</h2>
+<p>Do not evaluate RAG with one final-answer score.</p>
+<p>Evaluate the evidence chain:</p>
+<ol><li>Did retrieval find the right information?</li><li>Was it ranked and filtered correctly?</li><li>Did the model stay grounded?</li><li>Was the answer correct, complete, and relevant?</li><li>Did the system remain within latency, cost, freshness, and security limits?</li></ol>
+<p>Then identify which configuration variable caused a failure and measure which change improves the outcome.</p><div class="related"><h4>Related reading</h4><ul><li><a href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-detailed-page.html">complete RAG architecture guide</a></li><li><a href="https://www.dataknobs.com/embeddings/chunking-and-tokenization.html">chunking vs tokenization</a></li><li><a href="https://www.dataknobs.com/vector-database/">vector database guide</a></li><li><a href="https://www.dataknobs.com/generativeai/10-llms/rag-retriever-options.html">RAG retriever options</a></li><li><a href="https://www.dataknobs.com/embeddings/how-to-evaluate-embeddings.html">how to evaluate embeddings</a></li><li><a href="https://www.dataknobs.com/generativeai/3-how-to-evaluate/">generative AI evaluation framework</a></li><li><a href="https://www.dataknobs.com/generativeai/10-llms/when-to-use-rag.html">when to use RAG</a></li><li><a href="https://www.dataknobs.com/generativeai/10-llms/when-not-to-use-rag.html">when not to use RAG</a></li><li><a href="https://www.dataknobs.com/products/knobs/examples/retrieval-rag.html">retrieval and RAG knobs</a></li></ul></div>
+        </div>
+      </div>
+
+      <div class="cta-band">
+        <h3>KNOBS</h3>
+        <p>Make chunking, embeddings, retrieval depth, hybrid weighting, reranking, model choice, and grounding thresholds explicit variables and measure which settings improve outcomes.</p>
+        <a class="cta-link" href="https://www.dataknobs.com/products/knobs/">Explore KNOBS →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-kicker">FAQ</div>
+        <h2 class="section-title">Frequently asked questions</h2>
+        <div class="section-intro">
+          Short answers to the questions teams ask most often about RAG evaluation.
+        </div>
+      </div>
+
+      <div class="faq-list">
+<div class="faq-item"><h3>What is RAG evaluation?</h3><p>Measuring both how well the system retrieves relevant evidence and how well the model uses that evidence to produce a correct, relevant, and grounded answer.</p></div><div class="faq-item"><h3>What are the most important RAG metrics?</h3><p>Retrieval metrics such as Recall@K, Precision@K, MRR, and NDCG plus generation metrics such as groundedness, correctness, relevance, completeness, and citation quality.</p></div><div class="faq-item"><h3>How often should RAG be evaluated?</h3><p>Before important configuration changes and continuously in production.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-architectures/">Rag Architectures</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/evolution-of-rag-info.html">Evolution Of Rag Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/evolution-of-rag.html">Evolution Of Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/privacy-in-rag.html">Privacy In Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/privacy-rag-info.html">Privacy Rag Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-detailed-page.html">Rag Detailed Page</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-for-structured-and-unstructred-data.html">Rag For Structured And Unstructred Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-for-strucutred-data.html">Rag For Strucutred Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-pattern-guide-info.html">Rag Pattern Guide Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-pattern-guide.html">Rag Pattern Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/sql-stats-genai-rag-methods-for-structred-data.html">Sql Stats Genai Rag Methods For Structred Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/text-chunking-of-rag-info.html">Text Chunking Of Rag Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/text-chunkng-of-rag.html">Text Chunkng Of Rag</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs Flywheel for Data Products </p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Data Knobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+
+</body></html>

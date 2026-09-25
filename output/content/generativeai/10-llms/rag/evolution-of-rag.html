@@ -1,122 +1,195 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Interactive Report: The Evolution of RAG</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <!-- Chosen Palette: Warm Neutrals (Background: #F8F7F4, Text: #3D405B, Primary: #81B29A, Accent: #E07A5F) -->
-    <!-- Application Structure Plan: The application is designed as an interactive dashboard. The core structure features a persistent navigation menu on the left (or top on mobile) allowing users to select a RAG type. This selection dynamically updates the main content panel on the right, which displays detailed information, key characteristics, and a visual process flow for the chosen architecture. This hub-and-spoke model avoids page loads and encourages exploration. Below this, a dedicated comparative analysis section uses a radar chart and a table to facilitate synthesis and high-level understanding. This structure was chosen to transform the linear, passive text report into an active, exploratory tool, making complex architectural concepts more digestible and comparable through visualization and interaction. -->
-    <!-- Visualization & Content Choices: 1. Report Info: RAG Architectures -> Goal: Organize/Explain -> Viz: HTML/CSS Flow Diagrams -> Interaction: Dynamically displayed based on user selection -> Justification: Visually simplifies complex pipelines without using prohibited SVG/Mermaid. 2. Report Info: Comparative Metrics (Complexity, Speed, etc.) -> Goal: Compare/Analyze -> Viz: Radar Chart (Chart.js) & HTML Table -> Interaction: Chart displays all types for direct comparison -> Justification: Radar chart provides an immediate, high-level visual summary of trade-offs, which is more impactful than a simple table. The table provides the granular details. 3. Report Info: Detailed descriptions of each RAG type -> Goal: Inform -> Viz: Dynamically updated text blocks -> Interaction: Content changes on nav click -> Justification: Keeps the user in a single, focused view, enhancing usability. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F8F7F4;
-            color: #3D405B;
-        }
-        .active-nav-button {
-            background-color: #81B29A !important;
-            color: #FFFFFF !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-        .nav-button {
-            transition: all 0.2s ease-in-out;
-        }
-        .nav-button:hover {
-            background-color: #A1C4B3;
-            color: #FFFFFF;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 700px;
-            height: 40vh;
-            max-height: 500px;
-            margin: auto;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 50vh;
-            }
-        }
-        .flow-diagram-arrow {
-            font-size: 1.5rem;
-            line-height: 2rem;
-            color: #81B29A;
-        }
-    </style>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>The Evolution of RAG | DataKnobs Architecture Guide</title>
+  <meta content="Explore Vanilla, Standard, Hybrid, HyDE, Cache-Augmented and Agentic RAG architectures, their flows, strengths, limitations and trade-offs." name="description"/>
+  <meta content="index, follow" name="robots"/>
+  <meta content="website" property="og:type"/>
+  <meta content="The Evolution of RAG | DataKnobs Architecture Guide" property="og:title"/>
+  <meta content="An interactive guide to RAG architectures, concepts, trade-offs and agentic retrieval patterns." property="og:description"/>
+  <meta content="summary" name="twitter:card"/>
+  <meta content="The Evolution of RAG | DataKnobs Architecture Guide" name="twitter:title"/>
+  <meta content="Explore six RAG architecture patterns and compare their design trade-offs." name="twitter:description"/>
+  <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+  <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+  <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
+  <link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "The Evolution of RAG",
+    "description": "A guide to evaluate RAG and compare Vanilla, Standard, Hybrid, HyDE, Cache-Augmented and Agentic RAG architectures."
+  }
+  </script>
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-JF94J1W5MC');
+  </script>
+</head>
+<body class="dk-page">
+  <header class="dk-header">
+    <div class="dk-container dk-header-inner">
+      <div class="dk-header-row">
+        <a aria-label="DataKnobs home" class="dk-logo-link" href="https://www.dataknobs.com/">
+          <img alt="DataKnobs" class="dk-logo" height="48" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" width="190"/>
+        </a>
+        <nav aria-label="Primary navigation" class="dk-nav dk-nav--desktop">
+          <a class="dk-nav-link" href="#architectures">Architectures</a>
+          <a class="dk-nav-link" href="#compare">Compare</a>
+          <a class="dk-nav-link" href="#matrix">Matrix</a>
+        </nav>
+        <button aria-controls="mobile-nav" aria-expanded="false" aria-label="Open navigation" class="dk-menu-button" id="menu-button" type="button">
+          <svg aria-hidden="true" class="dk-menu-icon" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path></svg>
+        </button>
+      </div>
+      <nav aria-label="Mobile navigation" class="dk-mobile-nav" id="mobile-nav">
+        <div class="dk-mobile-nav-list">
+          <a class="dk-mobile-link" href="#architectures">Architectures</a>
+          <a class="dk-mobile-link" href="#compare">Compare</a>
+          <a class="dk-mobile-link" href="#matrix">Matrix</a>
+        </div>
+      </nav>
+    </div>
+  </header>
 
-		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
-		(function (w, d, s, l, i) {
-			w[l] = w[l] || []; w[l].push({
-				'gtm.start':
-					new Date().getTime(), event: 'gtm.js'
-			}); var f = d.getElementsByTagName(s)[0],
-				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-JF94J1W5MC');
-</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
-<body class="antialiased">
+  <main>
+    <section class="dk-hero dk-hero--article dk-hero--purple">
+      <div class="dk-container dk-hero-grid">
+        <div class="dk-hero-copy">
+          <p class="dk-eyebrow dk-eyebrow--hero">Retrieval-Augmented Generation</p>
+          <h1 class="dk-hero-title">The Evolution of <span class="dk-hero-accent">RAG</span></h1>
+          <p class="dk-hero-lead"><strong>A Web Guide: RAG Architectures, Concepts, and Agents.</strong> Explore how retrieval patterns evolve from a simple retrieve-then-read pipeline into hybrid, cache-augmented, hypothetical-document, and agent-directed workflows.</p>
+          <div aria-label="Guide topics" class="dk-topic-meta">
+            <span class="dk-topic-meta-item">6 architecture patterns</span>
+            <span class="dk-topic-meta-item">Interactive explorer</span>
+            <span class="dk-topic-meta-item">Strengths &amp; limitations</span>
+            <span class="dk-topic-meta-item">Comparison matrix</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+    <nav aria-label="Breadcrumb" class="dk-breadcrumb">
+      <div class="dk-container dk-breadcrumb-inner">
+        <a href="https://www.dataknobs.com/">DataKnobs</a>
+        <span aria-hidden="true" class="dk-breadcrumb-sep">/</span>
+        <span class="dk-breadcrumb-current">Evolution of RAG</span>
+      </div>
+    </nav>
 
-        <header class="text-center mb-10">
-            <h1 class="text-4xl md:text-5xl font-bold text-[#3D405B] mb-2">The Evolution of RAG</h1>
-            <p class="text-lg text-[#3D405B]/80 max-w-3xl mx-auto">
-*   **A Web Guide: RAG Architectures, Concepts, and Agents.** (Concise and uses common terms)
+    <section class="dk-section dk-section--soft" id="architectures">
+      <div class="dk-container">
+        <div class="dk-section-heading dk-section-heading--center">
+          <p class="dk-eyebrow">Architecture explorer</p>
+          <h2 class="dk-title">Choose a RAG pattern and inspect how it works</h2>
+          <p class="dk-lead">The source page describes six related approaches. Select one to compare its process flow, primary strength and key limitation without leaving the page.</p>
+        </div>
 
-</p>
-        </header>
+        <div aria-label="RAG architecture choices" class="dk-card-grid dk-grid-3 dk-pattern-grid" id="architecture-navigation"></div>
 
-        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            <nav class="lg:col-span-3">
-                <div class="p-6 bg-white/70 rounded-xl shadow-lg sticky top-8">
-                    <h3 class="text-xl font-bold mb-4 text-[#3D405B]">Explore Architectures</h3>
-                    <div class="space-y-3" id="navigation">
-                    </div>
-                </div>
-            </nav>
+        <article aria-live="polite" class="dk-card dk-card--lg" id="architecture-detail">
+          <p class="dk-eyebrow" id="detail-kicker">Selected architecture</p>
+          <h2 class="dk-card-title dk-card-title--lg" id="detail-title">Vanilla RAG</h2>
+          <p class="dk-card-text" id="detail-intro"></p>
 
-            <div class="lg:col-span-9">
-                <section class="bg-white p-6 sm:p-8 rounded-xl shadow-lg min-h-[500px]" id="content-display">
-                    <h2 class="text-3xl font-bold text-[#3D405B] mb-4 transition-opacity duration-300" id="content-title">Welcome!</h2>
-                    <p class="text-base text-[#3D405B]/80 mb-6 transition-opacity duration-300" id="content-intro">Choose a RAG architecture from the list to understand its key elements, pros, and cons. This guide will help you discover the advancements in RAG systems.</p>
-                    
-                    <div id="content-details">
-                       <h4 class="text-xl font-semibold text-[#81B29A] mb-3">Process Flow</h4>
-                       <div class="flex flex-wrap items-center gap-2 p-4 bg-[#F8F7F4] rounded-lg mb-6" id="content-flow">
-                           <div class="text-center p-3 bg-white rounded-md shadow-sm">Select a type</div>
-                       </div>
-                       <h4 class="text-xl font-semibold text-[#81B29A] mb-3">Key Characteristics</h4>
-                       <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="content-points">
-                            <div class="p-4 bg-[#F8F7F4] rounded-lg">
-                                <h5 class="font-bold text-lg mb-1 text-[#3D405B]">Primary Strength</h5>
-                                <p class="text-sm text-[#3D405B]/80">Details will appear here.</p>
-                            </div>
-                            <div class="p-4 bg-[#F8F7F4] rounded-lg">
-                                <h5 class="font-bold text-lg mb-1 text-[#3D405B]">Key Limitation</h5>
-                                <p class="text-sm text-[#3D405B]/80">Details will appear here.</p>
-                            </div>
-                       </div>
-                    </div>
-                </section>
+          <div class="dk-callout">
+            <h3 class="dk-callout-title">Process flow</h3>
+            <div aria-label="Architecture process flow" class="dk-chip-list" id="detail-flow"></div>
+          </div>
+
+          <div class="dk-problem-solution" id="detail-points">
+            <div class="dk-ps-card dk-ps-card--solution">
+              <p class="dk-eyebrow">Primary strength</p>
+              <h3 class="dk-card-title">What it does well</h3>
+              <p class="dk-card-text" id="detail-strength"></p>
             </div>
+            <div class="dk-ps-card dk-ps-card--problem">
+              <p class="dk-eyebrow">Key limitation</p>
+              <h3 class="dk-card-title">Where it becomes difficult</h3>
+              <p class="dk-card-text" id="detail-limitation"></p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
 
-        <footer class="bg-gray-800 text-gray-300">
+    <section class="dk-section dk-section--white" id="compare">
+      <div class="dk-container">
+        <div class="dk-section-heading">
+          <p class="dk-eyebrow">Comparative analysis</p>
+          <h2 class="dk-title">Compare RAG architectures with ease</h2>
+          <p class="dk-lead"><strong>See how different Retrieval-Augmented Generation paradigms stack up.</strong> The original page used a radar chart; this rebuild presents the same relative 1–5 profile in a more accessible table.</p>
+        </div>
+
+        <div class="dk-callout dk-callout--warning">
+          <h3 class="dk-callout-title">Interpret these scores as design guidance, not benchmarks</h3>
+          <p>The 1–5 values are qualitative relative ratings from the supplied page. They are useful for understanding intended trade-offs, but they are not empirical performance measurements and should not be treated as benchmark results.</p>
+        </div>
+
+        <div class="dk-table-wrap">
+          <table class="dk-table" id="profile-table">
+            <thead>
+              <tr>
+                <th scope="col">Architecture</th>
+                <th scope="col">Complexity</th>
+                <th scope="col">Flexibility</th>
+                <th scope="col">Speed</th>
+                <th scope="col">Accuracy</th>
+                <th scope="col">Scalability</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="dk-section dk-section--gradient-soft" id="matrix">
+      <div class="dk-container">
+        <div class="dk-section-heading dk-section-heading--center">
+          <p class="dk-eyebrow">Detailed comparison</p>
+          <h2 class="dk-title">Six RAG patterns, side by side</h2>
+          <p class="dk-lead">Use the matrix to compare each pattern’s core concept, common use case, principal strength, main limitation and relative implementation complexity.</p>
+        </div>
+
+        <div class="dk-comparison-wrap">
+          <table class="dk-comparison-table" id="comparison-table">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="dk-section dk-section--white">
+      <div class="dk-container">
+        <div class="dk-cta-panel dk-cta-panel--purple">
+          <div class="dk-cta-grid">
+            <div>
+              <p class="dk-eyebrow">Architecture takeaway</p>
+              <h2 class="dk-title">There is no universally best RAG architecture.</h2>
+              <p class="dk-lead">The right pattern depends on the knowledge base, update frequency, latency target, query ambiguity, retrieval quality, operational complexity and how much dynamic reasoning the workflow actually needs.</p>
+            </div>
+            <div class="dk-card dk-card--brand">
+              <h3 class="dk-card-title">A practical progression</h3>
+              <ul class="dk-list dk-list--spaced">
+                <li class="dk-list-item"><span class="dk-bullet">1</span><span>Start with the simplest pattern that can satisfy the use case.</span></li>
+                <li class="dk-list-item"><span class="dk-bullet">2</span><span>Add query processing, reranking or hybrid retrieval when evaluation exposes retrieval failures.</span></li>
+                <li class="dk-list-item"><span class="dk-bullet">3</span><span>Use agentic retrieval when the task genuinely requires dynamic planning, tool selection or iterative research.</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 <div>
@@ -182,263 +255,177 @@ gtag('config', 'G-JF94J1W5MC');
 </div>
 </div>
 <div class="mt-8 text-center text-sm text-gray-400">
-<p class="text-sm text-gray-400">Knobs are harness for AI</p>
+<p class="text-sm text-gray-400">Knobs Flywheel for Data Products </p>
 </div>
 <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
-<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<p class="text-sm text-gray-400">© 2026 Data Knobs. All rights reserved.</p>
 <div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
 </div>
 </div>
-</footer></main>
-        
-        <section class="mt-16 bg-white p-6 sm:p-8 rounded-xl shadow-lg">
-            <div class="text-center mb-8">
-                 <h2 class="text-4xl font-bold text-[#3D405B] mb-2">Comparative Analysis</h2>
-                 <p class="text-lg text-[#3D405B]/80 max-w-3xl mx-auto">
+</footer>
 
-*   **Compare RAG architectures with ease:** See how different Retrieval Augmented Generation paradigms stack up, visualized by key metrics in the chart below.
-</p>
-            </div>
-            <div class="chart-container">
-                <canvas id="ragComparisonChart"></canvas>
-            </div>
-        </section>
-
-        <section class="mt-12 bg-white p-6 sm:p-8 rounded-xl shadow-lg">
-            <h3 class="text-2xl font-bold text-[#3D405B] mb-4 text-center">Detailed Comparison Matrix</h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left text-[#3D405B] min-w-[800px]" id="comparison-table">
-                    <thead class="text-xs text-[#3D405B] uppercase bg-[#F8F7F4]">
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-    </div>
-
-    <script>
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
-
-        const ragData = {
-            'vanilla': {
-                title: 'Vanilla RAG',
-                intro: 'The simplest form of RAG that combines retrieval with generation in a straightforward "retrieve-then-read" pipeline. It forms the foundational blueprint for all other advanced RAG systems.',
-                flow: ['Index', 'Retrieve', 'Generate'],
-                points: {
-                    strength: 'Simplicity and ease of implementation. Provides a basic but effective framework for grounding LLMs in external knowledge.',
-                    limitation: 'Often suffers from low precision retrieval. The simple semantic search can be brittle and retrieve irrelevant context, leading to poor generation quality.'
-                }
-            },
-            'standard': {
-                title: 'Standard RAG',
-                intro: 'An enhanced version of RAG that introduces pre-retrieval and post-retrieval steps to improve the quality of information passed to the generator LLM.',
-                flow: ['Query Rewrite', 'Retrieve', 'Rerank', 'Generate'],
-                points: {
-                    strength: 'Improved Relevance. Query rewriting clarifies user intent, and reranking filters out noise, significantly improving the precision of the context.',
-                    limitation: 'Increased Latency and Complexity. The additional processing steps (rewriting and reranking) add computational overhead and slow down the response time.'
-                }
-            },
-            'cag': {
-                title: 'Cache-Augmented Generation (CAG)',
-                intro: 'Instead of retrieving data during each interaction, CAG preloads a static set of documents into the model\'s context. This works well when the data is stable and fits in the context window.',
-                flow: ['Preload Knowledge', 'Cache KV States', 'Query', 'Generate'],
-                points: {
-                    strength: 'Extremely Low Latency. By eliminating the real-time retrieval step, it offers very fast response times, ideal for real-time applications.',
-                    limitation: 'Only suitable for small, static knowledge bases. It cannot handle large or dynamic datasets and is limited by the LLM\'s context window size.'
-                }
-            },
-            'hybrid': {
-                title: 'Hybrid RAG',
-                intro: 'Combines multiple retrieval methods, most commonly keyword-based (sparse) and semantic (dense) search, to collect more comprehensive and accurate information.',
-                flow: ['Dense Retrieve', 'Sparse Retrieve', 'Fuse Results (RRF)', 'Generate'],
-                points: {
-                    strength: 'Robustness and Comprehensiveness. It captures both semantic meaning and specific keywords, making it highly effective for domains requiring both (e.g., legal or medical).',
-                    limitation: 'High Implementation Complexity. Fusing results from different retrieval systems effectively can be challenging and requires careful tuning.'
-                }
-            },
-            'hyde': {
-                title: 'Hypothetical Document Embeddings (HyDE)',
-                intro: 'An inventive technique that generates a hypothetical document in response to a query and then uses that document\'s embedding to find real documents.',
-                flow: ['Query', 'Generate Hypothetical Doc', 'Encode Doc', 'Retrieve', 'Generate'],
-                points: {
-                    strength: 'Effectively bridges the semantic gap between short queries and long documents, often improving retrieval performance for vague or complex questions.',
-                    limitation: 'Risky if the hypothetical document is poor quality. An inaccurate or hallucinatory generated document can lead the entire retrieval process astray.'
-                }
-            },
-            'agentic': {
-                title: 'Agentic RAG',
-                intro: 'Employs autonomous AI agents that can reason, plan, and dynamically decide when, what, and how to retrieve information using a variety of tools.',
-                flow: ['Plan', 'Select Tool', 'Retrieve/Act', 'Reflect', 'Generate'],
-                points: {
-                    strength: 'Maximum Flexibility and Power. Can automate complex, multi-step research and analysis tasks that go far beyond simple question-answering.',
-                    limitation: 'Very high latency and complexity. Agentic systems are difficult to build, debug, and can be slow due to their iterative, multi-step nature.'
-                }
-            }
-        };
-
-        const comparisonData = {
-            labels: ['Vanilla RAG', 'Standard RAG', 'CAG', 'Hybrid RAG', 'HyDE', 'Agentic RAG'],
-            metrics: {
-                'Complexity':   [1, 3, 3, 4, 3, 5],
-                'Flexibility':  [1, 2, 1, 4, 2, 5],
-                'Speed (Latency)': [4, 3, 5, 2, 3, 1],
-                'Accuracy':     [2, 4, 3, 5, 4, 5],
-                'Scalability':  [4, 3, 1, 4, 3, 5],
-            }
-        };
-
-        const comparisonTableData = {
-            headers: ["Feature", "Vanilla RAG", "Standard RAG", "Hybrid RAG", "HyDE", "Cache-Augmented Generation (CAG)", "Agentic RAG"],
-            rows: [
-                { feature: "Core Concept", values: ["Simple retrieve-then-read pipeline.", "Enhanced retrieval via query/result processing.", "Fuses multiple retrieval methods.", "Uses a generated answer for retrieval.", "Preloads all knowledge into context.", "Autonomous agents perform dynamic retrieval."] },
-                { feature: "Primary Use Case", values: ["Simple Q&A on static documents.", "Complex or ambiguous queries.", "Domains needing both keyword and semantic search.", "Niche domains or vague queries.", "Low-latency apps with static knowledge.", "Complex, multi-step research and analysis tasks."] },
-                { feature: "Primary Strength", values: ["Simplicity", "Improved Relevance", "Robustness", "Bridges Semantic Gap", "Speed (Low Latency)", "Flexibility & Power"] },
-                { feature: "Key Limitation(s)", values: ["Low precision; brittle.", "Increased latency.", "High implementation complexity.", "Can propagate errors.", "Only for static, small data.", "Very high latency; complex to debug."] },
-                { feature: "Relative Complexity", values: ["Low", "Medium", "High", "Medium", "Medium", "Very High"] }
-            ]
-        };
-
-        const navigationContainer = document.getElementById('navigation');
-        const contentTitle = document.getElementById('content-title');
-        const contentIntro = document.getElementById('content-intro');
-        const contentFlow = document.getElementById('content-flow');
-        const contentPoints = document.getElementById('content-points');
-        const contentDetails = document.getElementById('content-details');
-
-        let activeNavButton = null;
-        
-        function updateContent(ragKey) {
-            const data = ragData[ragKey];
-            if (!data) return;
-
-            contentDetails.style.opacity = '0';
-            
-            setTimeout(() => {
-                contentTitle.textContent = data.title;
-                contentIntro.textContent = data.intro;
-
-                contentFlow.innerHTML = data.flow.map((step, index) => `
-                    <div class="text-center p-3 bg-white rounded-md shadow-sm flex-grow">${step}</div>
-                    ${index < data.flow.length - 1 ? '<div class="flow-diagram-arrow font-bold mx-2">&rarr;</div>' : ''}
-                `).join('');
-
-                contentPoints.innerHTML = `
-                    <div class="p-4 bg-[#F8F7F4] rounded-lg">
-                        <h5 class="font-bold text-lg mb-1 text-[#3D405B]">Primary Strength</h5>
-                        <p class="text-sm text-[#3D405B]/80">${data.points.strength}</p>
-                    </div>
-                    <div class="p-4 bg-[#F8F7F4] rounded-lg">
-                        <h5 class="font-bold text-lg mb-1 text-[#3D405B]">Key Limitation</h5>
-                        <p class="text-sm text-[#3D405B]/80">${data.points.limitation}</p>
-                    </div>
-                `;
-                contentDetails.style.opacity = '1';
-
-                const newActiveButton = document.querySelector(`[data-rag-key="${ragKey}"]`);
-                if (activeNavButton) {
-                    activeNavButton.classList.remove('active-nav-button');
-                }
-                if (newActiveButton) {
-                    newActiveButton.classList.add('active-nav-button');
-                    activeNavButton = newActiveButton;
-                }
-            }, 150);
+      const ragData = {
+        vanilla: {
+          title: 'Vanilla RAG',
+          intro: 'The simplest form of RAG that combines retrieval with generation in a straightforward retrieve-then-read pipeline. It forms the foundational blueprint for the more advanced RAG systems in this guide.',
+          flow: ['Index', 'Retrieve', 'Generate'],
+          strength: 'Simplicity and ease of implementation. It provides a basic but effective framework for grounding an LLM in external knowledge.',
+          limitation: 'It can suffer from low-precision retrieval. Simple semantic search may retrieve irrelevant context, which can reduce generation quality.'
+        },
+        standard: {
+          title: 'Standard RAG',
+          intro: 'An enhanced form of RAG that introduces pre-retrieval and post-retrieval steps to improve the information ultimately supplied to the generator model.',
+          flow: ['Query Rewrite', 'Retrieve', 'Rerank', 'Generate'],
+          strength: 'Improved relevance. Query rewriting can clarify user intent, while reranking helps filter noisy retrieval results before generation.',
+          limitation: 'Additional processing increases latency and implementation complexity compared with a simple retrieve-then-read pipeline.'
+        },
+        cag: {
+          title: 'Cache-Augmented Generation (CAG)',
+          intro: 'Instead of retrieving data during each interaction, CAG preloads a static set of documents into the model context and can reuse cached states when the knowledge is stable and fits within the context window.',
+          flow: ['Preload Knowledge', 'Cache KV States', 'Query', 'Generate'],
+          strength: 'Very low response latency when real-time retrieval can be removed from the request path.',
+          limitation: 'It is best suited to relatively small and stable knowledge sets and remains constrained by context capacity and update requirements.'
+        },
+        hybrid: {
+          title: 'Hybrid RAG',
+          intro: 'Combines multiple retrieval methods, commonly sparse keyword search and dense semantic search, to capture complementary signals before generation.',
+          flow: ['Dense Retrieve', 'Sparse Retrieve', 'Fuse Results', 'Generate'],
+          strength: 'Robustness and comprehensiveness. It can capture both semantic meaning and exact terminology, which is valuable in domains where both matter.',
+          limitation: 'The retrieval stack is more complex. Fusion, weighting and ranking strategies require additional tuning and evaluation.'
+        },
+        hyde: {
+          title: 'Hypothetical Document Embeddings (HyDE)',
+          intro: 'HyDE generates a hypothetical document for the query, embeds that generated document and then uses its representation to retrieve real documents.',
+          flow: ['Query', 'Generate Hypothetical Doc', 'Encode Doc', 'Retrieve', 'Generate'],
+          strength: 'It can help bridge the semantic gap between short or vague user queries and longer source documents.',
+          limitation: 'The retrieval path depends on the quality of the generated hypothetical document. A poor hypothetical representation can steer retrieval in the wrong direction.'
+        },
+        agentic: {
+          title: 'Agentic RAG',
+          intro: 'Uses an AI agent to reason about when, what and how to retrieve information, potentially choosing among multiple tools and iterating over several retrieval or action steps.',
+          flow: ['Plan', 'Select Tool', 'Retrieve / Act', 'Reflect', 'Generate'],
+          strength: 'Maximum flexibility for complex, multi-step research and analysis workflows that cannot be expressed as one fixed retrieval sequence.',
+          limitation: 'High operational complexity and latency. Iterative workflows are harder to evaluate, debug and control than deterministic RAG pipelines.'
         }
+      };
 
-        Object.keys(ragData).forEach(key => {
-            const button = document.createElement('button');
-            button.className = 'w-full text-left p-3 rounded-lg bg-white shadow-md nav-button text-[#3D405B]';
-            button.textContent = ragData[key].title;
-            button.dataset.ragKey = key;
-            button.addEventListener('click', () => updateContent(key));
-            navigationContainer.appendChild(button);
-        });
+      const relativeProfiles = {
+        vanilla:  [1, 1, 4, 2, 4],
+        standard: [3, 2, 3, 4, 3],
+        cag:      [3, 1, 5, 3, 1],
+        hybrid:   [4, 4, 2, 5, 4],
+        hyde:     [3, 2, 3, 4, 3],
+        agentic:  [5, 5, 1, 5, 5]
+      };
 
-        const ctx = document.getElementById('ragComparisonChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: Object.keys(comparisonData.metrics),
-                datasets: comparisonData.labels.map((label, index) => ({
-                    label: label,
-                    data: Object.values(comparisonData.metrics).map(metric => metric[index]),
-                    fill: true,
-                    backgroundColor: `rgba(${index * 40}, ${180 - index * 20}, ${150 + index * 10}, 0.2)`,
-                    borderColor: `rgb(${index * 40}, ${180 - index * 20}, ${150 + index * 10})`,
-                    pointBackgroundColor: `rgb(${index * 40}, ${180 - index * 20}, ${150 + index * 10})`,
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: `rgb(${index * 40}, ${180 - index * 20}, ${150 + index * 10})`
-                }))
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.r !== null) {
-                                    label += context.parsed.r + ' / 5';
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    r: {
-                        angleLines: {
-                            display: true
-                        },
-                        suggestedMin: 0,
-                        suggestedMax: 5,
-                        pointLabels: {
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        },
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
+      const comparisonTableData = {
+        headers: ['Feature', 'Vanilla RAG', 'Standard RAG', 'Hybrid RAG', 'HyDE', 'Cache-Augmented Generation (CAG)', 'Agentic RAG'],
+        rows: [
+          { feature: 'Core Concept', values: ['Simple retrieve-then-read pipeline.', 'Enhanced retrieval via query and result processing.', 'Fuses multiple retrieval methods.', 'Uses a generated hypothetical document for retrieval.', 'Preloads knowledge into model context.', 'An agent dynamically decides when and how to retrieve.'] },
+          { feature: 'Primary Use Case', values: ['Simple Q&A on static documents.', 'Complex or ambiguous queries.', 'Domains needing both keyword and semantic search.', 'Niche domains or vague queries.', 'Low-latency apps with static knowledge.', 'Complex, multi-step research and analysis tasks.'] },
+          { feature: 'Primary Strength', values: ['Simplicity', 'Improved relevance', 'Robustness', 'Bridges semantic gap', 'Low latency', 'Flexibility and power'] },
+          { feature: 'Key Limitation(s)', values: ['Low precision can make retrieval brittle.', 'Increased latency.', 'Higher implementation complexity.', 'Generated hypothetical content can propagate errors.', 'Best for smaller, static knowledge.', 'High latency and difficult debugging.'] },
+          { feature: 'Relative Complexity', values: ['Low', 'Medium', 'High', 'Medium', 'Medium', 'Very High'] }
+        ]
+      };
+
+      const nav = document.getElementById('architecture-navigation');
+      const title = document.getElementById('detail-title');
+      const intro = document.getElementById('detail-intro');
+      const flow = document.getElementById('detail-flow');
+      const strength = document.getElementById('detail-strength');
+      const limitation = document.getElementById('detail-limitation');
+      let activeKey = null;
+
+      function renderArchitecture(key) {
+        const data = ragData[key];
+        if (!data) return;
+        activeKey = key;
+        title.textContent = data.title;
+        intro.textContent = data.intro;
+        strength.textContent = data.strength;
+        limitation.textContent = data.limitation;
+
+        flow.replaceChildren();
+        data.flow.forEach((step, index) => {
+          const stepEl = document.createElement('span');
+          stepEl.className = 'dk-chip';
+          stepEl.textContent = step;
+          flow.appendChild(stepEl);
+          if (index < data.flow.length - 1) {
+            const arrow = document.createElement('span');
+            arrow.setAttribute('aria-hidden', 'true');
+            arrow.textContent = '→';
+            flow.appendChild(arrow);
+          }
         });
 
-        const tableHead = document.querySelector('#comparison-table thead');
-        const tableBody = document.querySelector('#comparison-table tbody');
-        let headHtml = '<tr>';
-        comparisonTableData.headers.forEach(header => {
-            headHtml += `<th scope="col" class="px-6 py-3">${header}</th>`;
+        nav.querySelectorAll('button[data-rag-key]').forEach(button => {
+          const selected = button.dataset.ragKey === key;
+          button.classList.toggle('dk-card--brand', selected);
+          button.setAttribute('aria-pressed', selected ? 'true' : 'false');
         });
-        headHtml += '</tr>';
-        tableHead.innerHTML = headHtml;
-        
-        let bodyHtml = '';
-        comparisonTableData.rows.forEach((row, rowIndex) => {
-            bodyHtml += `<tr class="${rowIndex % 2 === 0 ? 'bg-white' : 'bg-[#F8F7F4]'} border-b">`;
-            bodyHtml += `<th scope="row" class="px-6 py-4 font-medium whitespace-nowrap">${row.feature}</th>`;
-            row.values.forEach(value => {
-                bodyHtml += `<td class="px-6 py-4">${value}</td>`;
-            });
-            bodyHtml += '</tr>';
+      }
+
+      Object.entries(ragData).forEach(([key, data], index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'dk-card dk-card--compact dk-card--hover dk-pattern-button';
+        button.dataset.ragKey = key;
+        button.setAttribute('aria-pressed', 'false');
+        button.innerHTML = `<span class="dk-pattern-index">0${index + 1}</span><span class="dk-pattern-title">${data.title}</span><span class="dk-pattern-flow">${data.flow.join(' → ')}</span>`;
+        button.addEventListener('click', () => renderArchitecture(key));
+        nav.appendChild(button);
+      });
+
+      const profileBody = document.querySelector('#profile-table tbody');
+      Object.entries(ragData).forEach(([key, data]) => {
+        const values = relativeProfiles[key];
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${data.title}</td>${values.map(value => `<td>${value} / 5</td>`).join('')}`;
+        profileBody.appendChild(row);
+      });
+
+      const tableHead = document.querySelector('#comparison-table thead');
+      const tableBody = document.querySelector('#comparison-table tbody');
+      const headerRow = document.createElement('tr');
+      comparisonTableData.headers.forEach(header => {
+        const th = document.createElement('th');
+        th.scope = 'col';
+        th.textContent = header;
+        headerRow.appendChild(th);
+      });
+      tableHead.appendChild(headerRow);
+
+      comparisonTableData.rows.forEach(rowData => {
+        const tr = document.createElement('tr');
+        const feature = document.createElement('td');
+        feature.textContent = rowData.feature;
+        tr.appendChild(feature);
+        rowData.values.forEach(value => {
+          const td = document.createElement('td');
+          td.textContent = value;
+          tr.appendChild(td);
         });
-        tableBody.innerHTML = bodyHtml;
-        
-        updateContent('vanilla');
+        tableBody.appendChild(tr);
+      });
+
+      const menuButton = document.getElementById('menu-button');
+      const mobileNav = document.getElementById('mobile-nav');
+      menuButton.addEventListener('click', () => {
+        const open = mobileNav.classList.toggle('is-open');
+        menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+        mobileNav.classList.remove('is-open');
+        menuButton.setAttribute('aria-expanded', 'false');
+      }));
+
+      renderArchitecture('vanilla');
     });
-    </script>
+  </script>
 
 
 </body></html>

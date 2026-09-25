@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>LLM Expert Enterprise Tutorial: Architecture, Scale, Agentic Workflows and Compliance</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="Enterprise LLM tutorial: RAG architecture with hybrid search and knowledge graphs, scaling and routing, agentic workflows, AI compliance, and domain assistants." name="description"/>
+  <meta content="index, follow" name="robots"/>
+
+  <link href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" rel="icon"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  
+    <link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --violet: #7c3aed;
+      --violet-dark: #5b21b6;
+      --indigo: #4338ca;
+      --hero-a: #4c1d95;
+      --hero-b: #7c3aed;
+      --hero-c: #4338ca;
+      --footer: #1e293b;
+      --footer-text: #cbd5e1;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 50px rgba(15, 23, 42, 0.14);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+      height: auto;
+    }
+
+    a {
+      color: var(--violet);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .site-header-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand img {
+      height: 44px;
+      width: auto;
+    }
+
+    .brand-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .site-nav a {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #475569;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav a:hover {
+      color: var(--violet);
+      text-decoration: none;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: linear-gradient(135deg, var(--hero-a), var(--hero-b), var(--hero-c));
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.10), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(255,255,255,0.10), transparent 25%),
+        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.07), transparent 30%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      padding: 72px 0 82px;
+      display: grid;
+      gap: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.10);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 960px;
+      font-size: clamp(2.3rem, 5vw, 4.4rem);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-desc {
+      max-width: 900px;
+      font-size: 1.08rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.92);
+      white-space: pre-line;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .hero-tag {
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.95);
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .section {
+      padding: 72px 0;
+    }
+
+    .section-soft {
+      background: linear-gradient(to bottom, #f8fafc, #ffffff);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header {
+      max-width: 860px;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      line-height: 1.14;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .section-intro {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+
+    .gallery-grid {
+      display: grid;
+      gap: 28px;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .gallery-item a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      background: white;
+    }
+
+    .caption {
+      padding: 18px 22px 24px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #334155;
+      letter-spacing: 0.02em;
+    }
+
+    .article-wrap {
+      margin-top: 46px;
+      border-top: 1px solid var(--border);
+      padding-top: 34px;
+    }
+
+    .article-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+    }
+
+    .article-content {
+      color: #334155;
+      font-size: 1.03rem;
+      line-height: 1.85;
+      overflow-wrap: anywhere;
+    }
+
+    .article-content h2,
+    .article-content h3,
+    .article-content h4 {
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-top: 1.6em;
+      margin-bottom: 0.65em;
+    }
+
+    .article-content h2 {
+      font-size: 1.9rem;
+      font-weight: 800;
+    }
+
+    .article-content h3 {
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .article-content h4 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .article-content p,
+    .article-content ul,
+    .article-content ol,
+    .article-content blockquote,
+    .article-content table {
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+
+    .article-content ul,
+    .article-content ol {
+      padding-left: 1.4em;
+    }
+
+    .article-content li + li {
+      margin-top: 0.45em;
+    }
+
+    .article-content blockquote {
+      margin-left: 0;
+      padding: 14px 18px;
+      border-left: 4px solid #c4b5fd;
+      background: #f5f3ff;
+      border-radius: 12px;
+      color: #4c1d95;
+    }
+
+    .article-content code {
+      background: #f1f5f9;
+      padding: 0.15em 0.35em;
+      border-radius: 6px;
+      font-size: 0.92em;
+    }
+
+    .article-content pre {
+      overflow-x: auto;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 14px;
+    }
+
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+    }
+
+    .article-content th,
+    .article-content td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .article-content th {
+      background: #f8fafc;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .cta-band {
+      margin-top: 44px;
+      padding: 28px;
+      border: 1px solid #ddd6fe;
+      background: linear-gradient(135deg, #faf5ff, #ffffff, #eef2ff);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .cta-band h3 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+      line-height: 1.2;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .cta-band p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .site-footer {
+      background: var(--footer);
+      color: var(--footer-text);
+      margin-top: 0;
+    }
+
+    .footer-inner {
+      padding: 48px 0 34px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 30px;
+    }
+
+    .footer-col h4 {
+      margin: 0 0 14px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .footer-col p,
+    .footer-col li {
+      font-size: 0.95rem;
+      color: var(--footer-text);
+      line-height: 1.8;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-col li + li {
+      margin-top: 6px;
+    }
+
+    .footer-col a {
+      color: var(--footer-text);
+    }
+
+    .footer-col a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(148, 163, 184, 0.22);
+      margin-top: 30px;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+      color: #94a3b8;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: #94a3b8;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    @media (min-width: 900px) {
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 899px) {
+      .site-nav {
+        display: none;
+      }
+
+      .hero-inner {
+        padding: 56px 0 64px;
+      }
+
+      .section {
+        padding: 56px 0;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .brand-text {
+        font-size: 1rem;
+      }
+
+      .article-card,
+      .cta-band {
+        padding: 22px;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="brand">
+        <a aria-label="Dataknobs Home" href="https://www.dataknobs.com/">
+          <img alt="Dataknobs" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"/>
+        </a>
+        <div class="brand-text">Dataknobs</div>
+      </div>
+
+      <nav aria-label="Primary navigation" class="site-nav">
+        <a href="#slides">Slides</a>
+        <a href="#article">Article</a>
+        <a href="https://www.dataknobs.com/use-cases/">Use Cases</a>
+        <a href="https://www.dataknobs.com/data-products/">Data Products</a>
+        <a href="https://www.dataknobs.com/search.html">Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="eyebrow">Dataknobs Visual Storytelling</div>
+
+      <h1>LLM Expert Enterprise Tutorial: Architecture, Scale, Agentic Workflows and Compliance</h1>
+
+      <div class="hero-desc">Enterprise LLM tutorial: RAG architecture with hybrid search and knowledge graphs, scaling and routing, agentic workflows, AI compliance, and domain assistants.</div>
+
+      <div class="hero-tags">
+        <div class="hero-tag">Slides as Web Pages</div>
+        <div class="hero-tag">SEO-Friendly Content</div>
+        <div class="hero-tag">Structured Visual Knowledge</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-soft" id="slides">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-kicker">Slides</div>
+        <h2 class="section-title">Visual walkthrough</h2>
+        <div class="section-intro">
+          Browse the slides below. Each image can be opened directly for a larger view.
+        </div>
+      </div>
+
+      <div class="gallery-grid">
+        <section class="gallery-item">
+  <a href="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1200/llm-tutorial-4.png" rel="noopener" target="_blank">
+    <img alt="Slide titled LLM Expert Enterprise Topics showing five numbered areas: enterprise RAG architecture, designing LLM systems at scale, agentic workflows for business automation, legal and compliance considerations, and building domain-specific AI assistants" loading="lazy" src="https://storage.googleapis.com/generate-slides/llm-slides/images/Slide1200/llm-tutorial-4.png"/>
+  </a>
+  <div class="caption">The five expert enterprise LLM topics covered in this tutorial.</div>
+</section>
+      </div>
+
+      <div class="cta-band">
+        <h3>LLM Expert Enterprise Tutorial: Architecture, Scale, Agentic Workflows and Compliance</h3>
+        <p>
+          
+        </p>
+      </div>
+
+      <div class="article-wrap" id="article">
+        <div class="section-header">
+          <div class="section-kicker">Article</div>
+          <h2 class="section-title">Detailed explanation</h2>
+          <div class="section-intro">
+            The content below expands on the slides with structured HTML article content.
+          </div>
+        </div>
+
+        <div class="article-card">
+          <div class="article-content">
+            <p class="lede">Advanced material gets a system to production. This tutorial is about what changes when that system belongs to an enterprise :  when retrieval spans governed data with per-user entitlements, when inference budgets are scrutinized, when a workflow touches processes that have owners and auditors, when a regulator may eventually ask how a decision was made, and when the assistant is expected to be genuinely expert in a domain. It covers five areas: enterprise RAG architecture, designing LLM systems at scale, agentic workflows for business automation, legal and compliance considerations, and building domain-specific assistants. It assumes production experience with RAG, evaluation, and agent patterns.</p>
+
+<h2>Part 1 :  Enterprise RAG Architecture</h2>
+<p>Enterprise retrieval differs from the standard pattern in three ways: the queries are more precise, the corpus is more structured than plain prose, and every document has an owner and an access policy. Each drives a specific architectural response.</p>
+
+<h3>Hybrid search: BM25 plus embeddings</h3>
+<p>Pure vector search is weakest exactly where enterprise queries live :  part numbers, contract identifiers, error codes, internal acronyms, policy section references, employee names. Embeddings capture meaning and blur precision; a query for "SKU 48A-1120" retrieves things that are semantically about products rather than that product.</p>
+<p>BM25 is the mature lexical counterpart: a term-frequency ranking function that rewards rare terms and normalizes for document length. It nails exact tokens and fails on paraphrase. The two methods fail in complementary directions, which is why running both and fusing the results reliably outperforms either.</p>
+<p>The standard fusion technique is <strong>reciprocal rank fusion</strong>, which combines rankings by position rather than by score. Its advantage is practical: BM25 scores and cosine similarities live on incomparable scales, and normalizing them requires tuning that drifts as the corpus changes. RRF sidesteps that entirely by using rank alone, and it works well with essentially no configuration. Weighted score fusion can edge it out when you invest in calibration, and usually is not worth the maintenance.</p>
+<p>Implementation notes that matter at enterprise scale:</p>
+<ul>
+ <li><strong>Retrieve deeper on each leg than you need.</strong> Take the top 50 from each retriever, fuse, then rerank the merged set down to the handful you pass to the model. Shallow retrieval on either leg discards the documents fusion exists to recover.</li>
+ <li><strong>Invest in lexical preprocessing.</strong> BM25 quality depends on tokenization, stemming, stopwords, and synonym expansion. Enterprise vocabularies are full of internal terms, product codenames, and abbreviations that no general analyzer handles :  a curated synonym list is unglamorous and consistently valuable.</li>
+ <li><strong>Consider learned sparse retrieval.</strong> Methods such as SPLADE produce sparse term-weighted vectors that expand a query into related terms while retaining exact-match behaviour, occupying a middle ground between BM25 and dense embeddings. Several vector stores now support sparse and dense vectors natively, letting you run all of it in one engine.</li>
+ <li><strong>Measure, do not assume.</strong> Build a query set that includes identifier lookups, natural-language questions, and acronym-heavy phrasing, then compare recall for BM25 alone, vectors alone, and fused. The result tells you where to spend; in most enterprise corpora fusion wins decisively, but the margin varies enough to be worth knowing.</li>
+</ul>
+
+<h3>Knowledge graphs with LLMs</h3>
+<p>Chunk-based retrieval answers questions whose evidence sits in one passage. It struggles with questions whose answer requires connecting facts spread across documents: which suppliers are exposed to a sanctioned entity through two degrees of ownership, which systems depend on a deprecated service, what changed across three amendments to a contract. No single chunk contains those answers.</p>
+<p>A <strong>knowledge graph</strong> represents entities as nodes and relationships as edges, making multi-hop connections traversable rather than inferable. Combining it with retrieval :  commonly called GraphRAG :  adds structure that vectors alone cannot express.</p>
+<p>Three ways the combination is typically built:</p>
+<ul>
+ <li><strong>LLM-assisted graph construction.</strong> Extract entities and relationships from documents with a schema-constrained model call, resolve entities to canonical identifiers, and load into a graph store. The hard part is not extraction but <em>entity resolution</em> :  deciding that "Acme Corp", "ACME Corporation", and "Acme Inc." are one node. Budget for it, and keep a human review path for merges above a confidence threshold.</li>
+ <li><strong>Graph-augmented retrieval.</strong> Retrieve chunks conventionally, then expand along graph edges to pull in connected context the query did not mention. This catches the "related by relationship rather than by wording" case that pure similarity misses.</li>
+ <li><strong>Community summarization.</strong> Cluster the graph into communities, generate a summary for each, and use those summaries to answer global questions :  "what are the main themes across this corpus" :  which chunk retrieval handles badly because no chunk contains the theme.</li>
+</ul>
+<p>Be honest about cost. Graph construction over a large corpus is many model calls, entity resolution is genuinely difficult, and the graph needs maintenance as documents change. Justify it with a class of question your existing system demonstrably cannot answer, rather than adopting it as an architectural upgrade. Where your organization already maintains structured data :  a CMDB, a master data management system, an entity master, a product catalogue :  you may already have the graph, and connecting to it beats extracting one from prose.</p>
+<p>A cheaper intermediate step worth trying first: text-to-query. Let the model translate a natural-language question into SQL, Cypher, or an API call against systems that already hold the structured answer, and use retrieval only for unstructured content. Many "we need a knowledge graph" problems are really "we need the model to query the warehouse".</p>
+
+<h3>Security and data governance</h3>
+<p>This is the requirement that most often blocks enterprise deployment, and retrofitting it is close to a rebuild.</p>
+<ul>
+ <li><strong>Enforce entitlements at query time, in the store.</strong> Index every chunk with the access control identifiers of its source, and apply them as a mandatory server-side filter on every retrieval. Filtering after retrieval is a bug waiting to leak, and relying on the model to respect an instruction about who may see what is not a control at all.</li>
+ <li><strong>Propagate the user's identity, not the service's.</strong> The retrieval layer should act with the requesting user's permissions. A service account with read access to everything turns your assistant into a universal privilege-escalation tool: any user can ask it to summarize a document they could not open.</li>
+ <li><strong>Sync permissions, not just content.</strong> Source-system access changes constantly. If your index refreshes permissions weekly, you have a week-long window where a revoked user still retrieves. Subscribe to change events where the source supports it, and re-verify entitlements at query time against the live system for high-sensitivity content.</li>
+ <li><strong>Classify and tier data before ingesting it.</strong> Not everything should be in the index. Decide explicitly which classifications are eligible, and exclude regulated categories that need separate handling rather than discovering them in a retrieved answer.</li>
+ <li><strong>Control residency and flow.</strong> Where vectors are stored, where inference happens, and which jurisdictions data crosses are all governance questions with contractual answers. Self-hosted models and stores exist largely for this reason.</li>
+ <li><strong>Log for audit, not just debugging.</strong> Who asked what, which documents were retrieved, what was generated, and what action followed. This record serves security investigation, compliance evidence, and incident response simultaneously.</li>
+ <li><strong>Treat retrieved content as untrusted.</strong> Documents inside the enterprise can carry prompt injection too :  a resume, a vendor email, an uploaded spreadsheet. Never let retrieved text authorize a tool call or alter system instructions.</li>
+</ul>
+<p>Governance is also a lifecycle: a documented inventory of which systems feed the index, an owner for each source, retention and deletion that honours the source's policy, and a defined path for a data subject's deletion request to propagate into the vector store. Deletion is the one most teams discover late :  make sure you can find and remove every chunk derived from a given source record.</p>
+
+<h2>Part 2 :  Designing LLM Systems at Scale</h2>
+
+<h3>Multi-model routing</h3>
+<p>At scale, sending every request to one capable model is both wasteful and slow. Routing sends each request to the cheapest model that can handle it, and it is typically the single largest lever on unit economics.</p>
+<p>Routing strategies, in ascending sophistication:</p>
+<ul>
+ <li><strong>Task-based.</strong> Different endpoints use different models by design :  classification on a small model, summarization mid-tier, complex analysis on a frontier model. Deterministic, trivially debuggable, and sufficient for most systems.</li>
+ <li><strong>Difficulty-classified.</strong> A small fast model scores incoming requests and routes accordingly. Adds a hop of latency and needs its own evaluation, since a misrouted hard question produces a confidently poor answer.</li>
+ <li><strong>Cascading.</strong> Try the cheap model first, evaluate the answer with a validator or confidence signal, and escalate only on failure. Excellent economics when the cheap model succeeds often; worse than direct routing when it does not, because you pay twice.</li>
+ <li><strong>Capability-based.</strong> Route by required feature rather than difficulty :  vision input, long context, strict schema support, or a self-hosted model for regulated data.</li>
+</ul>
+<p>Build this behind an internal gateway so that model selection is configuration, not code. That abstraction earns its keep quickly: it gives you provider failover when an endpoint degrades, a single place to enforce rate limits and spending caps, consistent telemetry across providers, and the ability to shift traffic to a new model gradually. Keep per-route quality metrics, because the failure mode of routing is invisible quality decay on the cheap path.</p>
+
+<h3>Distillation and model compression</h3>
+<p>Routing optimizes which model handles a request. Compression changes what the models themselves cost.</p>
+<p><strong>Knowledge distillation</strong> trains a small student model to reproduce the behaviour of a large teacher. In practice the workflow is: run your production traffic through the large model, capture inputs and outputs, filter and verify them, then fine-tune a small model on that dataset. On a narrow task the student frequently matches the teacher at a fraction of the cost and latency :  this is the most reliable route to cheap inference for high-volume, well-defined work. The limits are equally clear: the student inherits the teacher's errors, generalizes poorly outside the distilled task, and needs re-distillation when the task shifts. Check your provider's terms on training with model outputs before building on it.</p>
+<p><strong>Quantization</strong> reduces numerical precision of weights and sometimes activations :  16-bit to 8-bit to 4-bit :  cutting memory and increasing throughput. Post-training quantization is fast and needs no retraining; quantization-aware training preserves more quality at higher cost. The practical guidance: 8-bit is usually near-lossless, 4-bit is often acceptable and sometimes not, and degradation concentrates in exactly the hard reasoning cases your evaluation set may under-represent. Always evaluate the quantized model on your own tasks rather than trusting a published perplexity figure.</p>
+<p><strong>Pruning</strong> removes weights or whole structural units. Unstructured pruning preserves quality better but needs sparse-aware hardware support to deliver real speedups; structured pruning removes heads or layers and yields genuine wins on ordinary hardware at greater quality cost.</p>
+<p><strong>Speculative decoding</strong> is different in kind and worth knowing: a small draft model proposes several tokens which the large model verifies in one pass, accelerating generation with no quality loss, since rejected tokens are discarded. It is an inference-time technique requiring no retraining and is widely supported in serving stacks.</p>
+<p>Sequence matters. Distill first to get onto a small model, then quantize the small model, then evaluate the combination :  compression effects compound and not always benignly.</p>
+
+<h3>GPU and infrastructure considerations</h3>
+<p>Self-hosting becomes attractive when volume is high, data cannot leave your boundary, or you need a customized model. It also makes you responsible for inference performance, which has its own distinctive shape.</p>
+<p><strong>Inference has two phases with opposite characteristics.</strong> Prefill processes the entire input in parallel and is compute-bound; decode generates one token at a time and is memory-bandwidth-bound. This is why long prompts cost latency up front while long outputs cost latency throughout, and why the optimizations for each differ.</p>
+<ul>
+ <li><strong>Continuous batching</strong> is the single most important serving technique. Rather than waiting for a fixed batch, the server admits new requests into the batch as earlier ones finish generating. Throughput improvements are large, because GPUs are badly underutilized by sequential single-request serving. Any serious serving stack does this.</li>
+ <li><strong>KV cache management</strong> dominates memory. Every generated token caches key and value tensors, and cache size scales with batch size and sequence length :  frequently exceeding the model weights themselves. Paged attention allocates cache in blocks rather than contiguous reservations, drastically reducing waste and raising achievable concurrency. Prefix sharing lets requests with a common system prompt share cache, which matters enormously when every request carries the same long preamble.</li>
+ <li><strong>Batch size trades throughput against latency.</strong> Larger batches serve more tokens per second and make each individual request slower. Interactive workloads want small batches and low latency; bulk processing wants the opposite. Run them as separate deployments rather than compromising on one.</li>
+ <li><strong>Memory arithmetic first.</strong> Weights plus KV cache plus activation overhead determines what fits. A rough planning figure: parameters times bytes-per-parameter for weights, plus a KV budget that grows with your concurrency and context targets. Quantization buys headroom on both.</li>
+ <li><strong>Parallelism when one GPU is not enough.</strong> Tensor parallelism splits layers across GPUs within a node and needs fast interconnect; pipeline parallelism splits layers across stages and suits slower links at the cost of bubbles. Prefer fitting on a single GPU via quantization before reaching for either.</li>
+ <li><strong>Autoscaling is awkward.</strong> Model loading takes minutes, so scale-from-zero is not viable for interactive traffic. Keep warm capacity for the baseline, use queueing with backpressure for spikes, and consider a hosted API as overflow for peaks rather than provisioning for them.</li>
+</ul>
+<p>Measure the metrics that describe user experience and economics: time to first token, inter-token latency, tokens per second per GPU, and cost per million tokens at your actual utilization. Hardware benchmarks at batch size one describe a workload nobody runs.</p>
+
+<h2>Part 3 :  Agentic Workflows for Business Automation</h2>
+
+<h3>Integrating LLMs into business processes</h3>
+<p>The failure mode of enterprise agent projects is rarely the model. It is choosing a process that should not have been automated, or automating it without the surrounding controls the process already had.</p>
+<p>Good candidates share a profile: high volume, meaningful unstructured input, tolerable error cost, a verifiable output, and an existing human fallback. Invoice coding, support triage, contract clause review, RFP response drafting, claims intake, and data reconciliation fit well. Poor candidates are low-volume high-stakes decisions, processes with no verification mechanism, and anything where an error is both expensive and hard to detect.</p>
+<p>Structure the rollout to earn autonomy rather than assume it:</p>
+<ol>
+ <li><strong>Shadow mode.</strong> The agent runs on live traffic and its output goes nowhere except a comparison log. You get real-distribution accuracy data at zero risk, and a baseline against current human performance :  which is usually worse than people assume, and knowing that changes the conversation.</li>
+ <li><strong>Suggestion mode.</strong> Output is presented to the human who does the work today. Adoption rate and edit distance become your quality metrics, and every edit is a labelled correction.</li>
+ <li><strong>Supervised automation.</strong> The agent acts, a human approves before the action commits. Tune the approval threshold by confidence and by stakes.</li>
+ <li><strong>Bounded autonomy.</strong> The agent acts unsupervised within explicit limits :  amount thresholds, document types, customer tiers :  and escalates outside them. This is the realistic end state for most processes; full autonomy is rarely the goal.</li>
+</ol>
+<p>Define the economics up front: cost per transaction, accuracy relative to the human baseline, escalation rate, and cycle time. A process owner will ask these questions, and "the demo was impressive" is not an answer. Involve that owner early :  they know the exceptions that will break your happy path, and those exceptions are usually most of the work.</p>
+
+<h3>Workflow orchestration</h3>
+<p>Multi-step business processes need durable execution, not a loop in a request handler. A process that takes hours, waits on human approval, or spans a dozen system calls cannot live inside an HTTP request.</p>
+<p>Requirements an enterprise workflow layer must satisfy:</p>
+<ul>
+ <li><strong>Durable state.</strong> Execution survives process restarts and deployments, resuming where it stopped rather than restarting the whole workflow.</li>
+ <li><strong>Checkpointing.</strong> Every step's input and output persisted, so a failure resumes from the last good state and an auditor can reconstruct the sequence.</li>
+ <li><strong>Human-in-the-loop as a first-class state.</strong> A workflow may pause for days awaiting approval and must resume cleanly, including after a deployment.</li>
+ <li><strong>Idempotency.</strong> Steps that touch external systems must tolerate re-execution. Use idempotency keys on every write, or your retry logic becomes a duplicate-payment generator.</li>
+ <li><strong>Timeouts and compensation.</strong> Steps need deadlines, and partially-completed workflows need defined compensating actions :  the saga pattern :  because distributed rollback does not exist for free.</li>
+ <li><strong>Observability.</strong> Per-step traces with model calls, tool calls, tokens, and costs attributed to the workflow instance.</li>
+</ul>
+<p>Two architectural approaches coexist. <strong>Deterministic workflows with LLM steps</strong> keep control flow in code and use the model for judgement at specific points :  classify, extract, draft, decide. Predictable, testable, auditable, and the right default for business processes. <strong>Agentic workflows</strong> let the model choose the sequence, which suits genuinely variable tasks and costs you predictability. Most enterprise processes want the first, with agentic behaviour confined to well-bounded subtasks.</p>
+<p>Durable execution engines from the general workflow world handle much of this, and agent frameworks with graph-based state and checkpointing cover it for model-centric flows. Whichever you pick, the requirement is the same: the workflow must be reconstructable after the fact, because someone will eventually ask what happened on a specific transaction six months ago.</p>
+
+<h3>Error recovery and backoff strategies</h3>
+<p>Agentic systems fail in more ways than conventional software, and the failures are noisier. Classify before you retry, because the right response differs sharply by failure type.</p>
+<ul>
+ <li><strong>Transient infrastructure failures</strong> :  rate limits, timeouts, overload responses, network faults. Retry with exponential backoff and jitter, respecting any retry-after header. Jitter is not optional: synchronized retries from many workers reproduce the overload that caused the failure. Cap total attempts and total elapsed time.</li>
+ <li><strong>Model output failures</strong> :  malformed structure, schema violations, refusals, truncation. Retrying identically rarely helps. Repair with specific feedback about what was wrong, adjust parameters (lower temperature, raise the output limit), or escalate to a stronger model. Bound this to two attempts.</li>
+ <li><strong>Tool execution failures</strong> :  a downstream API error, a missing record, invalid arguments. Return the error to the model as actionable text so it can correct its approach, but distinguish recoverable errors from ones that mean the task cannot proceed.</li>
+ <li><strong>Semantic failures</strong> :  the output is well-formed and wrong. Retries do not detect these; validation does. This is why business-rule checks and reconciliation against systems of record belong in the workflow, not just schema validation.</li>
+ <li><strong>Loop and drift failures</strong> :  the agent repeats actions or wanders from the goal. Detect with step caps, repeated-state detection, and cost ceilings per workflow instance. When tripped, escalate rather than continue.</li>
+</ul>
+<p>Around all of it, standard resilience patterns apply with extra force. <strong>Circuit breakers</strong> stop hammering a degraded provider and fail fast to a fallback. <strong>Bulkheads</strong> keep one misbehaving workflow type from exhausting shared capacity. <strong>Dead letter queues</strong> capture what could not be processed, with enough context for a human to resolve it. And every workflow needs a defined terminal failure state that notifies an owner :  silent failure in an automated business process is worse than loud failure, because it is discovered by the customer.</p>
+<p>Budget for the tail. Pilot accuracy on clean cases sets expectations that the exception path then has to meet; plan the escalation experience with as much care as the happy path, because at enterprise volume the exceptions are a full-time queue.</p>
+
+<h2>Part 4 :  Legal and Compliance Considerations</h2>
+<p>This section describes the landscape as of September 2026 and is general information, not legal advice. Obligations depend on jurisdiction, sector, and role, and the rules are moving :  verify current status with qualified counsel before relying on any date below.</p>
+
+<h3>Data privacy and PII handling</h3>
+<p>Existing privacy law applies to LLM systems without needing AI-specific provisions. Under GDPR and comparable regimes, the questions are the familiar ones: what is your lawful basis for processing, is the processing necessary and proportionate, how long is data retained, where does it flow, and can a data subject exercise their rights against it.</p>
+<p>What makes LLM systems distinctive in practice:</p>
+<ul>
+ <li><strong>Prompts are processing.</strong> Personal data in a prompt is personal data sent to a processor. Your agreements with model providers need to cover it, including sub-processors, retention, and whether inputs may be used for training. Most enterprise tiers contractually exclude training on customer data; confirm rather than assume.</li>
+ <li><strong>Telemetry is a second copy.</strong> Traces, evaluation datasets, and prompt logs replicate personal data into observability systems that often have looser access controls and longer retention than the primary application. Redact before export, and set retention deliberately.</li>
+ <li><strong>Deletion must reach everywhere.</strong> An erasure request has to propagate into vector indexes, caches, trace stores, and any evaluation or fine-tuning dataset derived from production. Design for it: chunk-to-source lineage is what makes deletion tractable, and data that has been trained into model weights cannot be deleted at all :  which is a strong argument against fine-tuning on personal data.</li>
+ <li><strong>Minimize before sending.</strong> Redact, tokenize, or pseudonymize personal data where the task does not require it. Restoring real values after generation is straightforward when you tokenized on the way in.</li>
+ <li><strong>Residency is architectural.</strong> Where inference happens determines cross-border transfer analysis. Regional endpoints and self-hosted models exist largely to answer this question.</li>
+ <li><strong>Assess before launching.</strong> High-risk processing typically requires a documented impact assessment, and producing it after deployment is both harder and less credible.</li>
+</ul>
+
+<h3>Model bias considerations</h3>
+<p>Models reflect their training data, and in consequential decisions that becomes a legal exposure rather than merely a quality issue. Anti-discrimination law applies to automated decisions regardless of whether the statute mentions AI, and "the model decided" is not a defence.</p>
+<p>Where bias enters: the pretraining corpus, your fine-tuning data, retrieval that surfaces some sources more than others, prompt framing, and the human review process that is meant to catch it. Concretely, it shows up as differential quality across demographic groups, differential refusal rates, stereotyped associations in generated text, and unequal outcomes in screening, scoring, or prioritization.</p>
+<p>Practical mitigations:</p>
+<ul>
+ <li><strong>Test for disparity explicitly.</strong> Build evaluation sets stratified by relevant groups and compare outcome rates and quality across them. You cannot manage what you have not measured, and a single aggregate accuracy number conceals exactly the pattern that matters.</li>
+ <li><strong>Remove proxies, not just protected attributes.</strong> Postcode, school, name, and employment gaps all correlate with protected characteristics. Excluding the attribute while retaining its proxies changes nothing.</li>
+ <li><strong>Keep humans meaningfully in the loop</strong> for consequential decisions :  with enough context and authority to disagree. Rubber-stamp review satisfies nobody, least of all a regulator examining it.</li>
+ <li><strong>Document the process.</strong> What you tested, what you found, what you changed, and what residual risk you accepted. This documentation is the compliance artifact.</li>
+ <li><strong>Monitor after launch.</strong> Population and usage drift. A system fair at launch is not permanently fair, and periodic re-testing should be scheduled, not incidental.</li>
+</ul>
+
+<h3>Auditability of outputs</h3>
+<p>Auditability means being able to answer, months later: what did the system produce, on what input, using which model and configuration, drawing on which sources, and who reviewed it. Non-determinism makes this harder than for conventional software :  you cannot re-run and reproduce :  so capture at the time is the only option.</p>
+<p>A defensible audit record contains the full input including system prompt and retrieved context, prompt and model versions with all generation parameters, the output verbatim, retrieved document identifiers and versions, tool calls with arguments and results, validation and safety filter outcomes, human review actions and identities, and immutable timestamps throughout. Retain it for the period your sector requires, with integrity controls proportionate to the stakes.</p>
+<p>The regulatory backdrop, as of September 2026, makes this concrete in some jurisdictions:</p>
+<ul>
+ <li><strong>EU AI Act.</strong> The Digital Omnibus on AI :  Regulation (EU) 2026/1744 :  was published in the Official Journal on 24 July 2026 and entered into force on 27 July 2026, amending the AI Act with deadline extensions for high-risk obligations, new prohibited practices, and scope clarifications. High-risk obligations for stand-alone Annex III systems now apply from 2 December 2027, and for AI embedded in regulated Annex I products from 2 August 2028; new prohibited-practice dates land on 2 December 2026. Transparency duties under Article 50 and the AI Office's enforcement powers over general-purpose AI providers took effect on schedule on 2 August 2026 and were not delayed :  prohibited practices, AI literacy duties, and GPAI obligations likewise remain on their original timetable. Article 50(2) transparency requirements reach systems already on the market by 2 December 2026, and member states must have a national AI regulatory sandbox operational by 2 August 2027. The Commission has also issued guidance clarifying GPAI obligations, including technical criteria based on training compute rather than a functionality list, and draft guidelines on high-risk classification. The practical implication of the deferral is not to pause: system inventory and classification are the slow parts, and they do not get easier with time.</li>
+ <li><strong>United States, state level.</strong> The picture has shifted materially. Colorado replaced its pioneering 2024 AI Act with SB 26-189, signed on 14 May 2026 and effective 1 January 2027, which narrows scope to automated decision-making technologies used in consequential decisions and removes the affirmative duty to prevent algorithmic discrimination, relying on existing state anti-discrimination law instead. Enforcement sits with the state attorney general, with no private right of action. California continues to advance sector-specific obligations across several statutes covering training-data disclosure, AI content provenance, and employment decision-making. Expect continued divergence rather than convergence across states.</li>
+ <li><strong>Sectoral rules still dominate.</strong> In finance, healthcare, insurance, and employment, existing regulators and their model-risk, records, and fair-lending regimes apply to AI systems already, often more concretely than AI-specific statutes.</li>
+ <li><strong>Voluntary frameworks are useful scaffolding.</strong> The NIST AI Risk Management Framework and ISO/IEC 42001 give you a defensible structure for governance documentation, and increasingly appear in customer due-diligence questionnaires.</li>
+</ul>
+<p>Whatever the jurisdiction, the durable operational answer is the same: maintain an inventory of AI systems and their risk classification, keep documentation current as systems change, log enough to reconstruct any individual decision, and be able to explain in plain language what a system does and what controls surround it.</p>
+
+<h2>Part 5 :  Building Domain-Specific AI Assistants</h2>
+
+<h3>Vertical assistants: tax, stocks, and similar</h3>
+<p>Domain assistants fail generically. Tax questions depend on jurisdiction, filing status, and tax year; investment questions depend on live prices, holdings, and a suitability profile. A general model answering from parametric memory will be confidently out of date, and in these domains out of date means wrong.</p>
+<p>The architecture that works separates three concerns:</p>
+<ul>
+ <li><strong>Authoritative sources for facts.</strong> Tax rules from current published guidance, retrieved with the applicable year and jurisdiction as hard metadata filters. Market data from a live feed, never from the model. Anything time-varying must be fetched, not recalled.</li>
+ <li><strong>Deterministic computation.</strong> Tax liability, portfolio allocation, and position sizing should be computed by code and validated, with the model orchestrating and explaining rather than calculating. A model doing arithmetic on money is an avoidable category of error.</li>
+ <li><strong>Explicit scope boundaries.</strong> A tax assistant that answers "should I incorporate in Delaware" has left information and entered advice, which in many jurisdictions is regulated activity. A stocks assistant that says "you should buy this" may be making a personalized recommendation subject to suitability rules. Define the line, enforce it in the system prompt <em>and</em> in output filtering, and design a clean handoff to a qualified human.</li>
+</ul>
+<p>Both examples share a pattern worth generalizing: the assistant's job is to retrieve current authoritative material, run deterministic calculations, explain results clearly with citations, and know precisely where its remit ends.</p>
+
+<h3>Healthcare, finance, and legal verticals</h3>
+<p>These verticals raise the same three requirements with different specifics.</p>
+<p><strong>Healthcare.</strong> Protected health information governs the entire architecture :  processing agreements with vendors, residency, minimum-necessary access, audit logging of every access. Clinical decision support may be regulated as a medical device depending on what it does and how much the clinician can independently review its basis. Clinical terminology needs coding systems rather than free text. And the human-in-the-loop requirement is non-negotiable: the system informs a clinician, it does not decide.</p>
+<p><strong>Finance.</strong> Model risk management frameworks already cover validation, documentation, and ongoing monitoring, and LLM systems fall inside them. Communications with customers carry recordkeeping and supervision obligations. Fair lending analysis applies to anything touching credit. Market abuse and conflict rules shape what a research or advisory assistant may say. The compliance function should be involved from design, not shown a finished system.</p>
+<p><strong>Legal.</strong> Privilege and confidentiality constrain what may be sent to a third-party model and what may be retained. Citation accuracy is existential :  fabricated case citations have produced sanctions :  so every authority must be verified against a real database before it reaches a human, never merely generated. Unauthorized practice rules constrain client-facing deployment. Jurisdiction and currency of law matter as much as in tax.</p>
+<p>Across all three: verification against an authoritative source is the defining architectural requirement, human accountability is retained by design, audit trails are mandatory, and conservative failure :  declining, escalating, flagging uncertainty :  is strongly preferable to a confident answer.</p>
+
+<h3>Guardrails and domain ontologies</h3>
+<p><strong>Guardrails</strong> in a domain assistant are layered and enforced in code, not requested in a prompt:</p>
+<ul>
+ <li><strong>Scope enforcement</strong> :  classify incoming requests and decline or route those outside remit, with a defined response rather than an improvised one.</li>
+ <li><strong>Grounding requirements</strong> :  every substantive claim traceable to a retrieved source, with unsupported claims blocked rather than caveated.</li>
+ <li><strong>Citation verification</strong> :  programmatic confirmation that every cited authority, standard, or document exists and says what the answer claims.</li>
+ <li><strong>Prohibited-output filtering</strong> :  specific advice, guarantees of outcome, or regulated recommendations blocked at the output stage.</li>
+ <li><strong>Escalation triggers</strong> :  defined conditions that route to a human: low confidence, high stakes, detected distress, out-of-scope drift, or conflicting sources.</li>
+ <li><strong>Disclosure</strong> :  the user knows they are talking to an AI system and understands its limits, which is both good practice and increasingly a legal requirement.</li>
+</ul>
+<p>A <strong>domain ontology</strong> is the formal vocabulary of the domain: its entities, their attributes, and the relationships and constraints between them :  diagnoses and their coding hierarchies, financial instruments and their issuers, legal concepts and their jurisdictional scope. Many verticals already have mature ones, and adopting an established standard beats inventing your own.</p>
+<p>An ontology earns its place in four ways. It normalizes terminology, mapping the many ways users and documents refer to the same thing onto one canonical identifier, which lifts retrieval quality immediately. It supplies the schema for structured extraction, so outputs are typed and validated against the domain's own constraints rather than free text. It enables consistency checks :  a relationship the ontology forbids is a detectable error. And it supports the multi-hop traversal described in Part 1, connecting entities in ways a chunk-based index cannot.</p>
+<p>Keep it proportionate. A full formal ontology is a large investment; a controlled vocabulary with synonym mappings and a handful of entity types delivers most of the retrieval benefit for a fraction of the effort. Start there, and extend only where a real failure demands it.</p>
+
+<h2>Enterprise Readiness Checklist</h2>
+<ol>
+ <li>Retrieval fuses lexical and vector results, with reranking over a deep candidate pool.</li>
+ <li>Entitlements are enforced server-side at query time under the requesting user's identity, and permission changes propagate promptly.</li>
+ <li>Data classification, residency, retention, and deletion lineage are documented and tested :  including deletion from vector stores and trace systems.</li>
+ <li>Model selection runs through an internal gateway with failover, spend caps, and per-route quality metrics.</li>
+ <li>Compression choices are evaluated on your own tasks, not on published benchmarks.</li>
+ <li>Self-hosted serving uses continuous batching and paged attention, with capacity planned from KV-cache arithmetic.</li>
+ <li>Automated processes graduated through shadow, suggestion, and supervised stages with measured accuracy against the human baseline.</li>
+ <li>Workflows are durable, checkpointed, idempotent, and reconstructable after the fact.</li>
+ <li>Failures are classified before retry, with jittered backoff, circuit breakers, step caps, and a terminal state that notifies an owner.</li>
+ <li>An AI system inventory exists with risk classification, impact assessments, and current documentation.</li>
+ <li>Bias testing is stratified, scheduled, and documented :  not a one-time pre-launch exercise.</li>
+ <li>Every consequential output has an audit record sufficient to reconstruct the decision.</li>
+ <li>Domain assistants verify citations programmatically and have enforced scope boundaries with human escalation paths.</li>
+</ol>
+
+<h2>Glossary</h2>
+<ul>
+ <li><strong>BM25</strong> :  a lexical ranking function rewarding rare terms, normalized for document length.</li>
+ <li><strong>Reciprocal rank fusion</strong> :  combining result lists by rank position rather than by incomparable scores.</li>
+ <li><strong>Learned sparse retrieval</strong> :  term-weighted sparse vectors that expand queries while keeping exact-match behaviour.</li>
+ <li><strong>GraphRAG</strong> :  retrieval augmented with a knowledge graph for multi-hop and global questions.</li>
+ <li><strong>Entity resolution</strong> :  determining that differently-written references denote the same entity.</li>
+ <li><strong>Text-to-query</strong> :  translating a natural-language question into SQL, Cypher, or an API call.</li>
+ <li><strong>Entitlement filtering</strong> :  enforcing per-user access control inside retrieval, server-side.</li>
+ <li><strong>Model routing</strong> :  directing each request to the cheapest model capable of handling it.</li>
+ <li><strong>Knowledge distillation</strong> :  training a small student model on a large teacher's outputs.</li>
+ <li><strong>Quantization</strong> :  reducing numerical precision of weights to cut memory and raise throughput.</li>
+ <li><strong>Speculative decoding</strong> :  a draft model proposing tokens that the large model verifies in one pass.</li>
+ <li><strong>Prefill / decode</strong> :  the compute-bound input phase and memory-bandwidth-bound generation phase of inference.</li>
+ <li><strong>Continuous batching</strong> :  admitting new requests into an in-flight batch as others complete.</li>
+ <li><strong>KV cache / paged attention</strong> :  cached attention tensors, and block-wise allocation that reduces their waste.</li>
+ <li><strong>Shadow mode</strong> :  running on live traffic with output logged rather than used.</li>
+ <li><strong>Durable execution</strong> :  workflow state that survives restarts and resumes from checkpoints.</li>
+ <li><strong>Saga / compensation</strong> :  defined reversal actions for partially completed distributed workflows.</li>
+ <li><strong>Circuit breaker</strong> :  failing fast away from a degraded dependency instead of retrying into it.</li>
+ <li><strong>Annex III</strong> :  the EU AI Act's list of stand-alone high-risk system categories.</li>
+ <li><strong>Domain ontology</strong> :  the formal entities, attributes, relationships, and constraints of a domain.</li>
+</ul>
+
+<h2>Frequently Asked Questions</h2>
+<h3>Why does enterprise RAG need hybrid search?</h3>
+<p>Enterprise queries are full of exact identifiers :  part numbers, contract IDs, error codes, internal acronyms :  where embeddings blur precision and BM25 excels, while natural-language questions need the opposite. Running both and fusing by reciprocal rank fusion reliably beats either alone.</p>
+<h3>When is a knowledge graph worth building?</h3>
+<p>When you have a class of question that chunk retrieval demonstrably cannot answer :  multi-hop relationships, dependency traversal, or global themes across a corpus. Try text-to-query against structured systems you already maintain first; many "we need a graph" problems are really "the model should query the warehouse".</p>
+<h3>How do I enforce document permissions in a RAG system?</h3>
+<p>Index access-control identifiers with every chunk and apply them as a mandatory server-side filter at query time, acting under the requesting user's identity rather than a service account. Filtering after retrieval leaks, and instructing the model about who may see what is not a control.</p>
+<h3>What is the biggest lever on LLM cost at scale?</h3>
+<p>Model routing :  sending each request to the cheapest model that can handle it. Beyond that, distilling a small model for high-volume narrow tasks, provider prefix caching, and, if self-hosting, continuous batching and paged attention to raise GPU utilization.</p>
+<h3>Is quantization safe for production?</h3>
+<p>8-bit is usually near-lossless and 4-bit is often acceptable, but degradation concentrates in hard reasoning cases that evaluation sets tend to under-represent. Always evaluate the quantized model on your own tasks rather than relying on published perplexity figures.</p>
+<h3>How should we roll out an agent into a business process?</h3>
+<p>Graduate through shadow mode (output logged, not used), suggestion mode (human decides), supervised automation (human approves), and finally bounded autonomy within explicit limits. Measure accuracy against the current human baseline at each stage.</p>
+<h3>What did the EU Digital Omnibus change?</h3>
+<p>It deferred high-risk obligations :  Annex III stand-alone systems to 2 December 2027 and Annex I embedded systems to 2 August 2028 :  while leaving prohibited practices, AI literacy duties, GPAI obligations, and Article 50 transparency on their original schedule. The deferral is a timing change, not a reprieve: inventory and classification are the slow work.</p>
+<h3>Is the Colorado AI Act still the US benchmark?</h3>
+<p>No. Colorado replaced it in May 2026 with SB 26-189, effective 1 January 2027, which narrows scope to automated decision-making technologies in consequential decisions, drops the affirmative duty to prevent algorithmic discrimination in favour of existing anti-discrimination law, and is enforced by the attorney general with no private right of action.</p>
+<h3>What makes an LLM output auditable?</h3>
+<p>Capturing at the time, since non-determinism means you cannot reproduce later: full input including system prompt and retrieved context, model and prompt versions with parameters, verbatim output, source document IDs and versions, tool calls, validation and filter outcomes, and human review actions with identities and timestamps.</p>
+<h3>Do I need a formal ontology for a domain assistant?</h3>
+<p>Usually not at first. A controlled vocabulary with synonym mappings and a few entity types delivers most of the retrieval and extraction benefit at a fraction of the cost. Adopt an established domain standard where one exists, and extend toward a formal ontology only when a specific failure requires it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-advanced-tutorial.html">Llm Advanced Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-enterprise-tutorial.html">Llm Enterprise Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-intermediate-tutorial.html">Llm Intermediate Tutorial</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial/llm-tutorial-for-beginners.html">Llm Tutorial For Beginners</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs Flywheel for Data Products </p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Data Knobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+</body></html>

@@ -1,1403 +1,406 @@
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="en">
-	
-	<head id="ctl00_head1">
-<meta name="google-site-verification" content="RVceKokUCmE6I_4EjvyNso7r-FabKr95sjVmUSOiUAI" />
-<!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-JF94J1W5MC');
-</script><title>
-	ATAM Explained: Architecture Tradeoff Analysis Method for Software Quality and Design Decisions
-</title><meta http-equiv="content-type" content="text/html; charset=utf-8" /><meta name="description" content="Learn what the Architecture Tradeoff Analysis Method (ATAM) is, why it matters, and how it helps organizations evaluate software architecture trade-offs across performance, modifiability, security, and scalability. Includes process steps, examples, and industry case studies." /><meta name="keywords" content="ATAM, Architecture Tradeoff Analysis Method, software architecture evaluation, architecture trade-offs, SEI ATAM, quality attributes, modifiability, performance, software design decisions, risk analysis, software architecture assessment, architecture evaluation framework, CBAM, SAAM, QAW, software quality assurance" /><link rel="icon" href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" /><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800" rel="stylesheet" type="text/css" />
-
-<!--		
-		<script src="https://css.dataknobs.com/sites/site-6/site6-1/js/jquery-1.8.3.min.js"></script>
-		<script src="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/init.js?use=mobile,desktop,1000px&amp;mobileUI=1&amp;mobileUI.theme=none"></script>
-		<script src="https://css.dataknobs.com/sites/site-6/site6-1/js/jquery.dropotron-1.2.js"></script>
-		<script src="https://css.dataknobs.com/sites/site-6/site6-1/js/init.js"></script>
-		<noscript>
-			<link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core-desktop.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core-1200px.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/5grid/core-noscript.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/style.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/style-desktop.css" />
-		</noscript>
-	-->
-		<!--[if lte IE 9]><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/ie9.css" /><![endif]-->
-		<!--[if lte IE 8]><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/ie8.css" /><![endif]-->
-		<!--[if lte IE 7]><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/site6-1/css/ie7.css" /><![endif]-->
-
-
-	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/js/jquery-1.8.3.min.js"></script>
-	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/init.js?use=mobile,desktop,1000px&amp;mobileUI=1&amp;mobileUI.theme=none"></script>
-	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/js/jquery.dropotron-1.2.js"></script>
-	<script src="https://css.dataknobs.com/sites/site-6/dataknobs/js/init.js"></script>
-	<noscript>
-		<link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core-desktop.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core-1200px.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/5grid/core-noscript.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/style.css" /><link rel="stylesheet" href="https://css.dataknobs.com/sites/site-6/dataknobs/css/style-desktop.css" />
-	</noscript>
-	
-	
-
-	<meta name="description" content="Learn what the Architecture Tradeoff Analysis Method (ATAM) is, why it matters, and how it helps organizations evaluate software architecture trade-offs across performance, modifiability, security, and scalability. Includes process steps, examples, and industry case studies." /><meta name="keywords" content="ATAM, Architecture Tradeoff Analysis Method, software architecture evaluation, architecture trade-offs, SEI ATAM, quality attributes, modifiability, performance, software design decisions, risk analysis, software architecture assessment, architecture evaluation framework, CBAM, SAAM, QAW, software quality assurance" /></head>
-  
-	<body class="no-sidebar">
-         
-		<!-- Header Wrapper -->
-			<div id="header-wrapper">
-				<div class="5grid-layout">
-					<div class="row">
-						<div class="12u">
-						
-							<!-- Header -->
-								<header id="header">
-								
-									<!-- Logo -->
-										
-										<div class="inner">
-										
-											<h1> <a id="ctl00_topheader" class="mobileUI-site-name">ATAM Explained: Architecture Tradeoff Analysis Method for Software Quality and Design Decisions</a></h1>
-										
-									        
-										</div>
-									
-									
-									<!-- Nav -->
-										<nav id="nav" class="mobileUI-site-nav">
-											<ul>
-												 <li><a id="ctl00_hyperlinkHome" href="https://www.dataknobs.com/">Home</a></li>
-												<!--
-														
-
-    
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl01_title" href="https://www.dataknobs.com/">Home</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl02_title" href="https://www.dataknobs.com/about-dataknobs/">About dataknobs</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl03_title" href="https://www.dataknobs.com/agent-ai/">Agent ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl04_title" href="https://www.dataknobs.com/agentic-ai/">Agentic ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl05_title" href="https://www.dataknobs.com/ai/">Ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl06_title" href="https://www.dataknobs.com/ai-assistants/">Ai assistants</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl07_title" href="https://www.dataknobs.com/blog/">Blog</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl08_title" href="https://www.dataknobs.com/capability-led-solutions/">Capability led solutions</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl09_title" href="https://www.dataknobs.com/careers/">Careers</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl10_title" href="https://www.dataknobs.com/causal-inference/">Causal inference</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl11_title" href="https://www.dataknobs.com/consulting/">Consulting</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl12_title" href="https://www.dataknobs.com/customers/">Customers</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl13_title" href="https://www.dataknobs.com/data-centric-ai/">Data centric ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl14_title" href="https://www.dataknobs.com/data-governance/">Data governance</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl15_title" href="https://www.dataknobs.com/data-products/">Data products</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl16_title" href="https://www.dataknobs.com/datasets-blindspots/">Datasets blindspots</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl17_title" href="https://www.dataknobs.com/demo/">Demo</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl18_title" href="https://www.dataknobs.com/embeddings/">Embeddings</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl19_title" href="https://www.dataknobs.com/explore/">Explore</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl20_title" href="https://www.dataknobs.com/fractional-cto-ai/">Fractional cto ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl21_title" href="https://www.dataknobs.com/generate-datasets/">Generate datasets</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl22_title" href="https://www.dataknobs.com/generativeai/">Generativeai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl23_title" href="https://www.dataknobs.com/industry/">Industry</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl24_title" href="https://www.dataknobs.com/partnership/">Partnership</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl25_title" href="https://www.dataknobs.com/platform/">Platform</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl26_title" href="https://www.dataknobs.com/pricing/">Pricing</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl27_title" href="https://www.dataknobs.com/privacy/">Privacy</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl28_title" href="https://www.dataknobs.com/products/">Products</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl29_title" href="https://www.dataknobs.com/slides/">Slides</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl30_title" href="https://www.dataknobs.com/solutions/">Solutions</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl31_title" href="https://www.dataknobs.com/test/">Test</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl32_title" href="https://www.dataknobs.com/use-cases/">Use cases</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articleshome_RepLinks_ctl33_title" href="https://www.dataknobs.com/vector-database/">Vector database</a>
-            </li>	
-
-
-
-
-
-
-
-             
- 
- 
- 
-
-												-->
-                                               
-											</ul>
-										</nav>
-								
-								</header>
-                               
-
-						</div>
-					</div>
-				</div>
-			
-		</div>
-
-		<div id="main-wrapper">
-
-			<div class="main-wrapper-style2">
-
-					<div class="inner">
-
-						<div class="5grid-layout">
-
-							<div class="row">
-
-									
-									<div class="12u mobileUI-main-content">
-										<div id="content">
-
-										<article>
-
-												
-													
-
-
-		
-							
-										
-
-    <header class="major">
-                                         
-					  <h2><span id="ctl00_ContentPlaceHolder1_title">ATAM Explained: Architecture Tradeoff Analysis Method for Software Quality and Design Decisions</span></h2>						
-										
-						 <span class="byline"> <span id="ctl00_ContentPlaceHolder1_metadesc">Learn what the Architecture Tradeoff Analysis Method (ATAM) is, why it matters, and how it helps organizations evaluate software architecture trade-offs across performance, modifiability, security, and scalability. Includes process steps, examples, and industry case studies.</span></span>				
-    </header>       
-     
-
-							
-										
-									<span id="ctl00_ContentPlaceHolder1_labeltext"></span>	
-
-                                                           														
-                            <br />
-                            <br />
-
-                               <table id="ctl00_ContentPlaceHolder1_RepComments" cellspacing="0" border="0">
-	<tr>
-		<td>
-
-
-</td>
-	</tr><tr>
-		<td>
-
-
-					
-                   
-
-												 
-               							
-		
-
-      <span id="ctl00_ContentPlaceHolder1_RepComments_ctl01_label2"><font color="Black" size="4"><h2>🧭 <strong>ATAM Overview Article</strong></h2>
-<hr>
-<h3><strong>ATAM Explained — The Architecture Tradeoff Analysis Method for Software Quality and Design Decisions</strong></h3>
-<blockquote>
-<p><em>(Primary keyword focus: “Architecture Tradeoff Analysis Method”, “ATAM”)</em>
-Brief intro (2–3 paragraphs) introducing ATAM as a structured framework for evaluating software architecture trade-offs — who developed it (SEI / Carnegie Mellon), why it’s used, and what problems it solves.</p>
-</blockquote>
-<hr>
-<h3><strong>What Is ATAM?</strong></h3>
-<blockquote>
-<p><em>(Secondary keywords: “ATAM definition”, “software architecture evaluation method”)</em></p>
-</blockquote>
-<ul>
-<li>Definition and origin (SEI / Carnegie Mellon University)</li>
-<li>Why architectural trade-offs matter in software systems</li>
-<li>Real-world motivation (e.g., balancing performance vs. modifiability)</li>
-<li>Role of ATAM in architecture lifecycle</li>
-</ul>
-<hr>
-<h3><strong>Goals and Benefits of ATAM</strong></h3>
-<blockquote>
-<p><em>(Keywords: “ATAM benefits”, “software architecture quality attributes”)</em></p>
-</blockquote>
-<ul>
-<li>Ensure architecture aligns with business and technical goals</li>
-<li>Early identification of risks and design weaknesses</li>
-<li>Improved communication among stakeholders</li>
-<li>Better trade-off visibility between quality attributes</li>
-<li>Long-term maintainability and reduced rework costs</li>
-</ul>
-<hr>
-<h3><strong>Core Concepts in ATAM</strong></h3>
-<blockquote>
-<p><em>(Keywords: “ATAM quality attributes”, “architecture trade-offs”, “sensitivity points”)</em></p>
-</blockquote>
-<p><strong>Quality Attributes and Scenarios</strong>
-Define and illustrate attributes like performance, security, scalability, and modifiability.
-Include a small example scenario (e.g., &quot;System must handle 10,000 concurrent users&quot;).</p>
-<p><strong>Sensitivity and Trade-off Points</strong>
-Explain sensitivity points (architectural decisions that heavily influence a quality attribute) and trade-off points (decisions that impact multiple attributes differently).</p>
-<p><strong>Risk Themes</strong>
-Describe how ATAM groups related risks and their relevance to system evolution.</p>
-<hr>
-<h3><strong>ATAM Process Steps</strong></h3>
-<blockquote>
-<p><em>(Keywords: “ATAM process”, “ATAM steps”, “software architecture analysis”)</em></p>
-</blockquote>
-<p><strong>Phase 1 – Present the Architecture</strong>
-Define business drivers, scope, and architecture overview.</p>
-<p><strong>Phase 2 – Investigate and Model</strong>
-Identify key quality attributes, build utility trees, and select key scenarios.</p>
-<p><strong>Phase 3 – Analyze Trade-offs</strong>
-Evaluate architecture decisions against the scenarios; identify trade-offs, sensitivity points, and risks.</p>
-<p><strong>Phase 4 – Report Findings</strong>
-Summarize risks, priorities, and recommendations for architecture improvement.</p>
-<hr>
-<h3><strong>ATAM vs. Other Architecture Evaluation Methods</strong></h3>
-<blockquote>
-<p><em>(Keywords: “ATAM vs SAAM”, “ATAM vs CBAM”, “QAW comparison”)</em></p>
-</blockquote>
-<p>Compare ATAM with related frameworks:</p>
-<ul>
-<li><strong>SAAM (Software Architecture Analysis Method)</strong> – early precursor focused on modifiability</li>
-<li><strong>QAW (Quality Attribute Workshop)</strong> – focuses on scenario generation</li>
-<li><strong>CBAM (Cost Benefit Analysis Method)</strong> – extends ATAM by quantifying trade-offs in business terms</li>
-</ul>
-<p>Include a small comparison table.</p>
-<hr>
-<h3><strong>Real-World Applications and Case Studies</strong></h3>
-<blockquote>
-<p><em>(Keywords: “ATAM case studies”, “ATAM in industry”, “ATAM success examples”)</em></p>
-</blockquote>
-<p>Summarize 3–5 notable examples:</p>
-<ul>
-<li>SEI Reference Architecture</li>
-<li>MITRE Formal Review</li>
-<li>CAAS (Avionics)</li>
-<li>Game-based architecture evaluation
-Link to your individual case study pages for internal SEO interlinking.</li>
-</ul>
-<hr>
-<h3><strong>Strengths and Limitations of ATAM</strong></h3>
-<blockquote>
-<p><em>(Keywords: “ATAM advantages”, “ATAM limitations”, “architecture evaluation challenges”)</em></p>
-</blockquote>
-<p><strong>Strengths:</strong></p>
-<ul>
-<li>Structured, repeatable, and stakeholder-inclusive</li>
-<li>Effective early in design</li>
-</ul>
-<p><strong>Limitations:</strong></p>
-<ul>
-<li>Time and resource intensive</li>
-<li>Requires trained facilitators</li>
-<li>Qualitative (non-quantitative without CBAM extension)</li>
-</ul>
-<hr>
-<h3><strong>When and How to Apply ATAM in Modern Systems</strong></h3>
-<blockquote>
-<p><em>(Keywords: “applying ATAM”, “architecture evaluation in agile”, “cloud system architecture trade-offs”)</em></p>
-</blockquote>
-<ul>
-<li>Integrating ATAM into agile or DevOps workflows</li>
-<li>Applying ATAM in cloud-native and microservices architectures</li>
-<li>Lightweight ATAM adaptations for startups or smaller teams</li>
-</ul>
-<hr>
-<h3><strong>Conclusion — Why ATAM Remains Relevant</strong></h3>
-<p>Summarize why ATAM continues to be one of the most valuable frameworks for <strong>architectural decision-making</strong>, <strong>risk mitigation</strong>, and <strong>quality trade-off analysis</strong> — even in modern distributed and AI-driven systems.</p>
-<p>Include CTA:</p>
-<blockquote>
-<p><em>Explore detailed ATAM case studies → [link to your case study collection]</em></p>
-</blockquote>
-<hr>
-
-</font></span>
-    <br />
-
-
-</td>
-	</tr><tr>
-		<td>
-
-
-
-</td>
-	</tr>
-</table>    
-                            <br />
-                            <br />
-                             <div class="fb-activity" data-site="https://www.dataknobs.com/" data-action="likes, recommends" data-colorscheme="light" data-header="true"></div>
-	
-								
-                                <div class="fb-comments" data-href="https://www.dataknobs.com/" data-numposts="5" data-colorscheme="light" data-order-by="reverse_time"></div>
-			
-<!--
-                            <div class="fb-post" data-href="https://www.facebook.com/DiwaliCelebrations" data-width="500"></div>		
-                              <div class="fb-recommendations" data-site="https://www.dataknobs.com/" data-action="likes, recommends" data-colorscheme="light" data-header="true"></div>
-		
-                            -->
-     
-
-    
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl01_title" href="https://www.dataknobs.com/blog/architecture/atam/atam-case-studies.html">Atam-case-studies</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl02_title" href="https://www.dataknobs.com/blog/architecture/atam/atam-lifecycle.html">Atam-lifecycle</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-												
-									
-		<a id="ctl00_ContentPlaceHolder1_articles2_RepLinks_ctl03_title" href="https://www.dataknobs.com/blog/architecture/atam/atam-overview.html">Atam-overview</a>
-            	
-&nbsp;&nbsp;
-
-
-
-
-
-
-
-             
- 
- 
- 
-	
-						
-		<span id="ctl00_ContentPlaceHolder1_label1"></span>	
-
-                                                           														
- 
-           <span id="ctl00_ContentPlaceHolder1_ad728_ad">
-</span>
-                                        <br /><br />
-
-    <!--
-				 <a id="ctl00_ContentPlaceHolder1_buttonmain" class="button"></a>
-                                                            <a id="ctl00_ContentPlaceHolder1_buttonall" class="button button-alt"></a>	
-    -->
-												
-
-
-   
-
-    
-
-
-										</article>
-									
-										</div>
-									</div>
-									
-
-							</div>
-
-						</div>
-
-					</div>
-
-			</div>
-
-			
-
-				<div class="main-wrapper-style3">
-					<div class="inner">
-						<div class=5grid-layout>
-							<div class="row">
-								<div class="8u">
-
-									<!-- Article list -->
-									<section class="box-article-list">
-				<h2 class="icon icon-news">Dataknobs Blog</h2>
-
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">Showcase: 10 Production Use Cases</span>
-										<h3><a href="https://www.dataknobs.com/use-cases/">10 Use Cases Built By Dataknobs</a></h3>
-									</header>
-									<p>
-										Dataknobs delivers real, shipped outcomes across finance, healthcare, real estate, e‑commerce, and more—powered by GenAI, Agentic workflows, and classic ML.
-
-										Explore detailed walk‑throughs of projects like Earnings Call Insights, E‑commerce Analytics with GenAI, Financial Planner AI, Kreatebots, Kreate Websites, Kreate CMS, Travel Agent Website, and Real Estate Agent tools.
-
-									</p>
-								</div>
-				</article>
-				<article class="box-excerpt">
-
-							<div>
-								<header>
-									<span class="date">Data Product Approach</span>
-									<h3><a href="https://www.dataknobs.com/data-products/">Why Build Data Products</a></h3>
-								</header>
-								<p>
-									Companies should build data products because they transform raw data into actionable, reusable assets that directly drive 
-									business outcomes. Instead of treating data as a byproduct of operations, a data product approach emphasizes usability, governance, and value creation.
-									Ultimately, they turn data from a cost center into a growth engine, unlocking compounding value across every function of the enterprise.
-
-								</p>
-							</div>
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Architecture Tradeoff Analysis Method (ATAM) Guide</title>
+  <meta content="A practical guide to the Architecture Tradeoff Analysis Method (ATAM): quality attributes, utility trees, scenarios, risks, sensitivity points, tradeoffs, and benefits." name="description"/>
+  <meta content="Prashant Dhingra" name="author"/>
+  <meta content="ATAM, Architecture Tradeoff Analysis Method, software architecture, quality attributes, architecture evaluation, utility tree, architecture risk, tradeoff analysis" name="keywords"/>
+  <meta content="ATAM evaluates software architecture decisions against prioritized quality-attribute scenarios to identify architectural risks, sensitivity points, and tradeoff points before costly implementation decisions become difficult to change." name="ai-summary"/>
+  <link href="https://prashant.dhingra.website/technology/architecture-tradeoff-analysis-method.html" rel="canonical"/>
+
+  <meta content="article" property="og:type"/>
+  <meta content="Architecture Tradeoff Analysis Method (ATAM) Guide" property="og:title"/>
+  <meta content="Learn how ATAM evaluates architecture quality attributes, exposes risks, and makes tradeoffs explicit before implementation costs rise." property="og:description"/>
+  <meta content="https://prashant.dhingra.website/technology/architecture-tradeoff-analysis-method.html" property="og:url"/>
+  <meta content="Prashant Dhingra" property="og:site_name"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-1.png" property="og:image"/>
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="Architecture Tradeoff Analysis Method (ATAM) Guide" name="twitter:title"/>
+  <meta content="A practical ATAM guide covering quality attributes, scenarios, risks, sensitivity points, tradeoffs, and evaluation steps." name="twitter:description"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-1.png" name="twitter:image"/>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://prashant.dhingra.website/technology/architecture-tradeoff-analysis-method.html#article",
+        "headline": "Architecture Tradeoff Analysis Method (ATAM): A Practical Guide",
+        "description": "A practical guide to the Architecture Tradeoff Analysis Method (ATAM), including quality attributes, scenarios, utility trees, architectural risks, sensitivity points, tradeoff points, and benefits.",
+        "url": "https://prashant.dhingra.website/technology/architecture-tradeoff-analysis-method.html",
+        "mainEntityOfPage": {"@id": "https://prashant.dhingra.website/technology/architecture-tradeoff-analysis-method.html#webpage"},
+        "inLanguage": "en",
+        "author": {"@id": "https://prashant.dhingra.website/#person"},
+        "image": [
+          "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-1.png",
+          "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-2.png",
+          "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-3.png",
+          "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-4.png",
+          "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-5.png"
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://prashant.dhingra.website/technology/architecture-tradeoff-analysis-method.html#webpage",
+        "url": "https://prashant.dhingra.website/technology/architecture-tradeoff-analysis-method.html",
+        "name": "Architecture Tradeoff Analysis Method (ATAM) Guide",
+        "description": "How to use ATAM to analyze software architecture quality attributes, risks, and tradeoffs.",
+        "inLanguage": "en",
+        "isPartOf": {"@id": "https://prashant.dhingra.website/#website"}
+      },
+      {
+        "@type": "Person",
+        "@id": "https://prashant.dhingra.website/#person",
+        "name": "Prashant Dhingra",
+        "url": "https://prashant.dhingra.website/"
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://prashant.dhingra.website/technology/architecture-tradeoff-analysis-method.html#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is ATAM?",
+            "acceptedAnswer": {"@type": "Answer", "text": "The Architecture Tradeoff Analysis Method is a structured method for evaluating a software architecture against important quality-attribute goals and identifying architectural risks, sensitivity points, and tradeoffs."}
+          },
+          {
+            "@type": "Question",
+            "name": "What does ATAM produce?",
+            "acceptedAnswer": {"@type": "Answer", "text": "Typical outputs include prioritized quality-attribute scenarios, a utility tree, documented architectural approaches, risks and non-risks, sensitivity points, tradeoff points, and risk themes."}
+          },
+          {
+            "@type": "Question",
+            "name": "When should ATAM be used?",
+            "acceptedAnswer": {"@type": "Answer", "text": "ATAM is most valuable when key architectural decisions exist but there is still time to change them before implementation and operational commitments make changes more expensive."}
+          },
+          {
+            "@type": "Question",
+            "name": "Is ATAM a performance test or security audit?",
+            "acceptedAnswer": {"@type": "Answer", "text": "No. ATAM is an architecture evaluation method. It can surface performance, security, availability, modifiability, and other risks, but it does not replace detailed testing, modeling, threat analysis, or operational validation."}
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --ink:#182235;
+      --muted:#52617a;
+      --line:#d9e1ec;
+      --panel:#f5f8fc;
+      --accent:#155eef;
+      --accent-dark:#0d3fa8;
+      --warm:#b93815;
+      --success:#176b4d;
+      --max:1120px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff;line-height:1.68}
+    a{color:var(--accent);text-underline-offset:3px}
+    a:hover{color:var(--accent-dark)}
+    a:focus-visible,button:focus-visible{outline:3px solid #8ab4ff;outline-offset:3px;border-radius:4px}
+    .skip{position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip:focus{left:16px;top:16px;width:auto;height:auto;padding:10px 14px;background:#fff;border:2px solid var(--accent);z-index:99}
+    header{background:linear-gradient(135deg,#0d234a 0%,#173d7c 60%,#215cc0 100%);color:#fff}
+    .hero{max-width:var(--max);margin:auto;padding:70px 24px 64px}
+    .eyebrow{font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#bdd3ff}
+    h1{font-size:clamp(2.25rem,5vw,4.4rem);line-height:1.04;margin:.4rem 0 1rem;max-width:950px;letter-spacing:-.035em}
+    .dek{font-size:clamp(1.05rem,2vw,1.35rem);max-width:820px;color:#e6efff;margin:0 0 20px}
+    .byline{font-size:.95rem;color:#c9d9f5}
+    main{max-width:var(--max);margin:auto;padding:44px 24px 84px}
+    article{max-width:900px;margin:auto}
+    h2{font-size:clamp(1.7rem,3.4vw,2.45rem);line-height:1.18;margin:3rem 0 .9rem;letter-spacing:-.02em}
+    h3{font-size:1.28rem;line-height:1.25;margin:2rem 0 .55rem}
+    p{margin:.75rem 0 1.15rem}
+    .lede{font-size:1.15rem;color:#2b3850}
+    .takeaways{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:14px;padding:22px 24px;margin:26px 0}
+    .takeaways h2{font-size:1.2rem;margin:0 0 .7rem}
+    .takeaways ul{margin:.2rem 0;padding-left:1.25rem}
+    nav.toc{border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin:26px 0;background:#fff}
+    nav.toc strong{display:block;margin-bottom:8px}
+    nav.toc ol{columns:2;column-gap:36px;margin:0;padding-left:1.2rem}
+    nav.toc li{margin:.35rem 0;break-inside:avoid}
+    figure{margin:2rem 0 2.3rem;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 12px 34px rgba(29,48,79,.08)}
+    figure img{display:block;width:100%;height:auto;object-fit:contain;background:#fff}
+    figcaption{font-size:.94rem;color:var(--muted);padding:13px 16px;border-top:1px solid var(--line);background:#fbfcfe}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:1.2rem 0 2rem}
+    .card{border:1px solid var(--line);border-radius:14px;padding:18px;background:#fff}
+    .card strong{display:block;margin-bottom:6px;color:#17366b}
+    .callout{border-radius:14px;padding:20px 22px;margin:22px 0;background:#fff7f3;border:1px solid #f0c7b8;border-left:5px solid var(--warm)}
+    .example{border:1px solid #b9dfcf;background:#f4fbf8;border-radius:14px;padding:20px 22px;margin:22px 0}
+    .example strong{color:var(--success)}
+    .table-wrap{overflow-x:auto;margin:1.2rem 0 2rem;border:1px solid var(--line);border-radius:14px}
+    table{border-collapse:collapse;width:100%;min-width:720px;background:#fff}
+    th,td{padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+    th{background:#eff4fb;font-size:.92rem;color:#223b62}
+    tr:last-child td{border-bottom:none}
+    .steps{counter-reset:step;list-style:none;padding:0;margin:1.4rem 0}
+    .steps li{counter-increment:step;position:relative;margin:0 0 14px;padding:16px 18px 16px 58px;border:1px solid var(--line);border-radius:12px;background:#fff}
+    .steps li::before{content:counter(step);position:absolute;left:16px;top:15px;width:29px;height:29px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:.9rem}
+    .faq details{border-top:1px solid var(--line);padding:15px 0}
+    .faq details:last-child{border-bottom:1px solid var(--line)}
+    .faq summary{font-weight:750;cursor:pointer}
+    .sources{font-size:.95rem;color:#39465d}
+    footer{border-top:1px solid var(--line);background:#f7f9fc}
+    footer .inner{max-width:var(--max);margin:auto;padding:28px 24px;color:#56647a;font-size:.92rem}
+    .pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#e9f0ff;color:#17428c;font-size:.82rem;font-weight:700;margin-right:6px;margin-bottom:6px}
+    @media (max-width:760px){
+      .hero{padding-top:52px}
+      main{padding-top:30px}
+      nav.toc ol{columns:1}
+      .grid{grid-template-columns:1fr}
+      h1{font-size:2.55rem}
+    }
+  </style>
+</head>
+<body>
+<a class="skip" href="#main-content">Skip to content</a>
+<header>
+  <div class="hero">
+    <div class="eyebrow">Software Architecture Evaluation</div>
+    <h1>Architecture Tradeoff Analysis Method (ATAM): A Practical Guide</h1>
+    <p class="dek">ATAM helps teams evaluate whether a proposed software architecture can satisfy the quality attributes that matter most—and exposes the risks, sensitivity points, and tradeoffs hidden inside architectural decisions.</p>
+    <div class="byline">By Prashant Dhingra</div>
+  </div>
+</header>
+
+<main id="main-content">
+<article>
+  <p class="lede">The Architecture Tradeoff Analysis Method (ATAM) is a structured approach to evaluating software architecture before expensive implementation choices become difficult to reverse. Rather than asking only whether the system delivers required functions, ATAM asks whether the architecture is likely to support the qualities stakeholders care about: performance, scalability, availability, security, usability, maintainability, portability, testability, time to market, cost, and other business concerns.</p>
+
+  <section aria-labelledby="takeaways-title" class="takeaways">
+    <h2 id="takeaways-title">Key takeaways</h2>
+    <ul>
+      <li>ATAM evaluates architectural decisions in the context of prioritized quality-attribute requirements.</li>
+      <li>The method connects business drivers to concrete scenarios and then to architectural approaches.</li>
+      <li>Its most useful outputs are architectural risks, non-risks, sensitivity points, tradeoff points, and risk themes.</li>
+      <li>ATAM is a risk-identification and architecture-evaluation method—not a substitute for detailed performance testing, security assessment, or functional verification.</li>
+      <li>The process improves communication because stakeholders make assumptions, priorities, and decision rationale explicit.</li>
+    </ul>
+  </section>
+
+  <nav aria-label="Table of contents" class="toc">
+    <strong>On this page</strong>
+    <ol>
+      <li><a href="#what-is-atam">What is ATAM?</a></li>
+      <li><a href="#why-architecture">Why architecture needs early analysis</a></li>
+      <li><a href="#quality-attributes">Quality attributes and stakeholder views</a></li>
+      <li><a href="#core-concepts">Risks, sensitivity points, and tradeoffs</a></li>
+      <li><a href="#process">The ATAM process</a></li>
+      <li><a href="#example">Illustrative example</a></li>
+      <li><a href="#benefits">Benefits and limitations</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ol>
+  </nav>
+
+  <figure>
+    <img alt="Title slide introducing the Architecture Tradeoff Analysis Method, ATAM" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-1.png"/>
+    <figcaption>ATAM focuses architectural discussion on explicit quality goals and the tradeoffs created by design decisions.</figcaption>
+  </figure>
+
+  <section id="what-is-atam">
+    <h2>What is the Architecture Tradeoff Analysis Method?</h2>
+    <p>ATAM was developed at Carnegie Mellon University’s Software Engineering Institute (SEI) as a method for evaluating a software architecture relative to its quality-attribute goals. The core idea is straightforward: software architecture is rarely “good” in the abstract. It is good or unsuitable relative to specific goals, constraints, workloads, users, threats, operating conditions, and business priorities.</p>
+    <p>That is why ATAM analyzes decisions in context. A caching layer might improve response time but complicate consistency. Replication may improve availability while increasing operational complexity and cost. Stronger security controls can change latency or usability. A highly modular architecture may improve modifiability but introduce more network calls, deployment units, and failure modes. ATAM helps a team make these interactions visible before they turn into production surprises.</p>
+
+    <figure>
+      <img alt="Slide defining ATAM as an architecture risk-identification method that evaluates decisions against quality-attribute requirements" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-2.png"/>
+      <figcaption>The slide emphasizes three foundations of ATAM: quality-attribute requirements, architectural tradeoffs and sensitivity points, and early risk identification.</figcaption>
+    </figure>
+
+    <div class="callout"><strong>Important distinction:</strong> ATAM evaluates architectural risk and decision consequences. It does not prove that a design will achieve a precise performance number, security posture, or availability target. Those concerns may require additional modeling, testing, measurement, threat analysis, or formal verification.</div>
+  </section>
+
+  <section id="why-architecture">
+    <h2>Why architecture needs early analysis</h2>
+    <p>Architecture establishes the structural decisions that shape how a system is built, deployed, operated, changed, and scaled. Those decisions include decomposition, communication patterns, data ownership, technology platforms, deployment topology, redundancy, integration mechanisms, and cross-cutting controls. Once many teams, APIs, schemas, operational processes, and customer experiences depend on those choices, changing them can become expensive.</p>
+    <p>ATAM therefore encourages analysis before implementation momentum turns an architectural assumption into a constraint. It also creates a shared language between architects and stakeholders. Rather than debating broad statements such as “the system must be scalable,” teams define scenarios precise enough to analyze: scalable for what workload, at what growth rate, under what response-time expectation, with what operational constraints?</p>
+
+    <figure>
+      <img alt="Slide explaining that software architecture must meet requirements, is expensive to change, affects stakeholders, and is central to communication" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-3.png"/>
+      <figcaption>Architecture analysis is valuable because architecture affects the whole stakeholder community, becomes costly to change, and provides the basis for communicating decision rationale and risk.</figcaption>
+    </figure>
+  </section>
+
+  <section id="quality-attributes">
+    <h2>Quality attributes connect architecture to stakeholder needs</h2>
+    <p>A quality attribute describes how well a system performs some aspect of its behavior or operation. ATAM uses quality attributes because functional requirements alone do not explain whether an architecture can support the conditions under which the system must succeed.</p>
+
+    <div aria-label="Quality attribute perspectives" class="grid">
+      <div class="card"><strong>End-user perspective</strong>Performance, availability, usability, security, responsiveness, and continuity directly shape the user experience.</div>
+      <div class="card"><strong>Developer and operator perspective</strong>Maintainability, portability, reuse, testability, deployability, observability, and operability influence the cost and speed of change.</div>
+      <div class="card"><strong>Business perspective</strong>Time to market, cost and benefit, expected system life, legacy integration, migration constraints, and rollback strategy can dominate architecture choices.</div>
+    </div>
+
+    <figure>
+      <img alt="Slide grouping system quality attributes into end-user, developer, and business-community views" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-4.png"/>
+      <figcaption>Quality attributes are viewed differently by end users, developers, and the business community. ATAM brings these perspectives into one architecture evaluation.</figcaption>
+    </figure>
+
+    <h3>From vague qualities to analyzable scenarios</h3>
+    <p>A useful ATAM discussion moves from broad attributes to scenarios. “High availability” is too vague to evaluate. A scenario can specify a stimulus, environment, affected artifact, expected response, and a measurable or observable response target. For example: “If one application instance fails during peak traffic, requests are automatically routed to healthy instances and the service remains available without losing committed transactions.”</p>
+    <p>This scenario format forces a team to connect architecture mechanisms—such as redundancy, health checks, idempotency, state management, and recovery behavior—to a concrete stakeholder expectation.</p>
+  </section>
+
+  <section id="core-concepts">
+    <h2>The core ATAM concepts: risks, sensitivity points, and tradeoff points</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Concept</th><th>Meaning</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Risk</strong></td><td>An architectural decision or uncertainty that may prevent an important quality goal from being achieved.</td><td>A single shared database becomes a throughput bottleneck for projected traffic growth.</td></tr>
+          <tr><td><strong>Non-risk</strong></td><td>An architectural decision that analysis indicates is acceptable under the documented assumptions.</td><td>Horizontal scaling meets expected load because application nodes are stateless and load tests validate the target envelope.</td></tr>
+          <tr><td><strong>Sensitivity point</strong></td><td>A property where a small change can have a significant effect on a quality attribute.</td><td>Timeout configuration strongly affects both perceived latency and failure behavior.</td></tr>
+          <tr><td><strong>Tradeoff point</strong></td><td>A decision that affects more than one quality attribute, often in different directions.</td><td>Stronger synchronous consistency improves correctness expectations but can reduce availability or increase latency during network partitions.</td></tr>
+          <tr><td><strong>Risk theme</strong></td><td>A pattern that groups several individual risks around a broader threat to business or system goals.</td><td>Multiple risks trace back to insufficient isolation between tenants, threatening enterprise adoption.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="process">
+    <h2>The ATAM process: from business drivers to architectural findings</h2>
+    <p>The SEI describes ATAM as a stakeholder-centered evaluation that connects business goals, architectural approaches, and quality-attribute scenarios. The widely used ATAM flow includes nine steps:</p>
+    <ol class="steps">
+      <li><strong>Present the ATAM.</strong> Explain the method, participants, expectations, and outputs.</li>
+      <li><strong>Present business drivers.</strong> Clarify the system’s business goals, constraints, major stakeholders, and architectural priorities.</li>
+      <li><strong>Present the architecture.</strong> Describe the architecture at a level that makes the important decisions and dependencies visible.</li>
+      <li><strong>Identify architectural approaches.</strong> Record the major patterns, technologies, structures, and decision strategies being used.</li>
+      <li><strong>Generate the quality-attribute utility tree.</strong> Decompose important quality attributes into concrete scenarios and prioritize them.</li>
+      <li><strong>Analyze architectural approaches.</strong> Examine how the architecture addresses high-priority scenarios and identify risks, sensitivity points, and tradeoffs.</li>
+      <li><strong>Brainstorm and prioritize scenarios.</strong> Bring in the broader stakeholder group to surface additional concerns and prioritize them.</li>
+      <li><strong>Analyze architectural approaches again.</strong> Use the prioritized stakeholder scenarios as test cases against the architecture.</li>
+      <li><strong>Present results.</strong> Summarize scenarios, architectural approaches, risks, non-risks, sensitivity points, tradeoffs, and risk themes.</li>
+    </ol>
+
+    <h3>What is a utility tree?</h3>
+    <p>The utility tree is a prioritization structure that turns business-important qualities into analyzable scenarios. At the top is overall system utility. Below that are quality attributes such as performance, availability, security, modifiability, and usability. These are refined into scenarios, which stakeholders then prioritize by business importance and architectural difficulty or risk. The result gives the evaluation team a disciplined way to focus analysis where it matters most.</p>
+  </section>
+
+  <section id="example">
+    <h2>Illustrative example: evaluating an online transaction platform</h2>
+    <div class="example">
+      <strong>Illustrative scenario—not a measured ATAM result.</strong>
+      <p>Suppose a transaction platform must support a tenfold traffic increase, maintain rapid response during peak demand, protect sensitive data, and allow weekly feature releases. The proposed architecture uses synchronous service-to-service calls, a shared relational database, centralized authentication, and multiple independently deployed services.</p>
+    </div>
+    <p>An ATAM session could surface several high-priority scenarios: a traffic spike, an identity provider slowdown, a database failover, deployment of a schema change, and a request to add a new product workflow. Each scenario is mapped to architectural decisions and quality goals.</p>
+    <p>The team might identify the shared database as a <em>sensitivity point</em> for scalability, because changes in connection limits, transaction duration, or write volume significantly affect throughput. Synchronous authorization on every request might become a <em>tradeoff point</em>: it improves centralized policy enforcement but can increase latency and broaden the blast radius of an identity-service outage. A tightly coupled database schema could become a <em>risk</em> to deployment independence and time to market.</p>
+    <p>The value is not that ATAM automatically chooses the “correct” architecture. The value is that the assumptions and consequences become explicit, prioritized, and testable. The team can then decide whether to redesign, prototype, benchmark, add redundancy, change integration patterns, or consciously accept a risk.</p>
+  </section>
+
+  <section id="benefits">
+    <h2>ATAM benefits—and what teams gain beyond the report</h2>
+    <figure>
+      <img alt="Slide listing ATAM benefits including alignment with requirements, decision rationale, early risk capture, and shared understanding" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/architecture/ATAM/images/Slide1000/ATAM-5.png"/>
+      <figcaption>ATAM improves architecture alignment, decision transparency, early risk discovery, and shared understanding among stakeholders.</figcaption>
+    </figure>
+
+    <p>The visible output of an ATAM evaluation is a set of findings. The larger benefit is often organizational: architects explain why decisions were made, business stakeholders clarify what they actually value, engineers expose operational realities, and quality goals become specific enough to drive further tests and design work.</p>
+    <div class="grid">
+      <div class="card"><strong>Earlier risk discovery</strong>Architectural weaknesses can be investigated while alternatives are still practical.</div>
+      <div class="card"><strong>Better decision records</strong>Teams capture the rationale, assumptions, and consequences behind important architecture choices.</div>
+      <div class="card"><strong>Stakeholder alignment</strong>Conflicting priorities become explicit rather than remaining hidden until delivery or production.</div>
+      <div class="card"><strong>Focused validation</strong>High-risk scenarios tell teams where prototypes, tests, benchmarks, threat modeling, or operational experiments are most valuable.</div>
+      <div class="card"><strong>Traceability</strong>Business drivers can be connected to quality attributes, scenarios, architectural approaches, and identified risks.</div>
+      <div class="card"><strong>Architecture communication</strong>The evaluation creates a shared vocabulary for discussing system qualities and tradeoffs.</div>
+    </div>
+
+    <h3>Limitations to remember</h3>
+    <p>ATAM depends on the quality of the architecture description, stakeholder participation, scenarios, assumptions, and facilitation. It is not a replacement for load testing, resilience testing, security reviews, cost modeling, reliability engineering, or detailed design verification. Instead, it helps decide where those deeper analyses should be concentrated.</p>
+  </section>
+
+  <section>
+    <h2>How to use ATAM effectively in modern architecture reviews</h2>
+    <p>For a practical architecture review, begin with a small set of the most important business drivers and quality attributes, then turn them into concrete scenarios. Avoid evaluating every possible quality at the same depth. Prioritize. Capture assumptions. Record which architectural decisions influence each scenario and where the evidence is strong, weak, or missing.</p>
+    <p>Finally, connect each significant risk to a next action: an architecture change, prototype, benchmark, failure-injection test, threat-modeling exercise, dependency review, cost experiment, or explicit risk acceptance. In this way, ATAM becomes not just a workshop but a bridge from architecture discussion to engineering evidence.</p>
+    <p>
+      <span class="pill">Architecture evaluation</span>
+      <span class="pill">Quality attributes</span>
+      <span class="pill">Risk analysis</span>
+      <span class="pill">Tradeoff analysis</span>
+      <span class="pill">Utility tree</span>
+    </p>
+  </section>
+
+  <section class="faq" id="faq">
+    <h2>Frequently asked questions</h2>
+    <details open=""><summary>What is ATAM?</summary><p>The Architecture Tradeoff Analysis Method is a structured method for evaluating a software architecture against important quality-attribute goals and identifying architectural risks, sensitivity points, and tradeoffs.</p></details>
+    <details><summary>What does ATAM produce?</summary><p>Typical outputs include prioritized quality-attribute scenarios, a utility tree, documented architectural approaches, risks and non-risks, sensitivity points, tradeoff points, and broader risk themes.</p></details>
+    <details><summary>When should ATAM be used?</summary><p>ATAM is especially useful when major architectural decisions have been proposed but there is still time to change them before implementation, integration, and operational dependencies make changes more expensive.</p></details>
+    <details><summary>Is ATAM a performance test or security audit?</summary><p>No. ATAM can expose performance, security, availability, modifiability, and other architectural risks, but it does not replace detailed testing, modeling, threat analysis, or operational validation.</p></details>
+  </section>
+
+  <section aria-labelledby="sources-title" class="sources">
+    <h2 id="sources-title">Sources and further reading</h2>
+    <p>This article expands the supplied ATAM slides and uses authoritative Software Engineering Institute material for the method description and process. See <a href="https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/">SEI’s Architecture Tradeoff Analysis Method collection</a>, <a href="https://www.sei.cmu.edu/library/the-architecture-tradeoff-analysis-method/">The Architecture Tradeoff Analysis Method</a>, and <a href="https://www.sei.cmu.edu/library/steps-in-an-architecture-tradeoff-analysis-method-quality-attribute-models-and-analysis/">Steps in an Architecture Tradeoff Analysis Method: Quality Attribute Models and Analysis</a>.</p>
+  </section>
 </article>
-						
-				<article class="box-excerpt">
+</main>
 
-								<div>
-									<header>
-										<span class="date">AI Agent for Business Analysis</span>
-										<h3><a href="https://www.dataknobs.com/products/kreate/kreate-structured-data-insights.html">Analyze reports, dashboard and determine To-do</a></h3>
-									</header>
-									<p>
-										Our structured‑data analysis agent connects to CSVs, SQL, and APIs; auto‑detects schemas; and standardizes formats.
-
-										It finds trends, anomalies, correlations, and revenue opportunities using statistics, heuristics, and LLM reasoning.
-
-										The output is crisp: prioritized insights and an action‑ready To‑Do list for operators and analysts.
-
-									</p>
-								</div>
-				</article>
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">AI Agent Tutorial</span>
-										<h3><a href="https://www.dataknobs.com/agent-ai/tutorials.html">Agent AI Tutorial</a></h3>
-									</header>
-									<p>
-										Dive into slides and a hands‑on guide to agentic systems—perception, planning, memory, and action.
-
-										Learn how agents coordinate tools, adapt via feedback, and make decisions in dynamic environments for automation, assistants, and robotics.
-
-									</p>
-								</div>
-				</article>
-				<article class="box-excerpt">
-
-					<div>
-						<header>
-							<span class="date">Toon Guide</span>
-							<h3><a href="https://www.dataknobs.com/generativeai/52-toon-tutorial/">Toon Tutorial and Guide</h3>
-						</header>
-						<p>
-							TOON is a compact, LLM-native data format that removes JSON’s structural noise.
-It lets you fit 5× more structured data into your model, improving accuracy and reducing cost.
-
-						</p>
-					</div>
-				</article>
-
-				<!-- Excerpt -->
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">Build Data Products</span>
-										<h3><a href="https://www.dataknobs.com/data-products/">How Dataknobs help in building data products</a></h3>
-									</header>
-									<p>
-										GenAI and Agentic AI accelerate data‑product development: generate synthetic data, enrich datasets, summarize and reason over large corpora, and automate reporting.
-
-										Use them to detect anomalies, surface drivers, and power predictive models—while keeping humans in the loop for control and safety.
-
-									</p>
-								</div>
-				</article>
-
-
-				
-
-				<!-- Excerpt -->
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">KreateHub</span>
-										<h3><a href="https://www.dataknobs.com/products/kreate/prompt-library-for-genai.html">Create New knowledge with Prompt library</a></h3>
-									</header>
-									<p>
-										KreateHub turns prompts into reusable knowledge assets—experiment, track variants, and compose chains that transform raw data into decisions.
-
-										It’s your workspace for rapid iteration, governance, and measurable impact.
-
-									</p>
-								</div>
-				</article>
-
-				<!-- Excerpt -->
-				<article class="box-excerpt">
-
-									<div>
-										<header>
-											<span class="date">Build Budget Plan for GenAI</span>
-											<h3><a href="https://www.dataknobs.com/generativeai/50-use-cases/how-to-create-genai-budget/">CIO Guide to create GenAI Budget for 2025</a></h3>
-										</header>
-										<p>
-											A pragmatic playbook for CIOs/CTOs: scope the stack, forecast usage, model costs, and sequence investments across infra, safety, and business use cases.
-
-											Apply the framework to IT first, then scale to enterprise functions.
-
-										</p>
-									</div>
-				</article>
-
-
-
-
-									<article class="box-excerpt">
-
-									<div>
-										<header>
-											<span class="date">RAG for Unstructured & Structured Data</span>
-											<h3><a href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-for-structured-and-unstructred-data.html">RAG Use Cases and Implementation</a></h3>
-										</header>
-										<p>Explore practical RAG patterns: unstructured corpora, tabular/SQL retrieval, and guardrails for accuracy and compliance. Implementation notes included.</p>
-									</div>
-								</article>
-
-				<article class="box-excerpt">
-
-								<div>
-									<header>
-										<span class="date">Why knobs matter</span>
-										<h3><a href="https://www.dataknobs.com/orthogonal.html">Knobs are levers using which you manage output</a></h3>
-									</header>
-									<p>
-
-										The Drivetrain approach frames product building in four steps; “knobs” are the controllable inputs that move outcomes.
-
-										Design clear metrics, expose the right levers, and iterate—control leads to compounding impact.
-
-									</p>
-								</div>
-				</article>
-
-</section>
-								</div>
-								<div class="4u">
-
-				<!-- Spotlight -->
-				<section class="box-spotlight pad-left">
-								<h2 class="icon icon-paper">Our Products</h2>
-
-								<article>
-									<header>
-										<h3><a href="https://www.dataknobs.com/products/kreatebots/">KreateBots</a></h3>
-										<span class="byline">Launch intelligent chatbots instantly</span>
-									</header>
-									<li>Ready-to-use front-end—configure in minutes</li>
-									<li>Admin dashboard for full chatbot control</li>
-									<li>Integrated prompt management system</li>
-									<li>Personalization and memory modules</li>
-									<li>Conversation tracking and analytics</li>
-									<li>Continuous feedback learning loop</li>
-									<li>Deploy across GCP, Azure, or AWS</li>
-									<li>Add Retrieval-Augmented Generation (RAG) in seconds</li>
-									<li>Auto-generate FAQs for user queries</li>
-									<footer>
-										<a href="https://www.dataknobs.com/products/kreatebots/" class="button" button-alt button-icon button-icon-paper>KreateBots</a>
-									</footer>
-								</article>
-
-								<article>
-									<header>
-										<h3><a href="https://www.dataknobs.com/products/kreatebots/">KreateWebsites</a></h3>
-										<span class="byline">AI-driven website builder</span>
-									</header>
-									<li>Build SEO-optimized sites powered by LLMs</li>
-									<li>Host on Azure, GCP, or AWS</li>
-									<li>Intelligent AI website designer</li>
-									<li>Agent-assisted website generation</li>
-									<li>End-to-end content automation</li>
-									<li>Content management for AI-driven websites</li>
-									<li>Available as SaaS or managed solution</li>
-									<li>Listed on Azure Marketplace</li>
-									<footer>
-										<a href="https://www.dataknobs.com/products/kreatewebsites/" class="button" button-alt button-icon button-icon-paper>KreateWebsites</a>
-									</footer>
-								</article>
-
-								<article>
-									<header>
-										<h3><a href="https://www.dataknobs.com/products/kreatebots/">Kreate CMS</a></h3>
-										<span class="byline">Content Management for GenAI</span>
-									</header>
-									<li>Purpose-built CMS for AI content pipelines</li>
-									<li>Track provenance for AI vs human edits</li>
-									<li>Monitor lineage and version history</li>
-									<li>Identify all pages using specific content</li>
-									<li>Remove or update AI-generated assets safely</li>
-									<footer>
-										<a href="https://www.dataknobs.com/products/kreate/cms/" class="button" button-alt button-icon button-icon-paper>CMS for Websites and Bots</a>
-									</footer>
-								</article>
-
-								<article>
-									<header>
-										<h3><a href="https://www.dataknobs.com/generativeai/generate-slides.html">Generate Slides</a></h3>
-										<span class="byline">Create presentations from prompts</span>
-									</header>
-									<li>Instant slide decks from natural language prompts</li>
-									<li>Convert slides into interactive webpages</li>
-									<li>Optimize presentation pages for SEO</li>
-									<footer>
-										<a href="https://www.dataknobs.com/generativeai/generative-ai-101-slides.html" class="button" button-alt button-icon button-icon-paper>Gen AI Slides</a>
-									</footer>
-								</article>
-
-								<article>
-									<header>
-										<h3><a href="https://www.dataknobs.com/products/kreate/content/">Content Compass</a></h3>
-										<span class="byline">Automated storytelling engine</span>
-									</header>
-									<li>Auto-generate articles and blogs</li>
-									<li>Create and embed matching visuals</li>
-									<li>Link related topics for SEO ranking</li>
-									<li>AI-driven topic and content recommendations</li>
-									<footer>
-										<a href="https://www.dataknobs.com/products/kreate/content/" class="button" button-alt button-icon button-icon-paper>Content Compass</a>
-									</footer>
-								</article>
-
-								<article>
-									<header>
-										<h3><a href="#">Fractional CTO for Generative AI and Data Products</a></h3>
-										<span class="byline">Access deep expertise on demand</span>
-									</header>
-									<li>Deliver complete AI and data use cases</li>
-									<li>On-demand GenAI and ML architecture</li>
-									<li>End-to-end product design and deployment</li>
-									<li>Integration across cloud ecosystems</li>
-									<li>Work across AWS, GCP, or Azure</li>
-									<footer>
-										<a href="https://www.dataknobs.com/fractional-cto-ai/" class="button" button-icon button-icon-paper>Fractional CTO</a>
-									</footer>
-								</article>
-				</section>
-
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
 </div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-		</div>
-
-		
-
-		<!-- Footer Wrapper -->
-			<div id="footer-wrapper">
-		
-				<footer id="footer" class="5grid-layout">
-					<div class="row">
-    
-						<div class="3u">
-						
-						
-								<section class="widget-links">
-									<h2>Main pages</h2>
-									<ul class="style2">
-										<a id="ctl00_hyperlink1"></a>
-										
-
-    
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl01_title" href="https://www.dataknobs.com/">Home</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl02_title" href="https://www.dataknobs.com/about-dataknobs/">About dataknobs</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl03_title" href="https://www.dataknobs.com/agent-ai/">Agent ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl04_title" href="https://www.dataknobs.com/agentic-ai/">Agentic ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl05_title" href="https://www.dataknobs.com/ai/">Ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl06_title" href="https://www.dataknobs.com/ai-assistants/">Ai assistants</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl07_title" href="https://www.dataknobs.com/blog/">Blog</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl08_title" href="https://www.dataknobs.com/capability-led-solutions/">Capability led solutions</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl09_title" href="https://www.dataknobs.com/careers/">Careers</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl10_title" href="https://www.dataknobs.com/causal-inference/">Causal inference</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl11_title" href="https://www.dataknobs.com/consulting/">Consulting</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl12_title" href="https://www.dataknobs.com/customers/">Customers</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl13_title" href="https://www.dataknobs.com/data-centric-ai/">Data centric ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl14_title" href="https://www.dataknobs.com/data-governance/">Data governance</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl15_title" href="https://www.dataknobs.com/data-products/">Data products</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl16_title" href="https://www.dataknobs.com/datasets-blindspots/">Datasets blindspots</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl17_title" href="https://www.dataknobs.com/demo/">Demo</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl18_title" href="https://www.dataknobs.com/embeddings/">Embeddings</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl19_title" href="https://www.dataknobs.com/explore/">Explore</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl20_title" href="https://www.dataknobs.com/fractional-cto-ai/">Fractional cto ai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl21_title" href="https://www.dataknobs.com/generate-datasets/">Generate datasets</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl22_title" href="https://www.dataknobs.com/generativeai/">Generativeai</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl23_title" href="https://www.dataknobs.com/industry/">Industry</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl24_title" href="https://www.dataknobs.com/partnership/">Partnership</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl25_title" href="https://www.dataknobs.com/platform/">Platform</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl26_title" href="https://www.dataknobs.com/pricing/">Pricing</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl27_title" href="https://www.dataknobs.com/privacy/">Privacy</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl28_title" href="https://www.dataknobs.com/products/">Products</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl29_title" href="https://www.dataknobs.com/slides/">Slides</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl30_title" href="https://www.dataknobs.com/solutions/">Solutions</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl31_title" href="https://www.dataknobs.com/test/">Test</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl32_title" href="https://www.dataknobs.com/use-cases/">Use cases</a>
-            </li>	
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_Articleshome3_RepLinks_ctl33_title" href="https://www.dataknobs.com/vector-database/">Vector database</a>
-            </li>	
-
-
-
-
-
-
-
-             
- 
- 
- 
-
-									</ul>
-								</section>
-						
-						</div>
-						<div class="3u">
-						
-							
-								<section class="widget-links">
-									<h2>Related Pages </h2>
-									<ul class="style2">
-										
-
-    
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl01_title" href="https://www.dataknobs.com/blog/architecture/atam/atam-case-studies.html">Atam-case-studies</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl02_title" href="https://www.dataknobs.com/blog/architecture/atam/atam-lifecycle.html">Atam-lifecycle</a>
-            </li>	
-    <br />
-
-
-
-
-
-												
-		<li>								
-		<a id="ctl00_articles1_RepLinks_ctl03_title" href="https://www.dataknobs.com/blog/architecture/atam/atam-overview.html">Atam-overview</a>
-            </li>	
-    <br />
-
-
-
-
-
-
-
-             
- 
- 
- 
-
-										
-									</ul>
-								</section>
-						
-						</div>
-						<div class="3u">
-						
-					
-								<section class="widget-links">
-									<h2>Explore more </h2>
-									<ul class="style2">
-										
-
-    
-
-
-
-												
-		<li>					
-			<a id="ctl00_Articlesub1_RepLinks_ctl01_title" href="https://www.dataknobs.com/"><em><b>Home</b></em></a>
-            
-           
-            </li>	
-
-
-
-
-
-
-
-             
- 
- 
- 
-	
-									</ul>
-								</section>
-						
-						</div>
-						<div class="3u">
-						
-						
-								<section class="widget-contact last">
-									<h2>Contact Us</h2>
-									<ul>
-										
-										<li><a href="https://www.facebook.com/kreatewebsites/" class="facebook">Facebook</a></li>
-										<li><a href="https://www.linkedin.com/company/kreatewebsites/" class="googleplus">Linkedin</a></li>
-									</ul>
-									<p>
-									Redmond, WA <br />
-									USA  </p>
-								</section>
-						
-						</div>
-                        
-					</div>
-					<div class="row">
-						<div class="12u">
-							 <div id="copyright">
-							&copy;  Design: <a id="ctl00_cright">Dataknobs</a> | <a id="ctl00_sitemap"></a>  | <a id="ctl00_privacypolicy" href="https://www.dataknobs.com/privacypolicy.html">Privacy Policy</a> | <a id="ctl00_footerfooter" href="https://www.dataknobs.com/">Dataknobs</a></asp:HyperLink> 
-			</div>
-								 <p></p>
-						</div>
-						</div>
-					
-				</footer>
-			</div>
-
-	</body>
-</html>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/architecture/atam/atam-case-studies.html">Atam Case Studies</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/architecture/atam/atam-lifecycle.html">Atam Lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/architecture/atam/atam-overview.html">Atam Overview</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs Flywheel for Data Products </p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Data Knobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+
+</body></html>

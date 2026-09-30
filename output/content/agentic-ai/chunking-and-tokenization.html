@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <title>Chunking vs Tokenization for LLMs and RAG: Complete Guide | Dataknobs</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+  <meta content="Understand chunking vs tokenization in LLM and RAG systems. Learn chunk size, overlap, semantic splitting, token-based chunking, retrieval tradeoffs, and how to evaluate the best strategy." name="description"/>
+  <meta content="chunking vs tokenization, RAG chunking, tokenization in LLMs, chunk size for RAG, text chunking, document chunking, chunk overlap, token-based chunking, semantic chunking" name="keywords"/>
+  <meta content="Dataknobs" name="author"/>
+  <meta content="index, follow" name="robots"/>
+  <meta content="2026-09-21" name="revised"/>
+  <link href="https://www.dataknobs.com/embeddings/chunking-and-tokenization.html" rel="canonical"/>
+
+  <!-- Open Graph -->
+  <meta content="Chunking vs Tokenization for LLMs and RAG: Complete Guide | Dataknobs" property="og:title"/>
+  <meta content="Understand chunking vs tokenization in LLM and RAG systems. Learn chunk size, overlap, semantic splitting, token-based chunking, retrieval tradeoffs, and how to evaluate the best strategy." property="og:description"/>
+  <meta content="article" property="og:type"/>
+  <meta content="https://www.dataknobs.com/embeddings/chunking-and-tokenization.html" property="og:url"/>
+  <meta content="Dataknobs" property="og:site_name"/>
+  <meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" property="og:image"/>
+
+  <!-- Twitter Card -->
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="Chunking vs Tokenization for LLMs and RAG: Complete Guide | Dataknobs" name="twitter:title"/>
+  <meta content="Understand chunking vs tokenization in LLM and RAG systems. Learn chunk size, overlap, semantic splitting, token-based chunking, retrieval tradeoffs, and how to evaluate the best strategy." name="twitter:description"/>
+  <meta content="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" name="twitter:image"/>
+
+  <!-- Generative Engine Optimization -->
+  <meta content="chunking vs tokenization, RAG chunking, tokenization in LLMs, chunk size for RAG, text chunking, document chunking, chunk overlap, token-based chunking, semantic chunking" name="generative-engine-optimization"/>
+  <meta content="Chunking and tokenization solve different problems. Tokenization converts text into the subword units a language model processes and counts against its context window. Chunking divides documents into retrievable units that are embedded, indexed, searched and supplied as context. The pipeline is document to chunks to tokens to embeddings and retrieval to LLM context; one chunk normally contains many tokens. Chunking strategies include fixed-size, recursive, token-based, sentence or paragraph, structure-aware, semantic and LLM-based splitting, with recursive structure-aware splitting a strong general baseline. Overlap preserves boundary evidence but creates duplicate embeddings, larger indexes and extra context tokens, so it should be measured rather than defaulted. There is no universal best chunk size: build an evaluation set, compare configurations such as 250, 500 and 1,000 tokens plus section-aware and semantic splitting, and score them on Recall@K, Precision@K, MRR, NDCG, answer correctness, faithfulness, context efficiency, latency and cost. Long-context models do not eliminate chunking, because retrieval still supplies access control, provenance, freshness, lower input cost and scale." name="ai-summary"/>
+  <meta content="AI-assisted draft, human-reviewed." name="ai-content-declaration"/>
+  <meta content="Embeddings / Vector Databases / RAG / Chunking &amp; Tokenization" name="topic"/>
+  <meta content="Chunking vs Tokenization: How to Prepare Documents for LLMs, Embeddings, and RAG" name="citation_title"/>
+  <meta content="Dataknobs" name="citation_author"/>
+  <meta content="2026-09-21" name="citation_publication_date"/>
+
+  <link href="https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg" rel="icon"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+
+  <link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Chunking vs Tokenization: How to Prepare Documents for LLMs, Embeddings, and RAG",
+  "description": "Understand chunking vs tokenization in LLM and RAG systems. Learn chunk size, overlap, semantic splitting, token-based chunking, retrieval tradeoffs, and how to evaluate the best strategy.",
+  "author": {
+    "@type": "Organization",
+    "name": "Dataknobs"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Dataknobs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg"
+    }
+  },
+  "datePublished": "2026-09-21",
+  "dateModified": "2026-09-21",
+  "mainEntityOfPage": "https://www.dataknobs.com/embeddings/chunking-and-tokenization.html",
+  "image": "https://storage.googleapis.com/json_articles/dataknobs-logo-2.jpg",
+  "articleSection": "Embeddings / Vector Databases / RAG",
+  "keywords": [
+    "chunking vs tokenization",
+    "RAG chunking",
+    "tokenization in LLMs",
+    "chunk size for RAG",
+    "text chunking",
+    "document chunking",
+    "chunk overlap",
+    "token-based chunking",
+    "semantic chunking"
+  ]
+}
+  </script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the difference between chunking and tokenization?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chunking creates retrieval units; tokenization creates model-processing units. One chunk generally contains many tokens."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the best chunk size for RAG?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "There is no universal optimum. Test multiple sizes and strategies against retrieval and answer-quality metrics."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do long-context LLMs eliminate chunking?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Retrieval still helps with permissions, provenance, freshness, cost, and scale."
+      }
+    }
+  ]
+}
+  </script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.dataknobs.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Embeddings",
+      "item": "https://www.dataknobs.com/embeddings/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Chunking & Tokenization",
+      "item": "https://www.dataknobs.com/embeddings/chunking-and-tokenization.html"
+    }
+  ]
+}
+  </script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --violet: #7c3aed;
+      --violet-dark: #5b21b6;
+      --indigo: #4338ca;
+      --hero-a: #4c1d95;
+      --hero-b: #7c3aed;
+      --hero-c: #4338ca;
+      --footer: #1e293b;
+      --footer-text: #cbd5e1;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 18px 50px rgba(15, 23, 42, 0.14);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    img { max-width: 100%; display: block; height: auto; }
+
+    a { color: var(--violet); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .site-header-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .brand img { height: 44px; width: auto; }
+
+    .brand-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .site-nav { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+
+    .site-nav a {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #475569;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav a:hover { color: var(--violet); text-decoration: none; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: linear-gradient(135deg, var(--hero-a), var(--hero-b), var(--hero-c));
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.10), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(255,255,255,0.10), transparent 25%),
+        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.07), transparent 30%);
+      pointer-events: none;
+    }
+
+    .hero-inner { position: relative; padding: 72px 0 82px; display: grid; gap: 28px; }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.10);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 960px;
+      font-size: clamp(2.3rem, 5vw, 4.4rem);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero-desc {
+      max-width: 900px;
+      font-size: 1.08rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+
+    .hero-tag {
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.95);
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+
+    .section { padding: 72px 0; }
+
+    .section-soft {
+      background: linear-gradient(to bottom, #f8fafc, #ffffff);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header { max-width: 860px; margin-bottom: 34px; }
+
+    .section-kicker {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      line-height: 1.14;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .section-intro {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+
+    /* On-this-page */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 22px 26px;
+      margin-bottom: 34px;
+    }
+
+    .toc h2 {
+      margin: 0 0 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--violet);
+    }
+
+    .toc-links { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .toc-links a {
+      display: inline-block;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      border-radius: 999px;
+      padding: 8px 15px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #334155;
+      transition: all 0.2s ease;
+    }
+
+    .toc-links a:hover {
+      border-color: #c4b5fd;
+      background: #f5f3ff;
+      color: var(--violet-dark);
+      text-decoration: none;
+    }
+
+    .article-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 34px;
+    }
+
+    .article-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      align-items: center;
+      padding-bottom: 20px;
+      margin-bottom: 26px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .article-meta strong { color: var(--text); font-weight: 700; }
+
+    .article-content {
+      color: #334155;
+      font-size: 1.03rem;
+      line-height: 1.85;
+      overflow-wrap: anywhere;
+    }
+
+    .article-content h2,
+    .article-content h3,
+    .article-content h4 {
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-top: 1.6em;
+      margin-bottom: 0.65em;
+    }
+
+    .article-content h2 { font-size: 1.9rem; font-weight: 800; }
+    .article-content h3 { font-size: 1.45rem; font-weight: 700; }
+    .article-content h4 { font-size: 1.15rem; font-weight: 700; }
+
+    .article-content > h2:first-child { margin-top: 0; }
+
+    .article-content p,
+    .article-content ul,
+    .article-content ol,
+    .article-content blockquote,
+    .article-content table { margin-top: 1em; margin-bottom: 1em; }
+
+    .article-content ul,
+    .article-content ol { padding-left: 1.4em; }
+
+    .article-content li + li { margin-top: 0.45em; }
+
+    .article-content blockquote {
+      margin-left: 0;
+      padding: 14px 18px;
+      border-left: 4px solid #c4b5fd;
+      background: #f5f3ff;
+      border-radius: 12px;
+      color: #4c1d95;
+    }
+
+    .article-content code {
+      background: #f1f5f9;
+      padding: 0.15em 0.35em;
+      border-radius: 6px;
+      font-size: 0.92em;
+    }
+
+    .article-content pre {
+      overflow-x: auto;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 14px;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin: 1.3em 0;
+      background: var(--surface);
+    }
+
+    .table-scroll table { margin: 0; border: 0; }
+
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+    }
+
+    .article-content th,
+    .article-content td {
+      border: 1px solid var(--border);
+      padding: 11px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .article-content th {
+      background: #f8fafc;
+      color: var(--text);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .article-content td.num, .article-content th.num { text-align: right; white-space: nowrap; }
+
+    .table-scroll tbody tr:nth-child(even) td { background: #fcfcfd; }
+
+    .table-note {
+      margin-top: -0.4em;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    /* Formula block */
+    .formula {
+      margin: 1.3em 0;
+      padding: 22px 24px;
+      border: 1px solid #ddd6fe;
+      background: linear-gradient(135deg, #faf5ff, #ffffff);
+      border-radius: 20px;
+      text-align: center;
+    }
+
+    .formula .expr {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--violet-dark);
+      letter-spacing: -0.01em;
+    }
+
+    .formula .expr + .expr { margin-top: 10px; }
+
+    .formula .label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 10px;
+    }
+
+    /* Metric grid */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 1.3em 0;
+    }
+
+    .metric-card {
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      border-radius: 18px;
+      padding: 18px 20px;
+    }
+
+    .metric-card h4 {
+      margin: 0 0 6px !important;
+      font-size: 0.8rem !important;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--violet);
+    }
+
+    .metric-card p { margin: 0 !important; font-size: 0.97rem; line-height: 1.7; }
+
+    /* Two-column pros/cons */
+    .split-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      margin: 1.3em 0;
+    }
+
+    .split-card {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 24px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .split-card.tpu { border-color: #ddd6fe; background: linear-gradient(160deg, #faf5ff, #ffffff); }
+    .split-card.gpu { border-color: #c7d2fe; background: linear-gradient(160deg, #eef2ff, #ffffff); }
+
+    .split-card h3 { margin-top: 0 !important; font-size: 1.2rem !important; }
+    .split-card ul { margin-bottom: 0 !important; }
+
+    /* Steps */
+    .steps { display: grid; gap: 14px; margin: 1.3em 0; counter-reset: stepcount; }
+
+    .step {
+      position: relative;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 18px 22px 18px 64px;
+      box-shadow: var(--shadow);
+    }
+
+    .step::before {
+      counter-increment: stepcount;
+      content: counter(stepcount);
+      position: absolute;
+      left: 20px;
+      top: 18px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--violet), var(--indigo));
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .step h4 { margin: 0 0 4px !important; font-size: 1.05rem !important; }
+    .step p { margin: 0 !important; font-size: 0.97rem; }
+
+    /* Callout */
+    .callout {
+      margin: 1.4em 0;
+      padding: 20px 24px;
+      border-left: 5px solid var(--violet);
+      background: #f5f3ff;
+      border-radius: 0 18px 18px 0;
+      color: #4c1d95;
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.75;
+    }
+
+    /* Related links */
+    .related {
+      margin-top: 1.6em;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+    }
+
+    .related h4 {
+      margin: 0 0 12px !important;
+      font-size: 0.82rem !important;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--violet);
+    }
+
+    .related ul { margin: 0 !important; padding-left: 1.2em; }
+
+    /* FAQ */
+    .faq-list { display: grid; gap: 14px; }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 22px 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .faq-item h3 {
+      margin: 0 0 8px;
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .faq-item p { margin: 0; color: #334155; line-height: 1.8; }
+
+    .cta-band {
+      margin-top: 44px;
+      padding: 32px;
+      border: 1px solid #ddd6fe;
+      background: linear-gradient(135deg, #faf5ff, #ffffff, #eef2ff);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .cta-band h3 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+      line-height: 1.2;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .cta-band p { margin: 0; color: var(--muted); line-height: 1.8; }
+
+    .cta-link {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--violet), var(--indigo));
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .cta-link:hover { text-decoration: none; opacity: 0.92; }
+
+    .source-note {
+      margin-top: 30px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .site-footer { background: var(--footer); color: var(--footer-text); margin-top: 0; }
+
+    .footer-inner { padding: 48px 0 34px; }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 30px;
+    }
+
+    .footer-col h4 { margin: 0 0 14px; color: white; font-size: 1rem; font-weight: 700; }
+
+    .footer-col p,
+    .footer-col li { font-size: 0.95rem; color: var(--footer-text); line-height: 1.8; }
+
+    .footer-col ul { list-style: none; padding: 0; margin: 0; }
+    .footer-col li + li { margin-top: 6px; }
+    .footer-col a { color: var(--footer-text); }
+    .footer-col a:hover { color: white; text-decoration: underline; }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(148, 163, 184, 0.22);
+      margin-top: 30px;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+      color: #94a3b8;
+    }
+
+    .footer-links { display: flex; gap: 16px; flex-wrap: wrap; }
+    .footer-links a { color: #94a3b8; }
+    .footer-links a:hover { color: white; }
+
+
+    @media (max-width: 899px) {
+      .site-nav { display: none; }
+      .hero-inner { padding: 56px 0 64px; }
+      .section { padding: 56px 0; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .split-grid { grid-template-columns: 1fr; }
+      .metric-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .container { padding-left: 18px; padding-right: 18px; }
+      .brand-text { font-size: 1rem; }
+      .article-card, .cta-band, .toc { padding: 22px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+      .article-content h2 { font-size: 1.6rem; }
+    }
+    /* Pitfalls */
+    .pitfalls { display: grid; gap: 12px; margin: 1.3em 0; }
+
+    .pitfall {
+      position: relative;
+      border: 1px solid #fecdd3;
+      background: linear-gradient(160deg, #fff1f2, #ffffff);
+      border-radius: 16px;
+      padding: 16px 20px 16px 56px;
+    }
+
+    .pitfall::before {
+      content: "\00d7";
+      position: absolute;
+      left: 18px;
+      top: 15px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #e11d48;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .pitfall p { margin: 0 !important; font-size: 0.98rem; }
+
+  </style>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <div class="brand">
+        <a aria-label="Dataknobs Home" href="https://www.dataknobs.com/">
+          <img alt="Dataknobs" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png"/>
+        </a>
+        <div class="brand-text">Dataknobs</div>
+      </div>
+
+      <nav aria-label="Primary navigation" class="site-nav">
+        <a href="#chunking-vs-tokenization">Chunking vs tokenization</a><a href="#why-tokenization-matters">Why tokenization matters</a><a href="#why-chunking-matters-in-rag">Why chunking matters in RAG</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://www.dataknobs.com/products/knobs/">KNOBS</a>
+        <a href="https://www.dataknobs.com/search.html">Search</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="eyebrow">Embeddings &amp; RAG · Chunking and Tokenization</div>
+
+      <h1>Chunking vs Tokenization: How to Prepare Documents for LLMs, Embeddings, and RAG</h1>
+
+      <div class="hero-desc">Understand chunking vs tokenization in LLM and RAG systems. Learn chunk size, overlap, semantic splitting, token-based chunking, retrieval tradeoffs, and how to evaluate the best strategy.</div>
+
+      <div class="hero-tags">
+<div class="hero-tag">Retrieval units vs model units</div><div class="hero-tag">Chunk size &amp; overlap</div><div class="hero-tag">Evaluate, don't default</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-soft">
+    <div class="container">
+
+      <div aria-label="On this page" class="toc">
+        <h2>On this page</h2>
+        <div class="toc-links">
+<a href="#chunking-vs-tokenization">Chunking vs tokenization</a><a href="#why-tokenization-matters">Why tokenization matters</a><a href="#why-chunking-matters-in-rag">Why chunking matters in RAG</a><a href="#chunks-that-are-too-large">Chunks that are too large</a><a href="#chunks-that-are-too-small">Chunks that are too small</a><a href="#common-chunking-strategies">Common chunking strategies</a><a href="#chunk-overlap">Chunk overlap</a><a href="#parent-child-chunking">Parent-child chunking</a><a href="#tables-need-special-handling">Tables need special handling</a><a href="#pdfs-need-special-handling">PDFs need special handling</a><a href="#metadata-and-lineage">Metadata and lineage</a><a href="#chunking-is-part-of-context-engineering">Chunking is part of context engineering</a><a href="#how-to-choose-chunk-size">How to choose chunk size</a><a href="#metrics">Metrics</a><a href="#common-mistakes">Common mistakes</a><a href="#multilingual-data">Multilingual data</a><a href="#long-context-llms-do-not-eliminate-chunking">Long-context LLMs do not eliminate chunking</a><a href="#practical-enterprise-default">Practical enterprise default</a><a href="#chunking-should-be-a-knob">Chunking should be a knob</a><a href="#bottom-line">Bottom line</a>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-meta">
+          <span><strong>Dataknobs</strong> · Embeddings / Vector Databases / RAG</span>
+          <span>Updated 21 September 2026</span>
+          <span>Chunking &amp; Tokenization</span>
+        </div>
+
+        <div class="article-content">
+<p>Chunking and tokenization both break information into smaller units, but they solve different problems.</p>
+<p><strong>Tokenization</strong> converts text into the units a language model processes.</p>
+<p><strong>Chunking</strong> divides documents into retrievable units that can be embedded, indexed, searched, and supplied as context to an LLM.</p>
+<p>A useful mental model is:</p>
+<div class="formula"><div class="expr">Document → chunks → tokens → embeddings / retrieval → LLM context</div></div>
+<p>Chunking determines what information is grouped together. Tokenization determines how the model represents and counts that text internally.</p>
+<h2 id="chunking-vs-tokenization">Chunking vs tokenization</h2>
+<div class="table-scroll"><table><thead><tr><th scope="col">Dimension</th><th scope="col">Chunking</th><th scope="col">Tokenization</th></tr></thead><tbody><tr><th scope="row">Purpose</th><td>Create retrieval units</td><td>Create model-processing units</td></tr><tr><th scope="row">Typical unit</th><td>section, paragraph, semantic block</td><td>token/subword</td></tr><tr><th scope="row">Controlled by application</th><td>usually</td><td>usually model/tokenizer dependent</td></tr><tr><th scope="row">Affects retrieval precision</th><td>strongly</td><td>indirectly</td></tr><tr><th scope="row">Affects context-window use</th><td>yes</td><td>directly</td></tr></tbody></table></div>
+<p>A chunk usually contains many tokens.</p>
+<h2 id="why-tokenization-matters">Why tokenization matters</h2>
+<p>Language models do not process text exactly as people see words. A tokenizer can split text into words, subwords, punctuation, symbols, or code fragments.</p>
+<p>That means:</p>
+<div class="formula"><div class="expr">characters ≠ words ≠ tokens</div></div>
+<p>Token counts matter because context limits and usage are token-based.</p>
+<h2 id="why-chunking-matters-in-rag">Why chunking matters in RAG</h2>
+<p>Imagine a 200-page operations manual. Embedding the whole document as one vector makes retrieval too coarse. Instead, split the document into smaller units and attach useful metadata such as heading, page, effective date, source URL, and access level.</p>
+<h2 id="chunks-that-are-too-large">Chunks that are too large</h2>
+<p>Oversized chunks reduce specificity, send irrelevant content to the LLM, increase token cost, and can introduce competing facts.</p>
+<h2 id="chunks-that-are-too-small">Chunks that are too small</h2>
+<p>Tiny chunks can lose headings, exceptions, definitions, table labels, and surrounding reasoning.</p>
+<p>The objective is:</p>
+<div class="callout">the smallest chunk that preserves enough information to answer the intended class of questions correctly.</div>
+<h2 id="common-chunking-strategies">Common chunking strategies</h2>
+<h3>Fixed-size chunking</h3>
+<p>Simple and deterministic, but may split ideas at awkward boundaries.</p>
+<h3>Recursive chunking</h3>
+<p>Uses natural boundaries such as sections and paragraphs before falling back to smaller units. This is a strong general baseline.</p>
+<h3>Token-based chunking</h3>
+<p>Uses a token maximum to control embedding and LLM context limits.</p>
+<h3>Sentence or paragraph chunking</h3>
+<p>Preserves more semantic coherence than arbitrary character boundaries.</p>
+<h3>Structure-aware chunking</h3>
+<p>Uses HTML headings, Markdown sections, JSON objects, code functions, legal clauses, or other source structure.</p>
+<h3>Semantic chunking</h3>
+<p>Splits when meaning or topic changes rather than only at fixed length.</p>
+<h3>LLM-based chunking</h3>
+<p>Uses a model to identify logical units or rewrite material into self-contained propositions. It can be powerful but adds cost, latency, and governance considerations.</p>
+<h2 id="chunk-overlap">Chunk overlap</h2>
+<p>Overlap repeats part of one chunk in the next. It can preserve evidence that crosses a boundary, but it also creates duplicate embeddings, larger indexes, redundant retrieval, and extra context tokens.</p>
+<p>Treat overlap as a measured parameter, not an automatic default.</p>
+<h2 id="parent-child-chunking">Parent-child chunking</h2>
+<p>A useful pattern is to index smaller child chunks for retrieval precision while preserving a reference to a larger parent section for reasoning context.</p>
+<p>This gives:</p>
+<div class="formula"><div class="expr">small retrieval unit + larger reasoning context</div></div>
+<h2 id="tables-need-special-handling">Tables need special handling</h2>
+<p>A row without its headers may be meaningless. Preserve structural context when turning tables into retrievable text.</p>
+<h2 id="pdfs-need-special-handling">PDFs need special handling</h2>
+<p>PDF extraction can introduce repeated headers, broken reading order, OCR errors, and damaged tables. Separate extraction quality from chunking quality.</p>
+<h2 id="metadata-and-lineage">Metadata and lineage</h2>
+<p>A production retrieval unit is better thought of as:</p>
+<div class="formula"><div class="expr">chunk text + metadata + lineage</div></div>
+<p>Metadata can enable filters, security, freshness controls, source attribution, reranking, and traceability.</p>
+<h2 id="chunking-is-part-of-context-engineering">Chunking is part of context engineering</h2>
+<p>The information an LLM sees depends on parsing, chunking, embeddings, metadata, retrieval, reranking, context assembly, and prompting.</p>
+<p>Changing chunking changes the model's effective information environment.</p>
+<h2 id="how-to-choose-chunk-size">How to choose chunk size</h2>
+<p>Do not use one default because a framework tutorial chose it. Build an evaluation set and compare several strategies, for example:</p>
+<ul><li>250 tokens,</li><li>500 tokens,</li><li>1,000 tokens,</li><li>section-aware splitting,</li><li>semantic splitting.</li></ul>
+<p>Then run the same questions against each configuration.</p>
+<h2 id="metrics">Metrics</h2>
+<p>Useful retrieval metrics include Recall@K, Precision@K, MRR, and NDCG.</p>
+<p>Then measure answer correctness, faithfulness, context efficiency, latency, embedding/index cost, and downstream LLM cost.</p>
+<h2 id="common-mistakes">Common mistakes</h2>
+<div class="pitfalls">
+<div class="pitfall"><p>One chunk size for every content type.</p></div>
+<div class="pitfall"><p>Optimizing only for maximum context length.</p></div>
+<div class="pitfall"><p>Ignoring headings.</p></div>
+<div class="pitfall"><p>Excessive overlap.</p></div>
+<div class="pitfall"><p>Losing source lineage.</p></div>
+<div class="pitfall"><p>Failing to re-chunk when sources change.</p></div>
+<div class="pitfall"><p>Measuring only final answers.</p></div>
+</div>
+<h2 id="multilingual-data">Multilingual data</h2>
+<p>Chunking rules that work well for English may not generalize to all writing systems. Test by language.</p>
+<h2 id="long-context-llms-do-not-eliminate-chunking">Long-context LLMs do not eliminate chunking</h2>
+<p>Retrieval still provides access control, provenance, freshness, lower input cost, targeted evidence, and scalability across large knowledge collections.</p>
+<h2 id="practical-enterprise-default">Practical enterprise default</h2>
+<div class="steps">
+<div class="step"><p>Preserve headings.</p></div>
+<div class="step"><p>Use recursive structure-aware splitting.</p></div>
+<div class="step"><p>Enforce a token-aware maximum.</p></div>
+<div class="step"><p>Use modest overlap.</p></div>
+<div class="step"><p>Preserve metadata and lineage.</p></div>
+<div class="step"><p>Retrieve a small Top-K.</p></div>
+<div class="step"><p>Measure Recall@K and answer quality.</p></div>
+</div>
+<p>Then add semantic chunking, parent-child retrieval, late chunking, proposition extraction, or reranking only when evaluation identifies a need.</p>
+<h2 id="chunking-should-be-a-knob">Chunking should be a knob</h2>
+<p>Treat chunk strategy, size, overlap, separator hierarchy, metadata inclusion, parent expansion, retrieval K, reranking K, and embedding model as measurable variables.</p>
+<h2 id="bottom-line">Bottom line</h2>
+<p>Tokenization converts text into units processed by the model. Chunking converts documents into units retrieved by the information system.</p>
+<div class="callout">Do not ask only "What chunk size should we use?" Ask "Which chunking configuration produces the best outcomes for our documents and queries?"</div><div class="related"><h4>Related reading</h4><ul><li><a href="https://www.dataknobs.com/embeddings/">introduction to embeddings</a></li><li><a href="https://www.dataknobs.com/embeddings/how-embedding-models-work.html">how embedding models work</a></li><li><a href="https://www.dataknobs.com/embeddings/how-to-evaluate-embeddings.html">how to evaluate embeddings</a></li><li><a href="https://www.dataknobs.com/embeddings/build-a-custom-rag-pipeline-with-embeddings.html">build a custom RAG pipeline with embeddings</a></li><li><a href="https://www.dataknobs.com/generativeai/10-llms/when-to-use-rag.html">when to use RAG</a></li><li><a href="https://www.dataknobs.com/products/knobs/examples/retrieval-rag.html">retrieval and RAG knobs</a></li></ul></div>
+        </div>
+      </div>
+
+      <div class="cta-band">
+        <h3>KNOBS</h3>
+        <p>Treat chunk size, overlap, embedding model, Top-K, and reranking as measurable configuration variables rather than hidden defaults.</p>
+        <a class="cta-link" href="https://www.dataknobs.com/products/knobs/">Explore KNOBS →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-kicker">FAQ</div>
+        <h2 class="section-title">Frequently asked questions</h2>
+        <div class="section-intro">
+          Short answers to the questions teams ask most often about chunking vs tokenization.
+        </div>
+      </div>
+
+      <div class="faq-list">
+<div class="faq-item"><h3>What is the difference between chunking and tokenization?</h3><p>Chunking creates retrieval units; tokenization creates model-processing units. One chunk generally contains many tokens.</p></div><div class="faq-item"><h3>What is the best chunk size for RAG?</h3><p>There is no universal optimum. Test multiple sizes and strategies against retrieval and answer-quality metrics.</p></div><div class="faq-item"><h3>Do long-context LLMs eliminate chunking?</h3><p>No. Retrieval still helps with permissions, provenance, freshness, cost, and scale.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-engineering/">Agent Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-frameworks/">Agent Frameworks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-observability/">Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Ai Development Life Cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/beyond-react/">Beyond React</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/beyond-react-slides/">Beyond React Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/conflict-resolution/">Conflict Resolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/cost-aware-planning/">Cost Aware Planning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/design-patterns/">Design Patterns</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/emergent-behavior/">Emergent Behavior</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/episodic-memory/">Episodic Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/event-vs-goal-agents/">Event Vs Goal Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/fail-safe-agents/">Fail Safe Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/">Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/hierarchical-agents/">Hierarchical Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/mas-simulation/">Mas Simulation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-arch/">Memory Arch</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-compression/">Memory Compression</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-strategies/">Memory Strategies</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/multi-agent-systems/">Multi Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/planning-algorithms/">Planning Algorithms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/planning-vs-reactive/">Planning Vs Reactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/prompt-injection/">Prompt Injection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/sandboxing-agents/">Sandboxing Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/self-evolving-memory/">Self Evolving Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/stateless-stateful-agents/">Stateless Stateful Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/symbolic-llm-reasoning/">Symbolic Llm Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/testing/">Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-chaining/">Tool Chaining</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-hallucination/">Tool Hallucination</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-schema-latency/">Tool Schema Latency</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-selection/">Tool Selection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/uncertainty-handling/">Uncertainty Handling</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/use-cases/">Use Cases</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/1-agent-strategy-use-case-identification(1).html">1 Agent Strategy Use Case Identification(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/17-agent-reliability-engineering.html">17 Agent Reliability Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/18-agent-economics(1).html">18 Agent Economics(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/18-agent-economics.html">18 Agent Economics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/19-agent-compliance-and-risk(1).html">19 Agent Compliance And Risk(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/19-agent-compliance-and-risk.html">19 Agent Compliance And Risk</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-ai-index-dataknobs-theme(1).html">Agent Ai Index Dataknobs Theme(1)</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for AI Security</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 DataKnobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+
+
+</body></html>

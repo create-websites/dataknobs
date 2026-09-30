@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Jev vs LLM: Decision Models in AI Systems | DataKnobs</title>
+<meta content="Compare Jev decision models with generative LLMs, including typed outputs, latency, cost, calibration, workflow design, limits, and evaluation." name="description"/>
+<meta content="index, follow, max-image-preview:large" name="robots"/>
+<meta content="Jev, LLM, decision models, language models, TypeSafe AI, bounded decisions, AI architecture, AI evaluation, calibration, AI cost" name="keywords"/>
+<meta content="article" property="og:type"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="Jev vs LLM: How Decision Models and Language Models Fit Into an AI System" property="og:title"/>
+<meta content="Compare Jev decision models with generative LLMs, including typed outputs, latency, cost, calibration, workflow design, limits, and evaluation." property="og:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-1.png" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Jev vs LLM: Decision Models in AI Systems" name="twitter:title"/>
+<meta content="Compare Jev decision models with generative LLMs, including typed outputs, latency, cost, calibration, workflow design, limits, and evaluation." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-1.png" name="twitter:image"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+<link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Jev vs LLM: How Decision Models and Language Models Fit Into an AI System", "description": "Compare Jev decision models with generative LLMs, including typed outputs, latency, cost, calibration, workflow design, limits, and evaluation.", "dateModified": "2026-09-24", "publisher": {"@type": "Organization", "name": "DataKnobs"}, "image": "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-1.png", "keywords": ["Jev", "LLM", "decision model", "bounded decisions", "AI system architecture", "AI evaluation", "TypeSafe AI"]}</script>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head>
+<body class="dk-page">
+<header class="dk-header">
+<div class="dk-container dk-header-inner">
+<div class="dk-header-row">
+<a aria-label="DataKnobs home" class="dk-logo-link" href="https://www.dataknobs.com/">
+<img alt="DataKnobs logo" class="dk-logo" height="64" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png" width="240"/>
+</a>
+<nav aria-label="Primary navigation" class="dk-nav dk-nav--desktop">
+<a class="dk-nav-link" href="https://www.dataknobs.com/#platform">Platform</a>
+<a class="dk-nav-link" href="https://www.dataknobs.com/#capabilities">Capabilities</a>
+<a class="dk-nav-link" href="https://www.dataknobs.com/#use-cases">Use Cases</a>
+<a class="dk-nav-link" href="https://www.dataknobs.com/#knobs-value">Knobs</a>
+<a class="dk-btn dk-btn--primary dk-btn--sm" href="https://www.dataknobs.com/search.html">Search</a>
+</nav>
+<button aria-controls="mobile-menu" aria-expanded="false" aria-label="Open main menu" class="dk-menu-button" id="mobile-menu-button" type="button">
+<svg aria-hidden="true" class="dk-menu-icon" fill="none" id="menu-open-icon" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"></path></svg>
+<svg aria-hidden="true" class="dk-menu-icon" fill="none" hidden="" id="menu-close-icon" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg>
+</button>
+</div>
+<nav aria-label="Mobile navigation" class="dk-mobile-nav" id="mobile-menu">
+<div class="dk-mobile-nav-list">
+<a class="dk-mobile-link" href="https://www.dataknobs.com/#platform">Platform</a>
+<a class="dk-mobile-link" href="https://www.dataknobs.com/#capabilities">Capabilities</a>
+<a class="dk-mobile-link" href="https://www.dataknobs.com/#use-cases">Use Cases</a>
+<a class="dk-mobile-link" href="https://www.dataknobs.com/#knobs-value">Knobs</a>
+<a class="dk-mobile-link" href="https://www.dataknobs.com/search.html">Search</a>
+</div>
+</nav>
+</div>
+</header>
+<main>
+<section class="dk-hero dk-hero--purple">
+<div class="dk-container dk-hero-grid">
+<div class="dk-hero-copy">
+<span class="dk-badge dk-badge--inverse">Decision Models · LLMs · AI System Design</span>
+<h1 class="dk-hero-title">Jev vs LLM: <span class="dk-hero-accent">use each model for the job it actually needs to do</span></h1>
+<p class="dk-hero-lead">Modern AI systems mix bounded judgments, language generation, deterministic rules, and human review. This guide examines where Jev can fit, where an <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> remains necessary, and how to evaluate the whole workflow rather than a model in isolation.</p>
+<div class="dk-topic-meta">
+<span class="dk-topic-meta-item">Reviewed Sep 24, 2026</span>
+<span class="dk-topic-meta-item">13-slide source set</span>
+<span class="dk-topic-meta-item">Technical comparison</span>
+</div>
+</div>
+<div aria-label="Jev and LLM roles in a combined AI system" class="dk-hero-visual">
+<div class="dk-hero-architecture">
+<div class="dk-hero-stage dk-hero-stage--knobs"><p class="dk-hero-stage-label">Bounded judgment</p><p class="dk-hero-stage-title">Jev / decision model</p><p class="dk-hero-stage-copy">Choice · Score · Noul · probabilities</p></div>
+<div class="dk-hero-stage dk-hero-stage--center"><p class="dk-hero-stage-label">Action boundary</p><p class="dk-hero-stage-title">Code + policy</p><p class="dk-hero-stage-copy">Thresholds · permissions · validation · routing</p></div>
+<div class="dk-hero-stage"><p class="dk-hero-stage-label">Open-ended work</p><p class="dk-hero-stage-title">Generative LLM</p><p class="dk-hero-stage-copy">Write · explain · summarize · code · plan</p></div>
+<div class="dk-hero-stage"><p class="dk-hero-stage-label">Uncertain / consequential</p><p class="dk-hero-stage-title">Human review</p><p class="dk-hero-stage-copy">Escalate exceptions with evidence and context</p></div>
+</div>
+</div>
+</div>
+</section>
+<nav aria-label="Breadcrumb" class="dk-breadcrumb">
+<div class="dk-container dk-breadcrumb-inner">
+<a href="https://www.dataknobs.com/">DataKnobs</a>
+<span aria-hidden="true" class="dk-breadcrumb-sep">/</span>
+<span>Agent AI</span>
+<span aria-hidden="true" class="dk-breadcrumb-sep">/</span>
+<span class="dk-breadcrumb-current">Jev vs LLM</span>
+</div>
+</nav>
+<section class="dk-section dk-section--soft dk-section--bordered">
+<div class="dk-container">
+<div class="dk-section-heading">
+<p class="dk-eyebrow">The central design question</p>
+<h2 class="dk-title">Do you need a decision, generated language, deterministic logic, or human judgment?</h2>
+<div class="dk-prose"><p>Modern AI applications do much more than answer questions. They route support tickets, prioritize work, decide whether to retrieve more information, select tools, and check whether an agent has finished its task. Many of these operations end with a small decision: a category, a score, or a yes-or-no judgment.</p>
+<p>A general-purpose large language model can perform these jobs, but its ability to generate language may be more than the application needs. That is the opportunity explored in the supplied slides: using Jev for bounded decisions while keeping LLMs for writing, coding, and more open-ended work.</p>
+<p>The distinction matters because choosing a model affects latency, cost, failure modes, and the amount of engineering required around it. The strongest case for Jev is a workflow that repeatedly asks well-defined questions and can act on structured answers. Its value must ultimately be demonstrated on that workflow’s own data.</p>
+</div>
+</div>
+<div class="dk-control-grid">
+<div class="dk-control-card"><p class="dk-control-label">Decision model</p><p class="dk-control-value"><strong>Best candidate when the answer space is bounded</strong> and the workflow repeatedly asks categories, scales, or yes/no questions.</p></div>
+<div class="dk-control-card"><p class="dk-control-label">Language model</p><p class="dk-control-value"><strong>Best candidate when output must be generated</strong> for the situation: replies, explanations, reports, summaries, code, or plans.</p></div>
+<div class="dk-control-card dk-control-card--accent"><p class="dk-control-label">Ordinary code</p><p class="dk-control-value"><strong>Keep exact business rules explicit</strong> when the requirement can be fully specified and deterministically enforced.</p></div>
+<div class="dk-control-card dk-control-card--accent"><p class="dk-control-label">People</p><p class="dk-control-value"><strong>Escalate ambiguity or consequence</strong> when evidence is insufficient, risk is high, or expert judgment is part of the task.</p></div>
+</div>
+</div>
+</section>
+<div class="dk-container dk-article-shell">
+<div class="dk-article-layout">
+<article class="dk-article-content">
+<section class="dk-article-section" id="what-is-jev">
+<p class="dk-eyebrow">Analysis</p>
+<h2 class="dk-article-heading">1. What is Jev?</h2>
+<div class="dk-prose"><p>Jev is TypeSafe AI’s decision-oriented model. The company describes it as a “System One” model: an interface that accepts application state and typed questions, then returns structured decisions and probabilities. It does not produce arbitrary prose through that interface. TypeSafe’s documentation identifies three question types: Choice, Score, and Noul. <a href="https://docs.typesafe.ai/introduction">TypeSafe introduction</a></p>
+<p>The supplied slides place Jev’s public introduction on September 15, 2026, and describe its training approach as Reinforcement Learning for Calibrated Decisions, or RLCD. TypeSafe’s launch announcement confirms those details. “System One” draws inspiration from Daniel Kahneman’s distinction between fast judgment and deliberate reasoning; it is the company’s terminology rather than a standardized industry classification. <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">TypeSafe launch announcement</a></p>
+<p>The slides also report a $40 million seed round led by DCVC and name Diogo Almeida, Erik Gafni, and Sasha Sheng as founders. Those company-background claims are reproduced here as slide-provided context, not independently verified findings. They do not establish model quality.</p>
+<p>The practical question is what the application needs to receive. If it needs a customer-facing explanation, a decision alone is insufficient. If it needs a department identifier, generating a paragraph and extracting the identifier may add unnecessary work.</p>
+</div>
+</section><section class="dk-article-section" id="the-central-difference-a-bounded-answer-versus-generated-language">
+<p class="dk-eyebrow">Architecture</p>
+<h2 class="dk-article-heading">2. The central difference: a bounded answer versus generated language</h2>
+<div class="dk-prose"><p>Consider a support platform that receives this message:</p>
+<div class="dk-callout"><p>
+</p><p>My subscription renewed yesterday, but I thought I had cancelled. Please review the charge and tell me what happens next.</p>
+<p></p></div>
+<p>The platform may need to identify the responsible team, assess urgency, and determine whether the message concerns a renewal. It may then need to compose a reply.</p>
+<p>These are different output requirements. The first three can be expressed using predefined categories or scales. The reply requires language that responds to the specific situation.</p>
+<p>An LLM can handle both kinds of work. Jev’s proposed role is to handle the bounded judgments efficiently, leaving the response-writing step to a language model.</p>
+<div class="dk-table-wrap"><table class="dk-table">
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Jev, as presented in the slides</th>
+<th>Conventional generative LLM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary output</td>
+<td>Typed decisions and probabilities</td>
+<td>Generated tokens: prose, code, or structured text</td>
+</tr>
+<tr>
+<td>Answer space</td>
+<td>Defined by the application</td>
+<td>Potentially open-ended; can also be constrained</td>
+</tr>
+<tr>
+<td>Typical task</td>
+<td>Classify, route, score, check</td>
+<td>Write, summarize, explain, code, plan</td>
+</tr>
+<tr>
+<td>Output process</td>
+<td>Parallel evaluation of typed questions, according to TypeSafe</td>
+<td>Typically autoregressive token generation</td>
+</tr>
+<tr>
+<td>Free-form rationale</td>
+<td>Not supplied by the decision interface</td>
+<td>Can generate a rationale, which still needs verification</td>
+</tr>
+<tr>
+<td>Main integration challenge</td>
+<td>Define useful questions, thresholds, and fallbacks</td>
+<td>Define prompts or schemas, validate results, and manage errors</td>
+</tr>
+<tr>
+<td>Remaining error risk</td>
+<td>Selects a valid but incorrect answer</td>
+<td>Can produce incorrect content even when the format is valid</td>
+</tr>
+</tbody>
+</table></div>
+<p>This comparison should not imply that LLMs are restricted to conversation. They can classify, use tools, and produce schema-constrained responses. A fair evaluation should compare Jev with a properly configured LLM performing the same task.</p>
+</div>
+</section><section class="dk-article-section" id="how-jevs-three-output-types-work">
+<p class="dk-eyebrow">Decision primitives</p>
+<h2 class="dk-article-heading">3. How Jev’s three output types work</h2>
+<div class="dk-prose"><h3 class="dk-card-title dk-card-title--lg">Choice: selecting from named options</h3>
+<p>Choice fits questions such as which team should own a ticket or which processing path should handle a document. The slides describe support for up to 255 options, with a two-stage approach for larger sets.</p>
+<p>For a ticket-routing application, the options might be billing, technical support, account access, sales, and needs review. Each category should have a clear description. Overlapping definitions make the task harder for any model.</p>
+<p>A review option is especially useful when an input falls outside the intended taxonomy. Without it, the model may be forced to choose the least unsuitable category.</p>
+<h3 class="dk-card-title dk-card-title--lg">Score: locating an input on an ordered rubric</h3>
+<p>Score fits questions about urgency, severity, or another ordered dimension. The slides describe a scale with two to ten levels.</p>
+<p>A useful urgency rubric describes observable situations: a routine question, a degraded feature with a workaround, or a complete service outage. Labels such as “medium” or “high” alone leave too much interpretation to the model.</p>
+<p>Current documentation adds an important detail: the returned score can be fractional. Levels are indexed from zero, and the score is the probability-weighted average of those level indices. For example, a five-level rubric uses positions 0 through 4; an application showing 1 through 5 must map that value deliberately. A fractional result is a position on the rubric, not a percentage of affected customers. <a href="https://docs.typesafe.ai/primitives/score">TypeSafe Score documentation</a></p>
+<h3 class="dk-card-title dk-card-title--lg">Noul: estimating whether a statement is true</h3>
+<p>Noul expresses a yes-or-no judgment as a value between zero and one. The slides use contract auto-renewal as an example. Similar bounded questions might ask whether a customer explicitly requested cancellation or whether an agent’s result satisfies a stated requirement.</p>
+<p>The number is an estimate. Application code still decides what to do with it. A probability near the middle may justify requesting more information; a strongly positive prediction may justify action only if the task and its consequences permit it.</p>
+</div>
+</section><section class="dk-article-section" id="why-the-output-process-can-affect-speed">
+<p class="dk-eyebrow">Performance &amp; evidence</p>
+<h2 class="dk-article-heading">4. Why the output process can affect speed</h2>
+<div class="dk-prose"><p>The slides contrast sequential LLM output with Jev’s parallel typed answers. An autoregressive language model generates an answer conditioned on preceding tokens. Even a small structured response requires some sequence of output tokens, and reasoning settings can add substantial computation.</p>
+<p>TypeSafe describes Jev as evaluating questions in parallel against the same state. Its documentation also says those questions are evaluated independently. <a href="https://docs.typesafe.ai/introduction">TypeSafe introduction</a></p>
+<p>For application design, that independence has a consequence: do not assume the answer to one question becomes evidence for another question in the same call. If a later judgment requires an earlier result, compose the dependency in code or make a subsequent request.</p>
+<p>The slides report 70–500 milliseconds per decision and headline speedups of 40–200 times over frontier LLM comparisons. Treat those as vendor-reported results for particular workloads. They do not establish the response time of every Jev integration or the performance of every LLM configuration.</p>
+<p>Input length, network location, concurrency, retries, and downstream tool execution all affect user-visible latency. Measure the time to complete the business operation, including unusually slow requests, rather than only the model’s typical response time.</p>
+</div>
+</section><section class="dk-article-section" id="probability-confidence-and-calibration-are-different-concepts">
+<p class="dk-eyebrow">Performance &amp; evidence</p>
+<h2 class="dk-article-heading">5. Probability, confidence, and calibration are different concepts</h2>
+<div class="dk-prose"><p>Probability describes the model’s estimated distribution over outcomes. Calibration asks whether those estimates correspond to observed frequencies over many comparable cases.</p>
+<p>For example, if events assigned approximately 0.8 probability occur about 80% of the time on a representative evaluation set, those predictions are well calibrated in that range. That observation does not prove calibration for another language, category, or data distribution.</p>
+<p>TypeSafe’s <code>confidence</code> field needs separate interpretation. Its documentation says Choice and Score confidence is calculated from the shape of the returned probability distribution. It is not a separate guarantee of correctness. Noul does not return that additional field. <a href="https://docs.typesafe.ai/confidence">TypeSafe confidence documentation</a></p>
+<p>Therefore, a confidence value of 0.9 should not automatically be described as “90% accurate.” Establish the relationship between a chosen threshold and actual errors using labeled data.</p>
+<p>A practical evaluation should ask how many cases pass each threshold, how often those accepted decisions are wrong, and which kinds of mistakes remain. A system that is highly accurate on a tiny accepted subset may provide less operational value than expected.</p>
+</div>
+</section><section class="dk-article-section" id="what-the-benchmark-numbers-show">
+<p class="dk-eyebrow">Performance &amp; evidence</p>
+<h2 class="dk-article-heading">6. What the benchmark numbers show</h2>
+<div class="dk-prose"><p>The slides reproduce the following comparison from TypeSafe’s four-workflow evaluation. These are the slide-reported figures, not measurements performed for this article.</p>
+<div class="dk-table-wrap"><table class="dk-table">
+<thead>
+<tr>
+<th>Model label in the slides</th>
+<th style="text-align:right">Agreement</th>
+<th style="text-align:right">Cost per case</th>
+<th style="text-align:right">Latency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Jev</td>
+<td style="text-align:right">67.8%</td>
+<td style="text-align:right">$0.0004</td>
+<td style="text-align:right">0.4 seconds</td>
+</tr>
+<tr>
+<td>GPT-5.6 Terra</td>
+<td style="text-align:right">67.9%</td>
+<td style="text-align:right">$0.0304</td>
+<td style="text-align:right">10.1 seconds</td>
+</tr>
+<tr>
+<td>GPT-5.6 Sol</td>
+<td style="text-align:right">74.1%</td>
+<td style="text-align:right">$0.0836</td>
+<td style="text-align:right">23.3 seconds</td>
+</tr>
+<tr>
+<td>Claude Opus 5</td>
+<td style="text-align:right">73.1%</td>
+<td style="text-align:right">$0.1761</td>
+<td style="text-align:right">37.8 seconds</td>
+</tr>
+</tbody>
+</table></div>
+<p>Using those rounded values, Jev costs one seventy-sixth as much as GPT-5.6 Terra and is about 25.3 times faster. Their reported agreement differs by 0.1 percentage point. The other two listed models lead Jev by 6.3 and 5.3 percentage points respectively.</p>
+<p>The roughly 25-times speedup in that specific row comparison should not be confused with the separate 40–200-times headline range. They describe different comparisons.</p>
+<p>More significantly, “agreement” requires careful interpretation. TypeSafe’s evaluation site says the reference answers are derived from the averaged responses of GPT-6 Astra and Claude Fable 5.1 at high thinking settings. Results are averaged equally across four workflows, with the evaluated models using their providers’ default reasoning settings. This is model-reference agreement rather than independently established human ground-truth accuracy. <a href="https://evals.typesafe.ai/">TypeSafe workflow evaluation methodology</a></p>
+<p>That methodology can support a useful comparison, but shared model biases, workflow construction, and reference disagreements affect its meaning. Similar agreement scores also do not establish statistical equivalence without sample counts and uncertainty estimates.</p>
+<p>For a production decision, evaluate against outcomes or expert-reviewed labels that reflect the application’s actual objective.</p>
+</div>
+</section><section class="dk-article-section" id="what-zero-hallucinations-does-and-does-not-establish">
+<p class="dk-eyebrow">Performance &amp; evidence</p>
+<h2 class="dk-article-heading">7. What “zero hallucinations” does: and does not: establish</h2>
+<div class="dk-prose"><p>The slides correctly separate output validity from decision correctness. A model constrained to approved categories cannot invent an additional category through that interface. It can still select the wrong approved category.</p>
+<p>Suppose a document belongs to account-access support, but the model selects billing. The output may be perfectly valid according to the schema while producing an operational error.</p>
+<p>Three distinct checks are useful:</p>
+<ol class="dk-list dk-list--spaced">
+<li><strong>Format validity:</strong> Does the result satisfy the required schema?</li>
+<li><strong>Decision correctness:</strong> Does it identify the right outcome?</li>
+<li><strong>Action appropriateness:</strong> Should the application take the proposed action under its rules and permissions?</li>
+</ol>
+<p>Type safety addresses the first question. It does not, by itself, answer the other two.</p>
+<p>A narrow output space also does not eliminate adversarial input, incomplete evidence, or distribution shift. If Jev is used to check an LLM’s work, that check is another model judgment rather than an independent proof. Deterministic checks remain valuable wherever the requirement can be expressed exactly.</p>
+</div>
+</section><section class="dk-article-section" id="reconstructing-the-slides-monthly-cost-example">
+<p class="dk-eyebrow">Performance &amp; evidence</p>
+<h2 class="dk-article-heading">8. Reconstructing the slides’ monthly cost example</h2>
+<div class="dk-prose"><p>The slides estimate token costs for ten million ticket-triage requests per month. Their assumptions are 800 input tokens per request and approximately 30 output tokens for each LLM response.</p>
+<p>That gives eight billion input tokens and 300 million LLM output tokens monthly. The Jev rate used is $0.042 per million input tokens, with no output charge. TypeSafe’s homepage also advertises the equivalent $42 per billion input tokens. <a href="https://typesafe.ai/">TypeSafe pricing statement</a></p>
+<p>The two LLM scenarios below are illustrative rates from the slides, not current quotes for specific models. Output pricing is assumed to be five times input pricing.</p>
+<div class="dk-table-wrap"><table class="dk-table">
+<thead>
+<tr>
+<th>Monthly token cost</th>
+<th style="text-align:right">Jev at slide rate</th>
+<th style="text-align:right">LLM: $0.20 input / $1 output per million</th>
+<th style="text-align:right">LLM: $10 input / $50 output per million</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Input: 8 billion tokens</td>
+<td style="text-align:right">$336</td>
+<td style="text-align:right">$1,600</td>
+<td style="text-align:right">$80,000</td>
+</tr>
+<tr>
+<td>Output: 300 million LLM tokens</td>
+<td style="text-align:right">$0</td>
+<td style="text-align:right">$300</td>
+<td style="text-align:right">$15,000</td>
+</tr>
+<tr>
+<td>Total</td>
+<td style="text-align:right"><strong>$336</strong></td>
+<td style="text-align:right"><strong>$1,900</strong></td>
+<td style="text-align:right"><strong>$95,000</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>The arithmetic checks out. Under these assumptions, Jev’s token bill is approximately 82.3% below the lower-priced LLM scenario and 99.65% below the higher-priced scenario.</p>
+<p>These calculations assume 800 tokens covers all billable request content, including the questions and rubric where applicable. More elaborate schemas, repeated context, or additional checking calls change the total.</p>
+<p>The economically relevant measure is cost per successfully completed case. Add orchestration, escalation, human review, retries, and error remediation. As an illustrative extension, if just 1% of ten million requests requires review at $1 each, review alone costs $100,000. This is not a forecast; it shows why automation coverage and mistake rates can matter more than token prices.</p>
+</div>
+</section><section class="dk-article-section" id="combining-jev-llms-code-and-people">
+<p class="dk-eyebrow">Architecture</p>
+<h2 class="dk-article-heading">9. Combining Jev, LLMs, code, and people</h2>
+<div class="dk-prose"><p>The slides propose a support workflow with different components handling different responsibilities. A practical implementation might work as follows.</p>
+<p>First, the application retrieves the ticket and authoritative account context. Jev evaluates the department, urgency, and relevant yes-or-no questions. Code checks the returned values against business rules and the thresholds validated for that task.</p>
+<p>A clear, low-risk classification can route the ticket automatically. An uncertain case can receive additional context, a stronger model assessment, or human review. When a response is required, an LLM drafts it using the verified facts and the permitted actions.</p>
+<p>Before sending, code can check exact requirements such as whether an account identifier exists or a requested operation is authorized. A model may additionally assess semantic questions, such as whether the draft promises an unsupported outcome. Failed or uncertain cases go to a person with the relevant context.</p>
+<p>The model’s role is to contribute evidence to the workflow. Code controls the action boundary.</p>
+<p>For traceability, retain the schema and model versions, returned probabilities, applicable thresholds, decision, and eventual outcome. A later explanation generated by an LLM should be described as an explanation based on the available evidence, not as a recovered account of Jev’s internal reasoning.</p>
+</div>
+</section><section class="dk-article-section" id="choosing-the-right-approach">
+<p class="dk-eyebrow">Architecture</p>
+<h2 class="dk-article-heading">10. Choosing the right approach</h2>
+<div class="dk-prose"><div class="dk-table-wrap"><table class="dk-table">
+<thead>
+<tr>
+<th>Task shape</th>
+<th>Candidate approach</th>
+<th>What to establish before adoption</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Repeated semantic decisions with a known answer set</td>
+<td>Jev or another decision model</td>
+<td>Quality, calibration, latency, and total cost on real data</td>
+</tr>
+<tr>
+<td>Customer replies, reports, summaries, or code</td>
+<td>LLM</td>
+<td>Factual support, output quality, and suitable checks</td>
+</tr>
+<tr>
+<td>Complex decisions requiring investigation or justification</td>
+<td>LLM-assisted workflow and/or expert review</td>
+<td>Evidence quality and whether the reasoning supports the decision</td>
+</tr>
+<tr>
+<td>Stable categories with abundant labeled examples</td>
+<td>Supervised classifier</td>
+<td>Whether a simpler model meets the requirement more efficiently</td>
+</tr>
+<tr>
+<td>Fully specified business logic</td>
+<td>Ordinary code</td>
+<td>Correct implementation and coverage of edge cases</td>
+</tr>
+<tr>
+<td>Workflow containing decisions and language generation</td>
+<td>Combined architecture</td>
+<td>Whether the extra components improve end-to-end outcomes</td>
+</tr>
+</tbody>
+</table></div>
+<p>This keeps the evaluation open to alternatives. Jev should outperform the strongest practical baseline for the task, which may be a classifier or existing rules rather than a frontier LLM.</p>
+</div>
+</section><section class="dk-article-section" id="limitations-and-access-considerations">
+<p class="dk-eyebrow">Adoption guidance</p>
+<h2 class="dk-article-heading">11. Limitations and access considerations</h2>
+<div class="dk-prose"><p>The slides identify several constraints: no arbitrary text generation, no native written rationale, predefined answer spaces, and a text-oriented interface rather than direct image understanding. These affect where Jev can sit in a workflow.</p>
+<p>For a scanned document, image-to-text processing may be required before a decision model can evaluate it. Errors in that earlier stage remain part of the system’s error budget.</p>
+<p>Changing a taxonomy also changes the task. Adding a department, revising severity definitions, or changing a policy should trigger versioning and re-evaluation. Historical results may not be directly comparable after such a change.</p>
+<p>The slide set describes early access and a waitlist. Treat that as launch-era information rather than a permanent access restriction: the current official quick-start directs users to the playground and dashboard for API access. Check account-specific availability and service terms before planning a rollout. <a href="https://docs.typesafe.ai/introduction/quickstart">TypeSafe quick-start</a></p>
+<p>The slides do not provide enough information to reconstruct Jev’s full architecture, parameter count, or training data. Those gaps limit conclusions about why it performs as reported or how broadly the results will generalize.</p>
+</div>
+</section><section class="dk-article-section" id="a-six-step-evaluation-plan">
+<p class="dk-eyebrow">Adoption guidance</p>
+<h2 class="dk-article-heading">12. A six-step evaluation plan</h2>
+<div class="dk-prose"><p><strong>Choose one decision.</strong> Start with a task whose outcome can be reviewed, such as routing tickets to a small number of teams. Record current accuracy, latency, costs, and escalation rates.</p>
+<p><strong>Build a representative labeled dataset.</strong> Include ordinary cases, rare classes, ambiguous inputs, missing context, and examples outside the expected categories. Reserve a held-out set that is not used to tune prompts, descriptions, or thresholds.</p>
+<p><strong>Compare realistic baselines.</strong> Include the existing process, a schema-constrained LLM, and a classifier where appropriate. Give each approach the same relevant evidence and account for its configuration.</p>
+<p><strong>Measure operational outcomes.</strong> Track per-class precision and recall, errors among automatically accepted decisions, automation coverage, calibration, p95 and p99 latency, and full cost per resolved case. Examine both missed urgent cases and unnecessary escalations.</p>
+<p><strong>Stress-test the workflow.</strong> Test long inputs, conflicting facts, unfamiliar labels, prompt-injection attempts, service timeouts, and model updates. Make fallback behavior explicit when a request fails or the evidence is insufficient.</p>
+<p><strong>Roll out in stages.</strong> Begin in shadow mode, where the model records recommendations without controlling the live process. Then automate a limited, reversible subset that meets predefined acceptance criteria. Continue sampling outcomes and retain clear rollback conditions.</p>
+</div>
+</section><section class="dk-article-section" id="what-this-means-for-ai-product-engineering">
+<p class="dk-eyebrow">Adoption guidance</p>
+<h2 class="dk-article-heading">13. What this means for AI product engineering</h2>
+<div class="dk-prose"><p>The broader idea behind the slide deck is to separate the different kinds of intelligence an application needs. Some steps require language; others require bounded judgments; still others are deterministic rules.</p>
+<p>This separation can make costs and responsibilities easier to inspect. A routing decision can have its own dataset and acceptance criteria. A drafting step can be evaluated for factuality and usefulness. Business logic can remain visible in code.</p>
+<p>It also creates additional interfaces to maintain. Teams should adopt the combined design when measurements show a meaningful benefit, rather than assuming that adding a specialized model automatically improves the system.</p>
+<p>Jev’s reported speed and pricing make it a candidate for high-volume decision steps. The case for adoption becomes convincing when a real evaluation shows that those advantages survive the cost of verification, exceptions, and mistakes.</p>
+<hr/>
+</div>
+</section><section class="dk-article-section" id="source-slide-index">
+<p class="dk-eyebrow">Source material</p>
+<h2 class="dk-article-heading">Source-slide index</h2>
+<p class="dk-article-intro">All 13 slide images remain linked below. Four representative visuals are surfaced here to make the article easier to navigate.</p>
+<div class="dk-slide-showcase-grid"><article class="dk-slide-showcase">
+<div class="dk-slide-frame"><img alt="Overview and Jev definition slide from the supplied Jev versus LLM source deck" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-1.png"/></div>
+<div class="dk-slide-meta"><span class="dk-slide-kicker">Source slide</span><h3 class="dk-slide-title">Overview and Jev definition</h3><p class="dk-slide-description">The source deck introduces Jev as a bounded decision model and frames the Jev-versus-LLM question.</p></div>
+</article><article class="dk-slide-showcase">
+<div class="dk-slide-frame"><img alt="Choice, Score and Noul slide from the supplied Jev versus LLM source deck" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-4.png"/></div>
+<div class="dk-slide-meta"><span class="dk-slide-kicker">Source slide</span><h3 class="dk-slide-title">Choice, Score and Noul</h3><p class="dk-slide-description">The slide set explains the typed output primitives and the contrast with generated language.</p></div>
+</article><article class="dk-slide-showcase">
+<div class="dk-slide-frame"><img alt="Benchmark and output-validity distinction slide from the supplied Jev versus LLM source deck" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-7.png"/></div>
+<div class="dk-slide-meta"><span class="dk-slide-kicker">Source slide</span><h3 class="dk-slide-title">Benchmark and output-validity distinction</h3><p class="dk-slide-description">Vendor-reported benchmark results are useful context, but the article separates schema validity from decision correctness.</p></div>
+</article><article class="dk-slide-showcase">
+<div class="dk-slide-frame"><img alt="Combined support workflow slide from the supplied Jev versus LLM source deck" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-10.png"/></div>
+<div class="dk-slide-meta"><span class="dk-slide-kicker">Source slide</span><h3 class="dk-slide-title">Combined support workflow</h3><p class="dk-slide-description">The strongest architecture combines decision models, LLMs, deterministic checks and human escalation according to task shape.</p></div>
+</article></div>
+<div class="dk-prose"><p>All 13 supplied images were reviewed. Some images contain the end of one presentation section and the beginning of another, so the printed section numbers do not match the image count. The article reorganizes the material into a continuous narrative.</p>
+<ol class="dk-list dk-list--spaced">
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-1.png">Slide image 1: Overview, Jev definition, and launch context</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-2.png">Slide image 2: Company background and output-process comparison</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-3.png">Slide image 3: Parallel decisions and output primitives</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-4.png">Slide image 4: Score, Noul, and comparison table</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-5.png">Slide image 5: Confidence, latency, pricing, and availability</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-6.png">Slide image 6: Speed claims and benchmark introduction</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-7.png">Slide image 7: Benchmark figures and output-validity distinction</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-8.png">Slide image 8: Monthly cost example</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-9.png">Slide image 9: Cost caveats and confidence-based routing</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-10.png">Slide image 10: Decision guide and support architecture</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-11.png">Slide image 11: Workflow checks, audit trail, and limitations</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-12.png">Slide image 12: Limitations and evaluation steps</a></li>
+<li><a href="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/jev-vs-llm/images/Slide1000/jev-vs-llm-13.png">Slide image 13: Rollout and concluding recommendations</a></li>
+</ol>
+</div>
+</section>
+</article>
+<aside aria-label="On this page" class="dk-toc">
+<div class="dk-toc-card">
+<h2 class="dk-toc-title">On this page</h2>
+<p class="dk-toc-copy">A source-grounded comparison of Jev, generative LLMs, code, and human review.</p>
+<ol class="dk-toc-list">
+<li><a class="dk-toc-link" href="#what-is-jev">1. What is Jev?</a></li><li><a class="dk-toc-link" href="#the-central-difference-a-bounded-answer-versus-generated-language">2. The central difference: a bounded answer versus generated language</a></li><li><a class="dk-toc-link" href="#how-jevs-three-output-types-work">3. How Jev’s three output types work</a></li><li><a class="dk-toc-link" href="#why-the-output-process-can-affect-speed">4. Why the output process can affect speed</a></li><li><a class="dk-toc-link" href="#probability-confidence-and-calibration-are-different-concepts">5. Probability, confidence, and calibration are different concepts</a></li><li><a class="dk-toc-link" href="#what-the-benchmark-numbers-show">6. What the benchmark numbers show</a></li><li><a class="dk-toc-link" href="#what-zero-hallucinations-does-and-does-not-establish">7. What “zero hallucinations” does: and does not: establish</a></li><li><a class="dk-toc-link" href="#reconstructing-the-slides-monthly-cost-example">8. Reconstructing the slides’ monthly cost example</a></li><li><a class="dk-toc-link" href="#combining-jev-llms-code-and-people">9. Combining Jev, LLMs, code, and people</a></li><li><a class="dk-toc-link" href="#choosing-the-right-approach">10. Choosing the right approach</a></li><li><a class="dk-toc-link" href="#limitations-and-access-considerations">11. Limitations and access considerations</a></li><li><a class="dk-toc-link" href="#a-six-step-evaluation-plan">12. A six-step evaluation plan</a></li><li><a class="dk-toc-link" href="#what-this-means-for-ai-product-engineering">13. What this means for AI product engineering</a></li><li><a class="dk-toc-link" href="#source-slide-index">Source-slide index</a></li>
+</ol>
+</div>
+<div class="dk-callout">
+<p class="dk-callout-title">Evidence discipline</p>
+<p>Vendor-reported latency, pricing, agreement, and speed figures are preserved as claims from the supplied material. The article does not treat them as universal production guarantees.</p>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/adoption-in-enterprises/">Adoption In Enterprises</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/agents/">Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistants/">Ai Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/compare-llm-factors/">Compare Llm Factors</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/course/">Course</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/create-ai-assistants/">Create Ai Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/customer-onboarding-assistant/">Customer Onboarding Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/grounding/">Grounding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/guardrails/">Guardrails</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/hallucinations/">Hallucinations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/limitations/">Limitations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-course/">Llm Course</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-models/">Llm Models</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security/">Llm Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/multi-modal-llm/">Multi Modal Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/openai-fine-tuning/">Openai Fine Tuning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/privacy-preserving/">Privacy Preserving</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/prompt-injection/">Prompt Injection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/recent-updates/">Recent Updates</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/structured-data/">Structured Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/training/">Training</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/types-of-chatbots/">Types Of Chatbots</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/100K-tokens.html">100K Tokens</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/agenda.html">Agenda</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-architecture.html">Ai Assistant Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-building-blocks.html">Ai Assistant Building Blocks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-custom-model.html">Ai Assistant Custom Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-evaluation-metric.html">Ai Assistant Evaluation Metric</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-finetune-model.html">Ai Assistant Finetune Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-on-your-data.html">Ai Assistant On Your Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-tech-stack.html">Ai Assistant Tech Stack</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-wrapper.html">Ai Assistant Wrapper</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistants-page.html">Ai Assistants Page</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistants-types.html">Ai Assistants Types</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistants-with-slides.html">Ai Assistants With Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/applications-of-llm-1.html">Applications Of Llm 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/applications-of-llm.html">Applications Of Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/approaches-to-verify-ai-assist.html">Approaches To Verify Ai Assist</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/architecture-llm-training.html">Architecture Llm Training</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/architecture-slide-for-custome.html">Architecture Slide For Custome</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/assistant-bot-metrics.html">Assistant Bot Metrics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/behavioral-metrics-for-recomme.html">Behavioral Metrics For Recomme</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/building-blocks-of-llms.html">Building Blocks Of Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/chatgpt.html">Chatgpt</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/common-terminology-llms.html">Common Terminology Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/consideraions-for-bot-architec.html">Consideraions For Bot Architec</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/criteria-to-compare-llms.html">Criteria To Compare Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/criteria-to-select-llm-customization.html">Criteria To Select Llm Customization</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/customer-onboarding-ai-assisat.html">Customer Onboarding Ai Assisat</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/customer-onboarding-bot.html">Customer Onboarding Bot</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/data-ownership-issues-llm.html">Data Ownership Issues Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/enterprise-ai-llm-fintuning.html">Enterprise Ai Llm Fintuning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/enterprise-foundation-model-fine-tuning-guide.html">Enterprise Foundation Model Fine Tuning Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/enterprise-foundation-model-strategy-guide.html">Enterprise Foundation Model Strategy Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/enterprise-foundation-model.html">Enterprise Foundation Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/enterprise-grade-answers-ai-as.html">Enterprise Grade Answers Ai As</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/evaluate-llms.html">Evaluate Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/evoloving-applications-of-llms.html">Evoloving Applications Of Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/evolution-of-llms-8-stages-ai-advancement.html">Evolution Of Llms 8 Stages Ai Advancement</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/example-bot-assistants.html">Example Bot Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/example-features-of-ai-assista.html">Example Features Of Ai Assista</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/features-of-ai-assistants.html">Features Of Ai Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/fine-tuning-foundation-models.html">Fine Tuning Foundation Models</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/fine-tuning-llms-stock-analysis-guide.html">Fine Tuning Llms Stock Analysis Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/finetuning-llm-fo-stock-analysis.html">Finetuning Llm Fo Stock Analysis</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/gounding.html">Gounding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/how-to-compare-llms.html">How To Compare Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/in-context-learning.html">In Context Learning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/jev-vs-llm.html">Jev Vs Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-3-phases-1.html">Llm 3 Phases 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-agents-1.html">Llm Agents 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-apps-lifecycle-1.html">Llm Apps Lifecycle 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-apps-lifecycle-2.html">Llm Apps Lifecycle 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-apps-lifecycle-3.html">Llm Apps Lifecycle 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-apps-lifecycle.html">Llm Apps Lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-architectue-for-bot.html">Llm Architectue For Bot</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-base-vs-agentic-ai-comparison.html">Llm Base Vs Agentic Ai Comparison</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-big-token-example-100k.html">Llm Big Token Example 100K</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-challenges-slide.html">Llm Challenges Slide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-1.html">Llm Concerns 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-2.html">Llm Concerns 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-3.html">Llm Concerns 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-4.html">Llm Concerns 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-5.html">Llm Concerns 5</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-6.html">Llm Concerns 6</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-7.html">Llm Concerns 7</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-8.html">Llm Concerns 8</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-9.html">Llm Concerns 9</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-slides.html">Llm Concerns Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns.html">Llm Concerns</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-environment-issues.html">Llm Environment Issues</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-ethical-concerns-slides.html">Llm Ethical Concerns Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-example-complex-summarization.html">Llm Example Complex Summarization</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-finetuning-steps.html">Llm Finetuning Steps</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-function-calling.html">Llm Function Calling</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-generated-output-issues.html">Llm Generated Output Issues</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-guardrails-1.html">Llm Guardrails 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-guardrails-2.html">Llm Guardrails 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-guardrails-3.html">Llm Guardrails 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-guardrails.html">Llm Guardrails</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-journey-levels.html">Llm Journey Levels</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-key-concepts-1.html">Llm Key Concepts 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-large-language-models.html">Llm Large Language Models</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-overview.html">Llm Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-1.html">Llm Security Agenda 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-2.html">Llm Security Agenda 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-3.html">Llm Security Agenda 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-4.html">Llm Security Agenda 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-5.html">Llm Security Agenda 5</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-6.html">Llm Security Agenda 6</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-7.html">Llm Security Agenda 7</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-8.html">Llm Security Agenda 8</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-9.html">Llm Security Agenda 9</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-technology-slides.html">Llm Technology Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-testing-1.html">Llm Testing 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-threats-slides.html">Llm Threats Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-1.html">Llm Token Cost 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-2.html">Llm Token Cost 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-3.html">Llm Token Cost 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-4.html">Llm Token Cost 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-5.html">Llm Token Cost 5</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-topics.html">Llm Topics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-training-steps.html">Llm Training Steps</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial-1.html">Llm Tutorial 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial-2.html">Llm Tutorial 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial-3.html">Llm Tutorial 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial-4.html">Llm Tutorial 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-uncontrolled-behavior-slid.html">Llm Uncontrolled Behavior Slid</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-vol3-reasoning-scaling.html">Llm Vol3 Reasoning Scaling</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-vs-other-models.html">Llm Vs Other Models</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llms-overview.html">Llms Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/metrics-for-recommendation-bot.html">Metrics For Recommendation Bot</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/metrics-for-search-bot.html">Metrics For Search Bot</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/metrics-to-evaluate-ai-assista.html">Metrics To Evaluate Ai Assista</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/multi-model-llms.html">Multi Model Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/NLP Tasks With LLM.html">Nlp Tasks With Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/nlp-applications.html">Nlp Applications</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/open-source-vs-close.html">Open Source Vs Close</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-architecture-slide.html">Rag Architecture Slide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-node-post-processor.html">Rag Node Post Processor</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-node-processor.html">Rag Node Processor</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-overview-slides.html">Rag Overview Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-retriever-options.html">Rag Retriever Options</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-slides.html">Rag Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/search-answer-recommendation-plan-assistants.html">Search Answer Recommendation Plan Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide-1.html">Slide 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-10.html">Slide 10</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-11.html">Slide 11</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-12.html">Slide 12</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-13.html">Slide 13</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-14.html">Slide 14</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-15.html">Slide 15</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-16.html">Slide 16</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-17.html">Slide 17</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-18.html">Slide 18</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-19.html">Slide 19</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide-2.html">Slide 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-20.html">Slide 20</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-21.html">Slide 21</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-22.html">Slide 22</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-23.html">Slide 23</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-24.html">Slide 24</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-25.html">Slide 25</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-26.html">Slide 26</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-27.html">Slide 27</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-28.html">Slide 28</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-29.html">Slide 29</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide-3.html">Slide 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-30.html">Slide 30</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-31.html">Slide 31</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-32.html">Slide 32</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-33.html">Slide 33</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-34.html">Slide 34</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-35.html">Slide 35</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-36.html">Slide 36</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-37.html">Slide 37</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-38.html">Slide 38</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-39.html">Slide 39</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide-4.html">Slide 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-40.html">Slide 40</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-41.html">Slide 41</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-42.html">Slide 42</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-43.html">Slide 43</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-44.html">Slide 44</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-45.html">Slide 45</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-46.html">Slide 46</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-47.html">Slide 47</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-48.html">Slide 48</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-49.html">Slide 49</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-5.html">Slide 5</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-50.html">Slide 50</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-51.html">Slide 51</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-52.html">Slide 52</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-53.html">Slide 53</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-54.html">Slide 54</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-55.html">Slide 55</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-56.html">Slide 56</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-57.html">Slide 57</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-58.html">Slide 58</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-59.html">Slide 59</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-6.html">Slide 6</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-60.html">Slide 60</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-61.html">Slide 61</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-62.html">Slide 62</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-63.html">Slide 63</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-64.html">Slide 64</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-65.html">Slide 65</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-66.html">Slide 66</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-67.html">Slide 67</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-68.html">Slide 68</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-69.html">Slide 69</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-7.html">Slide 7</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-70.html">Slide 70</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-71.html">Slide 71</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-72.html">Slide 72</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-73.html">Slide 73</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-74.html">Slide 74</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-75.html">Slide 75</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-76.html">Slide 76</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-77.html">Slide 77</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-78.html">Slide 78</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-79.html">Slide 79</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-8.html">Slide 8</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-80.html">Slide 80</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-81.html">Slide 81</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-82.html">Slide 82</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-83.html">Slide 83</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-84.html">Slide 84</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-85.html">Slide 85</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-86.html">Slide 86</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-87.html">Slide 87</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-88.html">Slide 88</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-89.html">Slide 89</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-9.html">Slide 9</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-90.html">Slide 90</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-91.html">Slide 91</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-92.html">Slide 92</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-93.html">Slide 93</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-94.html">Slide 94</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-95.html">Slide 95</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide26-llm-based-ai-assistant.html">Slide26 Llm Based Ai Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide59.html">Slide59</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide62.html">Slide62</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide63.html">Slide63</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide64.html">Slide64</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide65.html">Slide65</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide66.html">Slide66</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide67.html">Slide67</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide68.html">Slide68</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide69.html">Slide69</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide70.html">Slide70</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide71.html">Slide71</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide72.html">Slide72</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide73.html">Slide73</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide74.html">Slide74</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide75.html">Slide75</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide76.html">Slide76</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide77.html">Slide77</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide78.html">Slide78</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide79.html">Slide79</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide80.html">Slide80</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide81.html">Slide81</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide82.html">Slide82</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide83.html">Slide83</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide84.html">Slide84</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide85.html">Slide85</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide86.html">Slide86</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide87.html">Slide87</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide88.html">Slide88</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide89.html">Slide89</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide90.html">Slide90</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide91.html">Slide91</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide92.html">Slide92</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide93.html">Slide93</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide94.html">Slide94</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide95.html">Slide95</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide96.html">Slide96</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide97.html">Slide97</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide98.html">Slide98</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slm-slides-1.html">Slm Slides 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slm-slides-2.html">Slm Slides 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slm-slides-3.html">Slm Slides 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slm-transformation.html">Slm Transformation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slm-vs-llm.html">Slm Vs Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/software-applications.html">Software Applications</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/technical-metrics-ai-assistant.html">Technical Metrics Ai Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/token-paradox.html">Token Paradox</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/types-of-ai-assistants.html">Types Of Ai Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/when-not-to-use-rag.html">When Not To Use Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/when-to-use-rag.html">When To Use Rag</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for AI Security</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 DataKnobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+<script>
+(function(){
+  const btn=document.getElementById('mobile-menu-button');
+  const menu=document.getElementById('mobile-menu');
+  const openIcon=document.getElementById('menu-open-icon');
+  const closeIcon=document.getElementById('menu-close-icon');
+  if(btn&&menu){btn.addEventListener('click',()=>{const open=btn.getAttribute('aria-expanded')==='true';btn.setAttribute('aria-expanded',String(!open));menu.classList.toggle('is-open',!open);if(openIcon)openIcon.hidden=!open;if(closeIcon)closeIcon.hidden=open;});}
+  const links=[...document.querySelectorAll('.dk-toc-link')];
+  const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if('IntersectionObserver' in window && sections.length){
+    const obs=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){links.forEach(a=>a.classList.toggle('dk-toc-link--active',a.getAttribute('href')==='#'+entry.target.id));}});},{rootMargin:'-18% 0px -72% 0px'});
+    sections.forEach(s=>obs.observe(s));
+  }
+})();
+</script>
+</body></html>

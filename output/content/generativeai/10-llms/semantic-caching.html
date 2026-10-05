@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Semantic Caching for LLMs: Architecture, Cost, TTL &amp; Safety</title>
+<meta content="Learn how LLM semantic caching reduces AI cost and latency using embeddings, similarity thresholds, TTLs, tenant isolation, freshness rules and safe cache invalidation." name="description"/>
+<meta content="semantic caching for LLMs, LLM semantic cache, LLM cache, semantic caching, LLM caching, Redis semantic cache, AI gateway semantic caching, semantic cache threshold, RAG caching" name="keywords"/>
+<meta content="DataKnobs" name="author"/>
+<meta content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" name="robots"/>
+<link href="https://www.dataknobs.com/generativeai/10-llms/semantic-caching.html" rel="canonical"/>
+<!-- GEO / AI discovery metadata -->
+<meta content="Semantic Caching for LLMs: How to Reduce AI Cost and Latency Safely. Learn how LLM semantic caching reduces AI cost and latency using embeddings, similarity thresholds, TTLs, tenant isolation, freshness rules and safe cache invalidation. Primary topic: semantic caching for LLMs. This technical enterprise guide covers semantic caching for LLMs, LLM semantic cache, LLM cache, semantic caching, LLM caching, Redis semantic cache." name="ai-summary"/>
+<meta content="semantic caching for LLMs; LLM semantic cache; LLM cache; semantic caching; LLM caching; Redis semantic cache; AI gateway semantic caching; semantic cache threshold; RAG caching" name="ai-key-points"/>
+<meta content="Semantic Caching for LLMs: How to Reduce AI Cost and Latency Safely" name="citation_title"/>
+<meta content="DataKnobs" name="citation_author"/>
+<meta content="2026-10-05" name="citation_publication_date"/>
+<meta content="2026-10-05" name="citation_online_date"/>
+<meta content="en" name="citation_language"/>
+<meta content="article" property="og:type"/>
+<meta content="Semantic Caching for LLMs: Architecture, Cost, TTL &amp; Safety" property="og:title"/>
+<meta content="Learn how LLM semantic caching reduces AI cost and latency using embeddings, similarity thresholds, TTLs, tenant isolation, freshness rules and safe cache invalidation." property="og:description"/>
+<meta content="https://www.dataknobs.com/generativeai/10-llms/semantic-caching.html" property="og:url"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="2026-10-05T08:00:00-07:00" property="article:published_time"/>
+<meta content="2026-10-05T08:00:00-07:00" property="article:modified_time"/>
+<meta content="Generative AI / LLMs + AI Infrastructure" property="article:section"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Semantic Caching for LLMs: Architecture, Cost, TTL &amp; Safety" name="twitter:title"/>
+<meta content="Learn how LLM semantic caching reduces AI cost and latency using embeddings, similarity thresholds, TTLs, tenant isolation, freshness rules and safe cache invalidation." name="twitter:description"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://www.dataknobs.com/generativeai/10-llms/semantic-caching.html#article",
+      "headline": "Semantic Caching for LLMs: How to Reduce AI Cost and Latency Safely",
+      "description": "Learn how LLM semantic caching reduces AI cost and latency using embeddings, similarity thresholds, TTLs, tenant isolation, freshness rules and safe cache invalidation.",
+      "datePublished": "2026-10-05",
+      "dateModified": "2026-10-05",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.dataknobs.com/generativeai/10-llms/semantic-caching.html"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "DataKnobs",
+        "url": "https://www.dataknobs.com/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "DataKnobs",
+        "url": "https://www.dataknobs.com/"
+      },
+      "articleSection": "Generative AI / LLMs + AI Infrastructure",
+      "keywords": [
+        "semantic caching for LLMs",
+        "LLM semantic cache",
+        "LLM cache",
+        "semantic caching",
+        "LLM caching",
+        "Redis semantic cache",
+        "AI gateway semantic caching",
+        "semantic cache threshold",
+        "RAG caching"
+      ],
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "semantic caching for LLMs"
+        },
+        {
+          "@type": "Thing",
+          "name": "LLM semantic cache"
+        },
+        {
+          "@type": "Thing",
+          "name": "LLM cache"
+        },
+        {
+          "@type": "Thing",
+          "name": "semantic caching"
+        },
+        {
+          "@type": "Thing",
+          "name": "LLM caching"
+        },
+        {
+          "@type": "Thing",
+          "name": "Redis semantic cache"
+        },
+        {
+          "@type": "Thing",
+          "name": "AI gateway semantic caching"
+        },
+        {
+          "@type": "Thing",
+          "name": "semantic cache threshold"
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://www.dataknobs.com/generativeai/10-llms/semantic-caching.html#breadcrumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.dataknobs.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Generative AI",
+          "item": "https://www.dataknobs.com/generativeai/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Semantic Caching for LLMs: How to Reduce AI Cost and Latency Safely",
+          "item": "https://www.dataknobs.com/generativeai/10-llms/semantic-caching.html"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.dataknobs.com/generativeai/10-llms/semantic-caching.html#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is semantic caching for LLMs?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A caching approach that reuses a prior AI response when a new request is semantically similar and still valid under the current context, policy and authorization."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is semantic caching different from prompt caching?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Semantic caching reuses the final answer. Prompt/prefix caching reuses model computation for repeated input tokens while still generating a new answer."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can semantic caching reduce LLM cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, when a qualifying hit safely avoids a new generation call. Savings depend on repetition, hit precision, lookup cost and validation overhead."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link href="https://www.dataknobs.com/dataknobs-theme.css" rel="stylesheet"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head><body class="dk-page"><header class="dk-header"><div class="dk-container dk-header-inner"><div class="dk-header-row">
+<a aria-label="DataKnobs home" class="dk-logo-link" href="https://www.dataknobs.com/"><img alt="DataKnobs" class="dk-logo" height="72" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png" width="240"/></a>
+<nav aria-label="Primary navigation" class="dk-nav dk-nav--desktop"><a class="dk-nav-link" href="https://www.dataknobs.com/data-products/">Data Products</a><a class="dk-nav-link" href="https://www.dataknobs.com/generativeai/">Generative AI</a><a class="dk-nav-link" href="https://www.dataknobs.com/agentic-ai/">Agentic AI</a><a class="dk-nav-link" href="https://www.dataknobs.com/embeddings/">Embeddings</a><a class="dk-btn dk-btn--primary dk-btn--sm" href="https://www.dataknobs.com/search.html">Search</a></nav>
+<button aria-controls="mobileNav" aria-expanded="false" aria-label="Open navigation" class="dk-menu-button" id="menuButton" type="button"><svg aria-hidden="true" class="dk-menu-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button></div>
+<nav aria-label="Mobile navigation" class="dk-mobile-nav" id="mobileNav"><div class="dk-mobile-nav-list"><a class="dk-mobile-link" href="https://www.dataknobs.com/data-products/">Data Products</a><a class="dk-mobile-link" href="https://www.dataknobs.com/generativeai/">Generative AI</a><a class="dk-mobile-link" href="https://www.dataknobs.com/agentic-ai/">Agentic AI</a><a class="dk-mobile-link" href="https://www.dataknobs.com/embeddings/">Embeddings</a><a class="dk-mobile-link" href="https://www.dataknobs.com/search.html">Search</a></div></nav></div></header><section class="dk-hero dk-hero--article dk-hero--article-rich"><div class="dk-container dk-hero-grid"><div class="dk-hero-copy"><span class="dk-badge dk-badge--inverse">Generative AI / LLMs + AI Infrastructure • Field Guide</span><h1 class="dk-hero-title">Semantic Caching for LLMs: How to Reduce AI Cost and Latency Safely</h1><p class="dk-hero-lead">Learn how LLM semantic caching reduces AI cost and latency using embeddings, similarity thresholds, TTLs, tenant isolation, freshness rules and safe cache invalidation.</p><div class="dk-article-kicker-row"><span class="dk-article-kicker">Primary topic: semantic caching for LLMs</span><span class="dk-article-kicker">Architecture + evaluation</span><span class="dk-article-kicker">Enterprise implementation</span></div></div><div class="dk-hero-visual"><div class="dk-hero-architecture"><div class="dk-hero-stage dk-hero-stage--center"><p class="dk-hero-stage-label">Decision frame</p><p class="dk-hero-stage-title">Design for the workload, then measure the outcome.</p><p class="dk-hero-stage-copy">Use explicit system choices rather than relying on a single technology or benchmark.</p></div><div class="dk-hero-stage-row"><div class="dk-hero-stage"><p class="dk-hero-stage-label">Query</p><p class="dk-hero-stage-title">Understand intent</p><p class="dk-hero-stage-copy">Normalize reusable requests.</p></div><div class="dk-hero-stage"><p class="dk-hero-stage-label">Similarity</p><p class="dk-hero-stage-title">Find safe matches</p><p class="dk-hero-stage-copy">Apply thresholds + policy.</p></div><div class="dk-hero-stage"><p class="dk-hero-stage-label">Reuse</p><p class="dk-hero-stage-title">Skip duplicate work</p><p class="dk-hero-stage-copy">Reduce cost and latency.</p></div></div><div class="dk-hero-stage dk-hero-stage--knobs"><p class="dk-hero-stage-label">DataKnobs principle</p><p class="dk-hero-stage-title">Make consequential choices measurable and governable.</p></div></div></div></div></section><div class="dk-breadcrumb"><div class="dk-container dk-breadcrumb-inner"><a href="https://www.dataknobs.com/">Home</a><span class="dk-breadcrumb-sep">/</span><a href="https://www.dataknobs.com/generativeai/">Generative AI</a><span class="dk-breadcrumb-sep">/</span><span class="dk-breadcrumb-current">Semantic Caching for LLMs</span></div></div><main><section class="dk-article-shell"><div class="dk-container dk-article-layout"><article class="dk-article-content"><div class="dk-prose"><p>Large language models repeatedly solve the same problem.</p><p>Questions such as:</p><blockquote class="dk-callout">
+<p>What is our return policy?</p>
+</blockquote><blockquote class="dk-callout">
+<p>Can I return an item after 30 days?</p>
+</blockquote><blockquote class="dk-callout">
+<p>How long do customers have to return a purchase?</p>
+</blockquote><p>may be semantically equivalent even when their text differs.</p><p>Without caching, each query may repeat embedding, retrieval, context assembly and generation.</p><blockquote class="dk-callout">
+<p><strong>Semantic caching asks whether the system has already answered a sufficiently similar question under compatible context and policy conditions.</strong></p>
+</blockquote><p>If yes, the application may reuse a validated answer and avoid an expensive generation call.</p><pre><code class="language-text">User Query
+    ↓
+Embed Query
+    ↓
+Semantic Cache Search
+    ↓
+Similar Valid Entry?
+   /             \
+ Yes              No
+  ↓                ↓
+Cached Response    Normal LLM / RAG Pipeline
+                   ↓
+                Store Result
+</code></pre><p>The danger is returning a fast, cheap, semantically similar <strong>wrong answer</strong>.</p><p>A production semantic cache therefore needs:</p><p><strong>similarity + scope + freshness + policy + versioning + evaluation</strong></p><div class="dk-article-summary-grid"><div class="dk-article-summary-card"><strong>Primary question</strong><span>Semantic Caching for LLMs</span></div><div class="dk-article-summary-card"><strong>Decision lens</strong><span>Architecture, quality, risk, latency and cost.</span></div><div class="dk-article-summary-card"><strong>Validation</strong><span>Evaluate on the real workload before production adoption.</span></div></div><h2 class="dk-article-heading" id="what-is-semantic-caching">What is semantic caching?</h2><p>Semantic caching stores a query embedding, response and metadata.</p><p>A new query is embedded and compared with stored entries.</p><p>If a sufficiently similar entry is found and all business conditions still match, the cached response may be reused.</p><p>The key phrase is <strong>qualifying hit</strong>.</p><p>Similarity alone is insufficient.</p><h2 class="dk-article-heading" id="exact-cache-vs-semantic-cache">Exact cache vs semantic cache</h2><p>Exact caching requires identical keys.</p><p>Semantic caching can match paraphrases.</p><p>That creates more reuse opportunities but also false-match risk.</p><p>A question about a general return policy and a question about a damaged product may be semantically close while requiring different answers.</p><h2 class="dk-article-heading" id="semantic-caching-vs-prompt-caching-vs-kv-cache">Semantic caching vs prompt caching vs KV cache</h2><p><strong>Semantic response caching</strong> reuses the answer.</p><p><strong>Prompt/prefix caching</strong> reuses repeated input computation while the model still generates a new answer.</p><p><strong>KV caching</strong> reuses transformer attention state inside inference.</p><p>They solve different layers and can coexist.</p><h2 class="dk-article-heading" id="why-semantic-caching-can-reduce-cost">Why semantic caching can reduce cost</h2><p>A full generation request may incur retrieval, input tokens, model compute and output tokens.</p><p>A cache hit may require only an embedding, vector lookup and validation.</p><p>A conceptual expected-cost equation is:</p><pre><code class="language-text">Expected Cost
+≈
+Cache Lookup Cost
++
+(1 - Hit Rate) × Full Generation Cost
++
+Hit Rate × Cache Validation Cost
+</code></pre><p>But hit rate alone is not the objective.</p><h2 class="dk-article-heading" id="optimize-safe-cache-hit-rate">Optimize safe cache hit rate</h2><p>The useful metric is:</p><blockquote class="dk-callout">
+<p>What percentage of requests were served from cache and remained correct, current, authorized and appropriate?</p>
+</blockquote><p>Maximize correct reuse, not raw reuse.</p><h2 class="dk-article-heading" id="production-architecture">Production architecture</h2><pre><code class="language-text">USER REQUEST
+     ↓
+NORMALIZATION
+     ↓
+AUTHORIZATION CONTEXT
+     ↓
+QUERY EMBEDDING
+     ↓
+SEMANTIC CACHE LOOKUP
+     ↓
+Similar result?
+     ↓
+POLICY / FRESHNESS VALIDATION
+     ↓
+Valid?
+  ├── YES → RETURN CACHED
+  └── NO  → RAG / LLM
+                  ↓
+             EVALUATE
+                  ↓
+             STORE IF SAFE
+</code></pre><p>The lookup is only one decision point.</p><h2 class="dk-article-heading" id="cache-record-design">Cache record design</h2><p>A useful entry can include:</p><ul>
+<li>original query,</li>
+<li>query embedding,</li>
+<li>response,</li>
+<li>tenant,</li>
+<li>locale,</li>
+<li>model,</li>
+<li>system-prompt version,</li>
+<li>knowledge version,</li>
+<li>policy version,</li>
+<li>creation time,</li>
+<li>expiry,</li>
+<li>safety status.</li>
+</ul><p>Metadata turns a vector match into a potentially safe application decision.</p><h2 class="dk-article-heading" id="tenant-isolation-comes-before-similarity">Tenant isolation comes before similarity</h2><p>Do not run a global nearest-neighbor search and then return the result.</p><p>First constrain by tenant, locale, policy context and authorization.</p><p>Then run semantic matching inside the allowed partition.</p><p>This is an authorization boundary.</p><h2 class="dk-article-heading" id="cache-identity-is-multidimensional">Cache identity is multidimensional</h2><p>The effective cache identity may include:</p><pre><code class="language-text">semantic_query
++
+tenant
++
+user segment
++
+locale
++
+model
++
+system prompt
++
+knowledge version
++
+policy version
++
+authorization scope
+</code></pre><p>If two requests could legitimately require different answers, the cache must be able to distinguish them.</p><h2 class="dk-article-heading" id="similarity-threshold-is-the-central-knob">Similarity threshold is the central KNOB</h2><p>Strict thresholds produce fewer hits and higher precision.</p><p>Loose thresholds produce more savings and more false-hit risk.</p><p>There is no universal correct threshold.</p><p>Evaluate it on your own labeled data.</p><h2 class="dk-article-heading" id="threshold-semantics-vary">Threshold semantics vary</h2><p>One implementation may use high similarity scores.</p><p>Another may use low distance values.</p><p>Never copy a numeric threshold from another system without validating how the embedding model and vector metric behave in your application.</p><h2 class="dk-article-heading" id="tune-with-a-golden-dataset">Tune with a golden dataset</h2><p>Create query pairs labeled <code>reuse = true/false</code>.</p><p>Include:</p><ul>
+<li>obvious paraphrases,</li>
+<li>near misses,</li>
+<li>dates,</li>
+<li>geography,</li>
+<li>negation,</li>
+<li>product differences,</li>
+<li>personal state,</li>
+<li>policy exceptions.</li>
+</ul><p>Sweep thresholds and measure true hits, false hits, missed reuse, savings and latency.</p><h2 class="dk-article-heading" id="precision-vs-recall">Precision vs recall</h2><p>For high-risk workflows, cache precision should dominate cache recall.</p><p>Missing a cache hit costs tokens.</p><p>Returning an inappropriate cached answer can create a compliance incident.</p><h2 class="dk-article-heading" id="not-every-request-should-be-cacheable">Not every request should be cacheable</h2><p>Strong candidates:</p><ul>
+<li>stable FAQs,</li>
+<li>product documentation,</li>
+<li>instructional content,</li>
+<li>versioned internal policies,</li>
+<li>repetitive support questions.</li>
+</ul><p>Poor candidates:</p><ul>
+<li>live market data,</li>
+<li>balances,</li>
+<li>one-time transactions,</li>
+<li>personalized recommendations,</li>
+<li>workflows with side effects,</li>
+<li>high-risk decisions.</li>
+</ul><p>Add a cache-eligibility classifier.</p><h2 class="dk-article-heading" id="dynamic-data-is-hard">Dynamic data is hard</h2><p>Questions can be semantically identical while the underlying state changes.</p><p>Cache validity depends on semantics <strong>and</strong> freshness.</p><p>Semantic caching without freshness control is dangerous.</p><h2 class="dk-article-heading" id="ttl-is-necessary-but-insufficient">TTL is necessary but insufficient</h2><p>Use TTLs to limit age.</p><p>But a source can change before TTL expiry.</p><p>Add version-based invalidation and event-driven invalidation for important content.</p><h2 class="dk-article-heading" id="version-based-invalidation">Version-based invalidation</h2><p>Attach <code>knowledge_version</code>, <code>policy_version</code>, <code>system_prompt_version</code> or similar metadata.</p><p>When a new version goes live, old cache entries become ineligible immediately.</p><h2 class="dk-article-heading" id="event-driven-invalidation">Event-driven invalidation</h2><p>Trigger invalidation when:</p><ul>
+<li>policies change,</li>
+<li>prices change,</li>
+<li>catalogs update,</li>
+<li>regulations update,</li>
+<li>permissions change,</li>
+<li>prompts or models change.</li>
+</ul><p>Caching should follow the lifecycle of the knowledge it reuses.</p><h2 class="dk-article-heading" id="model-and-prompt-compatibility">Model and prompt compatibility</h2><p>A cached answer may no longer satisfy a new system prompt or quality requirement after a model migration.</p><p>Decide explicitly whether reuse across model or prompt versions is allowed.</p><h2 class="dk-article-heading" id="semantic-caching-for-rag">Semantic caching for RAG</h2><p>Possible cache layers include:</p><ul>
+<li>query embedding cache,</li>
+<li>retrieval-result cache,</li>
+<li>context cache,</li>
+<li>semantic response cache.</li>
+</ul><p>Final-response caching avoids the most work but creates the greatest freshness risk.</p><p>Store source IDs, source versions and retrieval-index version with cached RAG answers.</p><h2 class="dk-article-heading" id="semantic-caching-for-agents">Semantic caching for agents</h2><p>Cache information more aggressively than actions.</p><p>Never replay side effects merely because a similar action request was seen before.</p><p>Actions require live state, authorization, idempotency and execution confirmation.</p><h2 class="dk-article-heading" id="semantic-caching-at-the-ai-gateway">Semantic caching at the AI gateway</h2><p>A strong platform architecture is:</p><pre><code class="language-text">Applications
+     ↓
+AI Gateway
+     ├── Authentication
+     ├── Rate Limits
+     ├── Model Routing
+     ├── Semantic Cache
+     ├── Logging
+     └── Policy
+     ↓
+LLM Providers
+</code></pre><p>Centralized caching improves consistency and observability but increases the need for strong namespaces and policy.</p><h2 class="dk-article-heading" id="centralized-vs-application-local-caching">Centralized vs application-local caching</h2><p>Application-local cache offers domain-specific tuning and smaller blast radius.</p><p>Gateway-level cache provides shared governance and broader reuse.</p><p>Enterprises may use both.</p><h2 class="dk-article-heading" id="cache-namespaces">Cache namespaces</h2><p>Partition by application, tenant, environment, locale and risk class.</p><p>Never allow development responses to appear in production or one tenant's answers to appear in another tenant.</p><h2 class="dk-article-heading" id="privacy">Privacy</h2><p>Cached responses may contain personal or confidential information.</p><p>Authorization should select the permitted cache partition before semantic lookup.</p><p>A semantic cache should never broaden access.</p><h2 class="dk-article-heading" id="validate-after-retrieval">Validate after retrieval</h2><p>A semantic hit should be treated as a candidate response.</p><p>Validate:</p><ul>
+<li>tenant compatibility,</li>
+<li>source freshness,</li>
+<li>policy version,</li>
+<li>locale,</li>
+<li>entitlement,</li>
+<li>safety status,</li>
+<li>schema.</li>
+</ul><p>Only then return the answer.</p><h2 class="dk-article-heading" id="confidence-bands">Confidence bands</h2><p>Instead of one binary threshold, use zones:</p><pre><code class="language-text">GREEN
+very high similarity → automatic reuse
+
+YELLOW
+possible reuse → additional validation
+
+RED
+cache miss → generate fresh response
+</code></pre><p>Thresholds should come from evaluation.</p><h2 class="dk-article-heading" id="evaluate-before-storing">Evaluate before storing</h2><p>Do not cache every generation.</p><p>One bad model response can be amplified into hundreds of repeated failures.</p><p>Require quality, safety, groundedness or citation checks before marking a response cache-eligible.</p><h2 class="dk-article-heading" id="caching-meets-evaluation">Caching meets evaluation</h2><pre><code class="language-text">LLM Response
+     ↓
+Evaluation
+     ↓
+PASS?
+  ├── YES → Cache
+  └── NO  → Do Not Cache
+</code></pre><p>This turns the cache into a store of validated reusable responses.</p><h2 class="dk-article-heading" id="false-semantic-equivalence">False semantic equivalence</h2><p>Test operationally different but semantically similar pairs:</p><ul>
+<li>“Cancel my subscription” vs “Can I cancel my subscription?”</li>
+<li>“Transfer $500” vs “What is the transfer limit?”</li>
+<li>“What was the policy in 2025?” vs “What is the policy today?”</li>
+</ul><p>A vector model may put these close together, while the business application must keep them separate.</p><h2 class="dk-article-heading" id="hybrid-cache-matching">Hybrid cache matching</h2><p>Use:</p><pre><code class="language-text">Semantic Similarity
+AND
+Metadata Match
+AND
+Business Rules
+</code></pre><p>Examples:</p><ul>
+<li>jurisdiction must match,</li>
+<li>policy version must be current,</li>
+<li>intent must be informational,</li>
+<li>tenant must match.</li>
+</ul><h2 class="dk-article-heading" id="intent-matters">Intent matters</h2><p>Distinguish informational requests from actions.</p><p>A simple rule such as “ACTION → semantic response cache disabled” removes a large class of failures.</p><h2 class="dk-article-heading" id="observability">Observability</h2><p>Capture:</p><ul>
+<li>lookup,</li>
+<li>hit/miss,</li>
+<li>similarity,</li>
+<li>candidate,</li>
+<li>threshold,</li>
+<li>namespace,</li>
+<li>TTL remaining,</li>
+<li>source version,</li>
+<li>decision,</li>
+<li>fallback reason,</li>
+<li>latency,</li>
+<li>estimated cost avoided.</li>
+</ul><p>You should be able to explain why a cached response was served.</p><h2 class="dk-article-heading" id="core-metrics">Core metrics</h2><p>Track:</p><ul>
+<li>hit rate,</li>
+<li>safe hit rate,</li>
+<li>false-hit rate,</li>
+<li>eligible-hit rate,</li>
+<li>cache latency,</li>
+<li>model calls avoided,</li>
+<li>tokens avoided,</li>
+<li>cache age,</li>
+<li>invalidation count,</li>
+<li>threshold by workload,</li>
+<li>net cost avoided.</li>
+</ul><p>Do not report only hit rate.</p><h2 class="dk-article-heading" id="cost-avoided">Cost avoided</h2><p>Estimate avoided tokens, retrieval and generation minus the embedding/lookup/validation cost.</p><p>Net cost avoided is more useful than raw number of cache hits.</p><h2 class="dk-article-heading" id="cold-start-and-warming">Cold start and warming</h2><p>New caches start empty.</p><p>You can warm them with validated high-frequency FAQs and approved responses.</p><p>Do not pre-populate production with unverified synthetic answers.</p><h2 class="dk-article-heading" id="semantic-caching-and-model-routing">Semantic caching and model routing</h2><p>Model routing asks which model should handle the request.</p><p>Semantic caching asks whether a model is needed at all.</p><p>A useful order is:</p><pre><code class="language-text">Request
+   ↓
+Semantic Cache
+   ↓ miss
+Model Router
+   ↓
+Selected Model
+</code></pre><h2 class="dk-article-heading" id="semantic-caching-and-rag-routing">Semantic caching and RAG routing</h2><p>A mature inference ladder can be:</p><pre><code class="language-text">Cached Answer
+      ↓ miss
+Simple Retrieval
+      ↓ insufficient
+RAG
+      ↓ insufficient
+Agentic Retrieval
+</code></pre><p>Use the cheapest path that satisfies the quality requirement.</p><h2 class="dk-article-heading" id="ai-finops">AI FinOps</h2><p>Semantic caching belongs alongside model routing, context compression, batching, prompt caching, evaluation sampling and agent-step controls.</p><p>The question is not only which model costs less, but which model calls were unnecessary.</p><h2 class="dk-article-heading" id="safe-cache-decision">Safe cache decision</h2><p>A conceptual policy:</p><pre><code class="language-text">cache_candidate =
+    semantic_similarity &gt;= threshold
+AND tenant_match
+AND locale_match
+AND source_version_current
+AND policy_version_current
+AND safety_status_approved
+AND cacheable_intent
+AND not_expired
+</code></pre><p>Only then serve the cached answer.</p><h2 class="dk-article-heading" id="cache-invalidation-is-governance">Cache invalidation is governance</h2><p>AI cache validity can depend on time, data, model, prompt, policy and authorization.</p><p>Define the invalidation contract for every cacheable workload before launch.</p><h2 class="dk-article-heading" id="cache-contract">Cache contract</h2><p>A machine-readable contract can define:</p><ul>
+<li>whether the workload is cacheable,</li>
+<li>required scopes,</li>
+<li>TTL,</li>
+<li>required source version,</li>
+<li>threshold version,</li>
+<li>whether actions are prohibited,</li>
+<li>whether only validated responses may be cached.</li>
+</ul><h2 class="dk-article-heading" id="semantic-cache-knobs">Semantic-cache KNOBS</h2><p>Important variables:</p><ul>
+<li>similarity threshold,</li>
+<li>TTL,</li>
+<li>eligibility,</li>
+<li>namespace,</li>
+<li>model compatibility,</li>
+<li>source-version compatibility,</li>
+<li>validation level,</li>
+<li>max age,</li>
+<li>sampling rate,</li>
+<li>cache size,</li>
+<li>eviction policy.</li>
+</ul><p>Each changes cost, latency, freshness, correctness and risk.</p><h2 class="dk-article-heading" id="different-workloads-need-different-thresholds">Different workloads need different thresholds</h2><p>Public documentation may tolerate a more permissive cache.</p><p>Customer-specific data should be more strictly scoped.</p><p>High-risk financial actions may disable response caching entirely.</p><p>One global threshold is usually too crude.</p><h2 class="dk-article-heading" id="where-knobs-fits">Where KNOBS fits</h2><p>KNOBS can make threshold, TTL, eligibility, freshness, model routing and context strategy observable and testable.</p><p>Tune them per workload based on quality, cost, latency and risk.</p><p>KONTROLS can complement KNOBS by enforcing tenant boundaries, privacy rules, authorization and policy-version constraints.</p><h2 class="dk-article-heading" id="practical-implementation-roadmap">Practical implementation roadmap</h2><ol>
+<li>Identify repetitive high-volume workloads.</li>
+<li>Classify cache eligibility.</li>
+<li>Build the cache schema.</li>
+<li>Start with a strict threshold.</li>
+<li>Build a gold evaluation set.</li>
+<li>Measure safe hit rate.</li>
+<li>Add invalidation.</li>
+<li>Integrate evaluation.</li>
+<li>Add observability.</li>
+<li>Experiment with cache KNOBS.</li>
+</ol><h2 class="dk-article-heading" id="maturity-model">Maturity model</h2><ol>
+<li>Exact cache.</li>
+<li>Semantic cache.</li>
+<li>Scoped semantic cache.</li>
+<li>Validated semantic cache.</li>
+<li>Adaptive semantic cache.</li>
+</ol><p>Not every workload needs the highest level.</p><h2 class="dk-article-heading" id="bottom-line">Bottom line</h2><p>Semantic caching can eliminate the most expensive step in an <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> architecture: generation.</p><p>But semantic similarity is not equivalence.</p><p>A durable design is:</p><pre><code class="language-text">REQUEST
+   ↓
+CACHE ELIGIBILITY
+   ↓
+AUTHORIZATION + SCOPE
+   ↓
+SEMANTIC MATCH
+   ↓
+FRESHNESS + VERSION CHECK
+   ↓
+VALIDATION
+   ↓
+SAFE HIT?
+   ├── YES → RETURN CACHED RESPONSE
+   └── NO  → RUN AI PIPELINE
+                    ↓
+                EVALUATE
+                    ↓
+              CACHE IF SAFE
+</code></pre><p>Do not maximize hit rate.</p><p>Maximize correct reuse and cost avoided subject to freshness, privacy, authorization and quality.</p><section class="dk-article-section" id="faq"><h2 class="dk-article-heading">Frequently asked questions</h2><div class="dk-faq"><details class="dk-faq-item"><summary>What is semantic caching for LLMs?</summary><div class="dk-faq-answer"><p>A caching approach that reuses a prior AI response when a new request is semantically similar and still valid under the current context, policy and authorization.</p></div></details><details class="dk-faq-item"><summary>How is semantic caching different from prompt caching?</summary><div class="dk-faq-answer"><p>Semantic caching reuses the final answer. Prompt/prefix caching reuses model computation for repeated input tokens while still generating a new answer.</p></div></details><details class="dk-faq-item"><summary>Can semantic caching reduce LLM cost?</summary><div class="dk-faq-answer"><p>Yes, when a qualifying hit safely avoids a new generation call. Savings depend on repetition, hit precision, lookup cost and validation overhead.</p></div></details></div></section><section class="dk-article-section" id="related"><h2 class="dk-article-heading">Related DataKnobs guides</h2><div class="dk-related-grid"><a class="dk-related-card" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-1.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Llm Token Cost And Economics</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/generativeai/10-llms/llm-vol3-reasoning-scaling.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Llm Reasoning And Inference Scaling</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-detailed-page.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Complete Rag Architecture Guide</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/embeddings/"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Embeddings Fundamentals</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/vector-database/"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Vector Database Guide</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Context Engineering For Ai Agents</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/agentic-ai/10-ai-agent-observability.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Ai Agent Observability And Tracing</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/ai/enterprise-ai/cdo-cio-playbook-for-enterprise-ai.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Enterprise Ai Architecture For Cios And Cdos</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/products/knobs/"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Knobs Ai Control Plane</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a></div></section><section class="dk-card dk-card--brand dk-commercial"><p class="dk-related-kicker">DataKnobs platform</p><h3 class="dk-card-title dk-card-title--lg" dk-card-title--lg="">KNOBS</h3><p class="dk-card-text">Make caching an observable optimization control by measuring how thresholds, TTLs, eligibility, freshness and routing affect quality, cost, latency and risk.</p><div class="dk-actions"><a class="dk-btn dk-btn--light" href="https://www.dataknobs.com/products/knobs/">Explore KNOBS</a></div></section><section class="dk-publish-note"><strong>SEO consolidation note:</strong> Create /generativeai/10-llms/semantic-caching.html as the canonical semantic-caching page. Keep token-cost, inference/KV cache, RAG, vector-database and enterprise-AI-gateway pages separate. Do not split Redis, RAG caching, prompt-cache comparison or gateway semantic caching into separate pages yet.</section></div></article><aside aria-label="Article navigation" class="dk-toc"><div class="dk-toc-card"><h2 class="dk-toc-title">On this page</h2><p class="dk-toc-copy">Jump to the main sections in this guide.</p><ul class="dk-toc-list"><li><a class="dk-toc-link" href="#what-is-semantic-caching">What is semantic caching?</a></li><li><a class="dk-toc-link" href="#exact-cache-vs-semantic-cache">Exact cache vs semantic cache</a></li><li><a class="dk-toc-link" href="#semantic-caching-vs-prompt-caching-vs-kv-cache">Semantic caching vs prompt caching vs KV cache</a></li><li><a class="dk-toc-link" href="#why-semantic-caching-can-reduce-cost">Why semantic caching can reduce cost</a></li><li><a class="dk-toc-link" href="#optimize-safe-cache-hit-rate">Optimize safe cache hit rate</a></li><li><a class="dk-toc-link" href="#production-architecture">Production architecture</a></li><li><a class="dk-toc-link" href="#cache-record-design">Cache record design</a></li><li><a class="dk-toc-link" href="#tenant-isolation-comes-before-similarity">Tenant isolation comes before similarity</a></li><li><a class="dk-toc-link" href="#cache-identity-is-multidimensional">Cache identity is multidimensional</a></li><li><a class="dk-toc-link" href="#similarity-threshold-is-the-central-knob">Similarity threshold is the central KNOB</a></li><li><a class="dk-toc-link" href="#threshold-semantics-vary">Threshold semantics vary</a></li><li><a class="dk-toc-link" href="#tune-with-a-golden-dataset">Tune with a golden dataset</a></li><li><a class="dk-toc-link" href="#precision-vs-recall">Precision vs recall</a></li><li><a class="dk-toc-link" href="#not-every-request-should-be-cacheable">Not every request should be cacheable</a></li><li><a class="dk-toc-link" href="#dynamic-data-is-hard">Dynamic data is hard</a></li><li><a class="dk-toc-link" href="#ttl-is-necessary-but-insufficient">TTL is necessary but insufficient</a></li><li><a class="dk-toc-link" href="#version-based-invalidation">Version-based invalidation</a></li><li><a class="dk-toc-link" href="#event-driven-invalidation">Event-driven invalidation</a></li><li><a class="dk-toc-link" href="#model-and-prompt-compatibility">Model and prompt compatibility</a></li><li><a class="dk-toc-link" href="#semantic-caching-for-rag">Semantic caching for RAG</a></li><li><a class="dk-toc-link" href="#semantic-caching-for-agents">Semantic caching for agents</a></li><li><a class="dk-toc-link" href="#semantic-caching-at-the-ai-gateway">Semantic caching at the AI gateway</a></li><li><a class="dk-toc-link" href="#centralized-vs-application-local-caching">Centralized vs application-local caching</a></li><li><a class="dk-toc-link" href="#cache-namespaces">Cache namespaces</a></li><li><a class="dk-toc-link" href="#privacy">Privacy</a></li><li><a class="dk-toc-link" href="#validate-after-retrieval">Validate after retrieval</a></li><li><a class="dk-toc-link" href="#confidence-bands">Confidence bands</a></li><li><a class="dk-toc-link" href="#evaluate-before-storing">Evaluate before storing</a></li></ul></div><div class="dk-toc-card"><h2 class="dk-toc-title">Primary topic</h2><p class="dk-toc-copy"><strong>semantic caching for LLMs</strong></p><div class="dk-knob-chips"><span class="dk-knob-chip">semantic caching for LLMs</span><span class="dk-knob-chip">LLM semantic cache</span><span class="dk-knob-chip">LLM cache</span><span class="dk-knob-chip">semantic caching</span><span class="dk-knob-chip">LLM caching</span></div></div></aside></div></section></main><footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/adoption-in-enterprises/">Adoption In Enterprises</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/agents/">Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistants/">Ai Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/compare-llm-factors/">Compare Llm Factors</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/course/">Course</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/create-ai-assistants/">Create Ai Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/customer-onboarding-assistant/">Customer Onboarding Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/grounding/">Grounding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/guardrails/">Guardrails</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/hallucinations/">Hallucinations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/limitations/">Limitations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-course/">Llm Course</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-models/">Llm Models</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security/">Llm Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/multi-modal-llm/">Multi Modal Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/openai-fine-tuning/">Openai Fine Tuning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/privacy-preserving/">Privacy Preserving</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/prompt-injection/">Prompt Injection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/">Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/recent-updates/">Recent Updates</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/structured-data/">Structured Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/training/">Training</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/types-of-chatbots/">Types Of Chatbots</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/100K-tokens.html">100K Tokens</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/agenda.html">Agenda</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-architecture.html">Ai Assistant Architecture</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-building-blocks.html">Ai Assistant Building Blocks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-custom-model.html">Ai Assistant Custom Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-evaluation-metric.html">Ai Assistant Evaluation Metric</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-finetune-model.html">Ai Assistant Finetune Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-on-your-data.html">Ai Assistant On Your Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-tech-stack.html">Ai Assistant Tech Stack</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistant-wrapper.html">Ai Assistant Wrapper</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistants-page.html">Ai Assistants Page</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistants-types.html">Ai Assistants Types</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/ai-assistants-with-slides.html">Ai Assistants With Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/applications-of-llm-1.html">Applications Of Llm 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/applications-of-llm.html">Applications Of Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/approaches-to-verify-ai-assist.html">Approaches To Verify Ai Assist</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/architecture-llm-training.html">Architecture Llm Training</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/architecture-slide-for-custome.html">Architecture Slide For Custome</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/assistant-bot-metrics.html">Assistant Bot Metrics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/behavioral-metrics-for-recomme.html">Behavioral Metrics For Recomme</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/building-blocks-of-llms.html">Building Blocks Of Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/chatgpt.html">Chatgpt</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/common-terminology-llms.html">Common Terminology Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/consideraions-for-bot-architec.html">Consideraions For Bot Architec</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/criteria-to-compare-llms.html">Criteria To Compare Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/criteria-to-select-llm-customization.html">Criteria To Select Llm Customization</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/customer-onboarding-ai-assisat.html">Customer Onboarding Ai Assisat</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/customer-onboarding-bot.html">Customer Onboarding Bot</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/data-ownership-issues-llm.html">Data Ownership Issues Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/enterprise-ai-llm-fintuning.html">Enterprise Ai Llm Fintuning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/enterprise-foundation-model-fine-tuning-guide.html">Enterprise Foundation Model Fine Tuning Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/enterprise-foundation-model-strategy-guide.html">Enterprise Foundation Model Strategy Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/enterprise-foundation-model.html">Enterprise Foundation Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/enterprise-grade-answers-ai-as.html">Enterprise Grade Answers Ai As</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/evaluate-llms.html">Evaluate Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/evoloving-applications-of-llms.html">Evoloving Applications Of Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/evolution-of-llms-8-stages-ai-advancement.html">Evolution Of Llms 8 Stages Ai Advancement</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/example-bot-assistants.html">Example Bot Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/example-features-of-ai-assista.html">Example Features Of Ai Assista</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/features-of-ai-assistants.html">Features Of Ai Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/fine-tuning-foundation-models.html">Fine Tuning Foundation Models</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/fine-tuning-llms-stock-analysis-guide.html">Fine Tuning Llms Stock Analysis Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/finetuning-llm-fo-stock-analysis.html">Finetuning Llm Fo Stock Analysis</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/gounding.html">Gounding</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/how-to-compare-llms.html">How To Compare Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/in-context-learning.html">In Context Learning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/jev-vs-llm.html">Jev Vs Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-3-phases-1.html">Llm 3 Phases 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-agents-1.html">Llm Agents 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-apps-lifecycle-1.html">Llm Apps Lifecycle 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-apps-lifecycle-2.html">Llm Apps Lifecycle 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-apps-lifecycle-3.html">Llm Apps Lifecycle 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-apps-lifecycle.html">Llm Apps Lifecycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-architectue-for-bot.html">Llm Architectue For Bot</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-base-vs-agentic-ai-comparison.html">Llm Base Vs Agentic Ai Comparison</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-big-token-example-100k.html">Llm Big Token Example 100K</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-challenges-slide.html">Llm Challenges Slide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-1.html">Llm Concerns 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-2.html">Llm Concerns 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-3.html">Llm Concerns 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-4.html">Llm Concerns 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-5.html">Llm Concerns 5</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-6.html">Llm Concerns 6</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-7.html">Llm Concerns 7</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-8.html">Llm Concerns 8</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-9.html">Llm Concerns 9</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns-slides.html">Llm Concerns Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-concerns.html">Llm Concerns</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-environment-issues.html">Llm Environment Issues</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-ethical-concerns-slides.html">Llm Ethical Concerns Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-example-complex-summarization.html">Llm Example Complex Summarization</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-finetuning-steps.html">Llm Finetuning Steps</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-function-calling.html">Llm Function Calling</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-generated-output-issues.html">Llm Generated Output Issues</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-guardrails-1.html">Llm Guardrails 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-guardrails-2.html">Llm Guardrails 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-guardrails-3.html">Llm Guardrails 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-guardrails.html">Llm Guardrails</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-journey-levels.html">Llm Journey Levels</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-key-concepts-1.html">Llm Key Concepts 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-large-language-models.html">Llm Large Language Models</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-overview.html">Llm Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-1.html">Llm Security Agenda 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-2.html">Llm Security Agenda 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-3.html">Llm Security Agenda 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-4.html">Llm Security Agenda 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-5.html">Llm Security Agenda 5</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-6.html">Llm Security Agenda 6</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-7.html">Llm Security Agenda 7</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-8.html">Llm Security Agenda 8</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-9.html">Llm Security Agenda 9</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-technology-slides.html">Llm Technology Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-testing-1.html">Llm Testing 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-threats-slides.html">Llm Threats Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-1.html">Llm Token Cost 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-2.html">Llm Token Cost 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-3.html">Llm Token Cost 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-4.html">Llm Token Cost 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-token-cost-5.html">Llm Token Cost 5</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-topics.html">Llm Topics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-training-steps.html">Llm Training Steps</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial-1.html">Llm Tutorial 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial-2.html">Llm Tutorial 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial-3.html">Llm Tutorial 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-tutorial-4.html">Llm Tutorial 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-uncontrolled-behavior-slid.html">Llm Uncontrolled Behavior Slid</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-vol3-reasoning-scaling.html">Llm Vol3 Reasoning Scaling</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-vs-other-models.html">Llm Vs Other Models</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llms-overview.html">Llms Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/metrics-for-recommendation-bot.html">Metrics For Recommendation Bot</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/metrics-for-search-bot.html">Metrics For Search Bot</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/metrics-to-evaluate-ai-assista.html">Metrics To Evaluate Ai Assista</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/multi-model-llms.html">Multi Model Llms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/NLP Tasks With LLM.html">Nlp Tasks With Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/nlp-applications.html">Nlp Applications</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/open-source-vs-close.html">Open Source Vs Close</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-architecture-slide.html">Rag Architecture Slide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-node-post-processor.html">Rag Node Post Processor</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-node-processor.html">Rag Node Processor</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-overview-slides.html">Rag Overview Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-retriever-options.html">Rag Retriever Options</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-slides.html">Rag Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/search-answer-recommendation-plan-assistants.html">Search Answer Recommendation Plan Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide-1.html">Slide 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-10.html">Slide 10</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-11.html">Slide 11</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-12.html">Slide 12</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-13.html">Slide 13</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-14.html">Slide 14</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-15.html">Slide 15</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-16.html">Slide 16</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-17.html">Slide 17</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-18.html">Slide 18</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-19.html">Slide 19</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide-2.html">Slide 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-20.html">Slide 20</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-21.html">Slide 21</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-22.html">Slide 22</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-23.html">Slide 23</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-24.html">Slide 24</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-25.html">Slide 25</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-26.html">Slide 26</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-27.html">Slide 27</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-28.html">Slide 28</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-29.html">Slide 29</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide-3.html">Slide 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-30.html">Slide 30</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-31.html">Slide 31</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-32.html">Slide 32</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-33.html">Slide 33</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-34.html">Slide 34</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-35.html">Slide 35</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-36.html">Slide 36</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-37.html">Slide 37</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-38.html">Slide 38</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-39.html">Slide 39</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide-4.html">Slide 4</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-40.html">Slide 40</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-41.html">Slide 41</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-42.html">Slide 42</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-43.html">Slide 43</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-44.html">Slide 44</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-45.html">Slide 45</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-46.html">Slide 46</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-47.html">Slide 47</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-48.html">Slide 48</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-49.html">Slide 49</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-5.html">Slide 5</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-50.html">Slide 50</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-51.html">Slide 51</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-52.html">Slide 52</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-53.html">Slide 53</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-54.html">Slide 54</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-55.html">Slide 55</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-56.html">Slide 56</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-57.html">Slide 57</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-58.html">Slide 58</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-59.html">Slide 59</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-6.html">Slide 6</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-60.html">Slide 60</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-61.html">Slide 61</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-62.html">Slide 62</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-63.html">Slide 63</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-64.html">Slide 64</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-65.html">Slide 65</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-66.html">Slide 66</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-67.html">Slide 67</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-68.html">Slide 68</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-69.html">Slide 69</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-7.html">Slide 7</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-70.html">Slide 70</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-71.html">Slide 71</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-72.html">Slide 72</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-73.html">Slide 73</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-74.html">Slide 74</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-75.html">Slide 75</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-76.html">Slide 76</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-77.html">Slide 77</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-78.html">Slide 78</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-79.html">Slide 79</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-8.html">Slide 8</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-80.html">Slide 80</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-81.html">Slide 81</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-82.html">Slide 82</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-83.html">Slide 83</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-84.html">Slide 84</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-85.html">Slide 85</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-86.html">Slide 86</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-87.html">Slide 87</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-88.html">Slide 88</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-89.html">Slide 89</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-9.html">Slide 9</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-90.html">Slide 90</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-91.html">Slide 91</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-92.html">Slide 92</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-93.html">Slide 93</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-94.html">Slide 94</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-95.html">Slide 95</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide26-llm-based-ai-assistant.html">Slide26 Llm Based Ai Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide59.html">Slide59</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide62.html">Slide62</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide63.html">Slide63</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide64.html">Slide64</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide65.html">Slide65</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide66.html">Slide66</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide67.html">Slide67</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide68.html">Slide68</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide69.html">Slide69</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide70.html">Slide70</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide71.html">Slide71</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide72.html">Slide72</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide73.html">Slide73</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide74.html">Slide74</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide75.html">Slide75</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide76.html">Slide76</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide77.html">Slide77</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide78.html">Slide78</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide79.html">Slide79</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide80.html">Slide80</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide81.html">Slide81</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide82.html">Slide82</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide83.html">Slide83</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide84.html">Slide84</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide85.html">Slide85</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide86.html">Slide86</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide87.html">Slide87</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide88.html">Slide88</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide89.html">Slide89</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide90.html">Slide90</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide91.html">Slide91</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide92.html">Slide92</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide93.html">Slide93</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide94.html">Slide94</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide95.html">Slide95</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide96.html">Slide96</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide97.html">Slide97</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide98.html">Slide98</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slm-slides-1.html">Slm Slides 1</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slm-slides-2.html">Slm Slides 2</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slm-slides-3.html">Slm Slides 3</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slm-transformation.html">Slm Transformation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slm-vs-llm.html">Slm Vs Llm</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/software-applications.html">Software Applications</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/technical-metrics-ai-assistant.html">Technical Metrics Ai Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/token-paradox.html">Token Paradox</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/types-of-ai-assistants.html">Types Of Ai Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/when-not-to-use-rag.html">When Not To Use Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/when-to-use-rag.html">When To Use Rag</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for AI governance</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer><script>const b=document.getElementById('menuButton'),n=document.getElementById('mobileNav');if(b&&n){b.addEventListener('click',()=>{const o=n.classList.toggle('is-open');b.setAttribute('aria-expanded',String(o));});}</script></body></html>

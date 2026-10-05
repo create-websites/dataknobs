@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>GraphRAG Guide: Architecture, Local/Global Search &amp; Enterprise RAG</title>
+<meta content="Learn how GraphRAG combines knowledge graphs, embeddings and LLMs for local, global and multi-hop retrieval. Explore architecture, evaluation, cost and enterprise use cases." name="description"/>
+<meta content="GraphRAG, graph RAG, GraphRAG vs RAG, knowledge graph RAG, GraphRAG architecture, Microsoft GraphRAG, GraphRAG local vs global search, GraphRAG for AI agents, enterprise GraphRAG" name="keywords"/>
+<meta content="DataKnobs" name="author"/>
+<meta content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" name="robots"/>
+<link href="https://www.dataknobs.com/generativeai/10-llms/rag/graphrag.html" rel="canonical"/>
+<!-- GEO / AI discovery metadata -->
+<meta content="GraphRAG: How Knowledge Graphs Improve RAG for Complex Enterprise Questions. Learn how GraphRAG combines knowledge graphs, embeddings and LLMs for local, global and multi-hop retrieval. Explore architecture, evaluation, cost and enterprise use cases. Primary topic: GraphRAG. This technical enterprise guide covers GraphRAG, graph RAG, GraphRAG vs RAG, knowledge graph RAG, GraphRAG architecture, Microsoft GraphRAG." name="ai-summary"/>
+<meta content="GraphRAG; graph RAG; GraphRAG vs RAG; knowledge graph RAG; GraphRAG architecture; Microsoft GraphRAG; GraphRAG local vs global search; GraphRAG for AI agents; enterprise GraphRAG" name="ai-key-points"/>
+<meta content="GraphRAG: How Knowledge Graphs Improve RAG for Complex Enterprise Questions" name="citation_title"/>
+<meta content="DataKnobs" name="citation_author"/>
+<meta content="2026-10-05" name="citation_publication_date"/>
+<meta content="2026-10-05" name="citation_online_date"/>
+<meta content="en" name="citation_language"/>
+<meta content="article" property="og:type"/>
+<meta content="GraphRAG Guide: Architecture, Local/Global Search &amp; Enterprise RAG" property="og:title"/>
+<meta content="Learn how GraphRAG combines knowledge graphs, embeddings and LLMs for local, global and multi-hop retrieval. Explore architecture, evaluation, cost and enterprise use cases." property="og:description"/>
+<meta content="https://www.dataknobs.com/generativeai/10-llms/rag/graphrag.html" property="og:url"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="2026-10-05T08:00:00-07:00" property="article:published_time"/>
+<meta content="2026-10-05T08:00:00-07:00" property="article:modified_time"/>
+<meta content="Embeddings / Vector Databases / RAG" property="article:section"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="GraphRAG Guide: Architecture, Local/Global Search &amp; Enterprise RAG" name="twitter:title"/>
+<meta content="Learn how GraphRAG combines knowledge graphs, embeddings and LLMs for local, global and multi-hop retrieval. Explore architecture, evaluation, cost and enterprise use cases." name="twitter:description"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://www.dataknobs.com/generativeai/10-llms/rag/graphrag.html#article",
+      "headline": "GraphRAG: How Knowledge Graphs Improve RAG for Complex Enterprise Questions",
+      "description": "Learn how GraphRAG combines knowledge graphs, embeddings and LLMs for local, global and multi-hop retrieval. Explore architecture, evaluation, cost and enterprise use cases.",
+      "datePublished": "2026-10-05",
+      "dateModified": "2026-10-05",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.dataknobs.com/generativeai/10-llms/rag/graphrag.html"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "DataKnobs",
+        "url": "https://www.dataknobs.com/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "DataKnobs",
+        "url": "https://www.dataknobs.com/"
+      },
+      "articleSection": "Embeddings / Vector Databases / RAG",
+      "keywords": [
+        "GraphRAG",
+        "graph RAG",
+        "GraphRAG vs RAG",
+        "knowledge graph RAG",
+        "GraphRAG architecture",
+        "Microsoft GraphRAG",
+        "GraphRAG local vs global search",
+        "GraphRAG for AI agents",
+        "enterprise GraphRAG"
+      ],
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "GraphRAG"
+        },
+        {
+          "@type": "Thing",
+          "name": "graph RAG"
+        },
+        {
+          "@type": "Thing",
+          "name": "GraphRAG vs RAG"
+        },
+        {
+          "@type": "Thing",
+          "name": "knowledge graph RAG"
+        },
+        {
+          "@type": "Thing",
+          "name": "GraphRAG architecture"
+        },
+        {
+          "@type": "Thing",
+          "name": "Microsoft GraphRAG"
+        },
+        {
+          "@type": "Thing",
+          "name": "GraphRAG local vs global search"
+        },
+        {
+          "@type": "Thing",
+          "name": "GraphRAG for AI agents"
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://www.dataknobs.com/generativeai/10-llms/rag/graphrag.html#breadcrumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.dataknobs.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Generative AI",
+          "item": "https://www.dataknobs.com/generativeai/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "GraphRAG: How Knowledge Graphs Improve RAG for Complex Enterprise Questions",
+          "item": "https://www.dataknobs.com/generativeai/10-llms/rag/graphrag.html"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.dataknobs.com/generativeai/10-llms/rag/graphrag.html#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is GraphRAG?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A retrieval-augmented architecture combining knowledge graphs, source documents, vector retrieval and LLMs so search can use explicit entities and relationships."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is GraphRAG better than vector RAG?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Not universally. It is most useful for relational, multi-hop and corpus-wide questions; ordinary RAG is often simpler and cheaper for direct factual lookup."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does GraphRAG still use embeddings?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Usually yes. Embeddings remain useful for semantic retrieval and entity matching while graph traversal adds structural signals."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link href="https://www.dataknobs.com/dataknobs-theme.css" rel="stylesheet"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head><body class="dk-page"><header class="dk-header"><div class="dk-container dk-header-inner"><div class="dk-header-row">
+<a aria-label="DataKnobs home" class="dk-logo-link" href="https://www.dataknobs.com/"><img alt="DataKnobs" class="dk-logo" height="72" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png" width="240"/></a>
+<nav aria-label="Primary navigation" class="dk-nav dk-nav--desktop"><a class="dk-nav-link" href="https://www.dataknobs.com/data-products/">Data Products</a><a class="dk-nav-link" href="https://www.dataknobs.com/generativeai/">Generative AI</a><a class="dk-nav-link" href="https://www.dataknobs.com/agentic-ai/">Agentic AI</a><a class="dk-nav-link" href="https://www.dataknobs.com/embeddings/">Embeddings</a><a class="dk-btn dk-btn--primary dk-btn--sm" href="https://www.dataknobs.com/search.html">Search</a></nav>
+<button aria-controls="mobileNav" aria-expanded="false" aria-label="Open navigation" class="dk-menu-button" id="menuButton" type="button"><svg aria-hidden="true" class="dk-menu-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button></div>
+<nav aria-label="Mobile navigation" class="dk-mobile-nav" id="mobileNav"><div class="dk-mobile-nav-list"><a class="dk-mobile-link" href="https://www.dataknobs.com/data-products/">Data Products</a><a class="dk-mobile-link" href="https://www.dataknobs.com/generativeai/">Generative AI</a><a class="dk-mobile-link" href="https://www.dataknobs.com/agentic-ai/">Agentic AI</a><a class="dk-mobile-link" href="https://www.dataknobs.com/embeddings/">Embeddings</a><a class="dk-mobile-link" href="https://www.dataknobs.com/search.html">Search</a></div></nav></div></header><section class="dk-hero dk-hero--article dk-hero--article-rich"><div class="dk-container dk-hero-grid"><div class="dk-hero-copy"><span class="dk-badge dk-badge--inverse">Embeddings / Vector Databases / RAG • Field Guide</span><h1 class="dk-hero-title">GraphRAG: How Knowledge Graphs Improve RAG for Complex Enterprise Questions</h1><p class="dk-hero-lead">Learn how GraphRAG combines knowledge graphs, embeddings and LLMs for local, global and multi-hop retrieval. Explore architecture, evaluation, cost and enterprise use cases.</p><div class="dk-article-kicker-row"><span class="dk-article-kicker">Primary topic: GraphRAG</span><span class="dk-article-kicker">Architecture + evaluation</span><span class="dk-article-kicker">Enterprise implementation</span></div></div><div class="dk-hero-visual"><div class="dk-hero-architecture"><div class="dk-hero-stage dk-hero-stage--center"><p class="dk-hero-stage-label">Decision frame</p><p class="dk-hero-stage-title">Design for the workload, then measure the outcome.</p><p class="dk-hero-stage-copy">Use explicit system choices rather than relying on a single technology or benchmark.</p></div><div class="dk-hero-stage-row"><div class="dk-hero-stage"><p class="dk-hero-stage-label">Vector</p><p class="dk-hero-stage-title">Semantic similarity</p><p class="dk-hero-stage-copy">Find related content.</p></div><div class="dk-hero-stage"><p class="dk-hero-stage-label">Graph</p><p class="dk-hero-stage-title">Explicit relationships</p><p class="dk-hero-stage-copy">Traverse connected evidence.</p></div><div class="dk-hero-stage"><p class="dk-hero-stage-label">Router</p><p class="dk-hero-stage-title">Choose query mode</p><p class="dk-hero-stage-copy">Use graph cost where it helps.</p></div></div><div class="dk-hero-stage dk-hero-stage--knobs"><p class="dk-hero-stage-label">DataKnobs principle</p><p class="dk-hero-stage-title">Make consequential choices measurable and governable.</p></div></div></div></div></section><div class="dk-breadcrumb"><div class="dk-container dk-breadcrumb-inner"><a href="https://www.dataknobs.com/">Home</a><span class="dk-breadcrumb-sep">/</span><a href="https://www.dataknobs.com/generativeai/">Generative AI</a><span class="dk-breadcrumb-sep">/</span><span class="dk-breadcrumb-current">GraphRAG</span></div></div><main><section class="dk-article-shell"><div class="dk-container dk-article-layout"><article class="dk-article-content"><div class="dk-prose"><p>Traditional RAG works well when the answer can be found in a few relevant passages.</p><p>But many enterprise questions are not passage-local.</p><p>Examples:</p><blockquote class="dk-callout">
+<p>Which suppliers are indirectly connected to facilities affected by the new regulation?</p>
+</blockquote><blockquote class="dk-callout">
+<p>What themes appear across thousands of complaints, and which products, regions and policies connect to those themes?</p>
+</blockquote><blockquote class="dk-callout">
+<p>How are Customer A, Account B, Complaint C and Policy D related?</p>
+</blockquote><p>A <a href="https://www.dataknobs.com/vector-database/">vector database</a> can retrieve semantically similar text. It does not automatically understand the network of relationships connecting facts across documents.</p><blockquote class="dk-callout">
+<p><strong>GraphRAG combines retrieval-augmented generation with graph-structured knowledge so an AI system can retrieve not only similar passages, but related entities, relationships, communities and evidence paths.</strong></p>
+</blockquote><p>GraphRAG does not replace ordinary RAG. It extends retrieval for questions where relationships, multi-hop reasoning or corpus-wide structure matter.</p><div class="dk-article-summary-grid"><div class="dk-article-summary-card"><strong>Primary question</strong><span>GraphRAG</span></div><div class="dk-article-summary-card"><strong>Decision lens</strong><span>Architecture, quality, risk, latency and cost.</span></div><div class="dk-article-summary-card"><strong>Validation</strong><span>Evaluate on the real workload before production adoption.</span></div></div><h2 class="dk-article-heading" id="what-is-graphrag">What is GraphRAG?</h2><p>GraphRAG combines:</p><ul>
+<li>knowledge graphs,</li>
+<li>entity relationships,</li>
+<li>document evidence,</li>
+<li>vector retrieval,</li>
+<li>graph traversal,</li>
+<li>large language models.</li>
+</ul><p>A knowledge graph represents entities and relationships explicitly. GraphRAG uses that structure to guide retrieval and generation.</p><h2 class="dk-article-heading" id="graphrag-vs-traditional-rag">GraphRAG vs traditional RAG</h2><div class="dk-table-wrap"><table class="dk-table">
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Traditional RAG</th>
+<th>GraphRAG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary retrieval unit</td>
+<td>Text chunks</td>
+<td>Entities, relationships, communities + text</td>
+</tr>
+<tr>
+<td>Main signal</td>
+<td>Semantic similarity</td>
+<td>Semantic similarity + graph structure</td>
+</tr>
+<tr>
+<td>Strongest query type</td>
+<td>Passage-level questions</td>
+<td>Relational, multi-hop and corpus-wide questions</td>
+</tr>
+<tr>
+<td>Index construction</td>
+<td>Simpler</td>
+<td>More complex</td>
+</tr>
+<tr>
+<td>Relationships</td>
+<td>Implicit in text</td>
+<td>Explicitly modeled</td>
+</tr>
+<tr>
+<td>Global understanding</td>
+<td>Limited</td>
+<td>Can be explicitly supported</td>
+</tr>
+<tr>
+<td>Typical cost</td>
+<td>Lower</td>
+<td>Potentially higher</td>
+</tr>
+</tbody>
+</table></div><p>GraphRAG solves a different class of retrieval problems.</p><h2 class="dk-article-heading" id="why-vector-rag-can-fail-on-relational-questions">Why vector RAG can fail on relational questions</h2><p>If one document links Supplier A to Manufacturer B, another links Manufacturer B to Facility C, and a third says Facility C is affected by Regulation D, the answer requires a multi-hop relationship chain.</p><p>Graph traversal can provide another retrieval signal.</p><h2 class="dk-article-heading" id="indexing-architecture">Indexing architecture</h2><pre><code class="language-text">Documents
+   ↓
+Parsing
+   ↓
+Chunking
+   ↓
+Entity Extraction
+   ↓
+Relationship Extraction
+   ↓
+Entity Resolution
+   ↓
+Knowledge Graph
+   ↓
+Community Detection
+   ↓
+Community Summaries
+   ↓
+Embeddings / Search Indexes
+</code></pre><h2 class="dk-article-heading" id="parse-correctly">Parse correctly</h2><p>Poor PDF extraction, missing headings and broken tables reduce graph quality.</p><p>GraphRAG inherits standard RAG ingestion requirements.</p><h2 class="dk-article-heading" id="chunk-the-content">Chunk the content</h2><p>Chunking remains important because entity and relationship extraction depends on sufficient local context.</p><p>Poor boundaries can split relationships.</p><h2 class="dk-article-heading" id="extract-entities-and-relationships">Extract entities and relationships</h2><p>Common entities include people, companies, accounts, products, locations, policies, systems and events.</p><p>Relationships may include direction, dates, confidence, evidence and source.</p><h2 class="dk-article-heading" id="entity-resolution">Entity resolution</h2><p>Enterprise data contains aliases and inconsistent names.</p><p>GraphRAG needs canonicalization so one business entity does not become several nodes.</p><h2 class="dk-article-heading" id="community-detection">Community detection</h2><p>Large graphs contain clusters of strongly related entities.</p><p>Community summaries can support corpus-level questions.</p><h2 class="dk-article-heading" id="query-modes">Query modes</h2><p>A GraphRAG system may support multiple retrieval strategies.</p><h3 id="local-search">Local Search</h3><p>Best for entity-centered questions.</p><h3 id="global-search">Global Search</h3><p>Best for corpus-wide themes and patterns.</p><h3 id="drift-search">DRIFT Search</h3><p>Combines local retrieval with broader community context and iterative exploration.</p><h3 id="basic-search">Basic Search</h3><p>A vector-RAG baseline for direct factual questions.</p><p>Many questions do not need graph traversal.</p><h2 class="dk-article-heading" id="query-routing-matters">Query routing matters</h2><p>A production system can route:</p><ul>
+<li>simple factual query → Basic RAG,</li>
+<li>relationship query → Local GraphRAG,</li>
+<li>corpus-wide query → Global Search,</li>
+<li>complex exploratory query → DRIFT.</li>
+</ul><p>Do not use the most expensive retrieval mode for every question.</p><h2 class="dk-article-heading" id="graphrag-vs-knowledge-graph">GraphRAG vs knowledge graph</h2><p>A knowledge graph is a representation.</p><p>GraphRAG is:</p><p><strong>Knowledge Graph + Retrieval + Source Evidence + <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> Generation</strong></p><h2 class="dk-article-heading" id="bring-your-own-graph">Bring-your-own graph</h2><p>If the enterprise already has explicit customer, account, supplier, product or policy relationships, use those rather than reconstructing everything from text.</p><h2 class="dk-article-heading" id="graphrag-and-vector-databases-work-together">GraphRAG and vector databases work together</h2><pre><code class="language-text">Vector Search
+      ↓
+Find likely entities
+      ↓
+Graph Traversal
+      ↓
+Expand relationships
+      ↓
+Retrieve source evidence
+      ↓
+LLM
+</code></pre><p>Vectors and graphs solve different retrieval problems.</p><h2 class="dk-article-heading" id="graphrag-vs-hybrid-rag">GraphRAG vs hybrid RAG</h2><p>Hybrid RAG combines dense and sparse retrieval.</p><p>GraphRAG adds graph structure as another signal.</p><p>Enterprise retrieval can combine all three.</p><h2 class="dk-article-heading" id="when-graphrag-is-valuable">When GraphRAG is valuable</h2><p>Strong candidates include:</p><ul>
+<li>regulatory intelligence,</li>
+<li>financial intelligence,</li>
+<li>customer intelligence,</li>
+<li>supply chain,</li>
+<li>cybersecurity,</li>
+<li>enterprise knowledge.</li>
+</ul><p>GraphRAG becomes more useful as answers depend on connections rather than isolated passages.</p><h2 class="dk-article-heading" id="when-not-to-use-graphrag">When not to use GraphRAG</h2><p>Traditional RAG may be better when the corpus is small, questions are direct, relationships add little value, data changes rapidly, cost must be low or latency is strict.</p><h2 class="dk-article-heading" id="structured-databases-may-be-better">Structured databases may be better</h2><p>Exact balances, counts and current structured facts may belong in SQL or APIs.</p><p>GraphRAG should augment authoritative systems, not replace them.</p><h2 class="dk-article-heading" id="graph-construction-quality">Graph construction quality</h2><p>Measure entity precision/recall, relationship precision, duplicate rate, alias resolution, unsupported edges and source coverage.</p><p>A wrong edge can propagate errors.</p><h2 class="dk-article-heading" id="store-evidence-on-every-relationship">Store evidence on every relationship</h2><p>Attach source document, location, effective date and confidence where possible.</p><p>This supports explanation, audit and correction.</p><h2 class="dk-article-heading" id="temporal-graphrag">Temporal GraphRAG</h2><p>Relationships change over time.</p><p>Represent valid_from and valid_to where appropriate.</p><h2 class="dk-article-heading" id="graph-freshness">Graph freshness</h2><p>Measure source-change → graph-update → searchable delay.</p><p>Graph maintenance can be more complex than vector re-embedding.</p><h2 class="dk-article-heading" id="cost">Cost</h2><p>Costs split into index-time extraction/summarization and query-time retrieval/generation.</p><p>Use cost-aware routing so expensive global search is used only when needed.</p><h2 class="dk-article-heading" id="evaluate-against-a-strong-rag-baseline">Evaluate against a strong RAG baseline</h2><p>Compare GraphRAG with good chunking, embeddings, hybrid retrieval, metadata filters and reranking.</p><p>Adopt graph complexity only where it materially improves important queries.</p><h2 class="dk-article-heading" id="three-levels-of-evaluation">Three levels of evaluation</h2><ol>
+<li>Graph quality.</li>
+<li>Retrieval quality.</li>
+<li>Answer quality.</li>
+</ol><p>Do not compress these into one score.</p><h2 class="dk-article-heading" id="query-type-slices">Query-type slices</h2><p>Evaluate:</p><ul>
+<li>single fact,</li>
+<li>multi-hop,</li>
+<li>relationship,</li>
+<li>global thematic,</li>
+<li>historical,</li>
+<li>cross-document.</li>
+</ul><p>GraphRAG may win only on specific slices.</p><h2 class="dk-article-heading" id="evaluate-graph-paths">Evaluate graph paths</h2><p>For relational questions, measure whether the correct nodes and edges were retrieved.</p><p>Use node recall, edge recall, path precision and path completeness.</p><h2 class="dk-article-heading" id="source-grounding">Source grounding</h2><p>The graph should guide retrieval.</p><p>Authoritative source text should provide evidence.</p><h2 class="dk-article-heading" id="security">Security</h2><p>Graph structure itself can reveal sensitive relationships.</p><p>Apply permissions to nodes, edges, attributes, communities and summaries.</p><h2 class="dk-article-heading" id="permission-aware-traversal">Permission-aware traversal</h2><pre><code class="language-text">User / Agent Identity
+       ↓
+Authorized Graph View
+       ↓
+Graph Traversal
+       ↓
+Authorized Evidence
+       ↓
+LLM
+</code></pre><h2 class="dk-article-heading" id="multitenancy">Multitenancy</h2><p>Avoid cross-tenant graph or community leakage.</p><h2 class="dk-article-heading" id="graphrag-for-agents">GraphRAG for agents</h2><p>Agents can route context requests among SQL, vector search, GraphRAG and APIs.</p><p>This is stronger than forcing every query through one retrieval technology.</p><h2 class="dk-article-heading" id="context-engineering">Context engineering</h2><p>GraphRAG is one context-selection mechanism.</p><p>It answers:</p><blockquote class="dk-callout">
+<p>Which connected facts and relationships should be retrieved?</p>
+</blockquote><h2 class="dk-article-heading" id="domain-ontology">Domain ontology</h2><p>Use entity and relationship types appropriate to the domain.</p><p>Start small and expand only when evaluation shows a need.</p><h2 class="dk-article-heading" id="enterprise-reference-architecture">Enterprise reference architecture</h2><pre><code class="language-text">ENTERPRISE SOURCES
+      ↓
+INGEST + PARSE
+      ↓
+CANONICAL ENTITIES
+      ↓
+TEXT/VECTOR + KNOWLEDGE GRAPH
+      ↓
+RETRIEVAL ROUTER
+(Basic / Local / Global / DRIFT)
+      ↓
+RERANK
+      ↓
+SOURCE EVIDENCE
+      ↓
+LLM
+      ↓
+GROUNDED RESPONSE
+      ↓
+EVALUATION + FEEDBACK
+</code></pre><h2 class="dk-article-heading" id="important-graphrag-knobs">Important GraphRAG KNOBS</h2><ul>
+<li>chunk size,</li>
+<li>overlap,</li>
+<li>entity types,</li>
+<li>relationship types,</li>
+<li>extraction model,</li>
+<li>extraction prompt,</li>
+<li>merge threshold,</li>
+<li>community algorithm,</li>
+<li>community level,</li>
+<li>summary model,</li>
+<li>query route,</li>
+<li>traversal depth,</li>
+<li>candidate count,</li>
+<li>embedding model,</li>
+<li>reranking,</li>
+<li>context limit.</li>
+</ul><p>Measure impact on correctness, recall, graph density, latency, tokens and cost.</p><h2 class="dk-article-heading" id="build-incrementally">Build incrementally</h2><ol>
+<li>Select a relationship-heavy use case.</li>
+<li>Build a strong RAG baseline.</li>
+<li>Define a small ontology.</li>
+<li>Extract the graph.</li>
+<li>Resolve entities.</li>
+<li>Evaluate graph quality.</li>
+<li>Add Local Search.</li>
+<li>Add Global/DRIFT only if needed.</li>
+<li>Add routing.</li>
+<li>Compare end-to-end outcomes.</li>
+</ol><h2 class="dk-article-heading" id="common-mistakes">Common mistakes</h2><ol>
+<li>Assuming GraphRAG replaces vector search.</li>
+<li>Using it for every question.</li>
+<li>Focusing on graph visualization rather than retrieval.</li>
+<li>Ignoring entity resolution.</li>
+<li>Storing relationships without evidence.</li>
+<li>Ignoring temporal validity.</li>
+<li>Allowing unrestricted traversal.</li>
+<li>Measuring only final answers.</li>
+<li>Rebuilding everything unnecessarily.</li>
+<li>Using default prompts without evaluation.</li>
+</ol><h2 class="dk-article-heading" id="where-kreate-kontrols-and-knobs-fit">Where KREATE, KONTROLS and KNOBS fit</h2><p><strong>KREATE</strong> can transform documents, databases and APIs into governed entities, relationships and evidence.</p><p><strong>KONTROLS</strong> can govern sources, sensitive attributes, relationship visibility, tenant isolation and agent access.</p><p><strong>KNOBS</strong> can expose ontology, merge threshold, community level, retrieval mode and traversal depth as measurable variables.</p><h2 class="dk-article-heading" id="bottom-line">Bottom line</h2><p>GraphRAG extends RAG by giving retrieval an explicit model of entities and relationships.</p><p>Use:</p><ul>
+<li>SQL for structured facts,</li>
+<li>Basic RAG for passage-level questions,</li>
+<li>Hybrid RAG when lexical + semantic retrieval is enough,</li>
+<li>GraphRAG when relationships and corpus structure matter.</li>
+</ul><p>Ask:</p><blockquote class="dk-callout">
+<p><strong>Which classes of questions improve enough with graph structure to justify the additional complexity?</strong></p>
+</blockquote><section class="dk-article-section" id="faq"><h2 class="dk-article-heading">Frequently asked questions</h2><div class="dk-faq"><details class="dk-faq-item"><summary>What is GraphRAG?</summary><div class="dk-faq-answer"><p>A retrieval-augmented architecture combining knowledge graphs, source documents, vector retrieval and LLMs so search can use explicit entities and relationships.</p></div></details><details class="dk-faq-item"><summary>Is GraphRAG better than vector RAG?</summary><div class="dk-faq-answer"><p>Not universally. It is most useful for relational, multi-hop and corpus-wide questions; ordinary RAG is often simpler and cheaper for direct factual lookup.</p></div></details><details class="dk-faq-item"><summary>Does GraphRAG still use embeddings?</summary><div class="dk-faq-answer"><p>Usually yes. Embeddings remain useful for semantic retrieval and entity matching while graph traversal adds structural signals.</p></div></details></div></section><section class="dk-article-section" id="related"><h2 class="dk-article-heading">Related DataKnobs guides</h2><div class="dk-related-grid"><a class="dk-related-card" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-detailed-page.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Complete Rag Architecture Guide</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/generativeai/10-llms/rag/reference/how-to-evaluate-rag.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">How To Evaluate Rag Systems</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/vector-database/"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Vector Database Guide</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/embeddings/"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Embeddings Fundamentals</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/embeddings/how-to-evaluate-embeddings.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">How To Evaluate Embeddings</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/embeddings/chunking-and-tokenization.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Chunking Vs Tokenization</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/embeddings/knowledge-graphs-plus-embeddings-graph-neural-networks-and-representation-learning.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Knowledge Graphs And Embeddings</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Context Engineering For Ai Agents</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a><a class="dk-related-card" href="https://www.dataknobs.com/agentic-ai/3-ai-agent-memory-design.html"><p class="dk-related-kicker">Related guide</p><p class="dk-related-title">Ai Agent Memory Design</p><p class="dk-related-text">Continue exploring this DataKnobs topic.</p></a></div></section><section class="dk-card dk-card--brand dk-commercial"><p class="dk-related-kicker">DataKnobs platform</p><h3 class="dk-card-title dk-card-title--lg" dk-card-title--lg="">KREATE</h3><p class="dk-card-text">Turn documents, databases and APIs into governed entities, relationships, evidence and reusable intelligence for vector retrieval, GraphRAG, assistants and agents.</p><div class="dk-actions"><a class="dk-btn dk-btn--light" href="https://www.dataknobs.com/products/kreate/">Explore KREATE</a></div></section><section class="dk-publish-note"><strong>SEO consolidation note:</strong> Create /generativeai/10-llms/rag/graphrag.html as a new canonical GraphRAG page. Keep the broad RAG pillar, knowledge-graphs-plus-embeddings page and context-engineering page separate. Do not split GraphRAG vs RAG, Microsoft GraphRAG, or local-vs-global search into separate pages yet.</section></div></article><aside aria-label="Article navigation" class="dk-toc"><div class="dk-toc-card"><h2 class="dk-toc-title">On this page</h2><p class="dk-toc-copy">Jump to the main sections in this guide.</p><ul class="dk-toc-list"><li><a class="dk-toc-link" href="#what-is-graphrag">What is GraphRAG?</a></li><li><a class="dk-toc-link" href="#graphrag-vs-traditional-rag">GraphRAG vs traditional RAG</a></li><li><a class="dk-toc-link" href="#why-vector-rag-can-fail-on-relational-questions">Why vector RAG can fail on relational questions</a></li><li><a class="dk-toc-link" href="#indexing-architecture">Indexing architecture</a></li><li><a class="dk-toc-link" href="#parse-correctly">Parse correctly</a></li><li><a class="dk-toc-link" href="#chunk-the-content">Chunk the content</a></li><li><a class="dk-toc-link" href="#extract-entities-and-relationships">Extract entities and relationships</a></li><li><a class="dk-toc-link" href="#entity-resolution">Entity resolution</a></li><li><a class="dk-toc-link" href="#community-detection">Community detection</a></li><li><a class="dk-toc-link" href="#query-modes">Query modes</a></li><li><a class="dk-toc-link" href="#query-routing-matters">Query routing matters</a></li><li><a class="dk-toc-link" href="#graphrag-vs-knowledge-graph">GraphRAG vs knowledge graph</a></li><li><a class="dk-toc-link" href="#bring-your-own-graph">Bring-your-own graph</a></li><li><a class="dk-toc-link" href="#graphrag-and-vector-databases-work-together">GraphRAG and vector databases work together</a></li><li><a class="dk-toc-link" href="#graphrag-vs-hybrid-rag">GraphRAG vs hybrid RAG</a></li><li><a class="dk-toc-link" href="#when-graphrag-is-valuable">When GraphRAG is valuable</a></li><li><a class="dk-toc-link" href="#when-not-to-use-graphrag">When not to use GraphRAG</a></li><li><a class="dk-toc-link" href="#structured-databases-may-be-better">Structured databases may be better</a></li><li><a class="dk-toc-link" href="#graph-construction-quality">Graph construction quality</a></li><li><a class="dk-toc-link" href="#store-evidence-on-every-relationship">Store evidence on every relationship</a></li><li><a class="dk-toc-link" href="#temporal-graphrag">Temporal GraphRAG</a></li><li><a class="dk-toc-link" href="#graph-freshness">Graph freshness</a></li><li><a class="dk-toc-link" href="#cost">Cost</a></li><li><a class="dk-toc-link" href="#evaluate-against-a-strong-rag-baseline">Evaluate against a strong RAG baseline</a></li><li><a class="dk-toc-link" href="#three-levels-of-evaluation">Three levels of evaluation</a></li><li><a class="dk-toc-link" href="#query-type-slices">Query-type slices</a></li><li><a class="dk-toc-link" href="#evaluate-graph-paths">Evaluate graph paths</a></li><li><a class="dk-toc-link" href="#source-grounding">Source grounding</a></li></ul></div><div class="dk-toc-card"><h2 class="dk-toc-title">Primary topic</h2><p class="dk-toc-copy"><strong>GraphRAG</strong></p><div class="dk-knob-chips"><span class="dk-knob-chip">GraphRAG</span><span class="dk-knob-chip">graph RAG</span><span class="dk-knob-chip">GraphRAG vs RAG</span><span class="dk-knob-chip">knowledge graph RAG</span><span class="dk-knob-chip">GraphRAG architecture</span></div></div></aside></div></section></main><footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-architectures/">Rag Architectures</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/evolution-of-rag-info.html">Evolution Of Rag Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/evolution-of-rag.html">Evolution Of Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/graphrag.html">Graphrag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/how-to-evaluate-rag.html">How To Evaluate Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/privacy-in-rag.html">Privacy In Rag</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/privacy-rag-info.html">Privacy Rag Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-detailed-page.html">Rag Detailed Page</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-for-structured-and-unstructred-data.html">Rag For Structured And Unstructred Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-for-strucutred-data.html">Rag For Strucutred Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-pattern-guide-info.html">Rag Pattern Guide Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/rag-pattern-guide.html">Rag Pattern Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/sql-stats-genai-rag-methods-for-structred-data.html">Sql Stats Genai Rag Methods For Structred Data</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/text-chunking-of-rag-info.html">Text Chunking Of Rag Info</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag/text-chunkng-of-rag.html">Text Chunkng Of Rag</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for AI governance</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer><script>const b=document.getElementById('menuButton'),n=document.getElementById('mobileNav');if(b&&n){b.addEventListener('click',()=>{const o=n.classList.toggle('is-open');b.setAttribute('aria-expanded',String(o));});}</script></body></html>

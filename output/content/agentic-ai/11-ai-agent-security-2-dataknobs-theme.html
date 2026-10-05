@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>AI Agent Security Architecture and Controls | DataKnobs</title>
+  <meta content="Security architecture for AI agents covering trust boundaries, identity, authorization, tools, MCP, memory, runtime controls, observability and response." name="description"/>
+  <meta content="AI agent security, agentic AI security, prompt injection, MCP security, agent identity, least privilege, runtime authorization, AI guardrails, memory security, multi-agent security" name="keywords"/>
+  <meta content="DataKnobs" name="author"/>
+  <meta content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" name="robots"/>
+  <link href="https://www.dataknobs.com/agentic-ai/11-ai-agent-security.html" rel="canonical"/>
+  <link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon"/>
+  <link href="../dataknobs-theme.css" rel="stylesheet"/>
+
+  <meta content="article" property="og:type"/>
+  <meta content="DataKnobs" property="og:site_name"/>
+  <meta content="AI Agent Security Architecture and Controls" property="og:title"/>
+  <meta content="A security-architecture guide for governing AI-agent identity, tools, memory, authorization, execution, observability and incident response." property="og:description"/>
+  <meta content="https://www.dataknobs.com/agentic-ai/11-ai-agent-security.html" property="og:url"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-7.png" property="og:image"/>
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="AI Agent Security Architecture and Controls" name="twitter:title"/>
+  <meta content="Security architecture for AI agents: trust boundaries, authorization, MCP, memory, runtime controls, observability and response." name="twitter:description"/>
+  <meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-7.png" name="twitter:image"/>
+
+  <meta content="AI Agent Security Architecture and Controls: a practical enterprise guide to securing agent identity, context, tools, MCP integrations, memory, delegation, execution, observability, approvals and incident response." name="ai-summary"/>
+  <meta content="least agency; distinct agent identity; deterministic authorization; tool and MCP governance; memory provenance; permission-aware delegation; execution isolation; observability; security regression testing; incident response" name="ai-key-points"/>
+  <meta content="AI Agent Security Architecture and Controls" name="citation_title"/>
+  <meta content="DataKnobs" name="citation_author"/>
+  <meta content="2026-10-05" name="citation_publication_date"/>
+  <meta content="en" name="citation_language"/>
+
+  <script type="application/ld+json">{
+    "@context":"https://schema.org",
+    "@graph":[
+      {
+        "@type":"TechArticle",
+        "@id":"https://www.dataknobs.com/agentic-ai/11-ai-agent-security.html#article",
+        "headline":"AI Agent Security Architecture and Controls",
+        "description":"Security architecture for AI agents covering trust boundaries, identity, authorization, tools, MCP, memory, runtime controls, observability and response.",
+        "datePublished":"2026-10-05",
+        "dateModified":"2026-10-05",
+        "mainEntityOfPage":{"@type":"WebPage","@id":"https://www.dataknobs.com/agentic-ai/11-ai-agent-security.html"},
+        "author":{"@type":"Organization","name":"DataKnobs","url":"https://www.dataknobs.com/"},
+        "publisher":{"@type":"Organization","name":"DataKnobs","url":"https://www.dataknobs.com/"},
+        "articleSection":"Agentic AI Security",
+        "keywords":["AI agent security","agentic AI security","prompt injection","MCP security","agent identity","least privilege","runtime authorization","memory security","multi-agent security"]
+      },
+      {
+        "@type":"BreadcrumbList",
+        "itemListElement":[
+          {"@type":"ListItem","position":1,"name":"Home","item":"https://www.dataknobs.com/"},
+          {"@type":"ListItem","position":2,"name":"Agentic AI","item":"https://www.dataknobs.com/agentic-ai/"},
+          {"@type":"ListItem","position":3,"name":"AI Agent Security","item":"https://www.dataknobs.com/agentic-ai/11-ai-agent-security.html"}
+        ]
+      },
+      {
+        "@type":"FAQPage",
+        "mainEntity":[
+          {"@type":"Question","name":"How is AI-agent security different from model security?","acceptedAnswer":{"@type":"Answer","text":"AI-agent security must protect not only model behavior, but also identity, tools, credentials, retrieval, memory, delegation, authorization, execution and persistent side effects."}},
+          {"@type":"Question","name":"What is the most important security boundary for an AI agent?","acceptedAnswer":{"@type":"Answer","text":"The transition from model reasoning to authorized action is a critical boundary. Model output should be treated as a proposal; deterministic policy and authorization should decide whether execution is permitted."}},
+          {"@type":"Question","name":"How should MCP integrations be secured?","acceptedAnswer":{"@type":"Answer","text":"Treat MCP as an application integration boundary: authenticate endpoints, minimize scopes, inventory approved tools, validate metadata and arguments, restrict network access, log execution and authorize sensitive actions independently of model reasoning."}}
+        ]
+      }
+    ]
+  }</script>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head>
+<body class="dk-page">
+<header class="dk-header">
+  <div class="dk-container dk-header-inner">
+    <div class="dk-header-row">
+      <a aria-label="DataKnobs home" class="dk-logo-link" href="https://www.dataknobs.com/"><img alt="DataKnobs" class="dk-logo" height="72" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png" width="240"/></a>
+      <nav aria-label="Primary navigation" class="dk-nav dk-nav--desktop">
+        <a class="dk-nav-link" href="https://www.dataknobs.com/data-products/">Data Products</a>
+        <a class="dk-nav-link" href="https://www.dataknobs.com/generativeai/">Generative AI</a>
+        <a class="dk-nav-link dk-nav-current" href="https://www.dataknobs.com/agentic-ai/">Agentic AI</a>
+        <a class="dk-nav-link" href="https://www.dataknobs.com/embeddings/">Embeddings</a>
+        <a class="dk-btn dk-btn--primary dk-btn--sm" href="https://www.dataknobs.com/search.html">Search</a>
+      </nav>
+      <button aria-controls="mobileNav" aria-expanded="false" aria-label="Open navigation" class="dk-menu-button" id="menuButton" type="button">
+        <svg aria-hidden="true" class="dk-menu-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </button>
+    </div>
+    <nav aria-label="Mobile navigation" class="dk-mobile-nav" id="mobileNav">
+      <div class="dk-mobile-nav-list">
+        <a class="dk-mobile-link" href="https://www.dataknobs.com/data-products/">Data Products</a>
+        <a class="dk-mobile-link" href="https://www.dataknobs.com/generativeai/">Generative AI</a>
+        <a class="dk-mobile-link" href="https://www.dataknobs.com/agentic-ai/">Agentic AI</a>
+        <a class="dk-mobile-link" href="https://www.dataknobs.com/embeddings/">Embeddings</a>
+        <a class="dk-mobile-link" href="https://www.dataknobs.com/search.html">Search</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="dk-hero dk-hero--article dk-hero--article-rich">
+  <div class="dk-container dk-hero-grid">
+    <div class="dk-hero-copy">
+      <span class="dk-badge dk-badge--inverse">Agentic AI Security • Architecture Guide</span>
+      <h1 class="dk-hero-title">AI Agent Security: Architecture, Trust Boundaries, and Runtime Controls</h1>
+      <p class="dk-hero-lead">A security-engineering guide for systems that can retrieve data, call tools, retain memory, delegate work, and create real-world side effects. The objective is to keep model reasoning useful while keeping authority explicit, bounded, observable, and independently enforceable.</p>
+      <div class="dk-article-kicker-row">
+        <span class="dk-article-kicker">Least agency</span>
+        <span class="dk-article-kicker">Deterministic authorization</span>
+        <span class="dk-article-kicker">Zero-trust integrations</span>
+        <span class="dk-article-kicker">Observable execution</span>
+      </div>
+    </div>
+    <div class="dk-hero-visual">
+      <div class="dk-hero-architecture">
+        <div class="dk-hero-stage">
+          <p class="dk-hero-stage-label">1 · Identity + Context</p>
+          <p class="dk-hero-stage-title">Who is acting, on whose behalf, using which evidence?</p>
+          <p class="dk-hero-stage-copy">Authenticate users and agents; classify sources, retrieved context, memory, and peer messages by trust and sensitivity.</p>
+        </div>
+        <div class="dk-hero-stage dk-hero-stage--center">
+          <p class="dk-hero-stage-label">2 · Policy + Authorization</p>
+          <p class="dk-hero-stage-title">Treat model output as a proposal, not permission.</p>
+          <p class="dk-hero-stage-copy">Validate scope, resource, consequence, approval requirements, budgets, and policy outside the model.</p>
+        </div>
+        <div class="dk-hero-stage dk-hero-stage--knobs">
+          <p class="dk-hero-stage-label">3 · Execution + Evidence</p>
+          <p class="dk-hero-stage-title">Constrain side effects and preserve evidence.</p>
+          <p class="dk-hero-stage-copy">Use execution gateways, sandboxes, scoped credentials, telemetry, rollback, and incident-response controls.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="dk-breadcrumb"><div class="dk-container dk-breadcrumb-inner">
+  <a href="https://www.dataknobs.com/">Home</a><span class="dk-breadcrumb-sep">/</span>
+  <a href="https://www.dataknobs.com/agentic-ai/">Agentic AI</a><span class="dk-breadcrumb-sep">/</span>
+  <span class="dk-breadcrumb-current">AI Agent Security</span>
+</div></div>
+
+<section class="dk-article-shell">
+<div class="dk-container dk-article-layout">
+<article class="dk-article-content">
+<div class="dk-prose">
+
+<div class="dk-article-summary-grid">
+  <div class="dk-article-summary-card"><strong>Security objective</strong><span>Prevent a reasoning error, manipulated context, or compromised dependency from becoming an unauthorized enterprise action.</span></div>
+  <div class="dk-article-summary-card"><strong>Primary boundary</strong><span>The transition from model reasoning to policy-authorized execution.</span></div>
+  <div class="dk-article-summary-card"><strong>Operating principle</strong><span>Give the agent the minimum authority needed for the task, then verify every material side effect.</span></div>
+</div>
+
+<p>AI-agent security is broader than model safety. A production agent may retrieve enterprise data, call APIs, modify records, send messages, execute code, retain memory, hand work to other agents, and operate over long-running workflows. Security therefore has to cover the complete chain from input and context through authorization, execution, persistence, and audit.</p>
+
+<blockquote class="dk-callout"><p><strong>The security question is not only whether the model can be manipulated. It is what the system permits after the model produces a decision.</strong></p></blockquote>
+
+<h2 id="security-model">1. Security model: protect the system, not only the model</h2>
+<p>Model-level safeguards are useful, but they are not an authorization boundary. A secure agent architecture assumes that a model can misunderstand intent, over-trust retrieved content, select an inappropriate tool, or produce an invalid action request. Security controls should remain effective even when that happens.</p>
+<p>A useful control chain is:</p>
+<pre><code>Input / event
+    ↓
+Identity + source classification
+    ↓
+Agent reasoning
+    ↓
+Proposed action
+    ↓
+Deterministic policy + authorization
+    ↓
+Approval when required
+    ↓
+Constrained execution
+    ↓
+Telemetry + audit + response</code></pre>
+
+<div class="dk-slide-showcase-grid">
+  <figure class="dk-slide-showcase">
+    <div class="dk-slide-frame"><picture>
+      <source media="(max-width: 700px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-2.png"/>
+      <source media="(max-width: 1000px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-2.png"/>
+      <img alt="Slide illustrating why AI agents require a broader security threat model than conventional applications" decoding="async" height="563" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-2.png" width="1000"/>
+    </picture></div>
+    <figcaption class="dk-slide-meta"><p class="dk-slide-title">Agents introduce a broader trust model</p><p class="dk-slide-description">Security must cover context, identity, tools, memory, delegation, and side effects: not only generated text.</p></figcaption>
+  </figure>
+  <figure class="dk-slide-showcase">
+    <div class="dk-slide-frame"><picture>
+      <source media="(max-width: 700px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-7.png"/>
+      <source media="(max-width: 1000px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-7.png"/>
+      <img alt="Defense-in-depth architecture for AI agents" decoding="async" height="563" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-7.png" width="1000"/>
+    </picture></div>
+    <figcaption class="dk-slide-meta"><p class="dk-slide-title">Defense in depth</p><p class="dk-slide-description">Use model resistance, content controls, authorization, execution boundaries, and human review as independent layers.</p></figcaption>
+  </figure>
+</div>
+
+<h2 id="content-and-prompt-injection">2. Treat untrusted content as data, not authority</h2>
+<p>Prompt injection is a content-originated instruction-manipulation problem. The relevant content may come from a user, webpage, document, email, retrieved passage, tool output, or peer agent. Because those inputs eventually become model context, the system must preserve the distinction between <em>approved authority</em> and <em>untrusted evidence</em>.</p>
+<p>Direct and indirect prompt injection should therefore be handled as a trust-boundary problem, not only as a text-classification problem.</p>
+<ul>
+  <li><strong>System and policy instructions</strong> define approved authority.</li>
+  <li><strong>User instructions</strong> are evaluated within the user’s scope.</li>
+  <li><strong>Retrieved content and tool output</strong> are evidence and must not silently acquire control authority.</li>
+  <li><strong>Peer-agent messages</strong> require authenticated provenance and scoped delegation.</li>
+</ul>
+<p>Content scanning can reduce risk, but policy enforcement must still occur before tools execute.</p>
+
+<div class="dk-slide-showcase-grid">
+  <figure class="dk-slide-showcase">
+    <div class="dk-slide-frame"><picture>
+      <source media="(max-width: 700px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-3.png"/>
+      <source media="(max-width: 1000px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-3.png"/>
+      <img alt="Prompt injection pathways through direct input and retrieved content" decoding="async" height="563" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-3.png" width="1000"/>
+    </picture></div>
+    <figcaption class="dk-slide-meta"><p class="dk-slide-title">Content can carry instructions as well as facts</p><p class="dk-slide-description">The architecture should preserve the trust level of each source even after its text reaches the model context.</p></figcaption>
+  </figure>
+  <figure class="dk-slide-showcase">
+    <div class="dk-slide-frame"><picture>
+      <source media="(max-width: 700px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-8.png"/>
+      <source media="(max-width: 1000px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-8.png"/>
+      <img alt="Practical AI-agent guardrails across input, output, goal alignment and tool access" decoding="async" height="563" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-8.png" width="1000"/>
+    </picture></div>
+    <figcaption class="dk-slide-meta"><p class="dk-slide-title">Guardrails are supporting controls</p><p class="dk-slide-description">Input checks, output validation, goal-alignment checks, and tool allowlists reduce risk but do not replace authorization.</p></figcaption>
+  </figure>
+</div>
+
+<h2 id="trust-boundaries">3. Design around explicit trust boundaries</h2>
+<p>For security architecture reviews, it is useful to define six boundaries that can be assessed independently:</p>
+<div class="dk-table-wrap"><table class="dk-table">
+<thead><tr><th>Boundary</th><th>Security question</th><th>Representative controls</th></tr></thead>
+<tbody>
+<tr><td>Content</td><td>Which inputs are trusted, untrusted, or sensitive?</td><td>Source classification, provenance, parsing controls, retrieval filters</td></tr>
+<tr><td>Identity</td><td>Who is acting and on whose behalf?</td><td>User identity, agent identity, application identity, workload identity</td></tr>
+<tr><td>Capability</td><td>Which tools, data, and actions may this agent use?</td><td>Allowlists, scopes, role constraints, tool schemas</td></tr>
+<tr><td>Execution</td><td>Which proposed actions are actually permitted?</td><td>Policy engine, transaction limits, approvals, sandboxes, network controls</td></tr>
+<tr><td>Persistence</td><td>What may be written to memory or durable state?</td><td>Memory classes, provenance, expiry, validation, correction and deletion</td></tr>
+<tr><td>Delegation</td><td>What authority may pass to another agent or service?</td><td>Authenticated handoffs, scoped task context, correlation IDs, delegation policy</td></tr>
+</tbody></table></div>
+
+<h3>Least agency</h3>
+<p>Choose the lowest-autonomy pattern that satisfies the business requirement:</p>
+<ol>
+  <li>AI recommends; a person executes.</li>
+  <li>AI prepares; a person approves; the system executes.</li>
+  <li>AI executes only bounded, reversible actions.</li>
+  <li>Higher-impact actions require stronger authorization and review.</li>
+</ol>
+<blockquote class="dk-callout"><p><strong>Intelligence and authority should be controlled independently. A stronger model should not automatically receive broader permissions.</strong></p></blockquote>
+
+<h2 id="identity-authorization">4. Separate user identity, agent identity, and execution authority</h2>
+<p>A user and the user’s agent should not be treated as the same security principal. A secure decision may need to evaluate:</p>
+<pre><code>user identity
+AND agent identity
+AND application identity
+AND tool permission
+AND resource scope
+AND task scope
+AND approval state</code></pre>
+<p>Give agents distinct identities, owners, environments, approved tools, data scopes, action limits, and credential lifetimes. Prefer short-lived delegated credentials over long-lived secrets, and avoid placing powerful credentials in model context.</p>
+<p>User authority should normally be an upper bound, not a direct grant. A user may be able to perform a privileged operation manually while their autonomous agent is limited to recommending or preparing the same operation.</p>
+
+<figure class="dk-slide-showcase">
+  <div class="dk-slide-frame"><picture>
+      <source media="(max-width: 700px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-9.png"/>
+      <source media="(max-width: 1000px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-9.png"/>
+      <img alt="Least-privilege access and human approval for consequential AI-agent actions" decoding="async" height="563" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-9.png" width="1000"/>
+    </picture></div>
+  <figcaption class="dk-slide-meta"><p class="dk-slide-title">Least privilege at the execution boundary</p><p class="dk-slide-description">Restrict tools and data to what the task requires, and require explicit approval when an action is financially material, destructive, privileged, externally visible, or difficult to reverse.</p></figcaption>
+</figure>
+
+<h2 id="tools-mcp">5. Treat tools and MCP integrations as application security boundaries</h2>
+<p>Tool access changes the risk profile because a model decision can become a database write, API call, message, file operation, deployment, or transaction. The right control is not simply “the model should not call this tool.” The execution layer must determine whether the specific call is allowed.</p>
+<p>For each tool or MCP server, inventory and control:</p>
+<ul>
+  <li>server and publisher identity, version, and ownership;</li>
+  <li>approved tools and schemas;</li>
+  <li>requested scopes and credentials;</li>
+  <li>allowed network destinations;</li>
+  <li>argument validation and resource-level authorization;</li>
+  <li>logging, update policy, and review status.</li>
+</ul>
+<p>Tool descriptions and tool output should be treated as untrusted application data. Sensitive operations should be authorized independently of the language model.</p>
+
+<figure class="dk-slide-showcase">
+  <div class="dk-slide-frame"><picture>
+      <source media="(max-width: 700px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-5.png"/>
+      <source media="(max-width: 1000px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-5.png"/>
+      <img alt="AI-agent tool, MCP and supply-chain security considerations" decoding="async" height="563" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-5.png" width="1000"/>
+    </picture></div>
+  <figcaption class="dk-slide-meta"><p class="dk-slide-title">Tools extend the trust boundary</p><p class="dk-slide-description">Models, SDKs, packages, MCP servers, plugins, APIs, containers, and external services all become part of the agent’s security dependency chain.</p></figcaption>
+</figure>
+
+<h2 id="memory-multi-agent">6. Govern memory and multi-agent delegation</h2>
+<p>Memory is persistent state and should be secured like other durable application data. A memory write should carry source, confidence, sensitivity, ownership, expiry, and business relevance. The system should support correction, deletion, invalidation, and retention policy.</p>
+<p>Separate memory classes because they have different trust and retention requirements:</p>
+<ul>
+  <li>working/session memory;</li>
+  <li>user preferences;</li>
+  <li>enterprise knowledge;</li>
+  <li>episodic history;</li>
+  <li>learned heuristics or agent-specific state.</li>
+</ul>
+<p>For multi-agent systems, authenticate agents to each other and preserve sender identity, task identity, authorization, message integrity, replay protection, and correlation IDs. Forward only the context required for the delegated task rather than complete histories.</p>
+
+<figure class="dk-slide-showcase">
+  <div class="dk-slide-frame"><picture>
+      <source media="(max-width: 700px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-6.png"/>
+      <source media="(max-width: 1000px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-6.png"/>
+      <img alt="Multi-agent propagation and persistent-memory risk in AI-agent systems" decoding="async" height="563" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-6.png" width="1000"/>
+    </picture></div>
+  <figcaption class="dk-slide-meta"><p class="dk-slide-title">Propagation and persistence require explicit controls</p><p class="dk-slide-description">One agent’s output can become another agent’s input, while persistent memory can carry erroneous or adversarial state into future workflows. Both paths need provenance and policy.</p></figcaption>
+</figure>
+
+<h2 id="control-plane">7. Separate reasoning, control, and execution planes</h2>
+<p>A strong reference architecture treats the model as one component inside a governed system:</p>
+<pre><code>USER / EVENT
+     ↓
+IDENTITY + CONTENT GATE
+     ↓
+AGENT HARNESS
+(model / retrieval / memory / planner)
+     ↓
+PROPOSED ACTION
+     ↓
+POLICY + AUTHORIZATION ENGINE
+     ↓
+AUTO-APPROVED or HUMAN REVIEW
+     ↓
+EXECUTION GATEWAY / SANDBOX
+     ↓
+ENTERPRISE SYSTEM
+     ↓
+TELEMETRY + AUDIT + RESPONSE</code></pre>
+<p>The model can be probabilistic; authorization does not need to be. Policy should be implemented as executable rules rather than natural-language guidance alone.</p>
+
+<h3>Risk-based approval</h3>
+<div class="dk-table-wrap"><table class="dk-table">
+<thead><tr><th>Action class</th><th>Default posture</th><th>Examples</th></tr></thead>
+<tbody>
+<tr><td>Read-only / low consequence</td><td>Autonomous with logging</td><td>Search, retrieve, summarize, classify</td></tr>
+<tr><td>Reversible write</td><td>Bounded execution</td><td>Draft update, create proposed record, soft-delete request</td></tr>
+<tr><td>Material business action</td><td>Policy check + threshold-based approval</td><td>Refund, pricing change, external communication</td></tr>
+<tr><td>Privileged or irreversible</td><td>Explicit approval and stronger identity verification</td><td>Payment, production deployment, account closure, destructive change</td></tr>
+</tbody></table></div>
+<p>Reversibility should be treated as a design property. Prefer draft-before-send, staged deployment, soft delete, and proposed change before commit where possible.</p>
+
+<h2 id="runtime-controls">8. Make runtime security controls explicit</h2>
+<p>Important runtime controls include:</p>
+<ul>
+  <li>tool allowlists and validated schemas;</li>
+  <li>resource- and action-level authorization;</li>
+  <li>transaction and spend limits;</li>
+  <li>step, token, delegation, and external-request budgets;</li>
+  <li>network egress allowlists and private endpoints;</li>
+  <li>retrieval authorization and source eligibility;</li>
+  <li>memory write policy and retention;</li>
+  <li>human approval for defined consequence classes;</li>
+  <li>execution sandboxes for generated code or high-risk tools.</li>
+</ul>
+<p>Budgets are security controls as well as cost controls: they limit loops, runaway workflows, excessive delegation, and uncontrolled external activity.</p>
+
+<h2 id="observability">9. Observability is part of the security boundary</h2>
+<p>Capture enough evidence to reconstruct what happened without relying on hidden model reasoning. Useful telemetry includes:</p>
+<div class="dk-control-grid">
+  <div class="dk-control-card"><p class="dk-control-label">Identity</p><p class="dk-control-value">Task ID, user identity, agent identity, application identity, environment.</p></div>
+  <div class="dk-control-card"><p class="dk-control-label">Context</p><p class="dk-control-value">Approved goal, source references, retrieved evidence, memory reads, peer-agent handoffs.</p></div>
+  <div class="dk-control-card"><p class="dk-control-label">Decision</p><p class="dk-control-value">Model/provider version, proposed tool, arguments, policy result, approval decision.</p></div>
+  <div class="dk-control-card"><p class="dk-control-label">Execution</p><p class="dk-control-value">Credential used, resource affected, execution result, external destination, rollback state.</p></div>
+  <div class="dk-control-card"><p class="dk-control-label">Persistence</p><p class="dk-control-value">Memory writes, durable state changes, downstream notifications, delegation chain.</p></div>
+  <div class="dk-control-card"><p class="dk-control-label">Operations</p><p class="dk-control-value">Latency, cost, anomalies, policy violations, security events, business outcome.</p></div>
+</div>
+<p>Behavioral baselines can surface abnormal tool usage, unusual destinations, unexpected workflow sequences, or atypical transaction values.</p>
+
+<h2 id="evaluation">10. Security evaluation must be continuous</h2>
+<p>Security testing should include direct and indirect prompt injection, malicious or malformed documents, untrusted tool output, unauthorized tool selection, excessive privilege, invalid memory writes, deceptive peer-agent messages, loops, policy-engine failure, network failure, and tool failure.</p>
+<p>The acceptance criterion should not be only whether the model refuses. The architecture should prevent a forbidden action even when the model proposes it.</p>
+<p>Run regression testing after changes to:</p>
+<ul>
+  <li>model or provider version;</li>
+  <li>system prompt or planner;</li>
+  <li>tool or MCP-server inventory;</li>
+  <li>retrieval and memory policies;</li>
+  <li>authorization and approval rules;</li>
+  <li>agent topology or delegation model.</li>
+</ul>
+
+<h2 id="incident-response">11. Design incident response into the platform</h2>
+<p>Security teams should be able to rapidly constrain the system without rebuilding it. Useful controls include:</p>
+<ul>
+  <li>disable an agent or workflow;</li>
+  <li>disable a tool or MCP integration;</li>
+  <li>revoke delegated credentials;</li>
+  <li>reduce an agent to read-only mode;</li>
+  <li>disable external network access;</li>
+  <li>force human approval;</li>
+  <li>invalidate or quarantine memory;</li>
+  <li>preserve execution evidence;</li>
+  <li>roll back reversible actions;</li>
+  <li>identify downstream agents and systems affected.</li>
+</ul>
+<p>A practical response sequence is:</p>
+<pre><code>detect → constrain → preserve evidence → revoke → rollback → investigate → remediate → re-enable</code></pre>
+
+<h2 id="implementation">12. Practical implementation sequence</h2>
+<ol>
+  <li>Inventory agents, tools, MCP servers, data access, credentials, and external destinations.</li>
+  <li>Classify actions by consequence and reversibility.</li>
+  <li>Reduce agency where a recommendation or approval workflow is sufficient.</li>
+  <li>Establish distinct agent identities and short-lived scoped credentials.</li>
+  <li>Put deterministic policy and authorization between reasoning and execution.</li>
+  <li>Sandbox code execution and constrain network access.</li>
+  <li>Govern retrieval, memory, and peer-agent handoffs.</li>
+  <li>Add traceable execution evidence and anomaly monitoring.</li>
+  <li>Run adversarial and regression testing before and after material changes.</li>
+  <li>Maintain kill switches, rollback procedures, and credential revocation paths.</li>
+</ol>
+
+<h2 id="dataknobs">13. Where KONTROLS and KNOBS fit</h2>
+<p><strong>KONTROLS</strong> can operationalize identity, data access, tool permissions, execution limits, approvals, network restrictions, memory policy, and audit evidence.</p>
+<p><strong>KNOBS</strong> can expose autonomy level, approval threshold, transaction limit, tool allowlist, retrieval scope, memory retention, step budget, delegation depth, network access, and confidence thresholds as versioned operating parameters.</p>
+<blockquote class="dk-callout"><p><strong>The objective is not to make the model responsible for security policy. It is to make security policy explicit, independently enforced, measurable, and adjustable as the workload changes.</strong></p></blockquote>
+
+<figure class="dk-slide-showcase">
+  <div class="dk-slide-frame"><picture>
+      <source media="(max-width: 700px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide600/agent-security-10.png"/>
+      <source media="(max-width: 1000px)" srcset="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide900/agent-security-10.png"/>
+      <img alt="Summary slide emphasizing AI-agent security as an architectural concern" decoding="async" height="563" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/agent-security/images/Slide1000/agent-security-10.png" width="1000"/>
+    </picture></div>
+  <figcaption class="dk-slide-meta"><p class="dk-slide-title">Security is an architectural property</p><p class="dk-slide-description">Identity, scope, policy, execution, observability, and recovery should be designed before agents are permitted to create material side effects.</p></figcaption>
+</figure>
+
+<section class="dk-article-section" id="faq">
+<h2 class="dk-article-heading">Frequently asked questions</h2>
+<div class="dk-faq">
+  <details class="dk-faq-item"><summary>How is AI-agent security different from model security?</summary><div class="dk-faq-answer"><p>Model security focuses on model behavior and inputs. AI-agent security must additionally control identity, credentials, tools, retrieval, memory, delegation, authorization, execution and persistent side effects.</p></div></details>
+  <details class="dk-faq-item"><summary>Should the model decide whether an action is authorized?</summary><div class="dk-faq-answer"><p>No. The model can recommend an action, but authorization should be performed by deterministic policy and identity controls outside the model, especially for consequential actions.</p></div></details>
+  <details class="dk-faq-item"><summary>How should retrieved documents and tool output be treated?</summary><div class="dk-faq-answer"><p>As untrusted evidence unless a separate trust mechanism says otherwise. Their presence in model context should not grant them the authority of system policy or an authenticated user instruction.</p></div></details>
+  <details class="dk-faq-item"><summary>How should MCP integrations be secured?</summary><div class="dk-faq-answer"><p>Treat them as application integrations: authenticate endpoints, inventory approved tools, minimize scopes, validate metadata and arguments, restrict network access, log execution, and independently authorize sensitive actions.</p></div></details>
+  <details class="dk-faq-item"><summary>What should be logged for security investigations?</summary><div class="dk-faq-answer"><p>At minimum: task, user and agent identities; approved goal; model version; sources; tool calls and arguments; authorization and approval results; execution results; memory writes; delegations; external destinations; policy events; and resulting business impact.</p></div></details>
+</div>
+</section>
+
+<section class="dk-article-section" id="related">
+<h2 class="dk-article-heading">Related DataKnobs guides</h2>
+<div class="dk-related-grid">
+  <a class="dk-related-card" href="https://www.dataknobs.com/agentic-ai/4-ai-agent-tool-and-function-integration.html"><p class="dk-related-kicker">Agent architecture</p><p class="dk-related-title">Tool and Function Integration</p><p class="dk-related-text">Design tool interfaces, schemas and execution boundaries for agents.</p></a>
+  <a class="dk-related-card" href="https://www.dataknobs.com/agentic-ai/3-ai-agent-memory-design.html"><p class="dk-related-kicker">Persistence</p><p class="dk-related-title">AI Agent Memory Design</p><p class="dk-related-text">Design memory classes, retention, provenance and correction paths.</p></a>
+  <a class="dk-related-card" href="https://www.dataknobs.com/agentic-ai/10-ai-agent-observability.html"><p class="dk-related-kicker">Evidence</p><p class="dk-related-title">AI Agent Observability</p><p class="dk-related-text">Trace execution, tool usage, outcomes and operational behavior.</p></a>
+  <a class="dk-related-card" href="https://www.dataknobs.com/agentic-ai/12-ai-agent-governance.html"><p class="dk-related-kicker">Governance</p><p class="dk-related-title">AI Agent Governance</p><p class="dk-related-text">Define authority, risk tiers, approvals and operating controls.</p></a>
+</div>
+</section>
+
+<section class="dk-card dk-card--brand dk-commercial">
+  <p class="dk-related-kicker">DataKnobs platform</p>
+  <h3 class="dk-card-title dk-card-title--lg">KONTROLS + KNOBS</h3>
+  <p class="dk-card-text">Make agent authority, runtime policy, approvals, tool scope, memory policy and operating limits explicit, enforceable and measurable.</p>
+  <div class="dk-actions"><a class="dk-btn dk-btn--light" href="https://www.dataknobs.com/products/kontrols/">Explore KONTROLS</a><a class="dk-btn dk-btn--ghost-light" href="https://www.dataknobs.com/products/knobs/">Explore KNOBS</a></div>
+</section>
+
+</div>
+</article>
+
+<aside aria-label="Article navigation" class="dk-toc">
+  <div class="dk-toc-card">
+    <h2 class="dk-toc-title">On this page</h2>
+    <p class="dk-toc-copy">Security architecture from context to execution and response.</p>
+    <ul class="dk-toc-list">
+      <li><a class="dk-toc-link" href="#security-model">Security model</a></li>
+      <li><a class="dk-toc-link" href="#content-and-prompt-injection">Untrusted content</a></li>
+      <li><a class="dk-toc-link" href="#trust-boundaries">Trust boundaries</a></li>
+      <li><a class="dk-toc-link" href="#identity-authorization">Identity &amp; authorization</a></li>
+      <li><a class="dk-toc-link" href="#tools-mcp">Tools &amp; MCP</a></li>
+      <li><a class="dk-toc-link" href="#memory-multi-agent">Memory &amp; multi-agent</a></li>
+      <li><a class="dk-toc-link" href="#control-plane">Control plane</a></li>
+      <li><a class="dk-toc-link" href="#runtime-controls">Runtime controls</a></li>
+      <li><a class="dk-toc-link" href="#observability">Observability</a></li>
+      <li><a class="dk-toc-link" href="#evaluation">Security evaluation</a></li>
+      <li><a class="dk-toc-link" href="#incident-response">Incident response</a></li>
+      <li><a class="dk-toc-link" href="#implementation">Implementation</a></li>
+      <li><a class="dk-toc-link" href="#dataknobs">KONTROLS + KNOBS</a></li>
+      <li><a class="dk-toc-link" href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+  <div class="dk-toc-card">
+    <h2 class="dk-toc-title">Security lenses</h2>
+    <div class="dk-knob-chips">
+      <span class="dk-knob-chip">least agency</span>
+      <span class="dk-knob-chip">prompt injection</span>
+      <span class="dk-knob-chip">agent identity</span>
+      <span class="dk-knob-chip">MCP security</span>
+      <span class="dk-knob-chip">memory provenance</span>
+      <span class="dk-knob-chip">runtime policy</span>
+      <span class="dk-knob-chip">incident response</span>
+    </div>
+  </div>
+</aside>
+</div>
+</section>
+</main>
+
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-engineering/">Agent Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-frameworks/">Agent Frameworks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-observability/">Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Ai Development Life Cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/beyond-react/">Beyond React</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/beyond-react-slides/">Beyond React Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/conflict-resolution/">Conflict Resolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/cost-aware-planning/">Cost Aware Planning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/design-patterns/">Design Patterns</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/emergent-behavior/">Emergent Behavior</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/episodic-memory/">Episodic Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/event-vs-goal-agents/">Event Vs Goal Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/fail-safe-agents/">Fail Safe Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/">Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/hierarchical-agents/">Hierarchical Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/mas-simulation/">Mas Simulation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-arch/">Memory Arch</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-compression/">Memory Compression</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-strategies/">Memory Strategies</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/multi-agent-systems/">Multi Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/planning-algorithms/">Planning Algorithms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/planning-vs-reactive/">Planning Vs Reactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/prompt-injection/">Prompt Injection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/sandboxing-agents/">Sandboxing Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/self-evolving-memory/">Self Evolving Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/stateless-stateful-agents/">Stateless Stateful Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/symbolic-llm-reasoning/">Symbolic Llm Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/testing/">Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-chaining/">Tool Chaining</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-hallucination/">Tool Hallucination</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-schema-latency/">Tool Schema Latency</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-selection/">Tool Selection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/uncertainty-handling/">Uncertainty Handling</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/use-cases/">Use Cases</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/1-agent-strategy-use-case-identification(1).html">1 Agent Strategy Use Case Identification(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/17-agent-reliability-engineering.html">17 Agent Reliability Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/18-agent-economics(1).html">18 Agent Economics(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/18-agent-economics.html">18 Agent Economics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/19-agent-compliance-and-risk(1).html">19 Agent Compliance And Risk(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/19-agent-compliance-and-risk.html">19 Agent Compliance And Risk</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-ai-index-dataknobs-theme(1).html">Agent Ai Index Dataknobs Theme(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/chunking-and-tokenization.html">Chunking And Tokenization</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Knobs for AI governance</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+<script>
+const b=document.getElementById('menuButton'),n=document.getElementById('mobileNav');
+if(b&&n){b.addEventListener('click',()=>{const o=n.classList.toggle('is-open');b.setAttribute('aria-expanded',String(o));});}
+</script>
+
+
+</body></html>

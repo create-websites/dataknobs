@@ -1,776 +1,267 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <meta content="Comprehensive guide to LLM concerns and issues. Explore copyright challenges, hallucination problems, uncontrolled creativity, ethical concerns, security threats, and environmental impacts of Large Language Models." name="description"/>
-    <meta content="LLM Concerns, AI Ethics, Hallucination, Copyright Issues, Bias, Privacy, Deepfakes, Misinformation, Environmental Impact, AI Security, Ethical AI, Responsible AI" name="keywords"/>
-    <meta content="Data Knobs" name="author"/>
-    <title>LLM Concerns &amp; Issues | Ethical and Technical Challenges</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        header h1 {
-            font-size: 2.8em;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        header p {
-            font-size: 1.1em;
-            font-weight: 300;
-            opacity: 0.95;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .section {
-            background: white;
-            margin-bottom: 40px;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        .section h2 {
-            color: #667eea;
-            font-size: 2em;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #764ba2;
-        }
-
-        .section h3 {
-            color: #764ba2;
-            font-size: 1.5em;
-            margin-top: 30px;
-            margin-bottom: 20px;
-        }
-
-        .slide-image {
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        .slide-image img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .concern-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin: 30px 0;
-        }
-
-        .concern-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f7 100%);
-            padding: 25px;
-            border-radius: 10px;
-            border-left: 5px solid #667eea;
-            transition: all 0.3s ease;
-        }
-
-        .concern-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.2);
-        }
-
-        .concern-card h4 {
-            color: #667eea;
-            margin-bottom: 12px;
-            font-size: 1.2em;
-        }
-
-        .concern-card p {
-            font-size: 0.95em;
-            color: #555;
-            line-height: 1.5;
-        }
-
-        .issue-detail {
-            background: #f9fafb;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border-left: 4px solid #667eea;
-        }
-
-        .issue-detail h5 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 1.05em;
-        }
-
-        .issue-detail p {
-            color: #666;
-            font-size: 0.95em;
-            margin: 8px 0;
-        }
-
-        .issue-list {
-            list-style: none;
-            margin: 20px 0;
-        }
-
-        .issue-list li {
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-            padding-left: 30px;
-            position: relative;
-        }
-
-        .issue-list li:last-child {
-            border-bottom: none;
-        }
-
-        .issue-list li:before {
-            content: "⚠️";
-            position: absolute;
-            left: 0;
-            color: #e74c3c;
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 30px 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .comparison-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .comparison-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            color: #555;
-        }
-
-        .comparison-table tr:hover {
-            background: #f9f9f9;
-        }
-
-        .threat-box {
-            background: linear-gradient(135deg, #fee 0%, #fdd 100%);
-            border-left: 5px solid #e74c3c;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 25px 0;
-        }
-
-        .threat-box h4 {
-            color: #c0392b;
-            margin-bottom: 10px;
-        }
-
-        .threat-box p {
-            color: #8b0000;
-            font-size: 0.95em;
-        }
-
-        .solution-box {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            border-left: 5px solid #27ae60;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 25px 0;
-        }
-
-        .solution-box h4 {
-            color: #155724;
-            margin-bottom: 10px;
-        }
-
-        .solution-box p, .solution-box li {
-            color: #155724;
-            font-size: 0.95em;
-        }
-
-        .solution-box ul {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
-
-        .solution-box li {
-            margin: 8px 0;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            margin: 5px 5px 5px 0;
-            font-weight: 600;
-        }
-
-        .badge.critical {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .badge.ethical {
-            background: #9b59b6;
-            color: white;
-        }
-
-        .badge.technical {
-            background: #3498db;
-            color: white;
-        }
-
-        .badge.environmental {
-            background: #16a085;
-            color: white;
-        }
-
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin: 30px 0;
-        }
-
-        .column-card {
-            background: #f9fafb;
-            padding: 25px;
-            border-radius: 10px;
-            border-top: 4px solid #667eea;
-        }
-
-        .column-card h4 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        .impact-severity {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.85em;
-            margin-left: 10px;
-        }
-
-        .severity-high {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .severity-medium {
-            background: #f39c12;
-            color: white;
-        }
-
-        .severity-low {
-            background: #27ae60;
-            color: white;
-        }
-
-        .highlight-box {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-left: 4px solid #667eea;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 25px 0;
-        }
-
-        .highlight-box h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .highlight-box p {
-            color: #666;
-            font-size: 0.95em;
-        }
-
-        .section-intro {
-            background: #f0f4f8;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border-left: 4px solid #667eea;
-        }
-
-        .section-intro p {
-            color: #666;
-            font-size: 1em;
-            line-height: 1.6;
-        }
-
-        footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 30px;
-            margin-top: 60px;
-        }
-
-        footer p {
-            margin: 5px 0;
-        }
-
-        .cta-warning {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        .cta-warning h3 {
-            color: white;
-            margin-bottom: 15px;
-        }
-
-        .cta-warning p {
-            font-size: 1.05em;
-            line-height: 1.6;
-        }
-
-        .roadmap {
-            background: #f9fafb;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .roadmap-item {
-            padding: 15px;
-            border-left: 4px solid #667eea;
-            margin: 15px 0;
-            background: white;
-            border-radius: 4px;
-        }
-
-        .roadmap-item strong {
-            color: #667eea;
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2em;
-            }
-
-            .section {
-                padding: 20px;
-            }
-
-            .section h2 {
-                font-size: 1.5em;
-            }
-
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-
-            .concern-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .comparison-table {
-                font-size: 0.9em;
-            }
-
-            .comparison-table th,
-            .comparison-table td {
-                padding: 10px;
-            }
-        }
-    </style>
-<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>LLM Concerns: Technical, Ethical &amp; Security Challenges</title>
+<meta content="Review LLM concerns across hallucination, controllability, security, privacy, copyright, bias, misuse, resource intensity, and sustainability." name="description"/>
+<meta content="LLM Concerns, AI Ethics, Hallucination, Copyright Issues, Bias, Privacy, Deepfakes, Misinformation, Environmental Impact, AI Security, Ethical AI, Responsible AI" name="keywords"/>
+<meta content="DataKnobs" name="author"/>
+<meta content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" name="robots"/>
+<meta content="article" property="og:type"/>
+<meta content="LLM Concerns: Technical, Ethical &amp; Security Challenges" property="og:title"/>
+<meta content="Review LLM concerns across hallucination, controllability, security, privacy, copyright, bias, misuse, resource intensity, and sustainability." property="og:description"/>
+<meta content="DataKnobs" property="og:site_name"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-1.png" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="LLM Concerns: Technical, Ethical &amp; Security Challenges" name="twitter:title"/>
+<meta content="Review LLM concerns across hallucination, controllability, security, privacy, copyright, bias, misuse, resource intensity, and sustainability." name="twitter:description"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-1.png" name="twitter:image"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
+<link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "LLM Concerns: Technical, Ethical & Security Challenges", "description": "Review LLM concerns across hallucination, controllability, security, privacy, copyright, bias, misuse, resource intensity, and sustainability.", "publisher": {"@type": "Organization", "name": "DataKnobs", "url": "https://www.dataknobs.com/"}, "author": {"@type": "Organization", "name": "DataKnobs"}, "image": "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-1.png"}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-JF94J1W5MC');</script>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-JF94J1W5MC');
-</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
-<body>
-    <header>
-        <h1>LLM Concerns &amp; Issues</h1>
-        <p>Understanding the Challenges in Large Language Models</p>
-        <p style="font-size: 0.95em; margin-top: 10px; opacity: 0.9;">Can Machines be Creators? Rethink Copyright in the Age of AI</p>
-    </header>
-
-    <div class="container">
-        <!-- Section 1: Overview of LLM Concerns -->
-        <div class="section">
-            <h2>01. Four Major Categories of LLM Concerns</h2>
-            
-            <div class="slide-image">
-                <img alt="LLM Concerns Overview" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-1.png"/>
-            </div>
-
-            <div class="section-intro">
-                <p>As Large Language Models become increasingly integrated into business and society, critical concerns have emerged across four main dimensions. Understanding these challenges is essential for responsible AI deployment and development.</p>
-            </div>
-
-            <div class="concern-grid">
-                <div class="concern-card">
-                    <h4>📜 Copyright Issues</h4>
-                    <p>Questions about intellectual property rights, fair use, and the legal status of content generated from copyrighted training data.</p>
-                    <p style="margin-top: 10px; font-size: 0.85em; color: #999;">Rethink copyright in the age of AI</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4>🤖 Hallucination</h4>
-                    <p>LLMs can confidently produce false, fabricated, or misleading information while appearing convincing and authoritative.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4>🎨 Uncontrolled Creativity</h4>
-                    <p>Models generate unpredictable outputs that can be difficult to control, constrain, or align with intended purposes and values.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4>⚖️ Ethical Concerns</h4>
-                    <p>Broader ethical implications including bias, discrimination, privacy violations, and misuse potential of AI-generated content.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 2: LLM Threats & Risks -->
-        <div class="section">
-            <h2>02. LLM Threats &amp; Risks Taxonomy</h2>
-            
-            <div class="slide-image">
-                <img alt="LLM Threats" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-2.png"/>
-            </div>
-
-            <div class="section-intro">
-                <p>LLM threats exist on a spectrum from existing risks that have evolved, to entirely new threats that emerge with this technology. Understanding this taxonomy helps organizations prioritize mitigation strategies.</p>
-            </div>
-
-            <div class="two-column">
-                <div class="column-card">
-                    <h4>🔴 Existing Threats (Evolving)</h4>
-                    <ul style="margin-left: 20px; margin-top: 10px;">
-                        <li>Discriminatory outcomes from AI bias</li>
-                        <li>Lack of explainability and trust</li>
-                        <li>Privacy violations and data leaks</li>
-                        <li>Security vulnerabilities</li>
-                        <li>Copyright infringement issues</li>
-                    </ul>
-                </div>
-                <div class="column-card">
-                    <h4>🟠 New &amp; Emerging Threats</h4>
-                    <ul style="margin-left: 20px; margin-top: 10px;">
-                        <li>Convincing synthetic fake content</li>
-                        <li>Deepfakes and impersonation</li>
-                        <li>Personalized phishing attacks</li>
-                        <li>Adaptive malware generation</li>
-                        <li>Vulnerability exploitation</li>
-                        <li>Scaled cyber attacks</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="threat-box">
-                <h4>⚠️ Critical Risk: Low Barrier to Cyber Attacks</h4>
-                <p>LLMs dramatically lower the barrier for launching sophisticated cyber attacks. Attackers no longer need deep technical expertise to craft convincing phishing emails, find vulnerabilities, or generate malware variations. This democratization of attack capabilities is a significant emerging threat.</p>
-            </div>
-        </div>
-
-        <!-- Section 3: Technical Challenges -->
-        <div class="section">
-            <h2>03. Challenges in Using LLMs</h2>
-            
-            <div class="slide-image">
-                <img alt="Challenges in Using LLMs" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-3.png"/>
-            </div>
-
-            <div class="section-intro">
-                <p>Beyond security and ethical concerns, LLMs present significant technical and operational challenges that organizations must address for successful deployment.</p>
-            </div>
-
-            <div class="concern-grid">
-                <div class="concern-card">
-                    <h4><span class="badge critical">Critical</span>Uncontrolled Output</h4>
-                    <p>LLMs can produce unexpected, unpredictable, or undesired outputs that are difficult to constrain or align with specific requirements.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge critical">Critical</span>Hallucination</h4>
-                    <p>Models generate false information confidently, making it difficult for users to distinguish fact from fiction without verification.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge critical">Critical</span>Resource Intensive</h4>
-                    <p>LLMs require significant computational resources, high GPU/CPU infrastructure, and ongoing operational costs.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge technical">Technical</span>Data Poisoning</h4>
-                    <p>LLMs are susceptible to attacks where malicious data is injected into training or operational datasets to degrade performance.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge ethical">Ethical</span>Copyright Issues</h4>
-                    <p>Training on copyrighted material without permission raises legal and ethical questions about intellectual property rights.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge ethical">Ethical</span>Unethical Content</h4>
-                    <p>Models can generate harmful, offensive, or illegal content if not properly constrained and monitored.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge ethical">Ethical</span>Bias Issues</h4>
-                    <p>LLMs inherit biases from training data, potentially perpetuating or amplifying discrimination in outputs.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge critical">Critical</span>Model Size</h4>
-                    <p>Large model sizes create practical deployment challenges, making some models expensive or impractical to run.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge critical">Critical</span>Illegal Output</h4>
-                    <p>Models may produce outputs that violate laws or regulations despite safety measures.</p>
-                </div>
-            </div>
-
-            <div class="highlight-box">
-                <h4>Key Technical Insight</h4>
-                <p>The fundamental challenge is that LLMs are <strong>self-supervised and unsupervised systems</strong>. There is no ground truth during training, making quality assessment and accuracy measurement inherently difficult across the variety of tasks these models can perform.</p>
-            </div>
-        </div>
-
-        <!-- Section 4: Uncontrolled Behavior Deep Dive -->
-        <div class="section">
-            <h2>04. LLM Uncontrolled Behavior - Root Causes</h2>
-            
-            <div class="slide-image">
-                <img alt="LLM Uncontrolled Behavior" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-4.png"/>
-            </div>
-
-            <div class="section-intro">
-                <p>Understanding why LLMs behave unpredictably requires examining fundamental architectural and design characteristics of these models.</p>
-            </div>
-
-            <h3>Three Core Reasons for Uncontrolled Behavior</h3>
-
-            <div class="issue-detail">
-                <h5>1. Unsupervised/Self-Supervised Learning Paradigm</h5>
-                <p><strong>Problem:</strong> Generative AI models are trained without labeled ground truth, making it impossible to evaluate accuracy even on training data.</p>
-                <p><strong>Consequence:</strong> By design, models produce different outputs::including fiction::making accuracy quantification extremely difficult.</p>
-                <p><strong>Impact:</strong> No objective measure of "correctness" for many outputs, leading to unpredictable quality.</p>
-            </div>
-
-            <div class="issue-detail">
-                <h5>2. Multi-Task, Multi-Domain Versatility</h5>
-                <p><strong>Problem:</strong> LLMs are designed to handle Q&amp;A, content writing, summarization, translation, and dozens of other tasks with a single model.</p>
-                <p><strong>Consequence:</strong> Providing accurate evaluation metrics for such varied outputs is nearly impossible.</p>
-                <p><strong>Impact:</strong> Quality and behavior varies dramatically depending on task and input, making it hard to predict performance.</p>
-            </div>
-
-            <div class="issue-detail">
-                <h5>3. Complex Deep Learning Architecture</h5>
-                <p><strong>Problem:</strong> LLMs are complex deep learning models with billions of parameters and intricate internal mechanisms.</p>
-                <p><strong>Consequence:</strong> It is extremely difficult to explain model behavior, test for all edge cases, or predict failure modes.</p>
-                <p><strong>Impact:</strong> Models operate as "black boxes"::we can't fully understand why they produce specific outputs.</p>
-            </div>
-
-            <div class="solution-box">
-                <h4>✅ Mitigation Strategies</h4>
-                <ul>
-                    <li>Implement robust <strong>output filtering and validation</strong> systems</li>
-                    <li>Use <strong>retrieval-augmented generation (RAG)</strong> to ground outputs in verified data</li>
-                    <li>Apply <strong>constitutional AI</strong> techniques for behavioral constraints</li>
-                    <li>Conduct extensive <strong>testing and red-teaming</strong> before deployment</li>
-                    <li>Monitor outputs with <strong>human review</strong> in critical applications</li>
-                    <li>Implement <strong>uncertainty quantification</strong> to indicate confidence levels</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Section 5: Ethical Concerns -->
-        <div class="section">
-            <h2>05. Ethical Concerns in Using LLMs</h2>
-            
-            <div class="slide-image">
-                <img alt="Ethical Concerns in Using LLMs" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-5.png"/>
-            </div>
-
-            <div class="section-intro">
-                <p>Beyond technical capabilities, LLMs raise profound ethical questions about truth, identity, and societal impact.</p>
-            </div>
-
-            <div class="concern-grid">
-                <div class="concern-card">
-                    <h4>📜 Copyright Issues <span class="impact-severity severity-high">HIGH</span></h4>
-                    <p>Training on copyrighted material without permission and generating copyrighted content raises legal liability questions.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4>🤥 Misinformation <span class="impact-severity severity-high">HIGH</span></h4>
-                    <p>Can generate factually incorrect information that appears convincing, spreading false information at scale.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4>⚖️ Bias &amp; Discrimination <span class="impact-severity severity-high">HIGH</span></h4>
-                    <p>Inherited from training data, leading to discriminatory or biased outputs that harm marginalized groups.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4>🎭 Deepfakes <span class="impact-severity severity-high">HIGH</span></h4>
-                    <p>Can generate convincing fake content::text, images, video::used for impersonation or disinformation.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4>👤 Impersonation <span class="impact-severity severity-high">HIGH</span></h4>
-                    <p>Ability to generate content mimicking specific individuals, risking fraud, identity theft, or defamation.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4>🚀 Scaled Attacks <span class="impact-severity severity-high">HIGH</span></h4>
-                    <p>LLMs can be weaponized to launch sophisticated, personalized cyber attacks at enormous scale.</p>
-                </div>
-            </div>
-
-            <h3>Addressing Ethical Concerns</h3>
-
-            <div class="issue-detail">
-                <h5>1. Transparency &amp; Explainability</h5>
-                <p>Organizations must be transparent about data sources and clearly explain model predictions and limitations to users.</p>
-            </div>
-
-            <div class="issue-detail">
-                <h5>2. Bias Mitigation</h5>
-                <p>Design systems specifically to detect, measure, and handle bias in training data and model outputs.</p>
-            </div>
-
-            <div class="issue-detail">
-                <h5>3. Data Privacy &amp; Protection</h5>
-                <p>Establish clear procedures for data collection, storage, sensitivity classification, and access controls. Educate employees on privacy responsibilities.</p>
-            </div>
-
-            <div class="issue-detail">
-                <h5>4. IP &amp; Copyright Compliance</h5>
-                <p>Understand applicable laws, ensure training data complies with regulations, and verify generated content doesn't violate IP rights.</p>
-            </div>
-
-            <div class="issue-detail">
-                <h5>5. Incident Management</h5>
-                <p>Establish reporting and feedback mechanisms, review both inputs and outputs for violations, educate users about responsible use.</p>
-            </div>
-        </div>
-
-        <!-- Section 6: Data Ownership Questions -->
-        <div class="section">
-            <h2>06. Data Ownership - Open Questions</h2>
-            
-            <div class="slide-image">
-                <img alt="Data Ownership - Open Questions" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-6.png"/>
-            </div>
-
-            <div class="section-intro">
-                <p>LLMs are trained on massive datasets scraped from the web. This raises fundamental questions about data rights, consent, and fair compensation that remain largely unanswered.</p>
-            </div>
-
-            <div class="comparison-table">
-                
-                    
-                        Issue Type
-                        Key Questions
-                        Current Status
-                    
-                
-                
-                    
-                        <strong>Consent</strong> <span class="impact-severity severity-high">CRITICAL</span>
-                        
-                            • Does a company have the right to use web content for training?<br/>
-                            • Should content owners grant different licenses for reading vs. training?<br/>
-                            • Will opt-out mechanisms exist for future data collection?
-                        
-                        ⚠️ Unresolved
-                    
-                    
-                        <strong>Genuine Quality</strong> <span class="impact-severity severity-medium">MEDIUM</span>
-                        
-                            • Which web sources have high-quality content?<br/>
-                            • How can we distinguish reliable from unreliable sources?<br/>
-                            • What's the source of training data quality?
-                        
-                        ⚠️ Unresolved
-                    
-                    
-                        <strong>Data Poisoning</strong> <span class="impact-severity severity-high">CRITICAL</span>
-                        
-                            • What if malicious actors inject bad data into sources?<br/>
-                            • How can we prevent data poisoning attacks?<br/>
-                            • How do we detect poisoned training data?
-                        
-                        ⚠️ Unresolved
-                    
-                    
-                        <strong>Copyright</strong> <span class="impact-severity severity-high">CRITICAL</span>
-                        
-                            • Who owns content created by LLMs trained on copyrighted material?<br/>
-                            • If Site A publishes content, LLM learns it, Site B republishes it::who owns it?<br/>
-                            • Does original creator receive compensation?
-                        
-                        🔴 Active Litigation
-                    
-                
-            
-
-            <div class="threat-box">
-                <h4>The Core Dilemma</h4>
-                <p>A publisher creates original content. An LLM learns from it. A second company uses that LLM to generate similar content and gains more traffic than the original creator. Who benefits? Who should be compensated? Current legal frameworks don't have clear answers.</p>
-            </div>
-        </div>
-
-        <!-- Section 7: Data Output Questions -->
-        <div class="section">
-            <h2>07. Data Output - Open Questions</h2>
-            
-            <div class="slide-image">
-                <img alt="Data Output - Open Questions" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-7.png"/>
-            </div>
-
-            <div class="section-intro">
-                <p>Beyond training concerns, the content LLMs generate raises equally important questions about factuality, harm potential, and cultural representation.</p>
-            </div>
-
-            <div class="comparison-table">
+</script></head><body class="dk-page"><header class="dk-header"><div class="dk-container dk-header-inner"><div class="dk-header-row">
+<a aria-label="DataKnobs home" class="dk-logo-link" href="https://www.dataknobs.com/"><img alt="DataKnobs" class="dk-logo" height="72" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" width="240"/></a>
+<nav aria-label="Primary navigation" class="dk-nav dk-nav--desktop"><a class="dk-nav-link" href="https://www.dataknobs.com/data-products/">Data Products</a><a class="dk-nav-link" href="https://www.dataknobs.com/generativeai/">Generative AI</a><a class="dk-nav-link" href="https://www.dataknobs.com/agentic-ai/">Agentic AI</a><a class="dk-nav-link" href="https://www.dataknobs.com/embeddings/">Embeddings</a><a class="dk-btn dk-btn--primary dk-btn--sm" href="https://www.dataknobs.com/search.html">Search</a></nav>
+<button aria-controls="mobileNav" aria-expanded="false" aria-label="Open navigation" class="dk-menu-button" id="menuButton" type="button"><svg aria-hidden="true" class="dk-menu-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button></div>
+<nav aria-label="Mobile navigation" class="dk-mobile-nav" id="mobileNav"><div class="dk-mobile-nav-list"><a class="dk-mobile-link" href="https://www.dataknobs.com/data-products/">Data Products</a><a class="dk-mobile-link" href="https://www.dataknobs.com/generativeai/">Generative AI</a><a class="dk-mobile-link" href="https://www.dataknobs.com/agentic-ai/">Agentic AI</a><a class="dk-mobile-link" href="https://www.dataknobs.com/embeddings/">Embeddings</a><a class="dk-mobile-link" href="https://www.dataknobs.com/search.html">Search</a></div></nav>
+</div></header><section class="dk-hero dk-hero--article dk-hero--article-rich"><div class="dk-container dk-hero-grid"><div class="dk-hero-copy"><span class="dk-badge dk-badge--inverse">Generative AI • Responsible AI</span><h1 class="dk-hero-title">LLM Concerns &amp; Issues: Technical, Ethical, Security and Sustainability Challenges</h1><p class="dk-hero-lead">A structured review of LLM risk across factuality, controllability, security, privacy, copyright, bias, misuse, resource intensity and environmental impact.</p><div class="dk-article-kicker-row"><span class="dk-article-kicker">Technical guide</span><span class="dk-article-kicker">Architecture + evaluation</span><span class="dk-article-kicker">DataKnobs</span></div></div><div class="dk-hero-visual"><div class="dk-hero-architecture"><div class="dk-hero-stage dk-hero-stage--center"><p class="dk-hero-stage-label">Decision frame</p><p class="dk-hero-stage-title">Design the system, then measure the outcome.</p><p class="dk-hero-stage-copy">Separate the model, data, controls and operating assumptions so each can be evaluated deliberately.</p></div><div class="dk-hero-stage-row"><div class="dk-hero-stage"><p class="dk-hero-stage-label">Quality</p><p class="dk-hero-stage-title">Can the output be trusted?</p><p class="dk-hero-stage-copy">Evaluate factuality, consistency, provenance and failure modes.</p></div><div class="dk-hero-stage"><p class="dk-hero-stage-label">Governance</p><p class="dk-hero-stage-title">Is use policy-compliant?</p><p class="dk-hero-stage-copy">Address privacy, bias, copyright and responsible-use requirements.</p></div><div class="dk-hero-stage"><p class="dk-hero-stage-label">Operations</p><p class="dk-hero-stage-title">Can risk be controlled?</p><p class="dk-hero-stage-copy">Apply security, monitoring, resource and sustainability controls.</p></div></div><div class="dk-hero-stage dk-hero-stage--knobs"><p class="dk-hero-stage-label">DataKnobs principle</p><p class="dk-hero-stage-title">Make important choices explicit, measurable and governable.</p></div></div></div></div></section><div class="dk-breadcrumb"><div class="dk-container dk-breadcrumb-inner"><a href="https://www.dataknobs.com/">Home</a><span class="dk-breadcrumb-sep">/</span><a href="https://www.dataknobs.com/generativeai/">Generative AI</a><span class="dk-breadcrumb-sep">/</span><span class="dk-breadcrumb-current">LLM Concerns &amp; Issues: Technical, Ethical, Security and Sustainability Challenges</span></div></div><main><section class="dk-article-shell"><div class="dk-container dk-article-layout"><article class="dk-article-content"><div class="dk-prose"><div class="dk-article-summary-grid"><div class="dk-article-summary-card"><strong>Quality</strong><span>Factuality, hallucination, output variability and evaluation.</span></div><div class="dk-article-summary-card"><strong>Governance</strong><span>Bias, privacy, copyright, safety and accountability.</span></div><div class="dk-article-summary-card"><strong>Operations</strong><span>Security, resource intensity and environmental impact.</span></div></div><div class="section">
+<h2 id="01-four-major-categories-of-llm-concerns">01. Four Major Categories of LLM Concerns</h2>
+<div class="dk-slide-frame">
+<img alt="LLM Concerns Overview" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-1.png"/>
+</div>
+<div class="dk-callout">
+<p>As Large Language Models become increasingly integrated into business and society, critical concerns have emerged across four main dimensions. Understanding these challenges is essential for responsible AI deployment and development.</p>
+</div>
+<div class="dk-card-grid dk-grid-3">
+<article class="dk-card">
+<h3 id="copyright-issues">Copyright Issues</h3>
+<p>Questions about intellectual property rights, fair use, and the legal status of content generated from copyrighted training data.</p>
+<p>Rethink copyright in the age of AI</p>
+</article>
+<article class="dk-card">
+<h3 id="hallucination">Hallucination</h3>
+<p>LLMs can confidently produce false, fabricated, or misleading information while appearing convincing and authoritative.</p>
+</article>
+<article class="dk-card">
+<h3 id="uncontrolled-creativity">Uncontrolled Creativity</h3>
+<p>Models generate unpredictable outputs that can be difficult to control, constrain, or align with intended purposes and values.</p>
+</article>
+<article class="dk-card">
+<h3 id="ethical-concerns">Ethical Concerns</h3>
+<p>Broader ethical implications including bias, discrimination, privacy violations, and misuse potential of AI-generated content.</p>
+</article>
+</div>
+</div><div class="section">
+<h2 id="02-llm-threats-risks-taxonomy">02. LLM Threats &amp; Risks Taxonomy</h2>
+<div class="dk-slide-frame">
+<img alt="LLM Threats" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-2.png"/>
+</div>
+<div class="dk-callout">
+<p><a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> threats exist on a spectrum from existing risks that have evolved, to entirely new threats that emerge with this technology. Understanding this taxonomy helps organizations prioritize mitigation strategies.</p>
+</div>
+<div class="dk-card-grid dk-grid-2">
+<article class="dk-card">
+<h3 id="existing-threats-evolving">Existing Threats (Evolving)</h3>
+<ul>
+<li>Discriminatory outcomes from AI bias</li>
+<li>Lack of explainability and trust</li>
+<li>Privacy violations and data leaks</li>
+<li>Security vulnerabilities</li>
+<li>Copyright infringement issues</li>
+</ul>
+</article>
+<article class="dk-card">
+<h3 id="new-emerging-threats">New &amp; Emerging Threats</h3>
+<ul>
+<li>Convincing synthetic fake content</li>
+<li>Deepfakes and impersonation</li>
+<li>Personalized phishing attacks</li>
+<li>Adaptive malware generation</li>
+<li>Vulnerability exploitation</li>
+<li>Scaled cyber attacks</li>
+</ul>
+</article>
+</div>
+<div class="dk-callout dk-callout--warning">
+<h3 id="critical-risk-low-barrier-to-cyber-attacks">Critical Risk: Low Barrier to Cyber Attacks</h3>
+<p>LLMs dramatically lower the barrier for launching sophisticated cyber attacks. Attackers no longer need deep technical expertise to craft convincing phishing emails, find vulnerabilities, or generate malware variations. This democratization of attack capabilities is a significant emerging threat.</p>
+</div>
+</div><div class="section">
+<h2 id="03-challenges-in-using-llms">03. Challenges in Using LLMs</h2>
+<div class="dk-slide-frame">
+<img alt="Challenges in Using LLMs" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-3.png"/>
+</div>
+<div class="dk-callout">
+<p>Beyond security and ethical concerns, LLMs present significant technical and operational challenges that organizations must address for successful deployment.</p>
+</div>
+<div class="dk-card-grid dk-grid-3">
+<article class="dk-card">
+<h3 id="critical-uncontrolled-output"><span class="dk-risk-badge dk-risk-badge--high">Critical</span>Uncontrolled Output</h3>
+<p>LLMs can produce unexpected, unpredictable, or undesired outputs that are difficult to constrain or align with specific requirements.</p>
+</article>
+<article class="dk-card">
+<h3 id="critical-hallucination"><span class="dk-risk-badge dk-risk-badge--high">Critical</span>Hallucination</h3>
+<p>Models generate false information confidently, making it difficult for users to distinguish fact from fiction without verification.</p>
+</article>
+<article class="dk-card">
+<h3 id="critical-resource-intensive"><span class="dk-risk-badge dk-risk-badge--high">Critical</span>Resource Intensive</h3>
+<p>LLMs require significant computational resources, high GPU/CPU infrastructure, and ongoing operational costs.</p>
+</article>
+<article class="dk-card">
+<h3 id="technical-data-poisoning"><span class="dk-risk-badge">Technical</span>Data Poisoning</h3>
+<p>LLMs are susceptible to attacks where malicious data is injected into training or operational datasets to degrade performance.</p>
+</article>
+<article class="dk-card">
+<h3 id="ethical-copyright-issues"><span class="dk-risk-badge">Ethical</span>Copyright Issues</h3>
+<p>Training on copyrighted material without permission raises legal and ethical questions about intellectual property rights.</p>
+</article>
+<article class="dk-card">
+<h3 id="ethical-unethical-content"><span class="dk-risk-badge">Ethical</span>Unethical Content</h3>
+<p>Models can generate harmful, offensive, or illegal content if not properly constrained and monitored.</p>
+</article>
+<article class="dk-card">
+<h3 id="ethical-bias-issues"><span class="dk-risk-badge">Ethical</span>Bias Issues</h3>
+<p>LLMs inherit biases from training data, potentially perpetuating or amplifying discrimination in outputs.</p>
+</article>
+<article class="dk-card">
+<h3 id="critical-model-size"><span class="dk-risk-badge dk-risk-badge--high">Critical</span>Model Size</h3>
+<p>Large model sizes create practical deployment challenges, making some models expensive or impractical to run.</p>
+</article>
+<article class="dk-card">
+<h3 id="critical-illegal-output"><span class="dk-risk-badge dk-risk-badge--high">Critical</span>Illegal Output</h3>
+<p>Models may produce outputs that violate laws or regulations despite safety measures.</p>
+</article>
+</div>
+<div class="dk-callout">
+<h3 id="key-technical-insight">Key Technical Insight</h3>
+<p>The fundamental challenge is that LLMs are <strong>self-supervised and unsupervised systems</strong>. There is no ground truth during training, making quality assessment and accuracy measurement inherently difficult across the variety of tasks these models can perform.</p>
+</div>
+</div><div class="section">
+<h2 id="04-llm-uncontrolled-behavior-root-causes">04. LLM Uncontrolled Behavior - Root Causes</h2>
+<div class="dk-slide-frame">
+<img alt="LLM Uncontrolled Behavior" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-4.png"/>
+</div>
+<div class="dk-callout">
+<p>Understanding why LLMs behave unpredictably requires examining fundamental architectural and design characteristics of these models.</p>
+</div>
+<h3 id="three-core-reasons-for-uncontrolled-behavior">Three Core Reasons for Uncontrolled Behavior</h3>
+<div class="dk-guide-panel">
+<h3 id="1-unsupervised-self-supervised-learning-paradigm">1. Unsupervised/Self-Supervised Learning Paradigm</h3>
+<p><strong>Problem:</strong> <a href="https://www.dataknobs.com/generativeai/">Generative AI</a> models are trained without labeled ground truth, making it impossible to evaluate accuracy even on training data.</p>
+<p><strong>Consequence:</strong> By design, models produce different outputs :  including fiction :  making accuracy quantification extremely difficult.</p>
+<p><strong>Impact:</strong> No objective measure of "correctness" for many outputs, leading to unpredictable quality.</p>
+</div>
+<div class="dk-guide-panel">
+<h3 id="2-multi-task-multi-domain-versatility">2. Multi-Task, Multi-Domain Versatility</h3>
+<p><strong>Problem:</strong> LLMs are designed to handle Q&amp;A, content writing, summarization, translation, and dozens of other tasks with a single model.</p>
+<p><strong>Consequence:</strong> Providing accurate evaluation metrics for such varied outputs is nearly impossible.</p>
+<p><strong>Impact:</strong> Quality and behavior varies dramatically depending on task and input, making it hard to predict performance.</p>
+</div>
+<div class="dk-guide-panel">
+<h3 id="3-complex-deep-learning-architecture">3. Complex Deep Learning Architecture</h3>
+<p><strong>Problem:</strong> LLMs are complex deep learning models with billions of parameters and intricate internal mechanisms.</p>
+<p><strong>Consequence:</strong> It is extremely difficult to explain model behavior, test for all edge cases, or predict failure modes.</p>
+<p><strong>Impact:</strong> Models operate as "black boxes" :  we can't fully understand why they produce specific outputs.</p>
+</div>
+<div class="dk-callout">
+<h3 id="mitigation-strategies">Mitigation Strategies</h3>
+<ul>
+<li>Implement robust <strong>output filtering and validation</strong> systems</li>
+<li>Use <strong>retrieval-augmented generation (RAG)</strong> to ground outputs in verified data</li>
+<li>Apply <strong>constitutional AI</strong> techniques for behavioral constraints</li>
+<li>Conduct extensive <strong>testing and red-teaming</strong> before deployment</li>
+<li>Monitor outputs with <strong>human review</strong> in critical applications</li>
+<li>Implement <strong>uncertainty quantification</strong> to indicate confidence levels</li>
+</ul>
+</div>
+</div><div class="section">
+<h2 id="05-ethical-concerns-in-using-llms">05. Ethical Concerns in Using LLMs</h2>
+<div class="dk-slide-frame">
+<img alt="Ethical Concerns in Using LLMs" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-5.png"/>
+</div>
+<div class="dk-callout">
+<p>Beyond technical capabilities, LLMs raise profound ethical questions about truth, identity, and societal impact.</p>
+</div>
+<div class="dk-card-grid dk-grid-3">
+<article class="dk-card">
+<h3 id="copyright-issues-high">Copyright Issues <span class="dk-risk-badge dk-risk-badge--high">HIGH</span></h3>
+<p>Training on copyrighted material without permission and generating copyrighted content raises legal liability questions.</p>
+</article>
+<article class="dk-card">
+<h3 id="misinformation-high">Misinformation <span class="dk-risk-badge dk-risk-badge--high">HIGH</span></h3>
+<p>Can generate factually incorrect information that appears convincing, spreading false information at scale.</p>
+</article>
+<article class="dk-card">
+<h3 id="bias-discrimination-high">Bias &amp; Discrimination <span class="dk-risk-badge dk-risk-badge--high">HIGH</span></h3>
+<p>Inherited from training data, leading to discriminatory or biased outputs that harm marginalized groups.</p>
+</article>
+<article class="dk-card">
+<h3 id="deepfakes-high">Deepfakes <span class="dk-risk-badge dk-risk-badge--high">HIGH</span></h3>
+<p>Can generate convincing fake content :  text, images, video :  used for impersonation or disinformation.</p>
+</article>
+<article class="dk-card">
+<h3 id="impersonation-high">Impersonation <span class="dk-risk-badge dk-risk-badge--high">HIGH</span></h3>
+<p>Ability to generate content mimicking specific individuals, risking fraud, identity theft, or defamation.</p>
+</article>
+<article class="dk-card">
+<h3 id="scaled-attacks-high">Scaled Attacks <span class="dk-risk-badge dk-risk-badge--high">HIGH</span></h3>
+<p>LLMs can be weaponized to launch sophisticated, personalized cyber attacks at enormous scale.</p>
+</article>
+</div>
+<h3 id="addressing-ethical-concerns">Addressing Ethical Concerns</h3>
+<div class="dk-guide-panel">
+<h3 id="1-transparency-explainability">1. Transparency &amp; Explainability</h3>
+<p>Organizations must be transparent about data sources and clearly explain model predictions and limitations to users.</p>
+</div>
+<div class="dk-guide-panel">
+<h3 id="2-bias-mitigation">2. Bias Mitigation</h3>
+<p>Design systems specifically to detect, measure, and handle bias in training data and model outputs.</p>
+</div>
+<div class="dk-guide-panel">
+<h3 id="3-data-privacy-protection">3. Data Privacy &amp; Protection</h3>
+<p>Establish clear procedures for data collection, storage, sensitivity classification, and access controls. Educate employees on privacy responsibilities.</p>
+</div>
+<div class="dk-guide-panel">
+<h3 id="4-ip-copyright-compliance">4. IP &amp; Copyright Compliance</h3>
+<p>Understand applicable laws, ensure training data complies with regulations, and verify generated content doesn't violate IP rights.</p>
+</div>
+<div class="dk-guide-panel">
+<h3 id="5-incident-management">5. Incident Management</h3>
+<p>Establish reporting and feedback mechanisms, review both inputs and outputs for violations, educate users about responsible use.</p>
+</div>
+</div><div class="section">
+<h2 id="06-data-ownership-open-questions">06. Data Ownership - Open Questions</h2>
+<div class="dk-slide-frame">
+<img alt="Data Ownership - Open Questions" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-6.png"/>
+</div>
+<div class="dk-callout">
+<p>LLMs are trained on massive datasets scraped from the web. This raises fundamental questions about data rights, consent, and fair compensation that remain largely unanswered.</p>
+</div>
+<div class="dk-table-wrap"><table class="dk-table"><thead><tr><th>Issue type</th><th>Key questions</th><th>Status</th></tr></thead><tbody>
+<tr><td>Consent <span>Critical</span></td><td>Rights to use web content for training; licensing differences between reading and training; opt-out mechanisms.</td><td>Unresolved</td></tr>
+<tr><td>Genuine Quality <span>Medium</span></td><td>How to identify high-quality, reliable sources and assess training-data quality.</td><td>Unresolved</td></tr>
+<tr><td>Data Poisoning <span>Critical</span></td><td>How to detect and prevent malicious data from entering training or operational sources.</td><td>Unresolved</td></tr>
+<tr><td>Copyright <span>Critical</span></td><td>Ownership and compensation questions when models learn from copyrighted works and generate related content.</td><td>Active litigation</td></tr>
+</tbody></table></div>
+<!-- Section 7: Data Output Questions -->
+<section class="dk-article-section">
+<h2 id="07-data-output-open-questions">07. Data Output - Open Questions</h2>
+<div class="dk-slide-frame">
+<img alt="Data Output - Open Questions" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-7.png"/>
+</div>
+<div class="dk-callout">
+<p>Beyond training concerns, the content LLMs generate raises equally important questions about factuality, harm potential, and cultural representation.</p>
+</div>
+<div class="dk-guide-panel">
                 
                     
                         Output Issue
@@ -783,217 +274,195 @@ gtag('config', 'G-JF94J1W5MC');
                     
                         <strong>Factual Errors</strong>
                         LLMs can produce misleading or factually incorrect results while appearing authoritative
-                        <span class="impact-severity severity-high">HIGH</span>
+                        <span class="dk-risk-badge dk-risk-badge--high">HIGH</span>
                         Fact-checking, RAG, human review
                     
                     
                         <strong>Harmful Content</strong>
                         Can generate violent, dangerous, or illegal content if not properly constrained
-                        <span class="impact-severity severity-high">HIGH</span>
+                        <span class="dk-risk-badge dk-risk-badge--high">HIGH</span>
                         Output filtering, content policies
                     
                     
                         <strong>Fake News</strong>
                         Can generate and propagate convincing but false news articles and misinformation
-                        <span class="impact-severity severity-high">HIGH</span>
+                        <span class="dk-risk-badge dk-risk-badge--high">HIGH</span>
                         Truth labeling, source verification
                     
                     
                         <strong>Cultural Bias</strong>
                         Can perpetuate homogeneity and misrepresentation of languages, cultures, and groups
-                        <span class="impact-severity severity-medium">MEDIUM</span>
+                        <span class="dk-risk-badge dk-risk-badge--medium">MEDIUM</span>
                         Diverse training, bias evaluation
                     
                 
             
 
-            <div class="solution-box">
-                <h4>✅ Best Practices for Output Safety</h4>
-                <ul>
-                    <li><strong>Implement verification:</strong> Cross-reference generated content against trusted sources</li>
-                    <li><strong>Use retrieval-augmented generation:</strong> Ground outputs in verified knowledge bases</li>
-                    <li><strong>Add disclaimers:</strong> Clearly indicate when content is AI-generated</li>
-                    <li><strong>Monitor for patterns:</strong> Track bias and harmful content generation trends</li>
-                    <li><strong>Human oversight:</strong> Maintain human review for critical outputs</li>
-                    <li><strong>Rapid response:</strong> Establish processes to remove harmful content quickly</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Section 8: Environmental Impact -->
-        <div class="section">
-            <h2>08. Environmental Issues &amp; Sustainability</h2>
-            
-            <div class="slide-image">
-                <img alt="Environmental Issues" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-8.png"/>
-            </div>
-
-            <div class="section-intro">
-                <p>LLMs are computationally expensive systems with significant environmental costs that often go unacknowledged in discussions about AI advancement.</p>
-            </div>
-
-            <div class="concern-grid">
-                <div class="concern-card">
-                    <h4><span class="badge environmental">Environmental</span>High Computational Cost</h4>
-                    <p>Generating responses requires significant compute, often more expensive than traditional search for routine queries.</p>
+            <div class="dk-callout">
+<h3 id="best-practices-for-output-safety">Best Practices for Output Safety</h3>
+<ul>
+<li><strong>Implement verification:</strong> Cross-reference generated content against trusted sources</li>
+<li><strong>Use retrieval-augmented generation:</strong> Ground outputs in verified knowledge bases</li>
+<li><strong>Add disclaimers:</strong> Clearly indicate when content is AI-generated</li>
+<li><strong>Monitor for patterns:</strong> Track bias and harmful content generation trends</li>
+<li><strong>Human oversight:</strong> Maintain human review for critical outputs</li>
+<li><strong>Rapid response:</strong> Establish processes to remove harmful content quickly</li>
+</ul>
+</div>
+</div>
+<!-- Section 8: Environmental Impact -->
+<section class="dk-article-section">
+<h2 id="08-environmental-issues-sustainability">08. Environmental Issues &amp; Sustainability</h2>
+<div class="dk-slide-frame">
+<img alt="Environmental Issues" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-8.png"/>
+</div>
+<div class="dk-callout">
+<p>LLMs are computationally expensive systems with significant environmental costs that often go unacknowledged in discussions about AI advancement.</p>
+</div>
+<div class="dk-card-grid dk-grid-3">
+<article class="dk-card">
+<h3 id="environmental-high-computational-cost"><span class="dk-risk-badge dk-risk-badge--good">Environmental</span>High Computational Cost</h3>
+<p>Generating responses requires significant compute, often more expensive than traditional search for routine queries.</p>
+</article>
+<article class="dk-card">
+<h3 id="environmental-infrastructure-requirements"><span class="dk-risk-badge dk-risk-badge--good">Environmental</span>Infrastructure Requirements</h3>
+<p>Demands massive CPU/GPU infrastructure, creating a barrier for smaller companies and concentrating power.</p>
+</article>
+<article class="dk-card">
+<h3 id="environmental-rare-metals-mining"><span class="dk-risk-badge dk-risk-badge--good">Environmental</span>Rare Metals &amp; Mining</h3>
+<p>Chip manufacturing requires rare earth metals, creating environmental and social costs from mining operations.</p>
+</article>
+<article class="dk-card">
+<h3 id="environmental-carbon-emissions"><span class="dk-risk-badge dk-risk-badge--good">Environmental</span>Carbon Emissions</h3>
+<p>Training and inference generate substantial carbon emissions, contributing to climate change.</p>
+</article>
+<article class="dk-card">
+<h3 id="environmental-water-consumption"><span class="dk-risk-badge dk-risk-badge--good">Environmental</span>Water Consumption</h3>
+<p>Data centers require significant water for cooling, straining local water resources.</p>
+</article>
+<article class="dk-card">
+<h3 id="environmental-energy-intensity"><span class="dk-risk-badge dk-risk-badge--good">Environmental</span>Energy Intensity</h3>
+<p>Operating large-scale data centers requires continuous energy supply, much of which comes from non-renewable sources.</p>
+</article>
+</div>
+<h3 id="environmental-impact-analysis">Environmental Impact Analysis</h3>
+<div class="dk-guide-panel">
+<h3 id="economic-cost">Economic Cost</h3>
+<p>Generating answers is often more expensive than alternative approaches. For routine queries, traditional search may be more efficient both computationally and economically.</p>
+</div>
+<div class="dk-guide-panel">
+<h3 id="carbon-footprint">Carbon Footprint</h3>
+<p>Training large models creates carbon emissions equivalent to the lifetime emissions of multiple vehicles. Inference also contributes to ongoing carbon generation.</p>
+</div>
+<div class="dk-guide-panel">
+<h3 id="resource-depletion">Resource Depletion</h3>
+<p>Data centers consume massive amounts of water. In drought-prone regions, this can compete with local communities' water needs.</p>
+</div>
+<div class="dk-guide-panel">
+<h3 id="hardware-sustainability">Hardware Sustainability</h3>
+<p>Short hardware lifecycles in data centers create electronic waste. Chip production creates toxic by-products and requires rare materials.</p>
+</div>
+<div class="dk-callout">
+<h3 id="environmental-responsibility">Environmental Responsibility</h3>
+<ul>
+<li><strong>Use renewable energy:</strong> Prioritize data centers powered by wind or solar</li>
+<li><strong>Optimize models:</strong> Develop more efficient models requiring less compute</li>
+<li><strong>Cache responses:</strong> Avoid recomputing answers to common questions</li>
+<li><strong>Measure impact:</strong> Track carbon emissions and water usage transparently</li>
+<li><strong>Right-size solutions:</strong> Use LLMs only when appropriate, not as default</li>
+<li><strong>Support sustainable practices:</strong> Advocate for renewable energy in data centers</li>
+</ul>
+</div>
+</section>
+<!-- Section 9: Summary & Framework -->
+<section class="dk-article-section">
+<h2 id="09-comprehensive-risk-framework">09. Comprehensive Risk Framework</h2>
+<div class="dk-slide-frame">
+<img alt="Comprehensive Framework" class="dk-slide-image" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-9.png"/>
+</div>
+<h3 id="llm-concerns-matrix">LLM Concerns Matrix</h3>
+<div class="dk-table-wrap"><table class="dk-table">
+<thead>
+<tr>
+<th>Concern Category</th>
+<th>Key Issues</th>
+<th>Severity</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Technical</strong></td>
+<td>Hallucination, Uncontrolled Output, Model Size</td>
+<td><span>HIGH</span></td>
+<td>Mitigations exist but incomplete</td>
+</tr>
+<tr>
+<td><strong>Ethical</strong></td>
+<td>Bias, Discrimination, Privacy, Copyright</td>
+<td><span>HIGH</span></td>
+<td>Under litigation/regulation</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Data Poisoning, Adversarial Attacks, Misuse</td>
+<td><span>HIGH</span></td>
+<td>Emerging threat landscape</td>
+</tr>
+<tr>
+<td><strong>Environmental</strong></td>
+<td>Energy Use, Carbon, Water, Resources</td>
+<td><span>MEDIUM</span></td>
+<td>Growing awareness</td>
+</tr>
+<tr>
+<td><strong>Legal/IP</strong></td>
+<td>Copyright, Consent, Data Ownership</td>
+<td><span>HIGH</span></td>
+<td>Rapidly evolving law</td>
+</tr>
+</tbody>
+</table></div>
+<div class="dk-card dk-card--brand">
+<h3 id="responsible-ai-deployment-requires">Responsible AI Deployment Requires</h3>
+<p>A multi-faceted approach addressing technical robustness, ethical alignment, legal compliance, security hardening, and environmental responsibility. Organizations deploying LLMs must acknowledge these concerns and implement comprehensive strategies rather than assuming risks will self-resolve.</p>
+</div>
+<h3 id="recommended-actions">Recommended Actions</h3>
+<div class="dk-timeline">
+<div class="dk-timeline-item">
+<strong>Immediate (Weeks 1-4):</strong> Audit current usage, identify sensitive applications, implement content filtering and output validation systems
                 </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge environmental">Environmental</span>Infrastructure Requirements</h4>
-                    <p>Demands massive CPU/GPU infrastructure, creating a barrier for smaller companies and concentrating power.</p>
+<div class="dk-timeline-item">
+<strong>Short-term (Months 1-3):</strong> Establish governance policies, conduct bias assessments, implement human review processes, document training data sources
                 </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge environmental">Environmental</span>Rare Metals &amp; Mining</h4>
-                    <p>Chip manufacturing requires rare earth metals, creating environmental and social costs from mining operations.</p>
+<div class="dk-timeline-item">
+<strong>Medium-term (Months 3-6):</strong> Develop incident response procedures, launch employee training, engage with legal teams on IP issues, measure carbon footprint
                 </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge environmental">Environmental</span>Carbon Emissions</h4>
-                    <p>Training and inference generate substantial carbon emissions, contributing to climate change.</p>
+<div class="dk-timeline-item">
+<strong>Long-term (Ongoing):</strong> Monitor regulatory developments, invest in responsible AI research, contribute to industry standards, publish transparency reports
                 </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge environmental">Environmental</span>Water Consumption</h4>
-                    <p>Data centers require significant water for cooling, straining local water resources.</p>
-                </div>
-
-                <div class="concern-card">
-                    <h4><span class="badge environmental">Environmental</span>Energy Intensity</h4>
-                    <p>Operating large-scale data centers requires continuous energy supply, much of which comes from non-renewable sources.</p>
-                </div>
-            </div>
-
-            <h3>Environmental Impact Analysis</h3>
-
-            <div class="issue-detail">
-                <h5>💰 Economic Cost</h5>
-                <p>Generating answers is often more expensive than alternative approaches. For routine queries, traditional search may be more efficient both computationally and economically.</p>
-            </div>
-
-            <div class="issue-detail">
-                <h5>🔴 Carbon Footprint</h5>
-                <p>Training large models creates carbon emissions equivalent to the lifetime emissions of multiple vehicles. Inference also contributes to ongoing carbon generation.</p>
-            </div>
-
-            <div class="issue-detail">
-                <h5>💧 Resource Depletion</h5>
-                <p>Data centers consume massive amounts of water. In drought-prone regions, this can compete with local communities' water needs.</p>
-            </div>
-
-            <div class="issue-detail">
-                <h5>⚙️ Hardware Sustainability</h5>
-                <p>Short hardware lifecycles in data centers create electronic waste. Chip production creates toxic by-products and requires rare materials.</p>
-            </div>
-
-            <div class="solution-box">
-                <h4>✅ Environmental Responsibility</h4>
-                <ul>
-                    <li><strong>Use renewable energy:</strong> Prioritize data centers powered by wind or solar</li>
-                    <li><strong>Optimize models:</strong> Develop more efficient models requiring less compute</li>
-                    <li><strong>Cache responses:</strong> Avoid recomputing answers to common questions</li>
-                    <li><strong>Measure impact:</strong> Track carbon emissions and water usage transparently</li>
-                    <li><strong>Right-size solutions:</strong> Use LLMs only when appropriate, not as default</li>
-                    <li><strong>Support sustainable practices:</strong> Advocate for renewable energy in data centers</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Section 9: Summary & Framework -->
-        <div class="section">
-            <h2>09. Comprehensive Risk Framework</h2>
-            
-            <div class="slide-image">
-                <img alt="Comprehensive Framework" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/llms/llm-concerns/images/Slide600/llm-concerns-9.png"/>
-            </div>
-
-            <h3>LLM Concerns Matrix</h3>
-
-            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                <thead>
-                    <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                        <th style="padding: 12px; text-align: left; border: 1px solid #667eea;">Concern Category</th>
-                        <th style="padding: 12px; text-align: left; border: 1px solid #667eea;">Key Issues</th>
-                        <th style="padding: 12px; text-align: left; border: 1px solid #667eea;">Severity</th>
-                        <th style="padding: 12px; text-align: left; border: 1px solid #667eea;">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="border-bottom: 1px solid #ddd;">
-                        <td style="padding: 12px;"><strong>Technical</strong></td>
-                        <td style="padding: 12px;">Hallucination, Uncontrolled Output, Model Size</td>
-                        <td style="padding: 12px;"><span class="impact-severity severity-high">HIGH</span></td>
-                        <td style="padding: 12px;">Mitigations exist but incomplete</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #ddd; background: #f9f9f9;">
-                        <td style="padding: 12px;"><strong>Ethical</strong></td>
-                        <td style="padding: 12px;">Bias, Discrimination, Privacy, Copyright</td>
-                        <td style="padding: 12px;"><span class="impact-severity severity-high">HIGH</span></td>
-                        <td style="padding: 12px;">Under litigation/regulation</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #ddd;">
-                        <td style="padding: 12px;"><strong>Security</strong></td>
-                        <td style="padding: 12px;">Data Poisoning, Adversarial Attacks, Misuse</td>
-                        <td style="padding: 12px;"><span class="impact-severity severity-high">HIGH</span></td>
-                        <td style="padding: 12px;">Emerging threat landscape</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #ddd; background: #f9f9f9;">
-                        <td style="padding: 12px;"><strong>Environmental</strong></td>
-                        <td style="padding: 12px;">Energy Use, Carbon, Water, Resources</td>
-                        <td style="padding: 12px;"><span class="impact-severity severity-medium">MEDIUM</span></td>
-                        <td style="padding: 12px;">Growing awareness</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 12px;"><strong>Legal/IP</strong></td>
-                        <td style="padding: 12px;">Copyright, Consent, Data Ownership</td>
-                        <td style="padding: 12px;"><span class="impact-severity severity-high">HIGH</span></td>
-                        <td style="padding: 12px;">Rapidly evolving law</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="cta-warning">
-                <h3>Responsible AI Deployment Requires</h3>
-                <p>A multi-faceted approach addressing technical robustness, ethical alignment, legal compliance, security hardening, and environmental responsibility. Organizations deploying LLMs must acknowledge these concerns and implement comprehensive strategies rather than assuming risks will self-resolve.</p>
-            </div>
-
-            <h3>Recommended Actions</h3>
-
-            <div class="roadmap">
-                <div class="roadmap-item">
-                    <strong>Immediate (Weeks 1-4):</strong> Audit current usage, identify sensitive applications, implement content filtering and output validation systems
-                </div>
-                <div class="roadmap-item">
-                    <strong>Short-term (Months 1-3):</strong> Establish governance policies, conduct bias assessments, implement human review processes, document training data sources
-                </div>
-                <div class="roadmap-item">
-                    <strong>Medium-term (Months 3-6):</strong> Develop incident response procedures, launch employee training, engage with legal teams on IP issues, measure carbon footprint
-                </div>
-                <div class="roadmap-item">
-                    <strong>Long-term (Ongoing):</strong> Monitor regulatory developments, invest in responsible AI research, contribute to industry standards, publish transparency reports
-                </div>
-            </div>
-        </div>
-
-        <!-- Final Call to Action -->
-        <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <h2 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">Moving Forward Responsibly</h2>
-            
-            <p style="color: white; font-size: 1.05em; line-height: 1.8; margin-bottom: 20px;">
-                The power of Large Language Models is undeniable, but so are the risks. The question is not whether to use LLMs::they're becoming integral to modern systems::but <strong>how to use them responsibly</strong>.
+</div>
+</section>
+<!-- Final Call to Action -->
+<section class="dk-article-section">
+<h2 id="moving-forward-responsibly">Moving Forward Responsibly</h2>
+<p>
+                The power of Large Language Models is undeniable, but so are the risks. The question is not whether to use LLMs :  they're becoming integral to modern systems :  but <strong>how to use them responsibly</strong>.
             </p>
-
-            <p style="color: white; font-size: 1.05em; line-height: 1.8; margin-bottom: 20px;">
+<p>
                 This requires acknowledging concerns openly, implementing robust safeguards, maintaining human oversight in critical areas, and contributing to the development of industry standards and regulations that protect users while enabling innovation.
             </p>
-
-            <p style="color: white; font-size: 1.05em; line-height: 1.8;">
-                The future of AI should not be one where we've become comfortable with hallucination, where copyright is irrelevant, where bias is acceptable, or where environmental costs are externalized. Instead, let's build AI systems that are transparent, fair, and sustainable::worthy of the trust we're placing in them.
+<p>
+                The future of AI should not be one where we've become comfortable with hallucination, where copyright is irrelevant, where bias is acceptable, or where environmental costs are externalized. Instead, let's build AI systems that are transparent, fair, and sustainable :  worthy of the trust we're placing in them.
             </p>
-        </div>
-    </div>
-
-    <footer class="bg-gray-800 text-gray-300">
+</section>
+</section>
+<footer>
+<p>© 2024 LLM Concerns &amp; Responsible AI Guide</p>
+<p>Understanding Risks and Building Ethical AI Systems</p>
+<p>Data Knobs</p>
+</footer>
+</div></div></article><aside aria-label="Article navigation" class="dk-toc"><div class="dk-toc-card"><h2 class="dk-toc-title">On this page</h2><p class="dk-toc-copy">Jump to the main sections in this guide.</p><ul class="dk-toc-list"><li><a class="dk-toc-link" href="#01-four-major-categories-of-llm-concerns">01. Four Major Categories of LLM Concerns</a></li><li><a class="dk-toc-link" href="#02-llm-threats-risks-taxonomy">02. LLM Threats &amp; Risks Taxonomy</a></li><li><a class="dk-toc-link" href="#03-challenges-in-using-llms">03. Challenges in Using LLMs</a></li><li><a class="dk-toc-link" href="#04-llm-uncontrolled-behavior-root-causes">04. LLM Uncontrolled Behavior - Root Causes</a></li><li><a class="dk-toc-link" href="#05-ethical-concerns-in-using-llms">05. Ethical Concerns in Using LLMs</a></li><li><a class="dk-toc-link" href="#06-data-ownership-open-questions">06. Data Ownership - Open Questions</a></li><li><a class="dk-toc-link" href="#07-data-output-open-questions">07. Data Output - Open Questions</a></li><li><a class="dk-toc-link" href="#08-environmental-issues-sustainability">08. Environmental Issues &amp; Sustainability</a></li><li><a class="dk-toc-link" href="#09-comprehensive-risk-framework">09. Comprehensive Risk Framework</a></li><li><a class="dk-toc-link" href="#moving-forward-responsibly">Moving Forward Responsibly</a></li></ul></div><div class="dk-toc-card"><h2 class="dk-toc-title">Primary topic</h2><p class="dk-toc-copy"><strong>LLM Concerns &amp; Issues: Technical, Ethical, Security and Sustainability Challenges</strong></p><div class="dk-knob-chips"><span class="dk-knob-chip">KREATE</span><span class="dk-knob-chip">KONTROLS</span><span class="dk-knob-chip">KNOBS</span></div></div></aside></div></section></main><footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 <div>
@@ -1119,6 +588,7 @@ gtag('config', 'G-JF94J1W5MC');
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-apps-lifecycle-3.html">Llm Apps Lifecycle 3</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-apps-lifecycle.html">Llm Apps Lifecycle</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-architectue-for-bot.html">Llm Architectue For Bot</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-as-a-judge.html">Llm As A Judge</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-base-vs-agentic-ai-comparison.html">Llm Base Vs Agentic Ai Comparison</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-big-token-example-100k.html">Llm Big Token Example 100K</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-challenges-slide.html">Llm Challenges Slide</a></li>
@@ -1147,6 +617,7 @@ gtag('config', 'G-JF94J1W5MC');
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-key-concepts-1.html">Llm Key Concepts 1</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-large-language-models.html">Llm Large Language Models</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-overview.html">Llm Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-routing.html">Llm Routing</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-1.html">Llm Security Agenda 1</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-2.html">Llm Security Agenda 2</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/llm-security-agenda-3.html">Llm Security Agenda 3</a></li>
@@ -1188,6 +659,7 @@ gtag('config', 'G-JF94J1W5MC');
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-retriever-options.html">Rag Retriever Options</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/rag-slides.html">Rag Slides</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/search-answer-recommendation-plan-assistants.html">Search Answer Recommendation Plan Assistants</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/semantic-caching.html">Semantic Caching</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/slide-1.html">Slide 1</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-10.html">Slide 10</a></li>
 <li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/generativeai/10-llms/Slide-11.html">Slide 11</a></li>
@@ -1344,7 +816,7 @@ gtag('config', 'G-JF94J1W5MC');
 <div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
 </div>
 </div>
-</footer>
+</footer><script>
+const b=document.getElementById('menuButton'),n=document.getElementById('mobileNav');if(b&&n){b.addEventListener('click',()=>{const o=n.classList.toggle('is-open');b.setAttribute('aria-expanded',String(o));});}
 
-
-</div></div></body></html>
+</script></body></html>

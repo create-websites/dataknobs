@@ -1,906 +1,212 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <meta content="Understanding the Token Paradox in LLM economics. Learn about the conflicting incentives between cloud providers (maximize token consumption) and builders (optimize token usage), with strategies to get more value with fewer tokens." name="description"/>
-    <meta content="Token Paradox, LLM Economics, Token Optimization, Cost Efficiency, AI Infrastructure, Context Window, Prompt Engineering, ROI, LLM Costs" name="keywords"/>
-    <meta content="Data Knobs" name="author"/>
-    <title>Token Paradox | Maximizing LLM Value &amp; ROI</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<!-- Primary Meta Tags -->
+<title>LLM-Based vs. Agentic AI Systems: A Lifecycle Comparison</title>
+<meta content="LLM-Based vs. Agentic AI Systems: A Lifecycle Comparison" name="title"/>
+<meta content="An in-depth academic comparison of LLM-based generative AI and agentic AI systems, analyzing their entire lifecycle from design and training to deployment and evolution in the context of AI research assistants." name="description"/>
+<meta content="Agentic AI, Generative AI, LLM, Large Language Models, AI Research Assistant, System Lifecycle, AI Comparison, Autonomous AI, Proactive AI, AI Development" name="keywords"/>
+<!-- Open Graph / Facebook -->
+<meta content="article" property="og:type"/>
+<meta content="https://www.dataknobs.com/generativeai/10-llms/llm-base-vs-agentic-ai-comparison.html" property="og:url"/>
+<meta content="LLM-Based vs. Agentic AI Systems: A Lifecycle Comparison" property="og:title"/>
+<meta content="Explore the key differences between reactive LLM-based assistants and proactive agentic AI systems across their entire development and operational lifecycle." property="og:description"/>
+<meta content="https://storage.googleapis.com/css-designs/geo-images/ai-agent-for-data-products.png" property="og:image"/>
+<!-- Twitter -->
+<meta content="summary_large_image" property="twitter:card"/>
+<meta content="https://www.dataknobs.com/generativeai/10-llms/llm-base-vs-agentic-ai-comparison.html" property="twitter:url"/>
+<meta content="LLM-Based vs. Agentic AI Systems: A Lifecycle Comparison" property="twitter:title"/>
+<meta content="Explore the key differences between reactive LLM-based assistants and proactive agentic AI systems across their entire development and operational lifecycle." property="twitter:description"/>
+<meta content="https://storage.googleapis.com/css-designs/geo-images/ai-agent-for-data-products.png" property="twitter:image"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Lora:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet"/>
+<style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
         }
-
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        header h1 {
-            font-size: 2.8em;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        header p {
-            font-size: 1.1em;
-            font-weight: 300;
-            opacity: 0.95;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .section {
-            background: white;
-            margin-bottom: 40px;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        .section h2 {
-            color: #667eea;
-            font-size: 2em;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #764ba2;
-        }
-
-        .section h3 {
-            color: #764ba2;
-            font-size: 1.5em;
-            margin-top: 30px;
-            margin-bottom: 20px;
-        }
-
-        .slide-image {
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        .slide-image img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .perspective-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 30px 0;
-        }
-
-        .perspective-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f7 100%);
-            padding: 30px;
-            border-radius: 10px;
-            border-left: 5px solid #667eea;
-            transition: all 0.3s ease;
-        }
-
-        .perspective-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.2);
-        }
-
-        .perspective-card h4 {
-            color: #667eea;
-            margin-bottom: 12px;
-            font-size: 1.3em;
-            font-weight: 700;
-        }
-
-        .perspective-number {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 40px;
-            font-weight: bold;
-            margin-right: 12px;
-            font-size: 1.2em;
-        }
-
-        .perspective-card p {
-            font-size: 0.95em;
-            color: #555;
-            line-height: 1.7;
-        }
-
-        .detail-section {
-            background: #f9fafb;
-            padding: 25px;
-            border-radius: 10px;
-            margin: 25px 0;
-            border-left: 5px solid #667eea;
-        }
-
-        .detail-section h5 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.15em;
-        }
-
-        .detail-section p {
-            color: #666;
-            font-size: 0.95em;
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
-
-        .feature-list {
-            list-style: none;
-            margin: 15px 0;
-        }
-
-        .feature-list li {
-            padding: 10px 0;
-            padding-left: 25px;
-            position: relative;
-            color: #666;
-            border-bottom: 1px solid #eee;
-            font-size: 0.95em;
-        }
-
-        .feature-list li:last-child {
-            border-bottom: none;
-        }
-
-        .feature-list li:before {
-            content: "▸";
-            position: absolute;
-            left: 0;
-            color: #667eea;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        .strategy-box {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border-left: 4px solid #667eea;
-        }
-
-        .strategy-box h5 {
-            color: #667eea;
-            margin-bottom: 12px;
-            font-size: 1.05em;
-        }
-
-        .strategy-box p, .strategy-box li {
-            color: #555;
-            font-size: 0.95em;
-        }
-
-        .strategy-box ul {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
-
-        .strategy-box li {
-            margin: 8px 0;
-        }
-
-        .best-practice {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            border-left: 5px solid #27ae60;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .best-practice h5 {
-            color: #155724;
-            margin-bottom: 12px;
-        }
-
-        .best-practice p, .best-practice li {
-            color: #155724;
-            font-size: 0.95em;
-        }
-
-        .best-practice ul {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
-
-        .best-practice li {
-            margin: 8px 0;
-        }
-
-        .warning-box {
-            background: linear-gradient(135deg, #fee 0%, #fdd 100%);
-            border-left: 5px solid #e74c3c;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .warning-box h5 {
-            color: #c0392b;
-            margin-bottom: 10px;
-        }
-
-        .warning-box p {
-            color: #8b0000;
-            font-size: 0.95em;
-        }
-
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin: 30px 0;
-        }
-
-        .column-box {
-            background: #f9fafb;
-            padding: 25px;
-            border-radius: 10px;
-            border-top: 4px solid #667eea;
-        }
-
-        .column-box h4 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        .column-box ul {
-            list-style-position: inside;
-            color: #666;
-        }
-
-        .column-box li {
-            margin: 8px 0;
-            font-size: 0.95em;
-        }
-
-        .section-intro {
-            background: #f0f4f8;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border-left: 4px solid #667eea;
-        }
-
-        .section-intro p {
-            color: #666;
-            font-size: 1em;
-            line-height: 1.6;
-        }
-
-        .highlight-box {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-left: 4px solid #667eea;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 25px 0;
-        }
-
-        .highlight-box h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .highlight-box p {
-            color: #666;
-            font-size: 0.95em;
-        }
-
-        .cta-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin: 30px 0;
-            text-align: center;
-        }
-
-        .cta-box h3 {
-            color: white;
-            margin-bottom: 15px;
-        }
-
-        .cta-box p {
-            font-size: 1.05em;
-            line-height: 1.6;
-        }
-
-        .metric-box {
-            background: #f9fafb;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border-top: 4px solid #667eea;
-        }
-
-        .metric-box h5 {
-            color: #667eea;
-            margin-bottom: 12px;
-            font-size: 1.05em;
-        }
-
-        .metric-box p {
-            color: #555;
-            font-size: 0.95em;
-            margin-bottom: 8px;
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 30px 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .comparison-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .comparison-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            color: #555;
-        }
-
-        .comparison-table tr:hover {
-            background: #f9f9f9;
-        }
-
-        .comparison-table tr:nth-child(even) {
-            background: #f5f7fa;
-        }
-
-        footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 30px;
-            margin-top: 60px;
-        }
-
-        footer p {
-            margin: 5px 0;
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2em;
-            }
-
-            .section {
-                padding: 20px;
-            }
-
-            .section h2 {
-                font-size: 1.5em;
-            }
-
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-
-            .perspective-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .comparison-table {
-                font-size: 0.9em;
-            }
-
-            .comparison-table th,
-            .comparison-table td {
-                padding: 10px;
-            }
+        h1, h2, h3 {
+            font-family: 'Lora', serif;
         }
     </style>
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Comparing LLM-Based vs. Agentic AI Systems for Research Assistants",
+      "description": "An academic-level comparison of the system life cycle of LLM-based generative AI systems versus full-fledged agentic AI systems, in the context of AI-powered research assistants.",
+      "image": "https://storage.googleapis.com/css-designs/geo-images/ai-agent-for-data-products.png",  
+      "author": {
+        "@type": "Organization",
+        "name": "AI Research Group"
+      },  
+      "publisher": {
+        "@type": "Organization",
+        "name": "Tech Publishing",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://storage.googleapis.com/css-designs/logos/dataknobs-logo-small.png"
+        }
+      },
+      "datePublished": "2025-10-13",
+      "dateModified": "2025-10-13",
+      "keywords": "Agentic AI, Generative AI, LLM, Large Language Models, AI Research Assistant, System Lifecycle, AI Comparison, Autonomous AI",
+      "articleBody": "This report provides an academic-level comparison of the system life cycle of LLM-based generative AI systems versus full-fledged agentic AI systems, in the context of AI-powered research assistants. We examine each major life cycle phase – design, training, evaluation, deployment, interaction, maintenance, and evolution – and analyze how the two paradigms differ."
+    }
+    </script>
 <link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-JF94J1W5MC');
 </script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
-<body>
-    <header>
-        <h1>The Token Paradox</h1>
-        <p>The Industry Wants You to Spend More. But the Real Leverage is Getting More With Less.</p>
-        <p style="font-size: 0.95em; margin-top: 10px; opacity: 0.9;">Understanding the Fundamental Tension in LLM Economics</p>
-    </header>
-
-    <div class="container">
-        <!-- Section 1: The Paradox -->
-        <div class="section">
-            <h2>The Token Paradox: Two Opposing Incentives</h2>
-            
-            <div class="slide-image">
-                <img alt="Token Paradox" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/token-paradox/images/Slide1000/token-paradox-1.png"/>
-            </div>
-
-            <div class="section-intro">
-                <p><strong>The Token Paradox represents a fundamental conflict in AI economics.</strong> Cloud providers, model vendors, and GPU suppliers benefit when organizations consume more tokens. Organizations building with AI, however, maximize ROI by consuming fewer tokens to achieve the same or better outcomes. These opposing incentives create a paradox that builders must navigate strategically.</p>
-            </div>
-
-            <h3>Two Conflicting Perspectives</h3>
-
-            <div class="perspective-grid">
-                <div class="perspective-card">
-                    <h4><span class="perspective-number">1</span>Infrastructure/Hyperscaler View</h4>
-                    <p>Higher token consumption is seen as a proxy for greater AI utilization, driving more compute usage and ultimately more revenue for cloud providers, model vendors, and GPU manufacturers. From their perspective, more token usage = more business opportunity.</p>
-                    <ul class="feature-list" style="margin-top: 15px;">
-                        <li>More tokens = more revenue for infrastructure providers</li>
-                        <li>Incentive to keep context windows large</li>
-                        <li>Pricing models often favor heavy usage</li>
-                        <li>Marketing emphasizes capability over efficiency</li>
-                    </ul>
-                </div>
-
-                <div class="perspective-card">
-                    <h4><span class="perspective-number">2</span>Builder View</h4>
-                    <p>Efficient token usage::through better design, smarter context selection, and optimized workflows::maximizes ROI by delivering equal or better outcomes at significantly lower cost. Builders win when they get more value per token spent.</p>
-                    <ul class="feature-list" style="margin-top: 15px;">
-                        <li>Fewer tokens at same quality = lower costs</li>
-                        <li>Token efficiency directly impacts margins</li>
-                        <li>Cost-conscious customers demand optimization</li>
-                        <li>Competitive advantage through superior efficiency</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="highlight-box">
-                <h4>The Core Insight</h4>
-                <p><strong>This is not a conspiracy or plot::it's simple economics.</strong> Infrastructure providers have legitimate incentives to maximize resource consumption. Builders have equally legitimate incentives to minimize resource consumption. The tension is structural, not personal. Successful organizations acknowledge this dynamic and optimize for their own interests rather than accepting industry defaults.</p>
-            </div>
-        </div>
-
-        <!-- Section 2: Why This Matters -->
-        <div class="section">
-            <h2>Why the Token Paradox Matters</h2>
-            
-            <div class="section-intro">
-                <p>The Token Paradox isn't academic::it has real financial implications for every organization using LLMs. Understanding and navigating this paradox can dramatically impact profitability and competitive positioning.</p>
-            </div>
-
-            <h3>Business Impact of the Paradox</h3>
-
-            <div class="detail-section">
-                <h5>📈 Cost Implications</h5>
-                <p>Token costs directly impact business economics. A typical LLM API costs $0.01-$0.10 per 1000 tokens. For large-scale applications, this translates to millions in annual infrastructure costs.</p>
-                <ul class="feature-list">
-                    <li>Example: 1M daily API calls × 5000 tokens average = 5B tokens/day</li>
-                    <li>At $0.03 per 1K tokens = $150,000 per day in costs</li>
-                    <li>10% reduction in token usage = $15,000/day savings ($5.5M/year)</li>
-                    <li>Token efficiency directly impacts gross margins</li>
-                </ul>
-            </div>
-
-            <div class="detail-section">
-                <h5>⚡ Performance Implications</h5>
-                <p>More tokens often means longer response times, higher latency, and worse user experience. Efficiency and performance are often correlated.</p>
-                <ul class="feature-list">
-                    <li>Longer context = slower response times</li>
-                    <li>Faster responses = better user experience = higher retention</li>
-                    <li>Lower latency = ability to handle more concurrent users</li>
-                    <li>Cost and performance improvements compound</li>
-                </ul>
-            </div>
-
-            <div class="detail-section">
-                <h5>🎯 Competitive Advantage</h5>
-                <p>Organizations that optimize token usage gain structural competitive advantages.</p>
-                <ul class="feature-list">
-                    <li>Lower cost per transaction enables more aggressive pricing</li>
-                    <li>Faster responses = better product experience</li>
-                    <li>Higher margins enable more investment in product</li>
-                    <li>Capital efficiency in resource-constrained environment</li>
-                </ul>
-            </div>
-
-            <div class="warning-box">
-                <h5>⚠️ The Danger of Inaction</h5>
-                <p>Organizations that ignore the Token Paradox and simply accept industry defaults will face mounting costs as they scale. Token expenses grow with user base and feature complexity, potentially making products unprofitable. Early token efficiency investment pays dividends at scale.</p>
-            </div>
-        </div>
-
-        <!-- Section 3: Strategies for Token Optimization -->
-        <div class="section">
-            <h2>Strategies for Optimizing Token Usage</h2>
-            
-            <div class="section-intro">
-                <p>The good news: there are many proven strategies for reducing token consumption while maintaining or improving quality. These require intentional design but don't require accepting inferior products or experiences.</p>
-            </div>
-
-            <h3>Token Optimization Techniques</h3>
-
-            <div class="detail-section">
-                <h5>1. Smart Context Selection</h5>
-                <p>Don't send all available context to the LLM::intelligently select only the most relevant information.</p>
-                <ul class="feature-list">
-                    <li>Use semantic search with vector databases to find relevant documents</li>
-                    <li>Rank context by relevance before passing to LLM</li>
-                    <li>Implement context budgets::limit total context tokens</li>
-                    <li>Prune irrelevant or duplicate information</li>
-                    <li>Use summarization to compress large documents</li>
-                </ul>
-            </div>
-
-            <div class="detail-section">
-                <h5>2. Prompt Engineering for Efficiency</h5>
-                <p>Craft prompts that elicit desired outputs with fewer tokens.</p>
-                <ul class="feature-list">
-                    <li>Use specific, structured prompts rather than verbose natural language</li>
-                    <li>Provide examples in few-shot prompts (but select examples carefully)</li>
-                    <li>Use system prompts to set context instead of repeating in user prompts</li>
-                    <li>Request structured output (JSON) for parsing efficiency</li>
-                    <li>Guide the model toward concise responses</li>
-                </ul>
-            </div>
-
-            <div class="detail-section">
-                <h5>3. Workflow Optimization</h5>
-                <p>Redesign workflows to use LLMs more strategically.</p>
-                <ul class="feature-list">
-                    <li>Use cheaper/faster models for simple tasks, reserve expensive models for complex reasoning</li>
-                    <li>Cache common responses and context to avoid re-processing</li>
-                    <li>Implement filtering before LLM processing (e.g., only send required content)</li>
-                    <li>Use structured extraction tools instead of LLM for parsing</li>
-                    <li>Implement progressive enrichment::start simple, add complexity only when needed</li>
-                </ul>
-            </div>
-
-            <div class="detail-section">
-                <h5>4. Model Selection</h5>
-                <p>Choose the right model for each task based on cost and capability.</p>
-                <ul class="feature-list">
-                    <li>Use GPT-3.5 or Gemini Flash for routine tasks ($0.0005 per 1K tokens)</li>
-                    <li>Reserve GPT-4 for complex reasoning ($0.03 per 1K tokens)</li>
-                    <li>Test specialized smaller models for specific domains</li>
-                    <li>Consider fine-tuned models to reduce tokens needed for domain-specific tasks</li>
-                    <li>Implement fallback logic::try cheap model first, escalate only if needed</li>
-                </ul>
-            </div>
-
-            <div class="detail-section">
-                <h5>5. Output Optimization</h5>
-                <p>Reduce the tokens in responses while maintaining quality.</p>
-                <ul class="feature-list">
-                    <li>Request concise outputs only</li>
-                    <li>Use token limits to prevent verbose responses</li>
-                    <li>Parse structured outputs efficiently</li>
-                    <li>Compress responses at the client level if needed</li>
-                </ul>
-            </div>
-
-            <div class="best-practice">
-                <h5>✓ Optimization Best Practices</h5>
-                <ul>
-                    <li>Measure token usage per feature and per user interaction</li>
-                    <li>Set token budgets and treat efficiency like technical debt</li>
-                    <li>Run A/B tests on prompt variations to measure efficiency gains</li>
-                    <li>Monitor token usage trends as product scales</li>
-                    <li>Invest in token efficiency early::it compounds over time</li>
-                    <li>Don't sacrifice quality for cost::the goal is value per token</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Section 4: Measurement & Metrics -->
-        <div class="section">
-            <h2>Measuring Token Efficiency</h2>
-            
-            <div class="section-intro">
-                <p>You can't optimize what you don't measure. Establishing clear metrics for token efficiency is essential for continuous improvement.</p>
-            </div>
-
-            <h3>Key Efficiency Metrics</h3>
-
-            <div class="two-column">
-                <div class="column-box">
-                    <h4>Cost Metrics</h4>
-                    <ul>
-                        <li><strong>Cost per Request:</strong> Total API cost / number of requests</li>
-                        <li><strong>Cost per User:</strong> Monthly API cost / active users</li>
-                        <li><strong>Cost per Interaction:</strong> Cost of single user query + response</li>
-                        <li><strong>Token Efficiency Ratio:</strong> Output quality / tokens consumed</li>
-                    </ul>
-                </div>
-                <div class="column-box">
-                    <h4>Efficiency Metrics</h4>
-                    <ul>
-                        <li><strong>Average Tokens per Request:</strong> Total tokens / requests</li>
-                        <li><strong>Context Overhead:</strong> Context tokens / total tokens</li>
-                        <li><strong>Response Latency:</strong> Time from request to response</li>
-                        <li><strong>Model Distribution:</strong> % requests by model tier</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="detail-section">
-                <h5>Setting Efficiency Targets</h5>
-                <p>Establish benchmarks and targets for your organization.</p>
-                <ul class="feature-list">
-                    <li>Baseline: Measure current token usage and costs</li>
-                    <li>Industry benchmark: Compare to peer organizations (if data available)</li>
-                    <li>Target: Set 10-20% efficiency improvement goals</li>
-                    <li>Monitoring: Track progress monthly and adjust tactics</li>
-                </ul>
-            </div>
-
-            <div class="metric-box">
-                <h5>Example: Cost Reduction Targets</h5>
-                <p><strong>Current State:</strong> 1M daily requests × 2000 avg tokens = 2B tokens/day = $60K/day</p>
-                <p><strong>Year 1 Target:</strong> Reduce to 1500 avg tokens (25% reduction) = $45K/day = $5.5M savings</p>
-                <p><strong>Year 2 Target:</strong> Reduce to 1200 avg tokens (40% reduction) = $36K/day = $8.8M savings</p>
-                <p><strong>Note:</strong> These targets assume maintained or improved quality::efficiency should not come at cost of user experience.</p>
-            </div>
-        </div>
-
-        <!-- Section 5: Practical Implementation -->
-        <div class="section">
-            <h2>Implementing Token Optimization</h2>
-            
-            <div class="section-intro">
-                <p>Token optimization isn't a one-time project::it's an ongoing discipline. Here's how to build it into your organization.</p>
-            </div>
-
-            <h3>Implementation Roadmap</h3>
-
-            <div class="strategy-box">
-                <h5>Phase 1: Measurement &amp; Baseline (Weeks 1-2)</h5>
-                <p>Establish visibility into current token usage</p>
-                <ul>
-                    <li>Instrument API calls to log tokens consumed</li>
-                    <li>Calculate cost per feature, per user, per interaction</li>
-                    <li>Identify high-token-consumption areas</li>
-                    <li>Establish baseline metrics and targets</li>
-                </ul>
-            </div>
-
-            <div class="strategy-box">
-                <h5>Phase 2: Quick Wins (Weeks 3-6)</h5>
-                <p>Implement easy optimizations with immediate impact</p>
-                <ul>
-                    <li>Reduce context size (send only essential information)</li>
-                    <li>Optimize prompts for conciseness</li>
-                    <li>Switch simple tasks to cheaper models</li>
-                    <li>Implement token limits in API calls</li>
-                </ul>
-            </div>
-
-            <div class="strategy-box">
-                <h5>Phase 3: Structural Changes (Weeks 7-12)</h5>
-                <p>Implement more significant architectural improvements</p>
-                <ul>
-                    <li>Implement semantic search for smart context selection</li>
-                    <li>Design model routing (cheap vs expensive by task)</li>
-                    <li>Build caching for repeated queries</li>
-                    <li>Redesign workflows for efficiency</li>
-                </ul>
-            </div>
-
-            <div class="strategy-box">
-                <h5>Phase 4: Continuous Improvement (Ongoing)</h5>
-                <p>Maintain focus on efficiency as product evolves</p>
-                <ul>
-                    <li>Monthly efficiency reviews</li>
-                    <li>A/B test prompt variations</li>
-                    <li>Evaluate new models and pricing</li>
-                    <li>Share learnings across teams</li>
-                </ul>
-            </div>
-
-            <h3>Organizational Practices</h3>
-
-            <div class="two-column">
-                <div class="column-box">
-                    <h4>Engineering Practices</h4>
-                    <ul>
-                        <li>Token usage as code review criteria</li>
-                        <li>Efficiency testing in CI/CD</li>
-                        <li>Monitoring dashboards for token usage</li>
-                        <li>Alerting for cost anomalies</li>
-                    </ul>
-                </div>
-                <div class="column-box">
-                    <h4>Organizational Practices</h4>
-                    <ul>
-                        <li>Include efficiency in product roadmap</li>
-                        <li>Share cost/efficiency insights across teams</li>
-                        <li>Incentivize efficiency improvements</li>
-                        <li>Regular efficiency reviews</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="best-practice">
-                <h5>✓ Implementation Best Practices</h5>
-                <ul>
-                    <li>Make token efficiency visible::what gets measured gets managed</li>
-                    <li>Don't optimize in isolation::involve product, design, and business teams</li>
-                    <li>Balance efficiency with user experience::don't sacrifice quality</li>
-                    <li>Build efficiency into your culture, not as an afterthought</li>
-                    <li>Share learnings across teams to amplify impact</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Section 6: Token Paradox Dynamics -->
-        <div class="section">
-            <h2>Understanding the Deeper Dynamics</h2>
-            
-            <div class="section-intro">
-                <p>The Token Paradox isn't just about cost optimization. It reflects deeper trends in AI economics and infrastructure.</p>
-            </div>
-
-            <h3>Why Infrastructure Providers Push Higher Consumption</h3>
-
-            <div class="detail-section">
-                <h5>1. Revenue Growth Model</h5>
-                <p>Token consumption directly drives revenue. More tokens = more revenue. This creates a natural incentive to encourage higher consumption through:</p>
-                <ul class="feature-list">
-                    <li>Large context windows that encourage sending more data</li>
-                    <li>Generous free tier limits to build habits</li>
-                    <li>Pricing models that don't penalize over-consumption</li>
-                    <li>Marketing that emphasizes capability over efficiency</li>
-                </ul>
-            </div>
-
-            <div class="detail-section">
-                <h5>2. Competitive Dynamics</h5>
-                <p>Model vendors compete on capability, not efficiency. The incentive is to build bigger, more capable models, which consume more tokens.</p>
-                <ul class="feature-list">
-                    <li>Larger models = more impressive capabilities</li>
-                    <li>More impressive capabilities = more customers = more revenue</li>
-                    <li>Efficiency is a secondary concern in this dynamic</li>
-                </ul>
-            </div>
-
-            <div class="detail-section">
-                <h5>3. Hardware Economics</h5>
-                <p>GPU manufacturers benefit from higher consumption, creating a chain of incentives upward.</p>
-                <ul class="feature-list">
-                    <li>More token processing = more GPU utilization</li>
-                    <li>More GPU utilization = higher GPU demand = higher prices</li>
-                    <li>All parties up the stack benefit from higher consumption</li>
-                </ul>
-            </div>
-
-            <h3>Why Builders Must Optimize</h3>
-
-            <div class="detail-section">
-                <h5>1. Margin Economics</h5>
-                <p>For builders, token costs directly impact profitability. Optimization isn't optional::it's existential.</p>
-                <ul class="feature-list">
-                    <li>10% cost reduction = 10% margin improvement (huge for SaaS)</li>
-                    <li>In a competitive market, efficiency = lower pricing = more customers</li>
-                    <li>Cost advantage compounds as you scale</li>
-                </ul>
-            </div>
-
-            <div class="detail-section">
-                <h5>2. User Experience</h5>
-                <p>Token efficiency and user experience often align::less processing = faster responses.</p>
-                <ul class="feature-list">
-                    <li>Fewer tokens = lower latency</li>
-                    <li>Lower latency = better experience</li>
-                    <li>Better experience = higher retention and satisfaction</li>
-                </ul>
-            </div>
-
-            <div class="detail-section">
-                <h5>3. Competitive Advantage</h5>
-                <p>Token efficiency is a form of competitive moat that's hard to copy.</p>
-                <ul class="feature-list">
-                    <li>Requires deep product and engineering knowledge</li>
-                    <li>Accumulates over time as you learn</li>
-                    <li>Creates sustainable cost advantage</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Section 7: The Path Forward -->
-        <div class="section">
-            <h2>Navigating the Token Paradox</h2>
-            
-            <div class="section-intro">
-                <p>The Token Paradox won't disappear::it's structural to AI economics. But understanding it enables builders to make deliberate choices rather than accepting defaults.</p>
-            </div>
-
-            <h3>Strategic Insights</h3>
-
-            <div class="detail-section">
-                <h5>1. Acknowledge the Incentive Misalignment</h5>
-                <p>The industry wants you to consume more tokens. This isn't malicious::it's just economics. Acknowledging this dynamic is the first step to optimizing against it.</p>
-            </div>
-
-            <div class="detail-section">
-                <h5>2. Make Conscious Choices</h5>
-                <p>Don't accept default configurations or industry recommendations without questioning them. Default context windows, default prompts, and default models are optimized for vendors, not for your business.</p>
-            </div>
-
-            <div class="detail-section">
-                <h5>3. Invest in Measurement</h5>
-                <p>What you measure, you can improve. Build visibility into token usage from day one. This gives you leverage to optimize continuously.</p>
-            </div>
-
-            <div class="detail-section">
-                <h5>4. Optimize Early</h5>
-                <p>Token efficiency compounds over time. Optimizations made now will save millions at scale. Waiting until you're large to optimize means leaving money on the table.</p>
-            </div>
-
-            <div class="detail-section">
-                <h5>5. Don't Sacrifice Quality</h5>
-                <p>The goal is value per token, not minimum tokens. Optimization should improve user experience and outcomes, not degrade them. Token efficiency and product quality aren't opposed::they're aligned.</p>
-            </div>
-
-            <div class="cta-box">
-                <h3>The Real Leverage: Get More With Less</h3>
-                <p>The Token Paradox reveals the true path to competitive advantage in AI: <strong>getting more value with fewer resources.</strong> While the industry pushes toward higher consumption, the builders who win will be those who figure out how to deliver better products at lower cost. That's not just better economics::it's a better product for users. That's where the real leverage is.</p>
-            </div>
-
-            <div class="best-practice">
-                <h5>✓ Final Recommendations</h5>
-                <ul>
-                    <li>Build token efficiency into your product culture from day one</li>
-                    <li>Measure token usage as religiously as you measure conversion rates</li>
-                    <li>Don't trust vendor recommendations::validate for your use case</li>
-                    <li>Invest in semantic search and intelligent context selection</li>
-                    <li>Implement model routing to use appropriate models for each task</li>
-                    <li>Regularly review and optimize prompts and workflows</li>
-                    <li>Share efficiency learnings across your organization</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Section 8: Summary -->
-        <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <h2 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">Conclusion: The Token Paradox is an Opportunity</h2>
-            
-            <p style="color: white; font-size: 1.05em; line-height: 1.8; margin-bottom: 20px;">
-                <strong>The Token Paradox isn't a problem::it's an opportunity.</strong> While the infrastructure industry pushes toward higher consumption, builders who focus on efficiency will build better products at lower cost. This is a genuine competitive advantage.
-            </p>
-
-            <p style="color: white; font-size: 1.05em; line-height: 1.8; margin-bottom: 20px;">
-                <strong>The industry default won't serve your interests.</strong> Context windows will keep growing. Models will keep getting larger. Vendors will keep emphasizing capability over efficiency. That's fine::it's their business. Your business is served by optimizing token usage, delivering better value per token spent, and building sustainable economics.
-            </p>
-
-            <p style="color: white; font-size: 1.05em; line-height: 1.8;">
-                <strong>The real leverage is getting more with less.</strong> Not less quality, not less capability::but more value delivered per unit of resources consumed. That's how you win in the long term. That's how you build sustainable, profitable AI products that users love. That's where the real opportunity lies.
-            </p>
-        </div>
-    </div>
-
-    <footer class="bg-gray-800 text-gray-300">
+<body class="bg-slate-50 text-slate-800 leading-relaxed">
+<!-- Header -->
+<header class="bg-white shadow-sm sticky top-0 z-10">
+<div class="max-w-4xl mx-auto px-4 py-4">
+<h1 class="text-2xl font-bold text-slate-900">AI Systems Analysis</h1>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-4xl mx-auto p-4 md:p-8">
+<article>
+<!-- Article Header -->
+<header class="mb-8">
+<h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 leading-tight">Comparing LLM-Based vs. Agentic AI Systems for Research Assistants</h1>
+<p class="text-lg text-slate-600">An academic-level comparison of the system life cycle of LLM-based generative AI systems versus full-fledged agentic AI systems.</p>
+<div class="mt-4 border-b border-t border-slate-200 py-2">
+<span class="text-sm text-slate-500">Published on October 13, 2025</span>
+</div>
+</header>
+<!-- Hero Image -->
+<figure class="mb-8">
+<img alt="Abstract representation of interconnected AI agents" class="w-full h-auto rounded-lg shadow-md" src="https://storage.googleapis.com/css-designs/geo-images/ai-data-products-with-knobs.png"/>
+<figcaption class="text-center text-sm text-slate-500 mt-2"><a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a>-based systems are reactive tools, while agentic systems are proactive collaborators.</figcaption>
+</figure>
+<!-- Introduction -->
+<section class="mb-10 prose prose-lg max-w-none">
+<h2 class="text-3xl font-bold text-slate-900 border-b pb-2 mb-4">Introduction</h2>
+<p><a href="https://www.dataknobs.com/generativeai/">Generative AI</a> systems powered by large language models (LLMs) have shown remarkable ability to produce human-like text and other content in response to prompts. Such LLM-based research assistants operate primarily as <strong>reactive</strong> tools: given a user’s query or instruction, the model generates a relevant response based on patterns learned from vast training data. In contrast, <strong>agentic AI systems</strong> represent a more autonomous paradigm. Agentic AI refers to AI systems that can <strong>make independent decisions and take actions</strong> toward achieving complex goals with minimal human intervention. These systems typically orchestrate one or multiple agents that not only generate content but also plan steps, use external tools, and adapt to new information in a <strong>proactive</strong> manner.</p>
+<p>This report provides an academic-level comparison of the system life cycle of LLM-based generative AI systems versus full-fledged agentic AI systems, in the context of AI-powered research assistants. We examine each major life cycle phase – design, training, evaluation, deployment, interaction, maintenance, and evolution – to elucidate how a relatively reactive LLM-based assistant compares with a more autonomous agentic system across the lifecycle of development and use.</p>
+</section>
+<!-- Lifecycle Phases -->
+<div class="space-y-12 prose prose-lg max-w-none">
+<section id="design">
+<h2 class="text-3xl font-bold text-slate-900 border-b pb-2 mb-4">Design Phase</h2>
+<p><strong>LLM-Based System Design:</strong> The design is model-centric, focusing on a single pretrained LLM within a simple prompt-response interface. The architecture is a straightforward pipeline, with minimal tool integration. The system is designed to be reactive, assuming a human-in-the-loop for every query.</p>
+<p><strong>Agentic AI System Design:</strong> The design is system-centric and multi-component, specifying an architecture of interconnected agents. It incorporates planning modules, tool-using agents, and persistent memory. The design must account for agent communication, autonomous decision-making, and safety boundaries, making it significantly more complex.</p>
+</section>
+<section id="training">
+<h2 class="text-3xl font-bold text-slate-900 border-b pb-2 mb-4">Training Phase</h2>
+<p><strong>LLM-Based Systems Training:</strong> Training is a data-intensive, offline process involving pre-training on massive text corpora and fine-tuning on domain-specific data. The model's parameters are fixed post-deployment, and it does not learn from individual user interactions.</p>
+<p><strong>Agentic AI Systems Training:</strong> This involves training the underlying models and the agent's decision-making behavior, often using reinforcement learning (RL) in simulated environments. Training can be more continuous, with some systems designed for online learning to refine strategies from real-world interactions and feedback.</p>
+</section>
+<section id="evaluation">
+<h2 class="text-3xl font-bold text-slate-900 border-b pb-2 mb-4">Evaluation Phase</h2>
+<p><strong>LLM-Based System Evaluation:</strong> Evaluation focuses on the quality and accuracy of the generated content. It uses static benchmarks and human judgments to assess correctness, coherence, and relevance for single-turn or short multi-turn interactions.</p>
+<p><strong>Agentic AI System Evaluation:</strong> Evaluation is far more complex, assessing task performance over an entire autonomous workflow. It uses scenario-based tests to measure goal achievement, adaptability, efficiency, and the quality of intermediate decisions. The process, not just the outcome, is critically evaluated.</p>
+</section>
+<section id="deployment">
+<h2 class="text-3xl font-bold text-slate-900 border-b pb-2 mb-4">Deployment Phase</h2>
+<p><strong>LLM-Based System Deployment:</strong> Deployed as a service or API, this is a relatively contained prediction service. Key concerns are scalability, latency, and implementing a guardrail layer for output moderation.</p>
+<p><strong>Agentic AI System Deployment:</strong> This is akin to deploying a complex, distributed application with an orchestration layer to manage agent lifecycles. It requires robust integration with external tools, secure sandboxing for actions, and continuous monitoring for resource usage and failure detection.</p>
+</section>
+<section id="interaction">
+<h2 class="text-3xl font-bold text-slate-900 border-b pb-2 mb-4">Interaction Phase</h2>
+<p><strong>LLM-Based System Interaction:</strong> Interaction is reactive and user-driven. The human asks, and the LLM responds. The user must break down complex tasks into a series of prompts, maintaining full control.</p>
+<p><strong>Agentic AI System Interaction:</strong> Interaction is proactive and mixed-initiative. The agent can take the lead, execute multi-step plans, and consult the user when needed. The human's role shifts to that of a supervisor or collaborator, setting high-level goals and providing feedback.</p>
+</section>
+<section id="maintenance">
+<h2 class="text-3xl font-bold text-slate-900 border-b pb-2 mb-4">Maintenance Phase</h2>
+<p><strong>LLM-Based System Maintenance:</strong> This is primarily model-focused, involving periodic updates to the LLM to incorporate new knowledge. The feedback loop is offline, with developers updating the model in scheduled releases.</p>
+<p><strong>Agentic AI System Maintenance:</strong> This is a multi-faceted, ongoing process. It includes maintaining models, refining agent behaviors and heuristics, monitoring tool integrations, and supervising any self-learning capabilities. It's a continuous governance process for an evolving entity.</p>
+</section>
+<section id="evolution">
+<h2 class="text-3xl font-bold text-slate-900 border-b pb-2 mb-4">Evolution and Future Development</h2>
+<p><strong>LLM-Based System Evolution:</strong> Evolution occurs in discrete jumps with new model versions. The system is not inherently adaptable and relies on developer-driven updates to gain new capabilities.</p>
+<p><strong>Agentic AI System Evolution:</strong> Evolution can be more continuous and organic. The modular architecture allows for the easy addition of new agents and tools. With continual learning, the system can adapt and improve its performance over time based on experience, leading to higher innovation potential.</p>
+</section>
+</div>
+<!-- Summary Table -->
+<section class="mt-16">
+<h2 class="text-3xl font-bold text-slate-900 mb-6 text-center">Summary: Lifecycle Comparison</h2>
+<div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+<table class="w-full text-sm text-left text-slate-600">
+<thead class="text-xs text-slate-700 uppercase bg-slate-100">
+<tr>
+<th class="px-6 py-3 w-1/5" scope="col">Lifecycle Phase</th>
+<th class="px-6 py-3 w-2/5" scope="col">LLM-Based Research Assistant (Generative AI)</th>
+<th class="px-6 py-3 w-2/5" scope="col">Agentic Research Assistant (Agentic AI)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-white border-b">
+<th class="px-6 py-4 font-semibold text-slate-900" scope="row">Design</th>
+<td class="px-6 py-4">Model-centric, reactive, simple pipeline.</td>
+<td class="px-6 py-4">System-centric, proactive, multi-component architecture.</td>
+</tr>
+<tr class="bg-slate-50 border-b">
+<th class="px-6 py-4 font-semibold text-slate-900" scope="row">Training</th>
+<td class="px-6 py-4">Offline, large-scale supervised learning; model is fixed after deployment.</td>
+<td class="px-6 py-4">Includes reinforcement learning for decision-making; potential for online/continuous learning.</td>
+</tr>
+<tr class="bg-white border-b">
+<th class="px-6 py-4 font-semibold text-slate-900" scope="row">Evaluation</th>
+<td class="px-6 py-4">Focus on output quality and accuracy (outcome-centric).</td>
+<td class="px-6 py-4">Focus on task performance, behavior, and adaptability (process-centric).</td>
+</tr>
+<tr class="bg-slate-50 border-b">
+<th class="px-6 py-4 font-semibold text-slate-900" scope="row">Deployment</th>
+<td class="px-6 py-4">Contained prediction service (API). Simpler, with focus on scaling and latency.</td>
+<td class="px-6 py-4">Complex application with an orchestration layer. Focus on robustness, security, and monitoring.</td>
+</tr>
+<tr class="bg-white border-b">
+<th class="px-6 py-4 font-semibold text-slate-900" scope="row">Interaction</th>
+<td class="px-6 py-4">Reactive, user-driven conversation. Human is the driver.</td>
+<td class="px-6 py-4">Proactive, mixed-initiative collaboration. Human is the supervisor.</td>
+</tr>
+<tr class="bg-slate-50 border-b">
+<th class="px-6 py-4 font-semibold text-slate-900" scope="row">Maintenance</th>
+<td class="px-6 py-4">Model-focused. Periodic, offline updates to knowledge and behavior.</td>
+<td class="px-6 py-4">Multi-faceted. Continuous monitoring and refinement of models, tools, and agent behaviors.</td>
+</tr>
+<tr class="bg-white">
+<th class="px-6 py-4 font-semibold text-slate-900" scope="row">Evolution</th>
+<td class="px-6 py-4">Evolves in discrete jumps with new model versions. Low adaptability.</td>
+<td class="px-6 py-4">Evolves organically and continuously. High adaptability and innovation potential.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Conclusion -->
+<section class="mt-16 prose prose-lg max-w-none">
+<h2 class="text-3xl font-bold text-slate-900 border-b pb-2 mb-4">Conclusion</h2>
+<p>Generative LLM-based assistants and agentic AI systems represent two evolutionary stages in AI research assistants. LLM-based systems are powerful but <strong>reactive tools</strong> simpler to manage but limited in autonomy. In contrast, agentic AI systems function as <strong>autonomous collaborators</strong> more complex to build but offering far greater flexibility, proactivity, and potential for innovation.</p>
+<p>The choice between them depends on the task's complexity and the desired level of human control. For well-defined queries, an LLM suffices. For open-ended, complex research where tasks can be delegated, an agentic approach is significantly more powerful. Ultimately, the future lies in a convergence of both paradigms, blending the raw generative power of LLMs with the organized, goal-driven autonomy of agentic systems to create truly collaborative AI partners that amplify human research capabilities.</p>
+</section>
+<!-- Sources -->
+<section class="mt-16 prose prose-sm max-w-none">
+<h3 class="text-xl font-bold text-slate-800 border-b pb-2 mb-4">Sources</h3>
+<ul class="list-disc pl-5 space-y-2 text-slate-600">
+<li>Agentic AI vs. Generative AI | IBM</li>
+<li>What is agentic AI? Definition and differentiators | Google Cloud</li>
+<li>How we built our multi-agent research system | Anthropic</li>
+<li>Agent Laboratory: Using LLM Agents as Research Assistants | ArXiv</li>
+<li><a href="https://www.dataknobs.com/agentic-ai/">AI Agents</a> vs. Agentic AI: A Conceptual Taxonomy, Applications and Challenges | ArXiv</li>
+<li>Agentic AI: 4 reasons why it’s the next big thing in AI research | IBM</li>
+<li>How Agentic AI is Transforming Data Science | AnalytixLabs on Medium</li>
+</ul>
+</section>
+</article>
+</main>
+<!-- Footer -->
+<footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 <div>
@@ -1255,6 +561,4 @@ gtag('config', 'G-JF94J1W5MC');
 </div>
 </div>
 </footer>
-
-
 </body></html>

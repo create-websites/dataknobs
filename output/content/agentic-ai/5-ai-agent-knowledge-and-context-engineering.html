@@ -1,347 +1,385 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Context Engineering for AI Agents | DataKnobs</title>
-<meta content="Engineer reliable agent context with token budgets, retrieval, memory, compression, isolation, RAG, vector databases and GraphRAG patterns." name="description"/>
-<meta content="context engineering, knowledge engineering, AI agents, RAG, vector database, GraphRAG, agent memory, context window, prompt engineering, token budget, DataKnobs" name="keywords"/>
-<meta content="Prashant Dhingra, DataKnobs" name="author"/>
-<meta content="index, follow, max-image-preview:large" name="robots"/>
-<link href="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html" rel="canonical"/>
-<meta content="article" property="og:type"/><meta content="DataKnobs" property="og:site_name"/><meta content="Context Engineering for AI Agents" property="og:title"/><meta content="Engineer reliable agent context with token budgets, retrieval, memory, compression, isolation, RAG, vector databases and GraphRAG patterns." property="og:description"/><meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-1.png" property="og:image"/><meta content="https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html" property="og:url"/><meta content="summary_large_image" name="twitter:card"/><meta content="Prashant Dhingra" name="citation_author"/><meta content="Knowledge and Context Engineering for AI Agents" name="citation_title"/><meta content="Context engineering, knowledge engineering, RAG, GraphRAG, vector databases, agent memory and context isolation" name="ai-topic"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
-<style>
-:root{--bg:#f8f7ff;--surface:#fff;--soft:#f2efff;--ink:#17122b;--muted:#6e6782;--line:#ddd6f1;--line2:#c8bdf0;--purple:#6d4aff;--purple2:#8f7bff;--violet:#a855f7;--green:#159a73;--amber:#c9872d;--red:#c94a67;--shadow:0 18px 55px rgba(64,43,132,.12);--display:'Inter',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:radial-gradient(circle at 8% 0%,rgba(143,123,255,.14),transparent 28rem),linear-gradient(180deg,#fdfcff,var(--bg));color:var(--ink);font-family:var(--display);font-size:17px;line-height:1.68}.wrap{max-width:1180px;margin:auto;padding:0 28px}img{max-width:100%;display:block}a{color:var(--purple)}h1,h2,h3,h4,h5{font-family:var(--display);letter-spacing:-.025em}
-.topnav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(18px);border-bottom:1px solid rgba(200,189,240,.82)}.topnav .row{max-width:1180px;margin:auto;padding:0 28px;height:72px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:800;font-size:15px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px}.brand:before{content:'DK';display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--violet));color:#fff;font-size:11px;box-shadow:0 8px 20px rgba(109,74,255,.22)}.navlinks{display:flex;gap:24px;list-style:none;font-size:13px;font-weight:700}.navlinks a{text-decoration:none;color:var(--muted);padding:8px 0;position:relative}.navlinks a.active,.navlinks a:hover{color:var(--purple)}.navlinks a.active:after{content:'';position:absolute;left:0;right:0;bottom:1px;height:2px;background:var(--purple)}
-.hero{padding:82px 0 48px;position:relative;overflow:hidden}.hero:before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(109,74,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(109,74,255,.05) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,#000,transparent 82%)}.hero .wrap{position:relative}.eyebrow,.section-kicker,.qa-label,.card-tab,.brief-kicker{font-family:var(--mono);text-transform:uppercase;letter-spacing:.09em}.eyebrow{font-size:12px;color:var(--purple);display:inline-flex;align-items:center;gap:10px;margin-bottom:22px;border:1px solid var(--line);background:rgba(255,255,255,.85);border-radius:999px;padding:7px 12px}.eyebrow:before{content:'';width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 5px rgba(109,74,255,.12)}.hero-title{font-size:clamp(2.6rem,6vw,4.8rem);line-height:1.02;margin-bottom:22px;font-weight:800;max-width:920px;letter-spacing:-.04em}.hero-title em{font-style:normal;background:linear-gradient(135deg,var(--purple),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}.hero-sub{font-size:1.15rem;color:var(--muted);max-width:760px;margin-bottom:32px}.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}.btn{font-size:14px;font-weight:800;padding:13px 22px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border-radius:12px;border:1px solid var(--line2);transition:.2s}.btn:hover{transform:translateY(-2px)}.btn-solid{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border-color:transparent}.btn-ghost{background:#fff;color:var(--ink)}
-.card-frame{position:relative;background:#fff;border:1px solid var(--line);padding:16px;border-radius:24px;box-shadow:var(--shadow);overflow:hidden}.card-frame:before{display:none}.card-tab{font-size:10.5px;color:var(--muted);display:inline-block;background:var(--soft);border:1px solid var(--line);padding:5px 11px;margin-bottom:12px;border-radius:999px}.card-tab b{color:var(--purple)}.card-frame img{border:1px solid var(--line);border-radius:16px}.quick-answer{background:linear-gradient(135deg,#fff,var(--soft));border:1px solid var(--line);border-left:5px solid var(--purple);padding:30px 32px;margin:60px 0;max-width:980px;border-radius:18px;box-shadow:0 14px 34px rgba(77,47,208,.08)}.quick-answer .qa-label{font-size:11px;color:var(--purple);margin-bottom:10px;display:block}.quick-answer p{font-size:1rem;color:var(--muted)}.quick-answer strong{color:var(--ink)}
-.perf{height:56px;display:flex;align-items:center;justify-content:center;gap:6px}.perf span{width:7px;height:7px;border-radius:50%;background:var(--purple2);border:0}.perf:before,.perf:after{content:'';flex:1;border-top:1px dashed var(--line2)}section{padding:64px 0}.section-head{max-width:760px;margin-bottom:42px}.section-kicker{font-size:12px;color:var(--purple);margin-bottom:12px}.section-title{font-size:clamp(1.9rem,3.4vw,2.7rem);margin-bottom:14px;font-weight:800}.section-lede{color:var(--muted);font-size:1.03rem}.brief-row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:48px 0}.brief-row.reverse .brief-media{order:2}.brief-kicker{font-size:11px;color:var(--purple);margin-bottom:10px}.brief-title{font-size:1.85rem;margin-bottom:14px;font-weight:800}.brief-text p{font-size:.98rem;color:var(--muted);margin-bottom:14px}.brief-list{list-style:none;display:flex;flex-direction:column;gap:11px;margin-top:10px}.brief-list li{padding:14px 16px 14px 44px;position:relative;font-size:.94rem;color:var(--muted);border:1px solid var(--line);border-radius:14px;background:#fff}.brief-list li:before{content:'✓';position:absolute;left:16px;top:14px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(109,74,255,.12);color:var(--purple);font-size:11px;font-weight:800}
-.budget{border:1px solid var(--line);background:#fff;padding:6px;display:flex;height:54px;margin:12px 0 10px;border-radius:14px;overflow:hidden}.budget-seg{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:#fff;white-space:nowrap}.budget-legend{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:8px}.budget-legend .dot{width:9px;height:9px;display:inline-block;margin-right:5px;border-radius:50%}.pillar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:18px}.pillar-card{background:#fff;padding:24px 20px;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 26px rgba(58,36,118,.07)}.pillar-card h5{font-size:1.05rem;margin-bottom:8px}.pillar-card p{font-size:.87rem;color:var(--muted)}.pillar-card .icon{font-size:1.5rem;margin-bottom:10px}.table-wrap{overflow-x:auto;border:1px solid var(--line);background:#fff;border-radius:18px;box-shadow:0 10px 28px rgba(64,43,132,.07)}table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9rem}th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line)}th{font-family:var(--mono);font-size:10px;text-transform:uppercase;color:var(--muted);background:var(--soft)}td.dim{font-family:var(--mono);font-weight:600;color:var(--purple)}tr:last-child td{border-bottom:none}
-.faq-item{border-bottom:1px solid var(--line)}.faq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:1.05rem;color:var(--ink);padding:22px 0;display:flex;justify-content:space-between;gap:20px;font-weight:800}.faq-q .plus{font-family:var(--mono);color:var(--purple);transition:.25s}.faq-item.open .plus{transform:rotate(45deg)}.faq-a{max-height:0;overflow:hidden;transition:max-height .3s}.faq-a p{padding-bottom:22px;color:var(--muted);font-size:.97rem;max-width:860px}.cta-band{background:linear-gradient(135deg,#24134d,#4c2caf 55%,#6d4aff);padding:72px 0;color:#fff}.cta-band .section-kicker{color:#d8d0ff}.cta-band .section-title{color:#fff}.cta-band p{color:#e8e3ff;max-width:620px;margin-bottom:26px}.cta-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:30px;color:#eeeaff}.cta-list li:before{content:'✓ ';color:#b8ffde;font-weight:800}.cta-band .btn-solid{background:#fff;color:var(--purple);box-shadow:none}.cta-band .btn-ghost{border-color:rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.08)}footer{background:#171126;color:#c9c2da;padding:38px 0;text-align:center;font-size:13px}.reveal{opacity:0;transform:translateY(18px);transition:.6s}.reveal.visible{opacity:1;transform:none}
-@media(max-width:900px){.navlinks{display:none}.brief-row{grid-template-columns:1fr;gap:30px}.brief-row.reverse .brief-media{order:0}.pillar-grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.wrap,.topnav .row{padding-left:18px;padding-right:18px}.hero{padding-top:56px}.hero-title{font-size:2.55rem}.pillar-grid{grid-template-columns:1fr}.quick-answer{padding:24px 22px}}
-</style>
-<link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
-<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/>
-<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
-<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/>
-<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>AI Agent Context Engineering: Architecture &amp; Evaluation</title>
+<meta content="Build reliable AI agent context pipelines with RAG, memory, permissions, freshness checks, compression, safe tool outputs, and measurable evaluation." name="description"/>
+<meta content="AI agent context engineering, context engineering for AI agents, agent context architecture, LLM context engineering, agent context window, RAG context selection, context compression, context isolation, agent context evaluation" name="keywords"/>
+<meta content="DataKnobs" name="author"/><meta content="index,follow,max-image-preview:large,max-snippet:-1" name="robots"/>
+<link href="https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html" rel="canonical"/>
+<meta content="Context engineering is the runtime discipline of assembling minimal, authorized, current, sourced instructions, task state, evidence, memory, and tool results for each agent step. The architecture must enforce provenance, isolation, freshness, and evaluation." name="ai-summary"/>
+<meta content="Context assembly pipeline; Write Select Compress Isolate; retrieval authorization; freshness and source provenance; memory isolation; tool injection; context evaluation; enterprise agent optimization" name="ai-key-points"/>
+<meta content="AI Agent Context Engineering: Build Reliable Context Pipelines" name="citation_title"/><meta content="DataKnobs" name="citation_author"/><meta content="en" name="citation_language"/><meta content="2026-10-10" name="citation_online_date"/>
+<meta content="article" property="og:type"/><meta content="AI Agent Context Engineering: Architecture &amp; Evaluation" property="og:title"/><meta content="Build reliable AI agent context pipelines with RAG, memory, permissions, freshness checks, compression, safe tool outputs, and measurable evaluation." property="og:description"/><meta content="https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html" property="og:url"/><meta content="DataKnobs" property="og:site_name"/><meta content="2026-10-10T08:50:00-07:00" property="article:modified_time"/><meta content="Agentic AI" property="article:section"/>
+<meta content="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-1.png" property="og:image"/><meta content="summary_large_image" name="twitter:card"/><meta content="AI Agent Context Engineering: Architecture &amp; Evaluation" name="twitter:title"/><meta content="Build reliable AI agent context pipelines with RAG, memory, permissions, freshness checks, compression, safe tool outputs, and measurable evaluation." name="twitter:description"/>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://www.dataknobs.com/#organization", "name": "DataKnobs", "url": "https://www.dataknobs.com/"}, {"@type": "WebPage", "@id": "https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html#webpage", "url": "https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html", "name": "AI Agent Context Engineering: Architecture & Evaluation", "description": "Build reliable AI agent context pipelines with RAG, memory, permissions, freshness checks, compression, safe tool outputs, and measurable evaluation.", "inLanguage": "en", "dateModified": "2026-10-10", "breadcrumb": {"@id": "https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html#breadcrumb"}, "isPartOf": {"@id": "https://www.dataknobs.com/#website"}}, {"@type": "TechArticle", "@id": "https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html#article", "mainEntityOfPage": {"@id": "https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html#webpage"}, "headline": "AI Agent Context Engineering: Build Reliable Context Pipelines", "description": "Build reliable AI agent context pipelines with RAG, memory, permissions, freshness checks, compression, safe tool outputs, and measurable evaluation.", "author": {"@id": "https://www.dataknobs.com/#organization"}, "publisher": {"@id": "https://www.dataknobs.com/#organization"}, "inLanguage": "en", "dateModified": "2026-10-10", "articleSection": "AI Agents / Agentic AI", "isAccessibleForFree": true, "keywords": ["AI agent context engineering", "context engineering for AI agents", "agent context architecture", "LLM context engineering", "agent context window", "RAG context selection", "context compression", "context isolation", "agent context evaluation"], "about": [{"@type": "Thing", "name": "Context engineering"}, {"@type": "Thing", "name": "AI agents"}, {"@type": "Thing", "name": "Retrieval-augmented generation"}, {"@type": "Thing", "name": "Agent memory"}, {"@type": "Thing", "name": "Data governance"}]}, {"@type": "BreadcrumbList", "@id": "https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html#breadcrumb", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.dataknobs.com/"}, {"@type": "ListItem", "position": 2, "name": "Agentic AI", "item": "https://www.dataknobs.com/agentic-ai/"}, {"@type": "ListItem", "position": 3, "name": "Knowledge and Context Engineering", "item": "https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html"}]}, {"@type": "FAQPage", "@id": "https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html#faq", "mainEntity": [{"@type": "Question", "name": "What is context engineering for AI agents?", "acceptedAnswer": {"@type": "Answer", "text": "It is the systematic selection, assembly, validation, compression, and isolation of instructions, evidence, memory, state, and tool information provided to an agent at each model step. Its objective is to improve task reliability while controlling cost, privacy, and freshness."}}, {"@type": "Question", "name": "How is context engineering different from prompt engineering?", "acceptedAnswer": {"@type": "Answer", "text": "Prompt engineering improves how instructions are written. Context engineering governs the entire information package around those instructions, including retrieved evidence, live state, memory, tools, and subsequent updates during a workflow."}}, {"@type": "Question", "name": "Is context engineering the same as RAG?", "acceptedAnswer": {"@type": "Answer", "text": "No. RAG is one common mechanism for supplying external knowledge. Context engineering determines when to retrieve, what sources are allowed, which passages deserve tokens, what state to include, and how to handle contradictions or stale information."}}, {"@type": "Question", "name": "Should AI agents use the largest available context window?", "acceptedAnswer": {"@type": "Answer", "text": "Not automatically. Larger windows provide capacity, but irrelevant, stale, or contradictory content can raise cost and hurt reliability. Use a task-based budget and evaluate the effects of additional context on verified outcomes."}}, {"@type": "Question", "name": "How do you prevent sensitive data leaking through agent context?", "acceptedAnswer": {"@type": "Answer", "text": "Apply identity and tenant authorization before retrieval, filter sources at the data layer, avoid cross-tenant shared context, minimize prompt logging, and enforce action permissions outside the model. Include adversarial and cross-scope tests in the evaluation suite."}}, {"@type": "Question", "name": "What metrics matter most for context engineering?", "acceptedAnswer": {"@type": "Answer", "text": "Track evidence recall, unauthorized inclusion, freshness, groundedness, task completion, token usage, latency, and cost per successful task. Compare performance by workload, risk tier, source, and configuration version rather than relying on a single overall score."}}]}]}</script><style>
+:root{--bg:#f8f9fe;--navy:#13203b;--ink:#26324c;--muted:#58677f;--purple:#6552c6;--lavender:#f0edff;--line:#e2e6f0;--card:white;--code:#152039}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.75}
+a{color:#4b3bb3;text-underline-offset:3px}a:hover{color:#2b2476}a:focus-visible{outline:3px solid #a79aff;outline-offset:3px}
+.topbar{background:white;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:25}.topinner{max-width:1260px;margin:auto;padding:13px 24px;display:flex;align-items:center;gap:22px;justify-content:space-between}.brand{font-size:1.24rem;font-weight:850;color:#2b225e;text-decoration:none;letter-spacing:-.02em}.toplinks{display:flex;gap:24px;flex-wrap:wrap}.toplinks a{font-size:.9rem;color:#516079;text-decoration:none;font-weight:650}
+.hero{background:linear-gradient(116deg,#eeecff 0%,#f6f8ff 55%,#e5ecff 100%);border-bottom:1px solid #e1ddff}.herowrap{max-width:1260px;margin:auto;padding:55px 24px 46px}.overline{text-transform:uppercase;font-size:.76rem;letter-spacing:.13em;color:#5543a8;font-weight:800}.hero h1{max-width:1020px;color:#1c2545;letter-spacing:-.04em;font-size:clamp(2.2rem,4.7vw,4.35rem);line-height:1.12;margin:14px 0 18px}.hero p{max-width:860px;font-size:1.12rem;line-height:1.65;color:#4a5670}.byline{font-size:.88rem;font-weight:680;color:#66738e;margin-top:22px}.chips{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px}.chips span{border:1px solid #ddd7fb;background:#fff9;border-radius:99px;padding:6px 12px;font-size:.78rem;font-weight:700;color:#514299}
+.layout{display:grid;grid-template-columns:minmax(0,850px) minmax(230px,280px);gap:34px;align-items:start;max-width:1260px;margin:34px auto 72px;padding:0 24px}.article{min-width:0;background:white;border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 35px #18294b08;padding:clamp(24px,4vw,50px)}.article > h1{display:none}.article h2{font-size:clamp(1.45rem,2.35vw,1.92rem);line-height:1.28;letter-spacing:-.02em;color:var(--navy);margin:42px 0 17px;scroll-margin-top:90px}.article h3{font-size:1.16rem;line-height:1.37;color:#2a3450;margin:30px 0 10px;scroll-margin-top:90px}.article h2:first-of-type{margin-top:30px}.article p{margin:12px 0 18px}.article strong{color:#202d4b}.article blockquote{margin:26px 0;padding:8px 22px;background:#f5f3ff;border-left:4px solid #8a78e8;border-radius:0 10px 10px 0}.article ul,.article ol{padding-left:25px}.article li{padding:2px 0 5px}.article pre{background:var(--code);color:#f3f6ff;border-radius:12px;padding:21px;white-space:pre;overflow:auto;line-height:1.49;font-size:.86rem;tab-size:2}.article code{font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace}.article :not(pre)>code{background:#f1f1fc;color:#423085;padding:2px 4px;border-radius:4px;overflow-wrap:anywhere}.article table{display:block;border-collapse:collapse;overflow:auto;width:100%;font-size:.9rem;margin:20px 0 27px}.article th,.article td{border:1px solid var(--line);padding:10px 13px;min-width:95px;text-align:left;vertical-align:top}.article th{background:#f4f5fd;color:#293551}.sidebar{position:sticky;top:85px;max-height:calc(100vh - 110px);overflow:auto;background:white;border:1px solid var(--line);border-radius:15px;padding:19px 18px;box-shadow:0 7px 25px #19294905}.sidebar h2{font-size:.97rem;margin:0 0 8px;color:#1f2a45}.sidebar a{display:block;font-size:.84rem;text-decoration:none;color:#65718a;padding:5px 0 5px 9px;border-left:2px solid transparent;line-height:1.4}.sidebar a:hover{border-color:var(--purple);color:var(--purple)}.cta-box{background:#1c244a;color:white;border-radius:14px;margin:25px 0;padding:24px}.cta-box p{color:#e5e7ff;font-size:1.06rem}.pill{display:inline-block;background:#6554b8;padding:5px 12px;font-size:.74rem;border-radius:18px;font-weight:800;letter-spacing:.04em}.cta-link{display:inline-block;background:white;color:#342778;text-decoration:none;border-radius:9px;padding:10px 17px;font-weight:800}.reference-figure{margin:26px 0;padding:12px;border:1px solid var(--line);border-radius:13px;background:#f9faff}.reference-figure img{display:block;width:100%;height:auto;max-height:460px;object-fit:contain}.reference-figure figcaption{font-size:.82rem;color:var(--muted);text-align:center;padding:7px 12px}.foot{background:white;border-top:1px solid var(--line);color:#69758c;text-align:center;padding:30px 20px;font-size:.88rem}.skip{position:absolute;left:-9999px;top:auto}.skip:focus{left:10px;top:10px;background:white;padding:12px;z-index:99}
+@media(max-width:1020px){.layout{grid-template-columns:1fr}.sidebar{position:static;max-height:none}.toplinks{gap:12px}.herowrap{padding-top:36px}}@media(max-width:660px){.toplinks{display:none}.layout{margin-top:18px;padding:0 12px}.article{padding:22px}.herowrap{padding-left:18px;padding-right:18px}.hero h1{font-size:2.25rem}.reference-figure{padding:6px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-JF94J1W5MC');
-</script><link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/><script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Context Engineering for AI Agents", "description": "Engineer reliable agent context with token budgets, retrieval, memory, compression, isolation, RAG, vector databases and GraphRAG patterns.", "publisher": {"@type": "Organization", "name": "DataKnobs"}, "author": {"@type": "Person", "name": "Prashant Dhingra"}, "url": "https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html", "mainEntityOfPage": "https://www.dataknobs.com/agentic-ai/guide/5-ai-agent-knowledge-and-context-engineering.html", "image": "https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-1.png"}</script></head>
-<body class="dk-page dk-agent-page">
-<nav class="topnav">
-<div class="row">
-<a class="brand" href="https://www.dataknobs.com/"><img alt="DataKnobs logo" class="dk-agent-brand-logo" height="48" src="https://storage.googleapis.com/create-website/logo-images/dataknobs/dataknobs_complete_brandkit/dataknobs_logo_main.png" width="190"/><span class="dk-agent-brand-label">Agentic AI</span></a>
-<ul class="navlinks" id="navlinks">
-<li><a class="active" href="#overview">Overview</a></li>
-<li><a href="#types">Context Types</a></li>
-<li><a href="#pillars">Four Pillars</a></li>
-<li><a href="#knowledge">Knowledge Layer</a></li>
-<li><a href="#faq">FAQ</a></li>
-<li><a class="dk-all-guides-link" href="https://www.dataknobs.com/agent-ai/">All Guides</a></li></ul>
-</div>
-</nav><div class="dk-agent-breadcrumb"><div class="dk-agent-breadcrumb-inner"><a href="https://www.dataknobs.com/agent-ai/">Agentic AI Guides</a><span>/</span><span>Knowledge and Context Engineering for AI Agents</span></div></div>
-<header class="hero" id="top">
-<div class="wrap">
-<span class="eyebrow">Agentic AI · Systems Design</span>
-<h1 class="hero-title">What goes <em>in front</em><br/>of the model, matters.</h1>
-<p class="hero-sub">Context engineering involves determining the precise information available to an LLM or agent during reasoning, such as instructions, memory, retrieved facts, and tools, to ensure a fixed, finite window results in a dependable answer rather than a mere estimation.</p>
-<div class="hero-cta">
-<a class="btn btn-solid" href="#types">See the six types of context →</a>
-<a class="btn btn-ghost" href="#pillars">Jump to the four pillars</a>
-</div>
-<div class="card-frame reveal">
-<span class="card-tab">SLIDE <b>01</b> :  KNOWLEDGE &amp; CONTEXT ENGINEERING</span>
-<img alt="Cover slide: Knowledge and Context Engineering" height="563" loading="eager" sizes="(max-width: 900px) 100vw, 1076px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-1.png" srcset="
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-1.png 600w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-1.png 700w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-1.png 900w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-1.png 1000w" width="1000"/>
-</div>
-</div>
-</header>
-<div class="wrap">
-<div class="quick-answer reveal" id="overview">
-<span class="qa-label">Quick answer</span>
-<p><strong>Context engineering</strong> Curating and assembling all the information a model sees at inference time, including system instructions, user requests, memory, knowledge retrieval, and tools, allows an agent to reason with precision and efficiency, ensuring only the necessary information is utilized. This process differs from <strong>prompt engineering</strong>Context engineering oversees the entire information lifecycle for a multi-step, sometimes multi-session task by crafting a single instruction. The widely recognized operating framework, popularized by LangChain, divides the discipline into four key steps: <strong>Write</strong> (save context for later), <strong>Select</strong> (pull in only what's relevant now), <strong>Compress</strong> (fit more meaning into fewer tokens), and <strong>Isolate</strong> (keep unrelated context from contaminating a task).</p>
-</div>
-</div>
-<div class="perf"><span></span><span></span><span></span></div>
-<!-- ═══ SLIDE 2 :  WHAT IS CONTEXT ENGINEERING ═══════════════════════ -->
-<div class="wrap">
-<div class="brief-row reveal">
-<div class="brief-media card-frame">
-<span class="card-tab">SLIDE <b>02</b> :  CONTEXT VS. PROMPT ENGINEERING</span>
-<img alt="Diagram comparing prompt engineering and context engineering" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-2.png" srcset="
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-2.png 600w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-2.png 700w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-2.png 900w" width="900"/>
-</div>
-<div class="brief-text">
-<span class="brief-kicker">A shift in scope, not just vocabulary</span>
-<h3 class="brief-title">Bigger than a well-written prompt</h3>
-<p><strong>Prompt engineering</strong> It involves carefully wording a single directive - the phrasing, examples, and formatting - a skill applied to individual messages.</p>
-<p><strong>Context engineering</strong> The architectural approach to information management encompasses the entire lifecycle of information, including selection, retrieval, filtering, construction, compression, evaluation, and refresh, ensuring seamless functionality throughout an agent's entire task rather than just its initial message, preventing issues such as missing critical documents or being overwhelmed by unnecessary information.</p>
-</div>
-</div>
-</div>
-<div class="perf"><span></span><span></span><span></span></div>
-<!-- ═══ SLIDE 3 :  WHY IT MATTERS ═══════════════════════════════════ -->
-<div class="wrap">
-<div class="brief-row reverse reveal">
-<div class="brief-media card-frame">
-<span class="card-tab">SLIDE <b>03</b> :  THE CONSTRAINTS THAT MAKE IT HARD</span>
-<img alt="Four constraints of context engineering: tokens, cost, relevance, state" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-3.png" srcset="
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-3.png 600w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-3.png 700w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-3.png 900w" width="900"/>
-</div>
-<div class="brief-text">
-<span class="brief-kicker">Why this became its own discipline</span>
-<h3 class="brief-title">Four pressures pushing back</h3>
-<ul class="brief-list">
-<li><strong>Token limits</strong> :  even the most generous context windows have limits, requiring difficult decisions on what to include.</li>
-<li><strong>Cost</strong> :  each processed token incurs a cost; unchecked context expansion leads to increased budget expenses.</li>
-<li><strong>Relevance</strong> :  Superfluous information not only takes up space, it also diverts attention and diminishes the quality of reasoning.</li>
-<li><strong>State persistence</strong> :  agents must retain user preferences and previous interactions across multiple sessions, not just within a single session.</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="perf"><span></span><span></span><span></span></div>
-<!-- ═══ SLIDE 4 :  SIX TYPES OF CONTEXT ══════════════════════════════ -->
-<section id="types">
-<div class="wrap">
-<div class="section-head reveal">
-<span class="section-kicker">Anatomy of a context window</span>
-<h2 class="section-title">Everything competing for the same budget</h2>
-<p class="section-lede">Consider a context window as a checklist for a task: guidelines, the current issue, recent observations, reliable information, and available resources all come from the same limited pool of tokens.</p>
-</div>
-<div class="brief-row reveal">
-<div class="brief-media card-frame">
-<span class="card-tab">SLIDE <b>04</b> :  SIX TYPES OF CONTEXT</span>
-<img alt="Six types of context in an agent's context window" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-4.png" srcset="
-            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-4.png 600w,
-            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-4.png 700w,
-            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-4.png 900w" width="900"/>
-</div>
-<div class="brief-text">
-<span class="brief-kicker">A sample token allocation</span>
-<h3 class="brief-title">Where the budget typically goes</h3>
-<div class="budget-legend">
-<span><span class="dot" style="background:var(--indigo);"></span>Instructions</span>
-<span><span class="dot" style="background:var(--rust);"></span>User request</span>
-<span><span class="dot" style="background:var(--sage);"></span>Retrieved knowledge</span>
-<span><span class="dot" style="background:#B79A56;"></span>Memory</span>
-<span><span class="dot" style="background:#8A8478;"></span>Tools &amp; state</span>
-</div>
-<div class="budget">
-<div class="budget-seg" style="width:15%;background:var(--indigo);">15%</div>
-<div class="budget-seg" style="width:10%;background:var(--rust);">10%</div>
-<div class="budget-seg" style="width:45%;background:var(--sage);">45%</div>
-<div class="budget-seg" style="width:20%;background:#B79A56;">20%</div>
-<div class="budget-seg" style="width:10%;background:#8A8478;">10%</div>
-</div>
-<p style="font-size:.86rem;color:var(--ink-soft);">A knowledge-intensive agent task often fills up almost half of the window with retrieved documents, highlighting the importance of careful selection and compression over sheer window size.</p>
-</div>
-</div>
-</div>
-</section>
-<div class="perf"><span></span><span></span><span></span></div>
-<!-- ═══ SLIDE 5 :  FOUR PILLARS ══════════════════════════════════════ -->
-<section id="pillars">
-<div class="wrap">
-<div class="section-head reveal">
-<span class="section-kicker">The operating framework</span>
-<h2 class="section-title">Write, Select, Compress, Isolate</h2>
-<p class="section-lede">Four strategies, made famous by LangChain's research on agent engineering, that encompass nearly all the necessary tasks for a context-engineered system to maintain reliability as tasks become more lengthy and intricate.</p>
-</div>
-<div class="brief-row reveal">
-<div class="brief-media card-frame">
-<span class="card-tab">SLIDE <b>05</b> :  THE FOUR-PILLAR FRAMEWORK</span>
-<img alt="Write, Select, Compress, Isolate context engineering framework" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-5.png" srcset="
-            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-5.png 600w,
-            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-5.png 700w,
-            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-5.png 900w" width="900"/>
-</div>
-<div class="brief-text">
-<span class="brief-kicker">One system, four responsibilities</span>
-<h3 class="brief-title">Four verbs, one context budget</h3>
-<p>Every pillar addresses a unique failure mode: losing information, being overwhelmed by it, running out of space, or allowing unrelated tasks to overlap.</p>
-</div>
-</div>
-<div class="pillar-grid reveal">
-<div class="pillar-card"><div class="icon">✍️</div><h5>Write</h5><p>Store interim discoveries in a separate scratchpad to ensure they can be accessed later, preventing loss of important information when the window refreshes.</p></div>
-<div class="pillar-card"><div class="icon">🎯</div><h5>Select</h5><p>Only bring in information that is pertinent to the current task. Not every piece of stored data needs to be included, so retrieval should be both thorough and selective.</p></div>
-<div class="pillar-card"><div class="icon">🗜️</div><h5>Compress</h5><p>Condense or rearrange lengthy information to maximize efficiency without sacrificing necessary details for future use.</p></div>
-<div class="pillar-card"><div class="icon">🧱</div><h5>Isolate</h5><p>Prevent any unrelated information, such as another task, user, or document set, from influencing the current thought process.</p></div>
-</div>
-</div>
-</section>
-<div class="perf"><span></span><span></span><span></span></div>
-<!-- ═══ SLIDE 6 :  KNOWLEDGE LAYER (RAG / VECTOR DB) ═════════════════ -->
-<section id="knowledge">
-<div class="wrap">
-<div class="brief-row reveal">
-<div class="brief-media card-frame">
-<span class="card-tab">SLIDE <b>06</b> :  THE KNOWLEDGE LAYER</span>
-<img alt="Vector databases and RAG as the knowledge layer for context engineering" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-6.png" srcset="
-            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-6.png 600w,
-            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-6.png 700w,
-            https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-6.png 900w" width="900"/>
-</div>
-<div class="brief-text">
-<span class="brief-kicker">Where 'select' actually happens</span>
-<h3 class="brief-title">Retrieval turns a library into a lookup</h3>
-<p>Agents cannot just copy and paste an entire external knowledge base into their window. Vector databases address this issue by representing documents, conversation history, and structured records as embeddings, allowing the system to retrieve only the pertinent passages for the current task.</p>
-<p>When combined with a retrieval-augmented generation (RAG) pipeline, this enables 'select' to expand the agent's knowledge base beyond the limitations of a context window by loading only the necessary information at a time.</p>
-</div>
-</div>
-</div>
-</section>
-<div class="perf"><span></span><span></span><span></span></div>
-<!-- ═══ SLIDE 7 :  KNOWLEDGE GRAPHS / GRAPHRAG ═══════════════════════ -->
-<div class="wrap">
-<div class="brief-row reverse reveal">
-<div class="brief-media card-frame">
-<span class="card-tab">SLIDE <b>07</b> :  KNOWLEDGE GRAPHS &amp; GRAPHRAG</span>
-<img alt="Knowledge graphs and GraphRAG for structured context retrieval" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-7.png" srcset="
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-7.png 600w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-7.png 700w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-7.png 900w" width="900"/>
-</div>
-<div class="brief-text">
-<span class="brief-kicker">When flat retrieval isn't enough</span>
-<h3 class="brief-title">Facts that know how they connect</h3>
-<p>Vector search can identify passages that share similarities, but it may not recognize the connections between a customer's ticket, their subscription tier, and the relevant policy document. In contrast, knowledge graphs explicitly model these relationships, allowing agents to navigate from a customer to their tickets to the applicable SLA in a structured manner, rather than relying on chance for all three to be surfaced through a similarity search.</p>
-<p><strong>GraphRAG</strong> Integrating graph-aware traversal with retrieval helps pinpoint relevant facts and extract supporting text, minimizing errors and providing a clear path for answering complex, multi-source questions, especially important in environments with access restrictions or compliance regulations.</p>
-</div>
-</div>
-</div>
-<div class="perf"><span></span><span></span><span></span></div>
-<!-- ═══ SLIDE 8 :  PATTERNS IN PRACTICE ══════════════════════════════ -->
-<div class="wrap">
-<div class="brief-row reveal">
-<div class="brief-media card-frame">
-<span class="card-tab">SLIDE <b>08</b> :  PATTERNS SEEN IN PRODUCTION</span>
-<img alt="Practical context engineering patterns: scratchpad, sub-agents, memory tiers" height="507" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-8.png" srcset="
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-8.png 600w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-8.png 700w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-8.png 900w" width="900"/>
-</div>
-<div class="brief-text">
-<span class="brief-kicker">What this looks like day to day</span>
-<h3 class="brief-title">Three patterns worth borrowing</h3>
-<ul class="brief-list">
-<li><strong>The scratchpad</strong> :  as it operates, an agent records its discoveries in an external storage system, creating a lasting, searchable database to avoid starting from scratch every time.</li>
-<li><strong>Sub-agent isolation</strong> A complicated task is divided among multiple smaller agents, each operating within their own specific and isolated context, with only the end outcome being shared upwards.</li>
-<li><strong>Tiered memory</strong> Short-term memory stores the present conversation, while long-term memory retains lasting information and preferences, recalled selectively instead of replayed in its entirety each time.</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="perf"><span></span><span></span><span></span></div>
-<!-- ═══ SLIDE 9 :  CONCLUSION ═════════════════════════════════════════ -->
-<div class="wrap">
-<div class="brief-row reverse reveal">
-<div class="brief-media card-frame">
-<span class="card-tab">SLIDE <b>09</b> :  OWNING THE CONTEXT WINDOW</span>
-<img alt="Summary: owning your context window as a core design principle" height="563" loading="lazy" sizes="(max-width: 900px) 100vw, 500px" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-9.png" srcset="
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide600/knowledge-and-context-engineering-9.png 600w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide700/knowledge-and-context-engineering-9.png 700w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide900/knowledge-and-context-engineering-9.png 900w,
-          https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-9.png 1000w" width="1000"/>
-</div>
-<div class="brief-text">
-<span class="brief-kicker">The principle that ties it together</span>
-<h3 class="brief-title">Treat the window as owned, not infinite</h3>
-<p>The enduring concept present in all frameworks like LangChain's four pillars, RAG, knowledge graphs, and tiered memory, is also found in the 12-Factor Agents design principles: an agent architecture should be robust. <strong>own its context window</strong> Instead of viewing it as an endless notepad, the model will autonomously organize itself.</p>
-<p>This implies that each design choice regarding instructions, memory, and retrieval is done purposefully, with a defined responsibility and allocated resources, rather than relying on happenstance.</p>
-</div>
-</div>
-</div>
-<div class="perf"><span></span><span></span><span></span></div>
-<!-- ═══ CONTEXT TYPES REFERENCE TABLE ════════════════════════════════ -->
-<section>
-<div class="wrap">
-<div class="section-head reveal">
-<span class="section-kicker">Quick reference</span>
-<h2 class="section-title">The six types of context, side by side</h2>
-</div>
-<div class="table-wrap reveal">
+</script></head>
+<body><a class="skip" href="#article">Skip to article</a><header class="topbar"><div class="topinner"><a class="brand" href="/">DataKnobs</a><nav aria-label="Primary" class="toplinks"><a href="/agentic-ai/">Agentic AI</a><a href="/data-products/">Data Products</a><a href="/products/kontrols/">KONTROLS</a><a href="/products/knobs/">KNOBS</a></nav></div></header>
+<section class="hero"><div class="herowrap"><div class="overline">Agentic AI · Architecture &amp; Reliability</div><h1>AI Agent Context Engineering: Build Reliable Context Pipelines</h1><p>Build reliable AI agent context pipelines with RAG, memory, permissions, freshness checks, compression, safe tool outputs, and measurable evaluation.</p><div class="chips"><span>RAG &amp; Retrieval</span><span>Agent State</span><span>Governance</span><span>Context Evaluation</span></div><div class="byline">DataKnobs · Updated October 10, 2026</div></div></section>
+<main class="layout"><article class="article" id="article">
+<p><strong>AI agent context engineering</strong> is the design of the information an agent receives at each model call: instructions, the current task, permitted tools, retrieved evidence, task state, and selectively recalled memory. It is not the practice of putting everything into a large prompt. It is the discipline of providing <strong>the smallest sufficient, authorized, current, and verifiable set of information</strong> for the next decision.</p><figure class="reference-figure"><img alt="DataKnobs presentation diagram introducing knowledge and context engineering for AI agents" decoding="async" loading="lazy" src="https://storage.googleapis.com/5108_gdrive/slides.kreatewebsites.com/input/content/agent-ai/knowledge-and-context-engineering/images/Slide1000/knowledge-and-context-engineering-1.png" width="1000"/><figcaption>Existing DataKnobs context-engineering visual, retained as a supporting reference to the expanded implementation guide.</figcaption></figure>
+<p>That distinction matters in enterprise systems. An agent answering a policy question may need an approved policy document and its effective date. The same agent initiating a refund needs live transaction state, user authorization, allowed tools, and a business rule. Both tasks may use the same model, but they require different context.</p>
+<p>A dependable context pipeline should answer five questions before inference: <strong>What does the agent need now? Where does each fact come from? Who is allowed to see it? Is it current? How will we know the selection helped?</strong></p>
+<h2 id="context-engineering-vs-prompt-engineering-rag-and-memory">Context engineering vs prompt engineering, RAG, and memory</h2>
+<p>Prompt engineering is concerned with the clarity and format of instructions. Context engineering determines what information is assembled and exposed to the model throughout a workflow. Retrieval-augmented generation (RAG) supplies evidence from an external knowledge source; memory retains selected information across steps or sessions. These are components of context engineering, not competing replacements.</p>
 <table>
-<thead><tr><th>Context type</th><th>What it holds</th><th>Primary pillar it feeds</th></tr></thead>
+<thead>
+<tr>
+<th>Discipline</th>
+<th>Primary question</th>
+<th>Example output</th>
+</tr>
+</thead>
 <tbody>
-<tr><td class="dim">System instructions</td><td>Role, goals, constraints, safety rules</td><td>Write</td></tr>
-<tr><td class="dim">User prompt</td><td>The specific request and its stated constraints</td><td>Select</td></tr>
-<tr><td class="dim">Short-term memory</td><td>Recent conversation turns, current task state</td><td>Compress</td></tr>
-<tr><td class="dim">Long-term memory</td><td>Durable facts, preferences, past sessions</td><td>Select</td></tr>
-<tr><td class="dim">Retrieved knowledge</td><td>Documents, records, and graph facts pulled via RAG</td><td>Select / Compress</td></tr>
-<tr><td class="dim">Tools &amp; state</td><td>Available actions and the live state of the environment</td><td>Isolate</td></tr>
+<tr>
+<td>Prompt engineering</td>
+<td>How should the agent interpret and perform this task?</td>
+<td>Versioned task instructions</td>
+</tr>
+<tr>
+<td>RAG / knowledge retrieval</td>
+<td>Which source material is relevant and permitted?</td>
+<td>Approved policy passages with citations</td>
+</tr>
+<tr>
+<td>Agent memory</td>
+<td>What should persist or be recalled from past interactions?</td>
+<td>Customer preference or task checkpoint</td>
+</tr>
+<tr>
+<td>Context engineering</td>
+<td>What information is needed <strong>at this step</strong> and in what form?</td>
+<td>A scoped context package for the model</td>
+</tr>
 </tbody>
 </table>
-</div>
-</div>
-</section>
-<!-- ═══ FAQ ══════════════════════════════════════════════════════════ -->
-<section id="faq">
-<div class="wrap">
-<div class="section-head reveal">
-<span class="section-kicker">Frequently asked</span>
-<h2 class="section-title">Context engineering FAQ</h2>
-</div>
-<div class="reveal" id="faq-list">
-<div class="faq-item">
-<button class="faq-q">Is context engineering the same as prompt engineering?<span class="plus">+</span></button>
-<div class="faq-a"><p>Prompt engineering focuses on crafting the wording of individual instructions, while context engineering oversees the entire information lifecycle that an agent utilizes for a multi-step task, including instructions, memory, retrieved knowledge, and tools. Even a perfectly worded prompt can be ineffective if the surrounding context is inaccurate.</p></div>
-</div>
-<div class="faq-item">
-<button class="faq-q">What are the four pillars of context engineering?<span class="plus">+</span></button>
-<div class="faq-a"><p>The framework, popularized by LangChain's agent research, includes: Store (save context for future use), Retrieve (select only relevant information), Condense (pack more meaning into fewer words), and Shield (prevent unrelated context from interfering with the task at hand).</p></div>
-</div>
-<div class="faq-item">
-<button class="faq-q">How is knowledge engineering different from context engineering?<span class="plus">+</span></button>
-<div class="faq-a"><p>Knowledge engineering involves organizing and saving data for easy retrieval by constructing a vector database or knowledge graph. Context engineering is the next level, determining during inference which information from the stored knowledge is relevant to the model's current context window.</p></div>
-</div>
-<div class="faq-item">
-<button class="faq-q">What exactly is GraphRAG and when does the added complexity become justified?<span class="plus">+</span></button>
-<div class="faq-a"><p>GraphRAG integrates the explicit relationships of a knowledge graph with text lookup from retrieval-augmented generation, providing added complexity suitable for multi-source or time-sensitive inquiries, data with restricted access, or instances requiring explainable reasoning trails over single similarity-matched passages.</p></div>
-</div>
-<div class="faq-item">
-<button class="faq-q">Why does an agent need both short-term and long-term memory?<span class="plus">+</span></button>
-<div class="faq-a"><p>Short-term memory maintains the flow of conversation, while long-term memory stores important information to prevent repetitive learning. Selective retrieval of long-term memory prevents it from overwhelming the current task.</p></div>
-</div>
-<div class="faq-item">
-<button class="faq-q">What does it mean to 'own your context window'?<span class="plus">+</span></button>
-<div class="faq-a"><p>In the 12-Factor Agents methodology, the engineering team deliberately controls the contents of the model's context, treating it as a managed, finite resource instead of leaving it to the framework to decide.</p></div>
-</div>
-</div>
-</div>
-</section>
-<!-- ═══ CTA ══════════════════════════════════════════════════════════ -->
-<section class="cta-band">
-<div class="wrap">
-<span class="section-kicker">Get started</span>
-<h2 class="section-title">Ready to design your agent's context budget?</h2>
-<p>Begin by identifying the six necessary types of context for your agent, then use Write, Select, Compress, and Isolate techniques to maintain a focused and relevant window as tasks become more complex.</p>
-<ul class="cta-list">
-<li>A context-budget worksheet for your next agent design review</li>
-<li>A suggestion for a retrieval framework: consider utilizing vector search, knowledge graph, or a combination of both.</li>
-<li>A memory-tiering plan for short-term vs. long-term state</li>
+<p>The distinction becomes clearer in long-running workflows: a prompt can remain unchanged while the context must be rebuilt after every tool call. For deeper storage strategies, see <a href="/agentic-ai/3-ai-agent-memory-design.html">AI agent memory design</a> and the <a href="/generativeai/10-llms/rag/rag-detailed-page.html">RAG architecture guide</a>.</p>
+<h2 id="why-bigger-context-windows-do-not-solve-the-problem">Why bigger context windows do not solve the problem</h2>
+<p>More available tokens are helpful, but they do not guarantee more correct decisions. Context can include stale policies, duplicate passages, contradictory records, tool results from an unrelated user, and instructions embedded in untrusted documents. Putting all of that into a larger window can raise cost and make the agent less reliable.</p>
+<p>Anthropic's September 2025 engineering guide describes context as finite and emphasizes selecting a compact set of high-signal tokens. LangChain's July 2025 guide organizes the main techniques into <strong>write, select, compress, and isolate</strong>. These approaches address both quality and resource constraints. See the <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic engineering guide</a> and <a href="https://www.langchain.com/blog/context-engineering-for-agents">LangChain's context-engineering framework</a>.</p>
+<p>For enterprise systems, the main failure modes are concrete:</p>
+<ul>
+<li><strong>Missing context:</strong> the relevant exception clause was never retrieved.</li>
+<li><strong>Stale context:</strong> an old policy overrides a more recent effective version.</li>
+<li><strong>Conflicting context:</strong> two systems define “active account” differently.</li>
+<li><strong>Context overload:</strong> redundant tool output crowds out authoritative evidence.</li>
+<li><strong>Cross-scope leakage:</strong> records from another user or tenant enter the package.</li>
+<li><strong>Context injection:</strong> an untrusted document attempts to become an instruction.</li>
 </ul>
-<div class="hero-cta">
-<a class="btn btn-solid" href="#pillars">Revisit the four pillars →</a>
-<a class="btn btn-ghost" href="#types">Back to context types</a>
-</div>
-</div>
-</section>
+<p>The objective is not maximum context utilization. It is <strong>maximum task success subject to authorization, freshness, latency, and cost</strong>.</p>
+<h2 id="reference-architecture-the-context-assembly-pipeline">Reference architecture: the context assembly pipeline</h2>
+<p>Treat context assembly as a distinct application component rather than a string-concatenation helper. A practical architecture is:</p>
+<pre><code class="language-text">User request + verified identity
+             |
+             v
+    Intent and risk classifier
+             |
+             v
+    Context policy / permissions
+             |
+       +-----+--------------------+
+       |                          |
+       v                          v
+Current task state         Authorized retrieval
+       |                  (SQL / APIs / RAG / Graph)
+       |                          |
+       +------------+-------------+
+                    v
+           Rank and deduplicate
+                    |
+           Validate freshness
+                    |
+            Compress / isolate
+                    |
+             Context package
+                    |
+           Model / agent step
+                    |
+            Trace and evaluate
+</code></pre>
+<p>An important boundary appears near the top: <strong>authorization and source eligibility are decided before retrieval results are eligible for inclusion</strong>, not delegated to the language model after retrieval. Tool execution and high-impact actions have their own policy checks even when the context looks correct.</p>
+<h3 id="1-keep-the-context-sources-explicit">1. Keep the context sources explicit</h3>
+<p>Label context by origin and purpose:</p>
+<ul>
+<li><strong>System instructions:</strong> task boundaries and output contracts owned by the application.</li>
+<li><strong>User intent:</strong> the current request and confirmed constraints.</li>
+<li><strong>Task state:</strong> verified current workflow status, pending actions, deadlines.</li>
+<li><strong>Knowledge evidence:</strong> retrieved documents, records, authoritative definitions.</li>
+<li><strong>Memory:</strong> useful prior facts with provenance and retention rules.</li>
+<li><strong>Tool metadata and results:</strong> available capabilities and observed execution outcomes.</li>
+</ul>
+<p>Do not let retrieved text silently impersonate higher-priority instructions. Document passages are evidence, not policy authority over the agent's behavior.</p>
+<h3 id="2-store-provenance-with-each-evidence-item">2. Store provenance with each evidence item</h3>
+<p>For an enterprise agent, the context assembler should know more than the passage body. Record a source ID, version, effective time, retrieval time, authorization scope, and the specific task or claim the passage supports. This is especially important for financial, legal, compliance, and customer-account workflows.</p>
+<h3 id="3-build-different-packages-for-different-steps">3. Build different packages for different steps</h3>
+<p>A research step may need broad retrieval and tool discovery. A final answer step may need only the accepted evidence and conclusion. An action step needs live state, exact arguments, authorization, and confirmation rules. Replaying the complete history in all three stages wastes context and increases risk.</p>
+<h2 id="apply-the-four-operations-write-select-compress-isolate">Apply the four operations: write, select, compress, isolate</h2>
+<p>The framework is useful when implemented as explicit engineering decisions rather than buzzwords.</p>
+<h3 id="write-retain-useful-state-outside-the-prompt">Write: retain useful state outside the prompt</h3>
+<p>Persist task progress, source references, confirmed constraints, and important observations in a structured store or checkpoint. Do not persist unreviewed guesses as authoritative facts. Use stable IDs so that the agent can re-fetch the underlying record.</p>
+<p>For example, save <code>supplier_id=8421</code>, <code>review_period=2026-Q3</code>, and <code>policy_version=18</code> rather than a long generated narrative that may be difficult to verify later.</p>
+<h3 id="select-retrieve-only-what-this-step-requires">Select: retrieve only what this step requires</h3>
+<p>A selection policy can combine keyword search, embeddings, metadata filters, SQL, and graph traversal. Apply tenant, role, jurisdiction, effective date, and source status before ranking evidence. Select by <strong>task relevance and authority</strong>, not similarity alone.</p>
+<p>A semantic near-match can still be wrong: a refund policy for US customers may resemble a UK policy but contain different deadlines. Source metadata must disambiguate the result.</p>
+<h3 id="compress-preserve-decisions-and-evidence-not-noise">Compress: preserve decisions and evidence, not noise</h3>
+<p>Compress repeated history and verbose tool responses, but keep material exceptions, numerical values, citations, contradictions, and unresolved questions. Prefer structured extracts over free-form summaries for high-impact fields. Store a reference to the full result so a reviewer can inspect the original.</p>
+<p>Google's Agent Development Kit includes context-compaction features that summarize older interactions; this is a helpful implementation pattern, but a summary is still generated text and may omit or distort details. Preserve access to authoritative source state. See <a href="https://adk.dev/context/compaction/">Google ADK's context-compression documentation</a>.</p>
+<h3 id="isolate-separate-scopes-and-concerns">Isolate: separate scopes and concerns</h3>
+<p>Maintain boundaries between users, tenants, subagents, tasks, and trust levels. Store large tool outputs outside the model context and expose only relevant validated fields. For multi-agent workflows, pass scoped work products and provenance rather than the entire private history of one agent to another.</p>
+<p>This complements <a href="/agentic-ai/7-multi-ai-agent-systems.html">multi-agent system design</a>, but context engineering focuses on what each participant can <em>see</em>, not on the full orchestration strategy.</p>
+<h2 id="build-a-context-budget-that-follows-the-task">Build a context budget that follows the task</h2>
+<p>A context budget is a planning rule, not a universal percentage. Reserve space for core instructions, the current request, live state, evidence, tool schemas, and expected output. Leave headroom for tool results and later turns. Do not fill the model's maximum window merely because capacity is available.</p>
+<p>For illustration, suppose an application targets <strong>20,000 input tokens</strong> for a complex review step:</p>
+<table>
+<thead>
+<tr>
+<th>Context category</th>
+<th style="text-align:right">Illustrative allowance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Instructions and output contract</td>
+<td style="text-align:right">2,000</td>
+</tr>
+<tr>
+<td>Current task and verified state</td>
+<td style="text-align:right">2,000</td>
+</tr>
+<tr>
+<td>Retrieved evidence</td>
+<td style="text-align:right">9,000</td>
+</tr>
+<tr>
+<td>Selected memory and examples</td>
+<td style="text-align:right">2,000</td>
+</tr>
+<tr>
+<td>Tool metadata / recent results</td>
+<td style="text-align:right">3,000</td>
+</tr>
+<tr>
+<td>Reserved headroom</td>
+<td style="text-align:right">2,000</td>
+</tr>
+</tbody>
+</table>
+<p>These are <strong>example allocations, not industry benchmarks</strong>. A transaction agent may allocate more to live state and much less to long documents; a research agent may do the opposite. The correct mix should come from evaluation data.</p>
+<p>Useful budget knobs include <code>max_evidence_tokens</code>, <code>max_tool_result_tokens</code>, <code>retrieval_top_k</code>, <code>rerank_cutoff</code>, <code>history_turns</code>, <code>summary_trigger</code>, and <code>reserved_output_tokens</code>. Keep the configuration versioned and observable.</p>
+<h2 id="retrieval-start-simple-then-add-structure">Retrieval: start simple, then add structure</h2>
+<p>A robust retrieval pipeline generally begins with source selection and authorization, then combines lexical and semantic search where useful, reranks candidates, deduplicates overlapping chunks, and retains citations.</p>
+<p>For enterprise use cases, an effective sequence is:</p>
+<ol>
+<li>Identify the domain, task, and allowed source collection.</li>
+<li>Apply tenant, role, region, effective-date, and document-status filters.</li>
+<li>Retrieve candidates with keyword, vector, SQL, or API methods.</li>
+<li>Rerank by relevance <strong>and source authority</strong>.</li>
+<li>Detect duplicates, stale records, and conflicting statements.</li>
+<li>Assemble evidence with stable source references.</li>
+<li>Check whether evidence sufficiency is adequate; otherwise retrieve more or escalate.</li>
+</ol>
+<p>Do not use a <a href="https://www.dataknobs.com/vector-database/">vector database</a> as the only source of truth for precise live values such as an account balance, product inventory, or transaction status. Query the authoritative operational system when state matters.</p>
+<h3 id="when-does-graphrag-help">When does GraphRAG help?</h3>
+<p>Graph traversal becomes useful when the answer depends on relationships: customer → product → entitlement → policy exception, or supplier → subsidiary → legal case → region. In those cases, combine relationship-aware retrieval with textual evidence. It adds complexity and should be justified by evaluation, not assumed to beat standard RAG for every question.</p>
+<p>Related specialist guide: <a href="/vector-database/">vector databases</a>.</p>
+<h2 id="memory-must-have-expiry-provenance-and-correction">Memory must have expiry, provenance, and correction</h2>
+<p>Persistent memory and immediate context are different things. A preference may be safe to recall for weeks; an order status can change in minutes. Define which facts are durable, which must be refreshed, and which should never be remembered.</p>
+<p>A memory item needs at least an identity and scope, source, timestamp, confidence or review status, and a deletion/correction mechanism. For sensitive settings, require explicit retention and access policies. If new evidence conflicts with recalled memory, <strong>current authoritative data should win</strong> and the discrepancy should be logged.</p>
+<p>In particular, memory generated from prior agent responses is not automatically trustworthy. Errors can become persistent if a summary or inference is repeatedly read back as fact.</p>
+<h2 id="tool-results-are-data-not-instructions">Tool results are data, not instructions</h2>
+<p>Agents receive external text from search engines, documents, messages, webpages, databases, and MCP servers. That material can contain malicious instructions. Treat retrieved content and tool output as <strong>untrusted input</strong> even when the source is helpful for factual grounding.</p>
+<p>Recommended controls include:</p>
+<ul>
+<li>preserve clear trust boundaries among system instructions, user requests, and external data;</li>
+<li>avoid placing secrets in prompts or tool descriptions;</li>
+<li>restrict tool exposure by task and principal;</li>
+<li>validate tool arguments and authorization outside the <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a>;</li>
+<li>strip or quarantine suspicious control text from retrieved material;</li>
+<li>use human approval for consequential actions;</li>
+<li>test indirect prompt injection through source documents and tool results.</li>
+</ul>
+<p>OWASP's AI security guidance explicitly identifies cross-user retrieval leakage, untrusted MCP content, and context poisoning as security concerns. See the <a href="https://cornucopia.owasp.org/cards/LLM4">OWASP LLM security guidance</a> and the <a href="/agentic-ai/11-ai-agent-security.html">AI agent security guide</a>.</p>
+<h2 id="a-practical-context-package-contract">A practical context-package contract</h2>
+<p>The runtime needs an auditable data structure rather than an opaque prompt blob. The following is an <strong>illustrative application-level schema</strong>, not a standard required by any model provider:</p>
+<pre><code class="language-json">{
+  "context_version": "support-v12",
+  "task": "Explain refund eligibility",
+  "principal": {"tenant_id": "t17", "role": "support_agent"},
+  "policy_scope": {"region": "US", "effective_at": "2026-10-10"},
+  "evidence": [
+    {
+      "source_id": "returns-policy-v18",
+      "title": "Returns Policy",
+      "valid_from": "2026-10-01",
+      "retrieved_at": "2026-10-10T09:00:00Z",
+      "relevance": 0.93,
+      "authorization": "allowed"
+    }
+  ],
+  "live_state_refs": ["order:8742"],
+  "max_evidence_tokens": 4000,
+  "unresolved_questions": [],
+  "trace_id": "trace-example-123"
+}
+</code></pre>
+<p>The context assembler can then build the model-visible request from validated fields. The full source text can be fetched only for authorized references. Keep provenance in the trace so it is possible to reconstruct a decision without logging unnecessary personal content.</p>
+<h2 id="enterprise-example-a-supplier-risk-investigation">Enterprise example: a supplier-risk investigation</h2>
+<p>Consider an agent answering: <strong>“Is Supplier Northstar approved for the new EU contract?”</strong> A naïve system retrieves the nearest text and produces a persuasive answer. A governed system first identifies the supplier entity and jurisdiction, then loads verified account state, current approval policy, outstanding sanctions checks, and any relevant legal records.</p>
+<p>Its context may include:</p>
+<table>
+<thead>
+<tr>
+<th>Required item</th>
+<th>Source</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Supplier legal identity</td>
+<td>Master supplier product</td>
+<td>Match current entity ID</td>
+</tr>
+<tr>
+<td>EU eligibility policy</td>
+<td>Approved policy repository</td>
+<td>Current effective version only</td>
+</tr>
+<tr>
+<td>Due-diligence status</td>
+<td>Live procurement API</td>
+<td>Refresh at decision time</td>
+</tr>
+<tr>
+<td>Case evidence</td>
+<td>Authorized case repository</td>
+<td>Cite original case IDs</td>
+</tr>
+<tr>
+<td>Approval authority</td>
+<td>Workflow policy engine</td>
+<td>Enforced outside the model</td>
+</tr>
+</tbody>
+</table>
+<p>If the due-diligence status is missing or contradictory, the correct response is not an invented approval. The agent should mark the decision as pending and request the required check. Context engineering enables that behavior by representing uncertainty and absence explicitly.</p>
+<p>This pattern pairs naturally with reusable <a href="/data-products/">AI-ready data products</a> and an agent's <a href="/agentic-ai/4-ai-agent-tool-and-function-integration.html">governed tool integration</a>.</p>
+<h2 id="evaluate-context-quality-not-just-answer-quality">Evaluate context quality, not just answer quality</h2>
+<p>A large amount of context may correlate with a fluent answer without improving the underlying task. Evaluation should compare context configurations on <strong>the same test cases</strong> using frozen source snapshots where possible.</p>
+<p>Measure several levels:</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Useful metric</th>
+<th>Failure revealed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Retrieval</td>
+<td>Evidence recall / relevance</td>
+<td>Missing necessary evidence</td>
+</tr>
+<tr>
+<td>Scope</td>
+<td>Unauthorized inclusion rate</td>
+<td>Data isolation breach</td>
+</tr>
+<tr>
+<td>Freshness</td>
+<td>Version or effective-date accuracy</td>
+<td>Stale policy</td>
+</tr>
+<tr>
+<td>Grounding</td>
+<td>Claim support / citation correctness</td>
+<td>Unsupported output</td>
+</tr>
+<tr>
+<td>Agent outcome</td>
+<td>Verified task success</td>
+<td>Answer did not complete the job</td>
+</tr>
+<tr>
+<td>Efficiency</td>
+<td>Tokens, P95 latency, cost per success</td>
+<td>Context bloat</td>
+</tr>
+<tr>
+<td>Robustness</td>
+<td>Accuracy under conflicting or malicious sources</td>
+<td>Injection / confusion</td>
+</tr>
+</tbody>
+</table>
+<p>A rigorous test corpus should include near-duplicate policies, superseded documents, cross-tenant lookalikes, missing evidence, long tool responses, and adversarial text. Test both <strong>false inclusions</strong> (irrelevant or prohibited data appears) and <strong>false omissions</strong> (necessary facts are missing).</p>
+<h3 id="run-experiments-rather-than-tuning-by-intuition">Run experiments rather than tuning by intuition</h3>
+<p>Compare variants such as <code>top_k=5</code> versus <code>top_k=10</code>, lexical-plus-vector retrieval versus vector-only, or raw versus compressed tool results. Keep model, task set, and sources fixed while changing one major dimension. Promote a configuration only if quality and safety gates hold and the latency/cost trade-off is acceptable.</p>
+<p>This is where a context system becomes an optimization platform. See <a href="/agentic-ai/9-ai-agent-testing-and-evaluation.html">AI agent evaluation</a> for broader outcome and trace grading.</p>
+<h2 id="observe-every-context-decision-in-production">Observe every context decision in production</h2>
+<p>For each agent step, capture context version, eligible collections, selected source IDs, filter outcomes, token counts by category, compression applied, retrieval latency, freshness checks, policy denials, and model or agent result. Avoid retaining full sensitive source text unless necessary and authorized.</p>
+<p>An operator should be able to answer: <strong>“Why did the agent include this document and exclude the updated policy?”</strong> The decision trace should connect retrieval and context selection to the final output and its supporting evidence.</p>
+<p>Use <a href="/agentic-ai/10-ai-agent-observability.html">AI agent observability</a> to track those traces and tie them to regression results.</p>
+<h2 id="make-context-choices-measurable-with-knobs">Make context choices measurable with KNOBS</h2>
+<p>Retrieval breadth, reranking cutoff, memory lookback, compaction frequency, source freshness, evidence requirements, and tool visibility are adjustable operating parameters. <strong>KNOBS</strong> is the natural DataKnobs capability for comparing these settings against task success, groundedness, latency, cost, and risk. <strong>KONTROLS</strong> establishes the mandatory permissions and policy boundaries that no optimization setting may override.</p>
+<p><a href="/products/knobs/">Explore DataKnobs KNOBS for agent optimization</a> to turn context selection from scattered hard-coded choices into versioned experiments and operational controls.</p><div class="cta-box"><span class="pill">KNOBS · Optimize</span><p>Make retrieval breadth, freshness, compression and evidence thresholds versioned, testable operating controls.</p><a class="cta-link" href="/products/knobs/">Explore KNOBS →</a></div>
+<h2 id="implementation-roadmap-for-enterprise-teams">Implementation roadmap for enterprise teams</h2>
+<p><strong>First 30 days :  establish a baseline.</strong> Inventory source systems and agent workflows. Trace what the model currently sees. Define authorization boundaries and an initial gold dataset of real tasks and failures. Start with a deterministic context assembler and simple authorized retrieval.</p>
+<p><strong>Days 31–60 :  improve relevance and reliability.</strong> Add source metadata, hybrid retrieval, reranking, freshness checks, task-specific token budgets, and structured compression. Introduce negative test cases for leakage, stale policy, and malicious tool outputs. Compare configurations against the baseline.</p>
+<p><strong>Days 61–90 :  operationalize.</strong> Add context-version release gates, production tracing, dataset feedback from incidents, controlled knobs, and rollback. Extend to memory and multi-agent isolation only where those capabilities clearly improve outcomes.</p>
+<p>The best initial architecture is rarely the most complex one. Build the smallest pipeline that gets authoritative context to the right step, prove it works, and expand only when evaluation shows a benefit.</p>
+<h2 id="frequently-asked-questions">Frequently Asked Questions</h2>
+<h3 id="what-is-context-engineering-for-ai-agents">What is context engineering for AI agents?</h3>
+<p>It is the systematic selection, assembly, validation, compression, and isolation of instructions, evidence, memory, state, and tool information provided to an agent at each model step. Its objective is to improve task reliability while controlling cost, privacy, and freshness.</p>
+<h3 id="how-is-context-engineering-different-from-prompt-engineering">How is context engineering different from prompt engineering?</h3>
+<p>Prompt engineering improves how instructions are written. Context engineering governs the entire information package around those instructions, including retrieved evidence, live state, memory, tools, and subsequent updates during a workflow.</p>
+<h3 id="is-context-engineering-the-same-as-rag">Is context engineering the same as RAG?</h3>
+<p>No. RAG is one common mechanism for supplying external knowledge. Context engineering determines when to retrieve, what sources are allowed, which passages deserve tokens, what state to include, and how to handle contradictions or stale information.</p>
+<h3 id="should-ai-agents-use-the-largest-available-context-window">Should AI agents use the largest available context window?</h3>
+<p>Not automatically. Larger windows provide capacity, but irrelevant, stale, or contradictory content can raise cost and hurt reliability. Use a task-based budget and evaluate the effects of additional context on verified outcomes.</p>
+<h3 id="how-do-you-prevent-sensitive-data-leaking-through-agent-context">How do you prevent sensitive data leaking through agent context?</h3>
+<p>Apply identity and tenant authorization before retrieval, filter sources at the data layer, avoid cross-tenant shared context, minimize prompt logging, and enforce action permissions outside the model. Include adversarial and cross-scope tests in the evaluation suite.</p>
+<h3 id="what-metrics-matter-most-for-context-engineering">What metrics matter most for context engineering?</h3>
+<p>Track evidence recall, unauthorized inclusion, freshness, groundedness, task completion, token usage, latency, and cost per successful task. Compare performance by workload, risk tier, source, and configuration version rather than relying on a single overall score.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Reliable agents are not built by filling the prompt window. They are built by <strong>controlling the flow of authorized, current, relevant information</strong> across each step of a real task. Use write, select, compress, and isolate as practical operations. Keep authoritative data and permissions outside the model, preserve provenance, evaluate on real outcomes, and treat context settings as versioned knobs that can be measured and improved.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic: Effective context engineering for AI agents (September 29, 2025)</a></li>
+<li><a href="https://www.langchain.com/blog/context-engineering-for-agents">LangChain: Context Engineering (July 2, 2025)</a></li>
+<li><a href="https://adk.dev/context/compaction/">Google Agent Development Kit: Context compression</a></li>
+<li><a href="https://cornucopia.owasp.org/cards/LLM4">OWASP: Guidance on cross-user retrieval and untrusted agent context</a></li>
+</ul>
+</article><aside aria-label="On this page" class="sidebar"><h2>On this page</h2><a href="#context-engineering-vs-prompt-engineering-rag-and-memory">Context engineering vs prompt engineering, RAG, and memory</a>
+<a href="#why-bigger-context-windows-do-not-solve-the-problem">Why bigger context windows do not solve the problem</a>
+<a href="#reference-architecture-the-context-assembly-pipeline">Reference architecture: the context assembly pipeline</a>
+<a href="#apply-the-four-operations-write-select-compress-isolate">Apply the four operations: write, select, compress, isolate</a>
+<a href="#build-a-context-budget-that-follows-the-task">Build a context budget that follows the task</a>
+<a href="#retrieval-start-simple-then-add-structure">Retrieval: start simple, then add structure</a>
+<a href="#memory-must-have-expiry-provenance-and-correction">Memory must have expiry, provenance, and correction</a>
+<a href="#tool-results-are-data-not-instructions">Tool results are data, not instructions</a>
+<a href="#a-practical-context-package-contract">A practical context-package contract</a>
+<a href="#enterprise-example-a-supplier-risk-investigation">Enterprise example: a supplier-risk investigation</a>
+<a href="#evaluate-context-quality-not-just-answer-quality">Evaluate context quality, not just answer quality</a>
+<a href="#observe-every-context-decision-in-production">Observe every context decision in production</a>
+<a href="#make-context-choices-measurable-with-knobs">Make context choices measurable with KNOBS</a>
+<a href="#implementation-roadmap-for-enterprise-teams">Implementation roadmap for enterprise teams</a>
+<a href="#frequently-asked-questions">Frequently Asked Questions</a>
+<a href="#conclusion">Conclusion</a>
+<a href="#sources">Sources</a></aside></main>
 <footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -386,115 +424,81 @@ gtag('config', 'G-JF94J1W5MC');
 <div>
 <h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
 <ul class="space-y-2">
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-engineering/">Agent Engineering</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-frameworks/">Agent Frameworks</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-observability/">Agent Observability</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Ai Development Life Cycle</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/beyond-react/">Beyond React</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/beyond-react-slides/">Beyond React Slides</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/conflict-resolution/">Conflict Resolution</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/cost-aware-planning/">Cost Aware Planning</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/design-patterns/">Design Patterns</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/emergent-behavior/">Emergent Behavior</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/episodic-memory/">Episodic Memory</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/event-vs-goal-agents/">Event Vs Goal Agents</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/fail-safe-agents/">Fail Safe Agents</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/guide/">Guide</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/hierarchical-agents/">Hierarchical Agents</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/mas-simulation/">Mas Simulation</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-arch/">Memory Arch</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-compression/">Memory Compression</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/memory-strategies/">Memory Strategies</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/multi-agent-systems/">Multi Agent Systems</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/planning-algorithms/">Planning Algorithms</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/planning-vs-reactive/">Planning Vs Reactive</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/prompt-injection/">Prompt Injection</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/sandboxing-agents/">Sandboxing Agents</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/self-evolving-memory/">Self Evolving Memory</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/stateless-stateful-agents/">Stateless Stateful Agents</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/symbolic-llm-reasoning/">Symbolic Llm Reasoning</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/testing/">Testing</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-chaining/">Tool Chaining</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-hallucination/">Tool Hallucination</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-schema-latency/">Tool Schema Latency</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/tool-selection/">Tool Selection</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/uncertainty-handling/">Uncertainty Handling</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/use-cases/">Use Cases</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/agent-engineering/">Agent Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/agent-frameworks/">Agent Frameworks</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/agent-observability/">Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Ai Development Life Cycle</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/beyond-react/">Beyond React</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/beyond-react-slides/">Beyond React Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/conflict-resolution/">Conflict Resolution</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/cost-aware-planning/">Cost Aware Planning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/design-patterns/">Design Patterns</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/emergent-behavior/">Emergent Behavior</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/episodic-memory/">Episodic Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/event-vs-goal-agents/">Event Vs Goal Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/fail-safe-agents/">Fail Safe Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/guide/">Guide</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/hierarchical-agents/">Hierarchical Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/mas-simulation/">Mas Simulation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/memory-arch/">Memory Arch</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/memory-compression/">Memory Compression</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/memory-strategies/">Memory Strategies</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/multi-agent-systems/">Multi Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/planning-algorithms/">Planning Algorithms</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/planning-vs-reactive/">Planning Vs Reactive</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/prompt-injection/">Prompt Injection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/sandboxing-agents/">Sandboxing Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/self-evolving-memory/">Self Evolving Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/stateless-stateful-agents/">Stateless Stateful Agents</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/symbolic-llm-reasoning/">Symbolic Llm Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/testing/">Testing</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/tool-chaining/">Tool Chaining</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/tool-hallucination/">Tool Hallucination</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/tool-schema-latency/">Tool Schema Latency</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/tool-selection/">Tool Selection</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/uncertainty-handling/">Uncertainty Handling</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/use-cases/">Use Cases</a></li>
 </ul>
 </div>
 <div>
 <h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
 <ul class="space-y-2">
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/1-agent-strategy-use-case-identification(1).html">1 Agent Strategy Use Case Identification(1)</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/11-agent-security-2-dataknobs-theme.html.bak.html">11 Agent Security 2 Dataknobs Theme.Html.Bak</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/11-ai-agent-security-2-dataknobs-theme.html">11 Ai Agent Security 2 Dataknobs Theme</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/11-ai-agent-security.html">11 Ai Agent Security</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/17-agent-reliability-engineering.html">17 Agent Reliability Engineering</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/18-agent-economics(1).html">18 Agent Economics(1)</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/18-agent-economics.html">18 Agent Economics</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/19-agent-compliance-and-risk(1).html">19 Agent Compliance And Risk(1)</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/19-agent-compliance-and-risk.html">19 Agent Compliance And Risk</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agent-ai-index-dataknobs-theme(1).html">Agent Ai Index Dataknobs Theme(1)</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/ai-agent-identity-authorization.html">Ai Agent Identity Authorization</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/chunking-and-tokenization.html">Chunking And Tokenization</a></li>
-<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/mcp-vs-a2a.html">Mcp Vs A2A</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/1-agent-strategy-use-case-identification(1).html">1 Agent Strategy Use Case Identification(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/1-ai-agent-strategy-use-case-identification.html">1 Ai Agent Strategy Use Case Identification</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/10-ai-agent-observability.html">10 Ai Agent Observability</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/11-agent-security-2-dataknobs-theme.html.bak.html">11 Agent Security 2 Dataknobs Theme.Html.Bak</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/11-ai-agent-security-2-dataknobs-theme.html">11 Ai Agent Security 2 Dataknobs Theme</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/11-ai-agent-security.html">11 Ai Agent Security</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/12-ai-agent-governance.html">12 Ai Agent Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/13-ai-agent-human-in-the-loop.html">13 Ai Agent Human In The Loop</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/14-ai-agent-deployment.html">14 Ai Agent Deployment</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/15-ai-agent-operations.html">15 Ai Agent Operations</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/16-ai-agent-learning-and-adaptation.html">16 Ai Agent Learning And Adaptation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/17-agent-reliability-engineering.html">17 Agent Reliability Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/18-agent-economics(1).html">18 Agent Economics(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/18-agent-economics.html">18 Agent Economics</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/19-agent-compliance-and-risk(1).html">19 Agent Compliance And Risk(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/19-agent-compliance-and-risk.html">19 Agent Compliance And Risk</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/2-ai-agent-architecture-design.html">2 Ai Agent Architecture Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/3-ai-agent-memory-design.html">3 Ai Agent Memory Design</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/4-ai-agent-tool-and-function-integration.html">4 Ai Agent Tool And Function Integration</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/5-ai-agent-knowledge-and-context-engineering.html">5 Ai Agent Knowledge And Context Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/6-ai-agent-planning-and-reasoning.html">6 Ai Agent Planning And Reasoning</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/7-multi-ai-agent-systems.html">7 Multi Ai Agent Systems</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/8-ai-agent-development-and-prompt-engineering.html">8 Ai Agent Development And Prompt Engineering</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/9-ai-agent-testing-and-evaluation.html">9 Ai Agent Testing And Evaluation</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/agent-ai-index-dataknobs-theme(1).html">Agent Ai Index Dataknobs Theme(1)</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/ai-agent-identity-authorization.html">Ai Agent Identity Authorization</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/chunking-and-tokenization.html">Chunking And Tokenization</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/agentic-ai/mcp-vs-a2a.html">Mcp Vs A2A</a></li>
 </ul>
 </div>
 </div>
 <div class="mt-8 text-center text-sm text-gray-400">
-<p class="text-sm text-gray-400">Build AI Dataproducts with Safety and Governance</p>
 </div>
 <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
-<p class="text-sm text-gray-400">© 2026 Dataknobs. All rights reserved.</p>
+<p class="text-sm text-gray-400">© 2026 www.dataknobs. All rights reserved.</p>
 <div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
 </div>
 </div>
-</footer>
-<script>
-(function(){
-  var els = document.querySelectorAll('.reveal');
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
-  }, {threshold:.1});
-  els.forEach(function(el){ io.observe(el); });
-
-  var sections = ['overview','types','pillars','knowledge','faq'].map(function(id){return document.getElementById(id);}).filter(Boolean);
-  var links = document.querySelectorAll('.navlinks a');
-  var navIo = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){
-        links.forEach(function(l){ l.classList.remove('active'); });
-        var match = document.querySelector('.navlinks a[href="#'+e.target.id+'"]');
-        if(match) match.classList.add('active');
-      }
-    });
-  }, {rootMargin:'-40% 0px -50% 0px'});
-  sections.forEach(function(s){ navIo.observe(s); });
-
-  document.querySelectorAll('.faq-item').forEach(function(item){
-    var btn = item.querySelector('.faq-q');
-    var ans = item.querySelector('.faq-a');
-    btn.addEventListener('click', function(){
-      var isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(function(o){ o.classList.remove('open'); o.querySelector('.faq-a').style.maxHeight = null; });
-      if(!isOpen){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
-    });
-  });
-})();
-</script>
-</body></html>
+</footer></body></html>

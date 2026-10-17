@@ -1,111 +1,34 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Handling Malicious or Compromised MCP Servers: Failover Strategies</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-
-		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
-		(function (w, d, s, l, i) {
-			w[l] = w[l] || []; w[l].push({
-				'gtm.start':
-					new Date().getTime(), event: 'gtm.js'
-			}); var f = d.getElementsByTagName(s)[0],
-				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Handle Compromised MCP Servers | Dataknobs</title><meta content="A 2026 playbook for malicious or compromised MCP servers covering trust inventory, metadata drift, circuit breakers, quarantine, failover, and recovery." name="description"/><meta content="index, follow" name="robots"/><meta content="website" property="og:type"/><meta content="Handle Compromised MCP Servers | Dataknobs" property="og:title"/><meta content="A 2026 playbook for malicious or compromised MCP servers covering trust inventory, metadata drift, circuit breakers, quarantine, failover, and recovery." property="og:description"/><meta content="summary" name="twitter:card"/><meta content="Handle Compromised MCP Servers | Dataknobs" name="twitter:title"/><meta content="A 2026 playbook for malicious or compromised MCP servers covering trust inventory, metadata drift, circuit breakers, quarantine, failover, and recovery." name="twitter:description"/><meta content="#6d28d9" name="theme-color"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon"/><link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/><script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Handle Compromised MCP Servers | Dataknobs", "description": "A 2026 playbook for malicious or compromised MCP servers covering trust inventory, metadata drift, circuit breakers, quarantine, failover, and recovery.", "publisher": {"@type": "Organization", "name": "Dataknobs"}}</script><style>
+:root{--violet:#7c3aed;--indigo:#4f46e5;--purple:#6d28d9;--fuchsia:#c026d3;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--soft:#f8fafc;--green:#047857;--amber:#b45309;--red:#b91c1c;--max:1180px;--radius:24px;--shadow:0 18px 52px rgba(15,23,42,.09)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:88px}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff;line-height:1.65}a{color:inherit;text-decoration:none}button{font:inherit}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}
+.dk-nav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}.dk-nav-in{height:78px;display:flex;align-items:center;justify-content:space-between;gap:18px}.dk-logo{height:46px;width:auto;display:block}.dk-links{display:flex;align-items:center;gap:20px;color:#475569;font-size:.9rem}.dk-links a:hover{color:var(--purple)}.dk-badge{display:inline-flex;align-items:center;border:1px solid #ddd6fe;background:#f5f3ff;color:#5b21b6;border-radius:999px;padding:7px 11px;font-weight:800;font-size:.78rem;white-space:nowrap}
+.hero{position:relative;overflow:hidden;padding:82px 0 64px;background:radial-gradient(circle at 12% 15%,rgba(192,38,211,.12),transparent 34%),radial-gradient(circle at 92% 20%,rgba(79,70,229,.14),transparent 32%),linear-gradient(180deg,#fff,#faf8ff);border-bottom:1px solid #ede9fe}.hero:after{content:"";position:absolute;right:-110px;bottom:-190px;width:430px;height:430px;border-radius:50%;background:linear-gradient(135deg,rgba(124,58,237,.11),rgba(79,70,229,.02))}.eyebrow,.kicker{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:#6d28d9;font-weight:850}.hero h1{font-size:clamp(2.65rem,6vw,5rem);line-height:1.03;letter-spacing:-.045em;max-width:970px;margin:14px 0 18px}.hero p{max-width:820px;color:#475569;font-size:clamp(1.05rem,2vw,1.26rem);margin:0}.gradient-text{background:linear-gradient(90deg,#7c3aed,#4f46e5,#c026d3);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#6d28d9}.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}.btn{display:inline-flex;justify-content:center;align-items:center;padding:11px 17px;border-radius:999px;font-weight:800;border:1px solid transparent}.btn-primary{background:linear-gradient(90deg,#7c3aed,#4f46e5);color:white;box-shadow:0 12px 26px rgba(79,70,229,.2)}.btn-secondary{background:white;border-color:#d8b4fe;color:#5b21b6}
+main section{padding:66px 0}.section-soft{background:#f8fafc;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.section-violet{background:linear-gradient(180deg,#faf7ff,#f5f3ff)}.section-head{max-width:790px;margin:0 auto 34px;text-align:center}.section-head.left{text-align:left;margin-left:0}.section-head h2{font-size:clamp(2rem,4vw,3.08rem);line-height:1.1;letter-spacing:-.035em;margin:8px 0 12px}.section-head p{color:var(--muted);font-size:1.03rem;margin:0}
+.grid{display:grid;gap:20px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g5{grid-template-columns:repeat(5,minmax(0,1fr))}.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:0 8px 30px rgba(15,23,42,.05)}.card:hover{border-color:#c4b5fd;box-shadow:var(--shadow)}.card h3,.card h4{margin-top:0}.icon{width:45px;height:45px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#ede9fe,#eef2ff);font-size:1.35rem;margin-bottom:13px}.muted{color:var(--muted)}.small{font-size:.91rem}.pill-row{display:flex;flex-wrap:wrap;gap:8px}.pill{border:1px solid #ddd6fe;background:#fff;color:#5b21b6;border-radius:999px;padding:7px 10px;font-size:.8rem;font-weight:750}
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.flow.four{grid-template-columns:repeat(4,minmax(0,1fr))}.flow.six{grid-template-columns:repeat(6,minmax(0,1fr))}.flow-step{position:relative;background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px}.flow-step:not(:last-child):after{content:"→";position:absolute;right:-17px;top:50%;transform:translateY(-50%);z-index:3;color:#8b5cf6;font-size:1.25rem;font-weight:900}.num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#ede9fe;color:#6d28d9;font-weight:900;margin-bottom:11px}
+.note{border-left:4px solid #8b5cf6;background:#faf5ff;padding:18px 20px;border-radius:14px}.good{border-color:#86efac;background:#f0fdf4}.warn{border-color:#fde68a;background:#fffbeb}.risk{border-color:#fecaca;background:#fef2f2}.info{border-color:#bfdbfe;background:#eff6ff}
+ul.clean{list-style:none;padding:0;margin:0;display:grid;gap:11px}ul.clean li{display:flex;gap:10px;align-items:flex-start}ul.clean li:before{content:"✓";color:#6d28d9;font-weight:900;margin-top:1px}.risk ul.clean li:before{content:"!";color:#b91c1c}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:20px;background:#fff}.dk-table{width:100%;border-collapse:collapse;min-width:760px}.dk-table th,.dk-table td{padding:15px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.dk-table th{background:#fafafa;color:#475569;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase}.dk-table tr:last-child td{border-bottom:0}
+.score-panel{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;align-items:start}.toggle-list{display:grid;gap:12px}.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid var(--line);border-radius:16px;background:#fff;padding:15px 17px}.switch{position:relative;width:50px;height:28px;flex:none}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#cbd5e1;border-radius:999px;cursor:pointer;transition:.2s}.slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:.2s}.switch input:checked+.slider{background:#7c3aed}.switch input:checked+.slider:before{transform:translateX(22px)}.score-box{background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;position:sticky;top:104px}.score-number{font-size:4.5rem;line-height:1;font-weight:900;color:#5b21b6}.progress{height:12px;border-radius:999px;background:#ede9fe;overflow:hidden}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#c026d3,#7c3aed,#4f46e5);transition:.25s}
+.ladder{display:grid;gap:12px}.ladder-row{display:grid;grid-template-columns:130px 1fr auto;gap:16px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:18px;padding:16px}.bar{height:10px;background:#ede9fe;border-radius:999px;overflow:hidden}.bar span{height:100%;display:block;border-radius:999px;background:linear-gradient(90deg,#a78bfa,#4f46e5)}.tag{font-size:.78rem;font-weight:800;color:#5b21b6;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:999px;padding:5px 9px}
+.diagram{border:1px solid var(--line);border-radius:24px;background:#fff;padding:24px;box-shadow:0 8px 30px rgba(15,23,42,.05)}.diagram-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.box{border:1px solid #ddd6fe;background:#faf7ff;border-radius:16px;padding:14px 16px;text-align:center;min-width:145px}.arrow{font-weight:900;color:#8b5cf6;font-size:1.3rem}.codebox{background:#0f172a;color:#e2e8f0;border-radius:20px;padding:20px;overflow:auto;font:500 .88rem/1.65 ui-monospace,SFMono-Regular,Menlo,monospace}.codebox strong{color:#c4b5fd}.codebox .ok{color:#86efac}.codebox .warnc{color:#fde68a}
+.lifecycle-tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:26px}.tab-btn{border:1px solid #ddd6fe;background:#fff;color:#5b21b6;padding:9px 13px;border-radius:999px;font-weight:800;cursor:pointer}.tab-btn.active{background:#6d28d9;color:#fff}.tab-panel{display:none}.tab-panel.active{display:block}.accordion{display:grid;gap:10px}.acc-item{border:1px solid var(--line);border-radius:16px;background:#fff;overflow:hidden}.acc-btn{width:100%;background:#fff;border:0;padding:17px 18px;text-align:left;font-weight:800;display:flex;justify-content:space-between;gap:12px;cursor:pointer}.acc-content{display:none;padding:0 18px 18px;color:#475569}.acc-item.open .acc-content{display:block}
+.source-box{border-top:1px solid var(--line);margin-top:28px;padding-top:20px}.source-box h3{font-size:1rem;margin:0 0 10px}.source-box ul{margin:0;padding-left:19px;color:#64748b;font-size:.88rem}.source-box a{text-decoration:underline;text-decoration-color:#c4b5fd;text-underline-offset:3px}.callout{padding:28px;border-radius:24px;background:linear-gradient(135deg,#6d28d9,#4f46e5);color:#fff}.callout p{color:#ede9fe}.callout .pill{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff}
+.dk-footer{border-top:1px solid var(--line);background:#0f172a;color:#e2e8f0;padding:48px 0}.footer-grid{display:grid;grid-template-columns:1.3fr repeat(3,.75fr);gap:20px}.footer-grid h3,.footer-grid h4{color:#fff;margin-top:0}.footer-grid p{color:#94a3b8}.footer-tag{font-weight:850;color:#c4b5fd}.mini-cta{display:inline-block;margin-top:16px;color:#fff;border-bottom:1px solid #a78bfa}
+@media(max-width:1000px){.g5{grid-template-columns:repeat(2,1fr)}.flow.six{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.dk-links{display:none}.g4,.g3,.g2,.score-panel,.footer-grid{grid-template-columns:1fr}.score-box{position:static}.flow,.flow.four,.flow.six{grid-template-columns:1fr}.flow-step:not(:last-child):after{content:"↓";right:auto;left:50%;top:auto;bottom:-24px;transform:translateX(-50%)}.ladder-row{grid-template-columns:1fr}.g5{grid-template-columns:1fr}}@media(max-width:600px){.wrap{width:min(100% - 28px,var(--max))}.hero{padding:56px 0 48px}.hero h1{font-size:2.48rem}.card{padding:20px}.score-number{font-size:3.6rem}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-JF94J1W5MC');
-</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
-<body class="bg-gray-50 text-gray-800">
-
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">Handling Malicious or Compromised MCP Servers</h1>
-            <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Resilience and Failover Strategies for a Trustworthy Agentic Ecosystem</p>
-        </header>
-
-        <main class="max-w-4xl mx-auto">
-            <!-- Introduction Section -->
-            <section class="mb-12">
-                <p class="text-lg leading-relaxed">
-                    MCP servers act as reliable intermediaries in agentic systems, but what if that reliability falters? Servers may turn malicious, be breached by attackers, or crash from bugs or outages. To withstand such threats, multi-agent networks must plan for server failure. Without strong recovery measures, one compromised server could endanger agents, leak sensitive data, and disrupt the whole platform.
-                </p>
-            </section>
-
-            <!-- Circuit Breakers Section -->
-            <section class="mb-16" id="circuit-breakers">
-                 <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Proactive Defense: Circuit Breakers &amp; Fallbacks</h2>
-                 <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-                    <p class="text-lg leading-relaxed mb-6">Borrowed from electrical engineering, the circuit breaker pattern automatically detects failures and stops repeated requests to unreliable services.</p>
-                    
-                    <div class="space-y-4 mt-4">
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-800">Circuit Breakers</h3>
-                            <p class="text-gray-700">Here's a rewritten version of similar length and detail:
-
-An agent’s client wrapper tracks requests to an MCP server. When failures (such as timeouts, 5xx errors, or bad responses) surpass a set limit, the “circuit” switches off. For a fixed interval, any further requests to the server are instantly denied, conserving resources and reducing further disruption. The agent then promptly tries a fallback option.</p>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-800">Fallback Clients</h3>
-                            <p class="text-gray-700">Agents must be set up with a main MCP server and at least one backup for essential tools. If the primary server fails, the agent should seamlessly shift to a verified secondary, maintaining uninterrupted function.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Trust Scoring Section -->
-            <section class="mb-16" id="trust-scoring">
-                <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Dynamic Trust: Scoring &amp; Reputation Systems</h2>
-                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-                    <p class="text-lg leading-relaxed mb-4">Replace the binary 'trusted/untrusted' model with a dynamic trust score for each MCP server, updating it continuously using operational data.</p>
-                    <ul class="list-disc list-inside mt-4 space-y-2 text-lg text-gray-700">
-                        <li><strong>Performance Metrics:</strong> Persistent high latency or frequent errors may reduce a server's trust rating.</li>
-                        <li><strong>Security Signals:</strong> A server sending bad data or getting flagged by a scanner (such as MCP Guardian) would get a steep score penalty.</li>
-                        <li><strong>Community Reputation:</strong> Agents or operators could rate servers in a decentralized system, forming a web-of-trust framework.</li>
-                    </ul>
-                     <p class="text-lg mt-4 leading-relaxed">Agents can reference these scores to select servers for tasks, favoring those with stronger reliability and security reputations.
-                    </p>
-                </div>
-            </section>
-
-            <!-- Degradation and Quarantining Section -->
-            <section class="mb-16" id="quarantining">
-                <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Damage Control: Degradation &amp; Quarantining</h2>
-                <div class="bg-red-50 border-l-4 border-red-500 p-8 rounded-lg">
-                    <h3 class="text-2xl font-semibold text-red-900 mb-3">Isolating the Threat</h3>
-                    <p class="text-red-800 text-lg leading-relaxed">
-                        Upon detecting a server as malicious or compromised, swift measures must be taken to mitigate the risk.
-                    </p>
-                    <ul class="list-disc list-inside mt-4 space-y-2 text-lg text-red-800">
-                        <li><strong>Quarantining Servers:</strong> An orchestration platform or service mesh can 'quarantine' a server by disabling its network connectivity. This blocks communication with agents and internal systems during an investigation.</li>
-                        <li><strong>Graceful Degradation:</strong> If the main tool server is quarantined and no fallback exists, the system should degrade gracefully. The agent must detect that some functionality is unavailable and either try an alternative approach or notify the user of the limitation, avoiding a full crash.</li>
-                    </ul>
-                </div>
-            </section>
-
-            <!-- Conclusion -->
-            <section class="text-center mt-16">
-                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Designing for Failure</h2>
-                 <p class="text-lg leading-relaxed max-w-3xl mx-auto">
-                   In distributed systems, failure is expected, not unusual. By integrating resilience into agent-server interactions using circuit breakers, reputation scoring, and automated quarantining you build a robust, self-healing ecosystem that stays secure and operational even as individual parts encounter faults.
-                </p>
-            </section>
-        </main>
-
-        <footer class="bg-gray-800 text-gray-300">
+</script></head><body><header class="dk-nav"><div class="wrap dk-nav-in"><a aria-label="Dataknobs home" href="https://www.dataknobs.com/"><img alt="Dataknobs" class="dk-logo" height="58" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png" width="190"/></a><nav aria-label="Page navigation" class="dk-links"><a href="#threat">Threat Model</a><a href="#prevent">Prevent</a><a href="#runtime">Runtime</a><a href="#failover">Failover</a></nav><span class="dk-badge">MCP Security · 2026</span></div></header><section class="hero"><div class="wrap"><div class="eyebrow">Design for compromised dependencies</div><h1>Handling <span class="gradient-text">Malicious or Compromised MCP Servers</span></h1><p>A resilient agent platform assumes servers can fail operationally or become adversarial after approval. Detect trust drift, contain it quickly, and fail closed.</p><div class="hero-actions"><a class="btn btn-primary" href="#threat">See the threat model</a><a class="btn btn-secondary" href="https://www.dataknobs.com/">Dataknobs platform</a></div></div></section><main>
+<section id="threat"><div class="wrap"><div class="section-head"><div class="kicker">Trust can change after approval</div><h2>A server that was safe yesterday may be unsafe today</h2><p>Compromise is not limited to outages. The server can still respond successfully while changing tool metadata, steering the agent toward sensitive data, exfiltrating through permitted actions, or returning adversarial content.</p></div><div class="grid g4"><div class="card risk"><h3>Availability failure</h3><p>Timeouts, overload, dependency failure, certificate problems, regional outage.</p></div><div class="card risk"><h3>Integrity failure</h3><p>Tool output or metadata changes in a way that alters agent behavior.</p></div><div class="card risk"><h3>Confidentiality failure</h3><p>Server or tool tries to collect secrets, local files, customer data, or credentials.</p></div><div class="card risk"><h3>Authority abuse</h3><p>Tool attempts actions outside the approved business purpose or expected destination set.</p></div></div><div class="source-box"><h3>2026 update sources</h3><ul><li><a href="https://genai.owasp.org/resource/a-practical-guide-for-secure-mcp-server-development/" rel="noopener">OWASP secure MCP server development guide</a></li><li><a href="https://genai.owasp.org/2026/10/08/genai-and-agentic-ai-exploit-roundup-q3-2026/" rel="noopener">OWASP Q3 2026 agentic exploit roundup</a></li></ul></div></div></section>
+<section class="section-soft" id="prevent"><div class="wrap"><div class="section-head"><div class="kicker">Before runtime</div><h2>Make MCP servers managed dependencies</h2></div><div class="grid g3"><div class="card"><h3>Approved registry</h3><p>Track owner, source, package/container digest, endpoint, auth method, scopes, tool inventory, environment, and review status.</p></div><div class="card"><h3>Metadata snapshots</h3><p>Snapshot tool/prompt/resource definitions at approval time. Diff them continuously and require re-approval for meaningful change.</p></div><div class="card"><h3>Least privilege</h3><p>Keep agents away from local credential stores and sensitive files unless the task explicitly requires them.</p></div><div class="card"><h3>Egress control</h3><p>Restrict where the server and tool execution can connect. “Can make HTTP calls” should not mean “can reach anywhere.”</p></div><div class="card"><h3>Version pinning</h3><p>Use exact approved versions/digests in production and make upgrades an intentional deployment event.</p></div><div class="card"><h3>Security evaluation</h3><p>Test schemas, injection, path/command handling, data exposure, approval bypass, and tool-description poisoning.</p></div></div></div></section>
+<section id="runtime"><div class="wrap"><div class="section-head"><div class="kicker">At runtime</div><h2>Detect, trip, isolate, recover</h2></div><div class="flow five"><div class="flow-step"><div class="num">1</div><h3>Detect</h3><p class="small muted">Errors, metadata drift, unusual destinations, denied actions, anomaly signals.</p></div><div class="flow-step"><div class="num">2</div><h3>Trip circuit</h3><p class="small muted">Stop new requests before retries amplify damage.</p></div><div class="flow-step"><div class="num">3</div><h3>Quarantine</h3><p class="small muted">Remove routing, revoke credentials, deny network access, preserve evidence.</p></div><div class="flow-step"><div class="num">4</div><h3>Fail safely</h3><p class="small muted">Use a separately trusted fallback or degrade capability; never fail open.</p></div><div class="flow-step"><div class="num">5</div><h3>Re-validate</h3><p class="small muted">Root cause, rebuild, re-evaluate, re-approve, then restore gradually.</p></div></div></div></section>
+<section class="section-violet" id="failover"><div class="wrap"><div class="section-head"><div class="kicker">Failover is not trust transfer</div><h2>A backup must be independently trusted</h2></div><div class="table-wrap"><table class="dk-table"><thead><tr><th>Situation</th><th>Correct response</th><th>Avoid</th></tr></thead><tbody><tr><td>Primary times out</td><td>Circuit-break and retry a pre-approved equivalent with idempotency protection.</td><td>Retry storm against the same failing server.</td></tr><tr><td>Metadata changes unexpectedly</td><td>Block changed capability and require review/re-evaluation.</td><td>Automatically trusting the new description because endpoint identity is unchanged.</td></tr><tr><td>Suspected exfiltration</td><td>Quarantine, revoke tokens, stop egress, preserve logs, rotate affected credentials.</td><td>Continuing read-only calls “for diagnosis.”</td></tr><tr><td>No safe equivalent exists</td><td>Degrade gracefully and tell the user/operator what is unavailable.</td><td>Routing to an unknown public server.</td></tr></tbody></table></div></div></section>
+<section id="kontrols"><div class="wrap"><div class="callout"><h2 style="margin-top:0">KONTROLS treats trust as a lifecycle</h2><p>Server trust should move through registered → reviewed → approved → monitored → quarantined/revoked states, with KNOBS-based testing before promotion and after every material capability change.</p></div></div></section></main><footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 <div>
@@ -180,8 +103,4 @@ An agent’s client wrapper tracks requests to an MCP server. When failures (suc
 <div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
 </div>
 </div>
-</footer>
-    </div>
-
-
-</body></html>
+</footer></body></html>

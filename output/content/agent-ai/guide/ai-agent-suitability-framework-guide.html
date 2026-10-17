@@ -1,124 +1,85 @@
 <!DOCTYPE html>
-<html class="scroll-smooth" lang="en"><head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>AI Agent Decision Framework</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <!-- Chosen Palette: Warm Neutrals -->
-    <!-- Application Structure Plan: The application is designed as a single-page, vertical-scrolling experience with a sticky top navigation for easy access to all sections. This structure was chosen to guide the user through a logical decision-making process: 1) A quick introduction. 2) An interactive "Decision Framework" with toggle questions that immediately engage the user. 3) A dynamic "Suitability Score" that provides instant, personalized feedback based on their answers. 4) Supporting "Use Cases" and "Anti-Use Cases" for context. 5) Concluding "Lessons Learned". This flow transforms a static document into a practical, personalized tool, enhancing usability and user comprehension. -->
-    <!-- Visualization & Content Choices: Report Info: "Questions to ask" -> Goal: Guide user decision -> Viz/Presentation: Interactive toggle cards -> Interaction: User toggles Yes/No, which updates a JS state object -> Justification: More engaging than a static list and provides data for a summary score. Report Info: Suitability summary -> Goal: Synthesize & provide feedback -> Viz/Presentation: Donut Chart + dynamic text -> Interaction: Chart and text update in real-time based on toggle changes -> Justification: Provides a clear, quantitative, and personalized takeaway for the user. Library: Chart.js for the canvas-based chart. Report Info: "When to use/not use" -> Goal: Inform & Compare -> Viz/Presentation: Thematically colored cards with icons in a grid layout -> Interaction: Simple hover effects -> Justification: Easy to scan and visually distinguishes between positive and negative factors. All interactions are handled with vanilla JS. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #FDFBF8;
-            color: #374151;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 320px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 320px;
-        }
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #2dd4bf;
-        }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #2dd4bf;
-        }
-    </style>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-
-		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
-		(function (w, d, s, l, i) {
-			w[l] = w[l] || []; w[l].push({
-				'gtm.start':
-					new Date().getTime(), event: 'gtm.js'
-			}); var f = d.getElementsByTagName(s)[0],
-				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>When Should You Use an AI Agent? | Dataknobs</title>
+<meta content="A practical 2026 decision framework for choosing between prompts, workflows, assistants and AI agents, with Dataknobs KREATE, KONTROLS and KNOBS." name="description"/><meta content="index, follow" name="robots"/>
+<meta content="website" property="og:type"/><meta content="When Should You Use an AI Agent? | Dataknobs" property="og:title"/><meta content="A practical 2026 decision framework for choosing between prompts, workflows, assistants and AI agents, with Dataknobs KREATE, KONTROLS and KNOBS." property="og:description"/>
+<meta content="summary" name="twitter:card"/><meta content="When Should You Use an AI Agent? | Dataknobs" name="twitter:title"/><meta content="A practical 2026 decision framework for choosing between prompts, workflows, assistants and AI agents, with Dataknobs KREATE, KONTROLS and KNOBS." name="twitter:description"/>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon"/><link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "When Should You Use an AI Agent? | Dataknobs", "description": "A practical 2026 decision framework for choosing between prompts, workflows, assistants and AI agents, with Dataknobs KREATE, KONTROLS and KNOBS.", "publisher": {"@type": "Organization", "name": "Dataknobs"}}</script>
+<style>
+:root{
+  --dk-violet:#7c3aed;--dk-indigo:#4f46e5;--dk-purple:#6d28d9;--dk-fuchsia:#c026d3;
+  --dk-ink:#0f172a;--dk-muted:#64748b;--dk-line:#e2e8f0;--dk-soft:#f8fafc;
+  --dk-panel:#ffffff;--dk-green:#047857;--dk-amber:#b45309;--dk-red:#b91c1c;
+  --dk-shadow:0 18px 52px rgba(15,23,42,.09);--dk-radius:24px;--dk-max:1180px;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;color:var(--dk-ink);line-height:1.65}
+a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{width:min(var(--dk-max),calc(100% - 40px));margin:auto}
+.dk-nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--dk-line)}
+.dk-nav-in{height:78px;display:flex;align-items:center;justify-content:space-between;gap:22px}.dk-logo{height:46px;width:auto;display:block}
+.dk-links{display:flex;gap:22px;align-items:center;font-size:.92rem;color:#475569}.dk-links a:hover{color:var(--dk-purple)}
+.dk-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid #ddd6fe;background:#f5f3ff;color:#5b21b6;border-radius:999px;padding:8px 12px;font-weight:700;font-size:.82rem}
+.hero{position:relative;overflow:hidden;padding:86px 0 66px;background:radial-gradient(circle at 15% 10%,rgba(192,38,211,.12),transparent 34%),radial-gradient(circle at 90% 20%,rgba(79,70,229,.13),transparent 31%),linear-gradient(180deg,#fff 0%,#faf8ff 100%);border-bottom:1px solid #ede9fe}
+.hero:after{content:"";position:absolute;inset:auto -8% -100px auto;width:380px;height:380px;border-radius:50%;background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(79,70,229,.02));filter:blur(2px)}
+.eyebrow{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:#6d28d9;font-weight:800}.hero h1{font-size:clamp(2.7rem,6vw,5.2rem);line-height:1.02;letter-spacing:-.045em;margin:14px 0 20px;max-width:940px}.hero p{font-size:clamp(1.05rem,2vw,1.28rem);color:#475569;max-width:800px;margin:0}
+.gradient-text{color:#6d28d9;background:linear-gradient(90deg,#7c3aed,#4f46e5,#c026d3);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:999px;font-weight:750;border:1px solid transparent;cursor:pointer}.btn-primary{background:linear-gradient(90deg,#7c3aed,#4f46e5);color:#fff;box-shadow:0 12px 26px rgba(79,70,229,.2)}.btn-secondary{background:#fff;border-color:#d8b4fe;color:#5b21b6}.btn:hover{transform:translateY(-1px)}
+main section{padding:68px 0}.section-soft{background:var(--dk-soft);border-top:1px solid var(--dk-line);border-bottom:1px solid var(--dk-line)}.section-violet{background:linear-gradient(180deg,#faf7ff,#f5f3ff)}
+.section-head{max-width:760px;margin:0 auto 34px;text-align:center}.section-head h2{font-size:clamp(2rem,4vw,3.1rem);line-height:1.1;letter-spacing:-.035em;margin:0 0 12px}.section-head p{margin:0;color:#64748b;font-size:1.04rem}
+.grid{display:grid;gap:22px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:#fff;border:1px solid var(--dk-line);border-radius:var(--dk-radius);padding:24px;box-shadow:0 8px 30px rgba(15,23,42,.05)}.card h3,.card h4{margin-top:0}.card:hover{border-color:#c4b5fd;box-shadow:var(--dk-shadow)}
+.icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#ede9fe,#eef2ff);font-size:1.4rem;margin-bottom:14px}.kicker{font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;font-weight:800;color:#7c3aed}.muted{color:#64748b}.small{font-size:.92rem}
+.pill-row{display:flex;flex-wrap:wrap;gap:9px}.pill{border:1px solid #ddd6fe;background:#fff;color:#5b21b6;border-radius:999px;padding:7px 11px;font-size:.82rem;font-weight:700}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:stretch}.flow-step{position:relative;background:#fff;border:1px solid var(--dk-line);border-radius:20px;padding:20px}.flow-step:not(:last-child):after{content:"→";position:absolute;right:-17px;top:50%;transform:translateY(-50%);z-index:2;color:#8b5cf6;font-size:1.3rem;font-weight:900}.num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#ede9fe;color:#6d28d9;font-weight:850;margin-bottom:12px}
+.note{border-left:4px solid #8b5cf6;background:#faf5ff;padding:18px 20px;border-radius:14px}.good{border-color:#86efac;background:#f0fdf4}.warn{border-color:#fde68a;background:#fffbeb}.risk{border-color:#fecaca;background:#fef2f2}
+.table-wrap{overflow:auto;border:1px solid var(--dk-line);border-radius:20px;background:#fff}.dk-table{border-collapse:collapse;width:100%;min-width:760px}.dk-table th,.dk-table td{padding:15px 16px;border-bottom:1px solid var(--dk-line);text-align:left;vertical-align:top}.dk-table th{background:#fafafa;color:#475569;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em}.dk-table tr:last-child td{border-bottom:0}
+.score-panel{display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:center}.score-box{background:#fff;border:1px solid var(--dk-line);border-radius:24px;padding:28px}.score-number{font-size:4.6rem;font-weight:900;line-height:1;color:#5b21b6}.progress{height:12px;border-radius:999px;background:#ede9fe;overflow:hidden}.progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#c026d3,#7c3aed,#4f46e5);transition:width .25s ease}.toggle-list{display:grid;gap:12px}.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 17px;border:1px solid var(--dk-line);border-radius:16px;background:#fff}.switch{position:relative;width:50px;height:28px;flex:none}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#cbd5e1;border-radius:999px;cursor:pointer;transition:.2s}.slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:.2s}.switch input:checked + .slider{background:#7c3aed}.switch input:checked + .slider:before{transform:translateX(22px)}
+.matrix{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.matrix .card{min-height:190px}.matrix .high{border-top:4px solid #7c3aed}.matrix .low{border-top:4px solid #94a3b8}
+.pattern-path{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:14px;font-size:.88rem;font-weight:750}.pattern-path span{padding:7px 10px;border-radius:12px;background:#f5f3ff;color:#5b21b6}.pattern-path b{color:#a78bfa}
+.agent-console{background:#111827;color:#e5e7eb;border-radius:20px;padding:24px;box-shadow:0 18px 50px rgba(15,23,42,.18)}.agent-console .line{padding:11px 0;border-bottom:1px solid rgba(255,255,255,.08)}.agent-console .line:last-child{border-bottom:0}.agent-console strong{color:#c4b5fd}.agent-console code{color:#f0abfc}
+.refs{font-size:.88rem;color:#64748b}.refs a{text-decoration:underline;text-decoration-color:#c4b5fd;text-underline-offset:3px}
+.dk-footer{border-top:1px solid var(--dk-line);background:#0f172a;color:#e2e8f0;padding:48px 0}.footer-grid{display:grid;grid-template-columns:1.3fr repeat(3,.75fr);gap:20px}.footer-grid h3,.footer-grid h4{color:#fff;margin-top:0}.footer-grid p{color:#94a3b8}.footer-tag{font-weight:800;color:#c4b5fd}.mini-cta{margin-top:20px;display:inline-block;color:#fff;border-bottom:1px solid #a78bfa}
+@media(max-width:900px){.dk-links{display:none}.g4{grid-template-columns:repeat(2,1fr)}.g3,.g2,.score-panel,.footer-grid{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.flow-step:not(:last-child):after{content:"↓";right:auto;left:50%;top:auto;bottom:-24px;transform:translateX(-50%)}.matrix{grid-template-columns:1fr}}
+@media(max-width:600px){.wrap{width:min(100% - 28px,var(--dk-max))}.hero{padding:58px 0 48px}.g4{grid-template-columns:1fr}.card{padding:20px}.hero h1{font-size:2.55rem}.score-number{font-size:3.6rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-JF94J1W5MC');
-</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
-<body class="antialiased">
-
-    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-        <nav class="container mx-auto px-6 py-3">
-            <div class="flex items-center justify-between">
-                <div class="text-xl font-bold text-teal-600">AI Agent Guide</div>
-                <div class="hidden md:flex space-x-6 text-sm font-medium">
-                    <a class="text-gray-600 hover:text-teal-600 transition-colors" href="#framework">Framework</a>
-                    <a class="text-gray-600 hover:text-teal-600 transition-colors" href="#score">Score</a>
-                    <a class="text-gray-600 hover:text-teal-600 transition-colors" href="#use-cases">Use Cases</a>
-                    <a class="text-gray-600 hover:text-teal-600 transition-colors" href="#lessons">Lessons Learned</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="container mx-auto px-6 py-12">
-
-        <section class="text-center mb-16" id="intro">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Should You Use an AI Agent?</h1>
-            <p class="text-lg text-gray-600 max-w-3xl mx-auto">This interactive guide helps you evaluate the suitability of an AI agent for your specific needs. Answer the questions in the framework below to generate a personalized suitability score and gain clarity on your decision.</p>
-        </section>
-
-        <section class="mb-16" id="framework">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">The Decision Framework</h2>
-            <p class="text-md text-gray-500 text-center mb-10">Answer these key questions before considering an AI agent. Your score will update automatically.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="questions-container">
-            </div>
-        </section>
-
-        <section class="mb-16 bg-white rounded-2xl shadow-lg p-8" id="score">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">Your AI Agent Suitability Score</h2>
-            <div class="flex flex-col md:flex-row items-center justify-center gap-8">
-                <div class="chart-container">
-                    <canvas id="suitabilityChart"></canvas>
-                </div>
-                <div class="text-center md:text-left max-w-md">
-                    <p class="text-6xl font-bold text-gray-700 mb-4" id="score-text">0%</p>
-                    <h3 class="text-2xl font-semibold text-gray-800 mb-2" id="score-title">Start the Assessment</h3>
-                    <p class="text-gray-600" id="score-description">Toggle the switches in the framework above to see your score. The more questions you answer with "Yes," the more likely an AI agent is a good fit for your project.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="mb-16" id="use-cases">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div class="bg-teal-50/50 border border-teal-200 rounded-2xl p-8">
-                    <h3 class="text-2xl font-bold text-teal-800 mb-6 text-center">✅ When to Use an AI Agent</h3>
-                    <ul class="space-y-4" id="when-to-use-list">
-                    </ul>
-                </div>
-                <div class="bg-rose-50/50 border border-rose-200 rounded-2xl p-8">
-                    <h3 class="text-2xl font-bold text-rose-800 mb-6 text-center">❌ When Not to Use an AI Agent</h3>
-                    <ul class="space-y-4" id="when-not-to-use-list">
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section id="lessons">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">Key Lessons Learned</h2>
-            <p class="text-md text-gray-500 text-center mb-10">Keep these insights in mind throughout your AI agent implementation journey.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="lessons-learned-container">
-            </div>
-        </section>
-    <footer class="bg-gray-800 text-gray-300">
+</script></head><body>
+<header class="dk-nav"><div class="wrap dk-nav-in"><a aria-label="Dataknobs home" href="https://www.dataknobs.com/"><img alt="Dataknobs" class="dk-logo" height="58" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png" width="190"/></a><nav aria-label="Page navigation" class="dk-links"><a href="#framework">Decision</a><a href="#levels">AI levels</a><a href="#green-red">Use cases</a><a href="#dataknobs">Dataknobs</a></nav><span class="dk-badge">Agentic AI · 2026</span></div></header>
+<section class="hero"><div class="wrap"><div class="eyebrow">AI agent decision guide</div><h1>Should you use an <span class="gradient-text">AI agent?</span></h1><p>Not every AI use case needs autonomy. Use this framework to decide when an agent is justified, when a deterministic workflow is safer, and what controls and evaluation you need before production.</p><div class="hero-actions"><a class="btn btn-primary" href="#framework">Explore the framework</a><a class="btn btn-secondary" href="https://www.dataknobs.com/">Dataknobs platform</a></div></div></section>
+<main>
+<section id="framework"><div class="wrap"><div class="section-head"><div class="kicker">Decision framework</div><h2>Use an agent only when autonomy adds value</h2><p>The key question is not “Can an <a href="https://www.dataknobs.com/generativeai/10-llms/">LLM</a> do this?” It is whether the task benefits from goal-driven decisions, tool use, state, and controlled action.</p></div><div class="score-panel">
+<div class="toggle-list" id="agentQuestions">
+<label class="toggle-row"><span><strong>Multi-step work</strong><br/><span class="muted small">The task requires planning or choosing the next step dynamically.</span></span><span class="switch"><input data-weight="15" type="checkbox"/><span class="slider"></span></span></label>
+<label class="toggle-row"><span><strong>Tool or system access</strong><br/><span class="muted small">The solution must retrieve data, call APIs, update systems, or trigger actions.</span></span><span class="switch"><input data-weight="15" type="checkbox"/><span class="slider"></span></span></label>
+<label class="toggle-row"><span><strong>Variable path to the goal</strong><br/><span class="muted small">A fixed workflow cannot enumerate every reasonable path in advance.</span></span><span class="switch"><input data-weight="15" type="checkbox"/><span class="slider"></span></span></label>
+<label class="toggle-row"><span><strong>Grounding and context exist</strong><br/><span class="muted small">Reliable enterprise data, retrieval, or system-of-record context is available.</span></span><span class="switch"><input data-weight="15" type="checkbox"/><span class="slider"></span></span></label>
+<label class="toggle-row"><span><strong>Actions can be bounded</strong><br/><span class="muted small">Permissions, approvals, budgets, rate limits, or safe action scopes can be enforced.</span></span><span class="switch"><input data-weight="15" type="checkbox"/><span class="slider"></span></span></label>
+<label class="toggle-row"><span><strong>Quality can be evaluated</strong><br/><span class="muted small">Success, failure, cost, latency, and risk can be measured after deployment.</span></span><span class="switch"><input data-weight="15" type="checkbox"/><span class="slider"></span></span></label>
+<label class="toggle-row"><span><strong>Failure is recoverable</strong><br/><span class="muted small">The agent can retry, escalate, ask for approval, or hand off to a human.</span></span><span class="switch"><input data-weight="10" type="checkbox"/><span class="slider"></span></span></label>
+</div>
+<div class="score-box"><div class="kicker">Suitability</div><div class="score-number" id="scoreNumber">0%</div><div class="progress"><span id="scoreBar"></span></div><h3 id="scoreTitle">Start with the questions</h3><p class="muted" id="scoreCopy">A low score does not mean “no AI.” It often means a prompt, retrieval workflow, deterministic automation, or assistant is a better fit than an autonomous agent.</p><div class="note warn"><strong>Important:</strong> high autonomy should require stronger KONTROLS and stronger KNOBS, not less oversight.</div></div>
+</div></div></section>
+<section class="section-soft" id="levels"><div class="wrap"><div class="section-head"><div class="kicker">Choose the simplest architecture</div><h2>Prompt → workflow → assistant → agent</h2><p>Agentic architecture is a continuum. Start at the lowest level that can reliably deliver the desired outcome.</p></div><div class="grid g4">
+<div class="card"><div class="icon">💬</div><h3>Prompt</h3><p>One request, one response. Best for rewriting, extraction, summarization, classification, and bounded generation.</p></div>
+<div class="card"><div class="icon">🔗</div><h3>Workflow</h3><p>Known sequence of model and tool calls. Best when the path is stable and auditability matters more than autonomy.</p></div>
+<div class="card"><div class="icon">🧭</div><h3>Assistant</h3><p>Conversational system with retrieval and selected tools, but the user remains the primary decision-maker.</p></div>
+<div class="card"><div class="icon">🤖</div><h3>Agent</h3><p>Goal-oriented system that chooses steps, invokes tools, maintains state, and can act within defined boundaries.</p></div>
+</div></div></section>
+<section id="green-red"><div class="wrap"><div class="grid g2">
+<div><div class="section-head" style="text-align:left;margin-left:0"><div class="kicker">Good candidates</div><h2>Green lights</h2></div><div class="grid"><div class="note good"><strong>Knowledge-intensive operations:</strong> research, case assembly, incident investigation, claim review, complaint triage.</div><div class="note good"><strong>Cross-system workflows:</strong> gather context from multiple systems, decide the next action, and execute approved steps.</div><div class="note good"><strong>Long-running work:</strong> tasks that must maintain state, pause for human input, then resume.</div><div class="note good"><strong>High-volume decision support:</strong> when humans need recommendations plus evidence rather than raw data.</div></div></div>
+<div><div class="section-head" style="text-align:left;margin-left:0"><div class="kicker">Use caution</div><h2>Red flags</h2></div><div class="grid"><div class="note risk"><strong>One irreversible action:</strong> if a single wrong action can cause severe harm, default to approval gates or deterministic logic.</div><div class="note risk"><strong>No trustworthy context:</strong> an agent cannot compensate for missing, stale, or inaccessible data.</div><div class="note risk"><strong>No evaluation plan:</strong> if you cannot define “good,” you will not know whether autonomy is helping.</div><div class="note risk"><strong>Autonomy for its own sake:</strong> if a rules engine or workflow solves the problem, extra agent complexity creates cost and failure modes.</div></div></div>
+</div></div></section>
+<section class="section-violet" id="dataknobs"><div class="wrap"><div class="section-head"><div class="kicker">Dataknobs approach</div><h2>Build, govern, then continuously tune</h2><p>Dataknobs separates the agent problem into three operating layers so teams can move fast without treating autonomy as a black box.</p></div><div class="grid g3"><div class="card"><h3>KREATE</h3><p>Connect data, build retrieval, define tools, compose workflows and agents, and expose useful product experiences.</p></div><div class="card"><h3>KONTROLS</h3><p>Constrain permissions, policy, privacy, approvals, tool access, identity, logging and escalation paths.</p></div><div class="card"><h3>KNOBS</h3><p>Measure task success, quality, latency, cost, safety, tool behavior and business outcomes; experiment before expanding autonomy.</p></div></div></div></section></main>
+<footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 <div>
@@ -194,182 +155,8 @@ gtag('config', 'G-JF94J1W5MC');
 <div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
 </div>
 </div>
-</footer></main>
-    
-<!--
-    <footer class="bg-gray-100 mt-16">
-        <div class="container mx-auto px-6 py-4 text-center text-gray-500 text-sm">
-            <p>AI Agent Decision Framework | Interactive Guide</p>
-        </div>
-    </footer>
--->
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const questions = [
-                { id: 'q1', text: 'Is the task well-defined and repetitive?', weight: 15 },
-                { id: 'q2', text: 'Does the task involve complex data analysis or pattern recognition?', weight: 15 },
-                { id: 'q3', text: 'Can the process be broken down into logical steps or rules?', weight: 10 },
-                { id: 'q4', text: 'Do you have access to high-quality, relevant data for training/operation?', weight: 20 },
-                { id: 'q5', text: 'Is the goal to automate a process to increase efficiency or reduce human error?', weight: 15 },
-                { id: 'q6', text: 'Is personalization or dynamic response a key requirement?', weight: 10 },
-                { id: 'q7', text: 'Are the success metrics for the task clear and measurable?', weight: 10 },
-                { id: 'q8', text: 'Is the required level of accuracy achievable by current AI technology?', weight: 5 },
-            ];
-
-            const useCases = [
-                { icon: '🔄', text: 'Repetitive, high-volume tasks like data entry or customer service FAQs.' },
-                { icon: '📊', text: 'Complex data processing and analysis that exceeds human capability.' },
-                { icon: '🤖', text: 'Automating rule-based workflows and business processes.' },
-                { icon: '🎯', text: 'Personalizing user experiences in real-time.' },
-                { icon: '🔍', text: 'Tasks requiring continuous learning and adaptation from new data.' },
-            ];
-
-            const notUseCases = [
-                { icon: '🤔', text: 'Tasks requiring deep emotional intelligence, empathy, or complex ethical judgment.' },
-                { icon: '🎨', text: 'Highly creative or strategic work that requires novel, out-of-the-box thinking.' },
-                { icon: '❓', text: 'Ill-defined problems with constantly changing, unpredictable rules.' },
-                { icon: '🚫', text: 'Situations where 100% accuracy is critical and failure has severe consequences (e.g., life-critical systems).' },
-                { icon: '🔒', text: 'When you lack sufficient or high-quality data to train or guide the agent.' },
-            ];
-            
-            const lessons = [
-                { icon: '🎯', title: 'Start Small', description: 'Begin with a well-defined, low-risk pilot project to prove value.'},
-                { icon: '📈', title: 'Data is King', description: 'The quality and quantity of your data will determine the agent\'s success.'},
-                { icon: '👥', title: 'Human in the Loop', description: 'Design systems with human oversight, especially for critical decisions.'},
-                { icon: '💡', title: 'Iterate & Learn', description: 'AI implementation is not a one-time setup. Plan for continuous monitoring and improvement.'}
-            ];
-
-            const questionsContainer = document.getElementById('questions-container');
-            const whenToUseList = document.getElementById('when-to-use-list');
-            const whenNotToUseList = document.getElementById('when-not-to-use-list');
-            const lessonsLearnedContainer = document.getElementById('lessons-learned-container');
-
-            const state = {
-                answers: {}
-            };
-
-            questions.forEach(q => {
-                state.answers[q.id] = false;
-                const card = `
-                    <div class="bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                        <p class="font-semibold text-gray-700 mb-4 h-12">${q.text}</p>
-                        <div class="flex items-center justify-center">
-                            <span class="text-sm font-medium text-gray-500 mr-3">No</span>
-                            <label for="${q.id}" class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="${q.id}" class="sr-only peer toggle-input" data-question-id="${q.id}">
-                                <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-teal-300 peer-checked:bg-teal-500"></div>
-                            </label>
-                            <span class="text-sm font-medium text-gray-900 ml-3">Yes</span>
-                        </div>
-                    </div>
-                `;
-                questionsContainer.innerHTML += card;
-            });
-            
-            useCases.forEach(item => {
-                whenToUseList.innerHTML += `
-                    <li class="flex items-start">
-                        <span class="text-xl mr-4">${item.icon}</span>
-                        <span class="text-gray-700">${item.text}</span>
-                    </li>`;
-            });
-
-            notUseCases.forEach(item => {
-                whenNotToUseList.innerHTML += `
-                    <li class="flex items-start">
-                        <span class="text-xl mr-4">${item.icon}</span>
-                        <span class="text-gray-700">${item.text}</span>
-                    </li>`;
-            });
-            
-            lessons.forEach(lesson => {
-                lessonsLearnedContainer.innerHTML += `
-                    <div class="bg-white p-6 rounded-xl shadow-md text-center">
-                         <div class="text-4xl mb-3">${lesson.icon}</div>
-                         <h4 class="font-bold text-lg text-gray-800 mb-2">${lesson.title}</h4>
-                         <p class="text-gray-600 text-sm">${lesson.description}</p>
-                    </div>
-                `;
-            });
-
-            const ctx = document.getElementById('suitabilityChart').getContext('2d');
-            const suitabilityChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Suitability', 'Remaining'],
-                    datasets: [{
-                        data: [0, 100],
-                        backgroundColor: ['#14b8a6', '#f0f0f0'],
-                        borderColor: ['#ffffff', '#ffffff'],
-                        borderWidth: 4,
-                        circumference: 180,
-                        rotation: 270,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true
-                    }
-                }
-            });
-
-            const scoreText = document.getElementById('score-text');
-            const scoreTitle = document.getElementById('score-title');
-            const scoreDescription = document.getElementById('score-description');
-
-            function updateScore() {
-                let currentScore = 0;
-                questions.forEach(q => {
-                    if (state.answers[q.id]) {
-                        currentScore += q.weight;
-                    }
-                });
-
-                suitabilityChart.data.datasets[0].data[0] = currentScore;
-                suitabilityChart.data.datasets[0].data[1] = 100 - currentScore;
-                suitabilityChart.update();
-
-                scoreText.textContent = `${currentScore}%`;
-
-                if (currentScore === 0) {
-                     scoreTitle.textContent = 'Start the Assessment';
-                     scoreDescription.textContent = 'Toggle the switches in the framework above to see your score.';
-                     scoreText.style.color = '#4b5563';
-                } else if (currentScore < 40) {
-                    scoreTitle.textContent = 'Consider Carefully';
-                    scoreDescription.textContent = 'An AI agent might not be the best fit. Your use case has several contraindications. Re-evaluate the problem you are trying to solve.';
-                    scoreText.style.color = '#f43f5e';
-                } else if (currentScore < 75) {
-                    scoreTitle.textContent = 'Potentially a Good Fit';
-                    scoreDescription.textContent = 'An AI agent shows promise for your use case. Proceed with a pilot project and careful planning, paying attention to the areas you marked "No".';
-                    scoreText.style.color = '#f59e0b';
-                } else {
-                    scoreTitle.textContent = 'Excellent Candidate';
-                    scoreDescription.textContent = 'Your use case is a strong candidate for an AI agent. You have the key ingredients for a successful implementation.';
-                    scoreText.style.color = '#10b981';
-                }
-            }
-
-            document.querySelectorAll('.toggle-input').forEach(input => {
-                input.addEventListener('change', (event) => {
-                    const questionId = event.target.dataset.questionId;
-                    state.answers[questionId] = event.target.checked;
-                    updateScore();
-                });
-            });
-            
-            updateScore();
-        });
-    </script>
-
-
+</footer>
+<script>
+(function(){const qs=[...document.querySelectorAll('#agentQuestions input')],num=document.getElementById('scoreNumber'),bar=document.getElementById('scoreBar'),title=document.getElementById('scoreTitle'),copy=document.getElementById('scoreCopy');function update(){let s=qs.reduce((a,q)=>a+(q.checked?Number(q.dataset.weight):0),0);num.textContent=s+'%';bar.style.width=s+'%';if(s<35){title.textContent='Prefer a simpler AI pattern';copy.textContent='Start with prompting, retrieval, or a deterministic workflow. Add agent behavior only where dynamic decisions create measurable value.'}else if(s<70){title.textContent='Pilot with bounded autonomy';copy.textContent='The use case can benefit from agent behavior, but define tool scopes, approvals, test cases, and human escalation before expanding autonomy.'}else{title.textContent='Strong agent candidate';copy.textContent='The ingredients for agentic work are present. Focus next on runtime controls, evaluation, observability, state management, and production failure handling.'}}qs.forEach(q=>q.addEventListener('change',update));update()})();
+</script>
 </body></html>

@@ -1,155 +1,34 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Exposing Agents as MCP Servers: A New Pattern</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .code-block {
-            background-color: #2d3748; /* gray-800 */
-            color: #e2e8f0; /* gray-300 */
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
-            font-size: 0.9em;
-            line-height: 1.6;
-            overflow-x: auto;
-        }
-        .code-block .token.comment { color: #a0aec0; } /* gray-500 */
-        .code-block .token.key { color: #63b3ed; } /* blue-400 */
-        .code-block .token.string { color: #90cdf4; } /* blue-300 */
-        .code-block .token.function { color: #68d391; } /* green-400 */
-    </style>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script><script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
-
-		gtag('config', 'G-JF94J1W5MC');</script><!-- Google Tag Manager --><script>
-		(function (w, d, s, l, i) {
-			w[l] = w[l] || []; w[l].push({
-				'gtm.start':
-					new Date().getTime(), event: 'gtm.js'
-			}); var f = d.getElementsByTagName(s)[0],
-				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-		})(window, document, 'script', 'dataLayer', 'GTM-55TW6ML');</script><!-- End Google Tag Manager --><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/><script>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Expose Agent Capabilities with MCP | Dataknobs</title><meta content="A 2026 architecture guide for exposing bounded agent capabilities through MCP, when to use A2A instead, and how to secure, observe, and scale the pattern." name="description"/><meta content="index, follow" name="robots"/><meta content="website" property="og:type"/><meta content="Expose Agent Capabilities with MCP | Dataknobs" property="og:title"/><meta content="A 2026 architecture guide for exposing bounded agent capabilities through MCP, when to use A2A instead, and how to secure, observe, and scale the pattern." property="og:description"/><meta content="summary" name="twitter:card"/><meta content="Expose Agent Capabilities with MCP | Dataknobs" name="twitter:title"/><meta content="A 2026 architecture guide for exposing bounded agent capabilities through MCP, when to use A2A instead, and how to secure, observe, and scale the pattern." name="twitter:description"/><meta content="#6d28d9" name="theme-color"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon"/><link href="https://storage.googleapis.com/css-designs/dataknobs-theme/dataknobs-theme.css" rel="stylesheet"/><script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Expose Agent Capabilities with MCP | Dataknobs", "description": "A 2026 architecture guide for exposing bounded agent capabilities through MCP, when to use A2A instead, and how to secure, observe, and scale the pattern.", "publisher": {"@type": "Organization", "name": "Dataknobs"}}</script><style>
+:root{--violet:#7c3aed;--indigo:#4f46e5;--purple:#6d28d9;--fuchsia:#c026d3;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--soft:#f8fafc;--green:#047857;--amber:#b45309;--red:#b91c1c;--max:1180px;--radius:24px;--shadow:0 18px 52px rgba(15,23,42,.09)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:88px}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff;line-height:1.65}a{color:inherit;text-decoration:none}button{font:inherit}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}
+.dk-nav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}.dk-nav-in{height:78px;display:flex;align-items:center;justify-content:space-between;gap:18px}.dk-logo{height:46px;width:auto;display:block}.dk-links{display:flex;align-items:center;gap:20px;color:#475569;font-size:.9rem}.dk-links a:hover{color:var(--purple)}.dk-badge{display:inline-flex;align-items:center;border:1px solid #ddd6fe;background:#f5f3ff;color:#5b21b6;border-radius:999px;padding:7px 11px;font-weight:800;font-size:.78rem;white-space:nowrap}
+.hero{position:relative;overflow:hidden;padding:82px 0 64px;background:radial-gradient(circle at 12% 15%,rgba(192,38,211,.12),transparent 34%),radial-gradient(circle at 92% 20%,rgba(79,70,229,.14),transparent 32%),linear-gradient(180deg,#fff,#faf8ff);border-bottom:1px solid #ede9fe}.hero:after{content:"";position:absolute;right:-110px;bottom:-190px;width:430px;height:430px;border-radius:50%;background:linear-gradient(135deg,rgba(124,58,237,.11),rgba(79,70,229,.02))}.eyebrow,.kicker{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:#6d28d9;font-weight:850}.hero h1{font-size:clamp(2.65rem,6vw,5rem);line-height:1.03;letter-spacing:-.045em;max-width:970px;margin:14px 0 18px}.hero p{max-width:820px;color:#475569;font-size:clamp(1.05rem,2vw,1.26rem);margin:0}.gradient-text{background:linear-gradient(90deg,#7c3aed,#4f46e5,#c026d3);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#6d28d9}.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}.btn{display:inline-flex;justify-content:center;align-items:center;padding:11px 17px;border-radius:999px;font-weight:800;border:1px solid transparent}.btn-primary{background:linear-gradient(90deg,#7c3aed,#4f46e5);color:white;box-shadow:0 12px 26px rgba(79,70,229,.2)}.btn-secondary{background:white;border-color:#d8b4fe;color:#5b21b6}
+main section{padding:66px 0}.section-soft{background:#f8fafc;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.section-violet{background:linear-gradient(180deg,#faf7ff,#f5f3ff)}.section-head{max-width:790px;margin:0 auto 34px;text-align:center}.section-head.left{text-align:left;margin-left:0}.section-head h2{font-size:clamp(2rem,4vw,3.08rem);line-height:1.1;letter-spacing:-.035em;margin:8px 0 12px}.section-head p{color:var(--muted);font-size:1.03rem;margin:0}
+.grid{display:grid;gap:20px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g5{grid-template-columns:repeat(5,minmax(0,1fr))}.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:0 8px 30px rgba(15,23,42,.05)}.card:hover{border-color:#c4b5fd;box-shadow:var(--shadow)}.card h3,.card h4{margin-top:0}.icon{width:45px;height:45px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#ede9fe,#eef2ff);font-size:1.35rem;margin-bottom:13px}.muted{color:var(--muted)}.small{font-size:.91rem}.pill-row{display:flex;flex-wrap:wrap;gap:8px}.pill{border:1px solid #ddd6fe;background:#fff;color:#5b21b6;border-radius:999px;padding:7px 10px;font-size:.8rem;font-weight:750}
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.flow.four{grid-template-columns:repeat(4,minmax(0,1fr))}.flow.six{grid-template-columns:repeat(6,minmax(0,1fr))}.flow-step{position:relative;background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px}.flow-step:not(:last-child):after{content:"→";position:absolute;right:-17px;top:50%;transform:translateY(-50%);z-index:3;color:#8b5cf6;font-size:1.25rem;font-weight:900}.num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#ede9fe;color:#6d28d9;font-weight:900;margin-bottom:11px}
+.note{border-left:4px solid #8b5cf6;background:#faf5ff;padding:18px 20px;border-radius:14px}.good{border-color:#86efac;background:#f0fdf4}.warn{border-color:#fde68a;background:#fffbeb}.risk{border-color:#fecaca;background:#fef2f2}.info{border-color:#bfdbfe;background:#eff6ff}
+ul.clean{list-style:none;padding:0;margin:0;display:grid;gap:11px}ul.clean li{display:flex;gap:10px;align-items:flex-start}ul.clean li:before{content:"✓";color:#6d28d9;font-weight:900;margin-top:1px}.risk ul.clean li:before{content:"!";color:#b91c1c}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:20px;background:#fff}.dk-table{width:100%;border-collapse:collapse;min-width:760px}.dk-table th,.dk-table td{padding:15px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.dk-table th{background:#fafafa;color:#475569;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase}.dk-table tr:last-child td{border-bottom:0}
+.score-panel{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;align-items:start}.toggle-list{display:grid;gap:12px}.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid var(--line);border-radius:16px;background:#fff;padding:15px 17px}.switch{position:relative;width:50px;height:28px;flex:none}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#cbd5e1;border-radius:999px;cursor:pointer;transition:.2s}.slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:.2s}.switch input:checked+.slider{background:#7c3aed}.switch input:checked+.slider:before{transform:translateX(22px)}.score-box{background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;position:sticky;top:104px}.score-number{font-size:4.5rem;line-height:1;font-weight:900;color:#5b21b6}.progress{height:12px;border-radius:999px;background:#ede9fe;overflow:hidden}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#c026d3,#7c3aed,#4f46e5);transition:.25s}
+.ladder{display:grid;gap:12px}.ladder-row{display:grid;grid-template-columns:130px 1fr auto;gap:16px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:18px;padding:16px}.bar{height:10px;background:#ede9fe;border-radius:999px;overflow:hidden}.bar span{height:100%;display:block;border-radius:999px;background:linear-gradient(90deg,#a78bfa,#4f46e5)}.tag{font-size:.78rem;font-weight:800;color:#5b21b6;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:999px;padding:5px 9px}
+.diagram{border:1px solid var(--line);border-radius:24px;background:#fff;padding:24px;box-shadow:0 8px 30px rgba(15,23,42,.05)}.diagram-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.box{border:1px solid #ddd6fe;background:#faf7ff;border-radius:16px;padding:14px 16px;text-align:center;min-width:145px}.arrow{font-weight:900;color:#8b5cf6;font-size:1.3rem}.codebox{background:#0f172a;color:#e2e8f0;border-radius:20px;padding:20px;overflow:auto;font:500 .88rem/1.65 ui-monospace,SFMono-Regular,Menlo,monospace}.codebox strong{color:#c4b5fd}.codebox .ok{color:#86efac}.codebox .warnc{color:#fde68a}
+.lifecycle-tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:26px}.tab-btn{border:1px solid #ddd6fe;background:#fff;color:#5b21b6;padding:9px 13px;border-radius:999px;font-weight:800;cursor:pointer}.tab-btn.active{background:#6d28d9;color:#fff}.tab-panel{display:none}.tab-panel.active{display:block}.accordion{display:grid;gap:10px}.acc-item{border:1px solid var(--line);border-radius:16px;background:#fff;overflow:hidden}.acc-btn{width:100%;background:#fff;border:0;padding:17px 18px;text-align:left;font-weight:800;display:flex;justify-content:space-between;gap:12px;cursor:pointer}.acc-content{display:none;padding:0 18px 18px;color:#475569}.acc-item.open .acc-content{display:block}
+.source-box{border-top:1px solid var(--line);margin-top:28px;padding-top:20px}.source-box h3{font-size:1rem;margin:0 0 10px}.source-box ul{margin:0;padding-left:19px;color:#64748b;font-size:.88rem}.source-box a{text-decoration:underline;text-decoration-color:#c4b5fd;text-underline-offset:3px}.callout{padding:28px;border-radius:24px;background:linear-gradient(135deg,#6d28d9,#4f46e5);color:#fff}.callout p{color:#ede9fe}.callout .pill{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff}
+.dk-footer{border-top:1px solid var(--line);background:#0f172a;color:#e2e8f0;padding:48px 0}.footer-grid{display:grid;grid-template-columns:1.3fr repeat(3,.75fr);gap:20px}.footer-grid h3,.footer-grid h4{color:#fff;margin-top:0}.footer-grid p{color:#94a3b8}.footer-tag{font-weight:850;color:#c4b5fd}.mini-cta{display:inline-block;margin-top:16px;color:#fff;border-bottom:1px solid #a78bfa}
+@media(max-width:1000px){.g5{grid-template-columns:repeat(2,1fr)}.flow.six{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.dk-links{display:none}.g4,.g3,.g2,.score-panel,.footer-grid{grid-template-columns:1fr}.score-box{position:static}.flow,.flow.four,.flow.six{grid-template-columns:1fr}.flow-step:not(:last-child):after{content:"↓";right:auto;left:50%;top:auto;bottom:-24px;transform:translateX(-50%)}.ladder-row{grid-template-columns:1fr}.g5{grid-template-columns:1fr}}@media(max-width:600px){.wrap{width:min(100% - 28px,var(--max))}.hero{padding:56px 0 48px}.hero h1{font-size:2.48rem}.card{padding:20px}.score-number{font-size:3.6rem}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-JF94J1W5MC');
-</script><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/></head>
-<body class="bg-gray-50 text-gray-800">
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-<header class="text-center mb-12">
-<h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">Exposing Agents as MCP Servers</h1>
-<p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">A New Architectural Pattern for Collaborative AI</p>
-</header>
-<main class="max-w-4xl mx-auto">
-<!-- Introduction Section -->
-<section class="mb-12">
-<p class="text-lg leading-relaxed">
-                    Traditionally, <a href="https://www.dataknobs.com/agentic-ai/">AI agents</a> act as clients, tapping into tools and data hosted by MCP servers. But what if we reverse this model? This deep dive examines a compelling architectural shift: reimagining each agent not only as a consumer, but as a provider a self-contained MCP server that offers its unique capabilities as tools for other agents to access.
-                </p>
-</section>
-<!-- The Core Idea Section -->
-<section class="mb-16 bg-white p-8 rounded-2xl shadow-sm border border-gray-200" id="the-idea">
-<h2 class="text-3xl font-bold text-gray-900 mb-6">The Agent-as-Server Pattern</h2>
-<p class="text-lg leading-relaxed mb-4">
-                    Agents’ internal capabilities like expertise, skills, or reasoning can be defined, tracked, and shared using a standard MCP interface.
-                </p>
-<p class="text-lg leading-relaxed">
-                    Rather than relying on a single, centralized system for tools, we shift to a flexible, peer-to-peer agent network. For example, a 'researcher' agent might provide a `summarize_document` tool, while a 'coder' agent supplies a `refactor_code` tool. Agents can find and utilize each other's skills, enabling collaborative solutions to intricate, multi-stage tasks.
-                </p>
-</section>
-<!-- Benefits Section -->
-<section class="mb-16" id="benefits">
-<h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Benefits of the New Pattern</h2>
-<div class="grid md:grid-cols-3 gap-8">
-<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-<h3 class="text-xl font-semibold text-green-600 mb-3">Modularity</h3>
-<p>Every agent is an independent, deployable unit with a well-defined interface. This streamlines development, testing, and upkeep, allowing skills to be updated in one agent without impacting the rest.</p>
-</div>
-<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-<h3 class="text-xl font-semibold text-green-600 mb-3">Composability</h3>
-<p>Agents can be combined to create complex workflows. For example, a 'project manager' agent might coordinate tasks by invoking 'coder,' 'researcher,' and 'tester' agents in order, building advanced solutions from basic components.</p>
-</div>
-<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-<h3 class="text-xl font-semibold text-green-600 mb-3">Decentralization</h3>
-<p>This approach eliminates single points of failure. The network grows more resilient and distributed, allowing agents to join or leave freely, which improves scalability and reliability.</p>
-</div>
-</div>
-</section>
-<!-- Challenges Section -->
-<section class="mb-16" id="challenges">
-<h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Key Challenges to Overcome</h2>
-<div class="bg-red-50 border-l-4 border-red-500 p-8 rounded-2xl text-red-900">
-<p class="text-lg leading-relaxed">
-                        This robust pattern also brings added architectural challenges that require careful handling.
-                    </p>
-<ul class="list-disc list-inside mt-4 space-y-3 text-lg">
-<li><strong>Service Discovery and Routing:</strong> How do agents locate one another in a changing network? Reliable service discovery such as a registry or distributed hash table helps direct requests to the appropriate agent.</li>
-<li><strong>Coordination and Orchestration:</strong> How is workflow managed for complex tasks? You may need orchestrator agents or advanced coordination to prevent race conditions and deadlocks.</li>
-<li><strong>Security and Trust:</strong> Trust isn’t automatic in decentralized systems. How can agents confirm each other's identity and enforce permissions? A zero-trust approach is crucial.</li>
-</ul>
-</div>
-</section>
-<!-- Example / Code Sketch Section -->
-<section class="mb-12" id="code-sketch">
-<h2 class="text-3xl font-bold text-gray-900 mb-6">Conceptual Sketch: The `mcp-agent`</h2>
-<p class="text-lg leading-relaxed mb-6">
-                    Here’s a rewritten version of your line, with similar length:
-
-The following is a sample YAML config sketch, illustrating how an agent could declare itself as an MCP server and present its skills as accessible tools.
-                </p>
-<div class="code-block">
-<pre><code><span class="token comment"># mcp-agent-config.yaml for a 'DataAnalystAgent'</span>
-<span class="token.key">agent_id:</span> <span class="token.string">"data-analyst-agent-v1"</span>
-<span class="token.key">display_name:</span> <span class="token.string">"Data Analyst Agent"</span>
-
-<span class="token.key">mcp_server:</span>
-  <span class="token.key">host:</span> <span class="token.string">"0.0.0.0"</span>
-  <span class="token.key">port:</span> <span class="token.string">"8080"</span>
-
-<span class="token.key">exposed_tools:</span>
-  <span class="token.key">- name:</span> <span class="token.function">"generate_csv_summary"</span>
-    <span class="token.key">description:</span> <span class="token.string">"Analyzes a CSV file and provides a statistical summary."</span>
-    <span class="token.key">inputs:</span>
-      <span class="token.key">- name:</span> <span class="token.string">"csv_resource_id"</span>
-        <span class="token.key">type:</span> <span class="token.string">"string"</span>
-        <span class="token.key">description:</span> <span class="token.string">"The ID of the CSV in the resource store."</span>
-    <span class="token.key">outputs:</span>
-      <span class="token.key">- name:</span> <span class="token.string">"summary_report"</span>
-        <span class="token.key">type:</span> <span class="token.string">"json"</span>
-  
-  <span class="token.key">- name:</span> <span class="token.function">"plot_timeseries"</span>
-    <span class="token.key">description:</span> <span class="token.string">"Creates a time-series plot from a CSV column."</span>
-    <span class="token.key">inputs:</span>
-      <span class="token.key">- name:</span> <span class="token.string">"csv_resource_id"</span>
-        <span class="token.key">type:</span> <span class="token.string">"string"</span>
-      <span class="token.key">- name:</span> <span class="token.string">"date_column"</span>
-        <span class="token.key">type:</span> <span class="token.string">"string"</span>
-      <span class="token.key">- name:</span> <span class="token.string">"value_column"</span>
-        <span class="token.key">type:</span> <span class="token.string">"string"</span>
-    <span class="token.key">outputs:</span>
-      <span class="token.key">- name:</span> <span class="token.string">"plot_image_id"</span>
-        <span class="token.key">type:</span> <span class="token.string">"string"</span>
-</code></pre>
-</div>
-</section>
-<!-- Conclusion -->
-<section class="text-center mt-16">
-<h2 class="text-3xl font-bold text-gray-900 mb-4">A Network of Intelligence</h2>
-<p class="text-lg leading-relaxed max-w-3xl mx-auto">
-                    Presenting agents as MCP servers isn't just a technical innovation it's a new approach for creating collaborative, intelligent systems. This method opens the door to fleets of specialized agents that can join forces on challenges no individual agent could solve alone.
-                </p>
-</section>
-</main>
-<footer class="bg-gray-800 text-gray-300">
+</script></head><body><header class="dk-nav"><div class="wrap dk-nav-in"><a aria-label="Dataknobs home" href="https://www.dataknobs.com/"><img alt="Dataknobs" class="dk-logo" height="58" src="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/png/logo-transparent.png" width="190"/></a><nav aria-label="Page navigation" class="dk-links"><a href="#pattern">Pattern</a><a href="#choose">MCP vs A2A</a><a href="#contract">Contract</a><a href="#risks">Risks</a></nav><span class="dk-badge">MCP Architecture · 2026</span></div></header><section class="hero"><div class="wrap"><div class="eyebrow">Interoperable capabilities</div><h1>Exposing <span class="gradient-text">Agent Capabilities</span> through MCP</h1><p>Use MCP when an agent should look like a bounded callable capability. Use A2A when the peer is truly an independent agent that needs discovery, task state, messaging, and delegation.</p><div class="hero-actions"><a class="btn btn-primary" href="#pattern">See the pattern</a><a class="btn btn-secondary" href="https://www.dataknobs.com/">Dataknobs platform</a></div></div></section><main>
+<section id="pattern"><div class="wrap"><div class="section-head"><div class="kicker">Pattern, not dogma</div><h2>An agent can expose a capability through MCP :  but not every agent should become an MCP server</h2><p>The original pattern remains useful when another application needs a well-defined callable capability. In 2026, however, MCP and A2A have clearer roles: MCP is the vertical interface to tools and data; A2A is the horizontal interface for agent-to-agent collaboration.</p></div><div class="diagram"><div class="diagram-row"><div class="box"><strong>Caller / host</strong><br/><span class="small muted">agent or application</span></div><span class="arrow">→</span><div class="box"><strong>MCP tool</strong><br/><span class="small muted">research_and_summarize()</span></div><span class="arrow">→</span><div class="box"><strong>Internal agent runtime</strong><br/><span class="small muted">plan · reason · evaluate</span></div><span class="arrow">→</span><div class="box"><strong>Downstream tools</strong><br/><span class="small muted">MCP / APIs / data</span></div></div></div></div></section>
+<section class="section-soft" id="choose"><div class="wrap"><div class="section-head"><div class="kicker">Choose the interface</div><h2>MCP tool or A2A agent?</h2><p>Expose the smallest interface that matches the collaboration model.</p></div><div class="table-wrap"><table class="dk-table"><thead><tr><th>Need</th><th>Prefer</th><th>Why</th></tr></thead><tbody><tr><td>Call a bounded capability and receive a result</td><td><strong>MCP tool</strong></td><td>Simple typed contract; caller does not need to understand the internal agent loop.</td></tr><tr><td>Access context or resources</td><td><strong>MCP resource</strong></td><td>Standard data/context interface without pretending data is an autonomous peer.</td></tr><tr><td>Delegate a task to an independent remote agent</td><td><strong>A2A</strong></td><td>Agent cards, task state, messages, artifacts, streaming, and cross-framework interoperability.</td></tr><tr><td>Run a long MCP action</td><td><strong>MCP Tasks extension</strong></td><td>Durable asynchronous work without making the protocol sessionful.</td></tr></tbody></table></div><div class="source-box"><h3>2026 update sources</h3><ul><li><a href="https://blog.modelcontextprotocol.io/posts/2026-07-28/" rel="noopener">MCP 2026-07-28 specification</a></li><li><a href="https://tasks.extensions.modelcontextprotocol.io/specification/2026-07-28/tasks" rel="noopener">MCP Tasks extension</a></li><li><a href="https://a2a-protocol.org/latest/" rel="noopener">Agent2Agent protocol</a></li></ul></div></div></section>
+<section id="contract"><div class="wrap"><div class="section-head"><div class="kicker">Design the contract</div><h2>Hide internal reasoning; expose outcomes, constraints, and evidence</h2></div><div class="grid g3"><div class="card"><div class="icon">🎯</div><h3>Narrow capability</h3><p>Expose a business-level action such as <code>analyze_portfolio</code>, not dozens of internal reasoning steps.</p></div><div class="card"><div class="icon">🧾</div><h3>Typed input/output</h3><p>Use explicit schemas, bounded enums, validation, stable error shapes, and structured evidence in the result.</p></div><div class="card"><div class="icon">🔐</div><h3>Authority boundary</h3><p>The server validates identity and permissions for every call. The internal agent never decides its own access rights.</p></div><div class="card"><div class="icon">⏱️</div><h3>Time &amp; budget</h3><p>Set limits on tool calls, wall-clock time, token/model spend, retries, and downstream fan-out.</p></div><div class="card"><div class="icon">🧭</div><h3>Traceability</h3><p>Return a correlation ID and record model/tool versions, policy decisions, outcome, and quality signals.</p></div><div class="card"><div class="icon">✋</div><h3>Approval</h3><p>Use explicit approval or MRTR-style input requirements before irreversible or high-risk actions.</p></div></div></div></section>
+<section class="section-violet" id="risks"><div class="wrap"><div class="section-head"><div class="kicker">Production concerns</div><h2>The dangerous part is recursive authority, not the server wrapper</h2></div><div class="grid g2"><div class="card risk"><h3>Failure modes</h3><ul class="clean"><li>Agent exposed as a broad “do anything” tool.</li><li>Agent calls another agent that calls back, creating loops.</li><li>Credentials or user authority are forwarded too broadly.</li><li>Long-running tasks become hidden, unbounded work.</li><li>Tool descriptions drift without re-evaluation.</li></ul></div><div class="card"><h3>Controls</h3><ul class="clean"><li>Capability allowlists and scoped credentials.</li><li>Call-depth, fan-out, and budget limits.</li><li>Idempotency keys and explicit task handles.</li><li>Approval gates for sensitive side effects.</li><li>Evaluation before new tool/server versions are promoted.</li></ul></div></div></div></section>
+<section id="dataknobs"><div class="wrap"><div class="callout"><h2 style="margin-top:0">Dataknobs pattern: capability as a governed data product</h2><p>KREATE packages the capability, KONTROLS defines who may invoke it and what it may touch, and KNOBS measures task success, tool behavior, latency, cost, and regressions as the capability evolves.</p></div></div></section></main><footer class="bg-gray-800 text-gray-300">
 <div class="container mx-auto px-6 py-12 lg:px-8">
 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
 <div>
@@ -224,6 +103,4 @@ The following is a sample YAML config sketch, illustrating how an agent could de
 <div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
 </div>
 </div>
-</footer>
-</div>
-</body></html>
+</footer></body></html>

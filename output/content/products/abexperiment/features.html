@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta content="light" name="color-scheme"/>
+  <meta content="#f7f8fd" name="theme-color"/>
+  <title>ABExperiment by Dataknobs | Experiment with confidence</title>
+  <meta content="ABExperiment helps teams test pages and product features with stable traffic assignment, feature flags, exposure tracking, statistical analysis and controlled rollouts." name="description"/>
+  <meta content="index, follow" name="robots"/>
+  <meta content="website" property="og:type"/>
+  <meta content="ABExperiment | Experiment with confidence. Roll out what works." property="og:title"/>
+  <meta content="One platform to create experiments, split traffic, track outcomes, analyze impact and control the rollout." property="og:description"/>
+  <meta content="https://abexperiment.com/" property="og:url"/>
+  <meta content="ABExperiment" property="og:site_name"/>
+  <meta content="summary" name="twitter:card"/>
+  <link href="https://abexperiment.com/" rel="canonical"/>
+  <style>
+    :root {
+      --ink: #15192f; --ink-2:#33394f; --muted:#66718c; --purple:#6547ec; --purple-dark:#4b34c7;
+      --purple-light:#f1edff; --border:#e2e6f1; --surface:#fff; --bg:#f8f9fd; --mint:#daf6e8;
+      --green:#137a56; --pink:#f5eafa; --teal:#087b91; --shadow:0 24px 65px rgba(46,37,109,.085);
+      --radius:20px;
+    }
+    * {box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:92px}
+    body{margin:0;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.58;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .skip{position:absolute;left:-999px;top:0;background:#fff;color:var(--ink);padding:10px 15px;z-index:200}
+    .skip:focus{left:15px;top:15px}
+    .container{width:min(1176px,calc(100% - 56px));margin-inline:auto}
+    .site-header{position:sticky;top:0;z-index:100;background:rgba(248,249,253,.91);backdrop-filter:blur(16px);border-bottom:1px solid rgba(216,220,235,.82)}
+    .header-inner{min-height:74px;display:flex;align-items:center;gap:26px;justify-content:space-between}
+    .brand{display:inline-flex;align-items:center;gap:11px;white-space:nowrap}
+    .brand-mark{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:linear-gradient(145deg,#8064fc,#5336d3);color:white;font-weight:900;letter-spacing:-.12em;font-size:16px;box-shadow:0 8px 19px rgba(101,71,236,.22)}
+    .brand-text{font-weight:850;font-size:19px;letter-spacing:-.7px;line-height:1.04}
+    .brand-text small{display:block;font-size:10px;letter-spacing:.055em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:6px}
+    .nav{display:flex;align-items:center;gap:26px;color:#4f5870;font-size:13.5px;font-weight:650}
+    .nav a:hover,.footer a:hover{color:var(--purple)}
+    .header-actions{display:flex;align-items:center;gap:11px}
+    .btn{display:inline-flex;justify-content:center;align-items:center;gap:9px;border:1px solid transparent;border-radius:12px;padding:12px 18px;font-weight:750;font-size:13.5px;line-height:1.2;transition:background .2s,transform .2s,border-color .2s;white-space:nowrap}
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{color:#fff;background:var(--purple);box-shadow:0 8px 24px rgba(101,71,236,.18)}
+    .btn.primary:hover{background:var(--purple-dark)}
+    .btn.light{background:#fff;color:var(--ink);border-color:#dfe2ed}
+    .btn.light:hover{border-color:#b7aafa}
+    .btn.small{padding:10px 14px;border-radius:10px;font-size:12.5px}
+    .menu-toggle{display:none;width:42px;height:42px;border:1px solid var(--border);border-radius:11px;background:#fff;color:var(--ink);align-items:center;justify-content:center;font-size:20px}
+    .hero{position:relative;overflow:hidden;padding:78px 0 75px;background:radial-gradient(circle at 79% 6%,rgba(232,223,255,.85),transparent 34%),radial-gradient(circle at -4% 40%,rgba(223,244,250,.74),transparent 35%),linear-gradient(180deg,#fcfcff,#f8f9fd)}
+    .hero:after{content:"";position:absolute;right:-180px;top:60px;width:590px;height:590px;border:1px solid rgba(137,122,233,.08);border-radius:50%;pointer-events:none}
+    .hero-grid{display:grid;grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);gap:56px;align-items:center;position:relative;z-index:1}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;color:#5a45c6;font-size:11.5px;font-weight:850;letter-spacing:.135em;text-transform:uppercase}
+    .eyebrow::before{content:"";width:8px;height:8px;background:#8064fc;border-radius:50%;box-shadow:0 0 0 4px #eee7ff}
+    h1,h2,h3,p{margin-top:0}
+    h1{font-size:clamp(39px,4.65vw,65px);line-height:1.095;letter-spacing:-2.75px;max-width:590px;margin:23px 0}
+    .gradient-text{background:linear-gradient(105deg,#6f51ef 0%,#6042dd 49%,#9c57d5 100%);color:transparent;background-clip:text;-webkit-background-clip:text}
+    .hero-copy{font-size:17px;line-height:1.77;color:#59647f;max-width:525px;margin-bottom:30px}
+    .hero-cta{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .hero-notes{display:flex;align-items:center;gap:9px 21px;flex-wrap:wrap;margin-top:26px;font-size:12px;color:#737e95}
+    .hero-notes span{display:flex;gap:7px;align-items:center}
+    .check{color:#15946c;font-weight:900}
+    .app-frame{border:1px solid #dbdff0;background:#fff;border-radius:23px;padding:10px;box-shadow:0 31px 90px rgba(51,44,117,.16);transform:rotate(.3deg)}
+    .app-inner{border:1px solid #edf0f7;border-radius:17px;overflow:hidden;background:#fff}
+    .app-toolbar{padding:13px 17px;display:flex;align-items:center;justify-content:space-between;background:#f7f8ff;border-bottom:1px solid #edf0f7;gap:10px}
+    .dots{display:flex;gap:5px}.dots span{width:7px;height:7px;border-radius:50%;background:#c6cce1}.dots span:first-child{background:#b5a9fd}.dots span:nth-child(2){background:#9fd9ca}
+    .app-breadcrumb{font-size:10px;color:#737e98;font-weight:700;letter-spacing:.01em}
+    .chip{display:inline-flex;align-items:center;gap:6px;border-radius:50px;font-size:10px;font-weight:850;letter-spacing:.025em;padding:5px 10px;background:var(--mint);color:var(--green)}
+    .chip:before{content:"";width:6px;height:6px;border-radius:50%;background:#17a57b}
+    .console-body{padding:21px 21px 16px}
+    .console-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+    .console-heading strong{display:block;font-size:15px;letter-spacing:-.2px}.console-heading p{font-size:10px;color:#7d859b;margin:3px 0 0}
+    .mini-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#7d85a1;font-weight:800}
+    .console-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+    .stat-box{padding:13px 12px;border:1px solid #e8ebf4;border-radius:12px;background:#fff;min-width:0}
+    .stat-box strong{display:block;font-size:21px;letter-spacing:-.8px;margin-top:5px;line-height:1.25;white-space:nowrap}
+    .stat-box .sub{font-size:10px;color:#77839d;margin-top:4px}
+    .stat-box strong.teal{color:#0f847d}
+    .chart-box{display:flex;gap:16px;border:1px solid #e9ecf6;border-radius:13px;padding:14px;margin-top:11px;align-items:flex-end;min-height:150px;background:linear-gradient(180deg,#fff,#fcfcff)}
+    .chart-left{flex:1;min-width:0}
+    .legend{display:flex;gap:13px;margin:9px 0 0;color:#68738d;font-size:10px;flex-wrap:wrap}
+    .legend span{display:flex;align-items:center;gap:5px}.legend i{width:7px;height:7px;border-radius:50%;display:inline-block}.legend .l-a{background:#ab9ae9}.legend .l-b{background:#7560ea}
+    .chart-svg{width:100%;height:105px;display:block;overflow:visible}
+    .chart-side{border-left:1px solid #edf0f6;padding-left:14px;min-width:118px}
+    .chart-side strong{font-size:16px;display:block;color:var(--green);margin-top:8px}.chart-side small{font-size:10px;color:#8a93a9;line-height:1.4;display:block}
+    .sim-panel{margin-top:11px;background:#f8f9ff;border:1px solid #ebedfa;border-radius:13px;padding:13px}
+    .sim-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:11px;color:#505b75;font-weight:750}
+    .sim-head strong{font-size:12px;color:#543dc6}
+    .range{width:100%;margin:10px 0 7px;accent-color:#7256ed;cursor:pointer}
+    .split-track{display:flex;height:9px;border-radius:20px;background:#eee;overflow:hidden}.split-a{background:#af9efa;transition:width .18s}.split-b{background:#6550db;flex:1}
+    .split-labels{display:flex;justify-content:space-between;font-size:10px;color:#6f7994;margin-top:7px}
+    .demo-note{color:#98a0b4;text-align:center;margin-top:12px;font-size:10px;letter-spacing:.005em}
+    .trust-strip{background:#fff;border-block:1px solid var(--border);padding:20px 0}
+    .trust-flex{display:grid;grid-template-columns:1fr repeat(3,1fr);gap:20px;align-items:center}
+    .trust-intro{font-weight:850;font-size:11px;letter-spacing:.09em;color:#71809b;text-transform:uppercase}
+    .trust-item{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:700;color:#59657e}.trust-item b{display:grid;place-items:center;width:25px;height:25px;background:#f0ecff;border-radius:8px;color:#6c50df;font-size:13px}
+    section.content{padding:95px 0}
+    .section-heading{max-width:710px;margin-bottom:39px}
+    .section-heading.center{text-align:center;margin:0 auto 41px}
+    .section-kicker{font-size:11px;font-weight:850;letter-spacing:.135em;color:var(--purple);text-transform:uppercase;margin-bottom:12px}
+    h2{font-size:clamp(30px,3.55vw,47px);line-height:1.15;letter-spacing:-1.8px;margin:0 0 14px}
+    .section-lead{font-size:15.5px;line-height:1.75;color:#69748d;max-width:690px;margin-bottom:0}
+    .center .section-lead{margin:auto}
+    .features-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+    .feature-card{border:1px solid #e6e8f2;border-radius:17px;padding:24px 21px 23px;background:#fff;min-height:235px;box-shadow:0 8px 29px rgba(50,57,88,.02);transition:transform .2s,box-shadow .2s}
+    .feature-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+    .feature-icon{height:43px;width:43px;border-radius:13px;display:grid;place-items:center;background:#f2edff;color:#6448df;font-weight:900;margin-bottom:18px;font-size:21px}
+    .feature-card:nth-child(3n + 2) .feature-icon{background:#e9f8f8;color:#0d8292}.feature-card:nth-child(3n) .feature-icon{background:#fceffa;color:#a552aa}
+    h3{font-size:16px;letter-spacing:-.4px;line-height:1.35;margin-bottom:8px}
+    .feature-card p{color:#707c95;font-size:12.9px;line-height:1.67;margin:0}
+    .how{background:#fff;border-block:1px solid var(--border)}
+    .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+    .step{position:relative;padding:25px 20px 22px;border:1px solid #e5e8f2;border-radius:17px;background:#fbfcff}
+    .step-number{font-size:11px;font-weight:900;color:#6b4ef1;letter-spacing:.07em;margin-bottom:20px}
+    .step h3{font-size:17px}
+    .step p{font-size:12.8px;line-height:1.7;color:#6d7790;margin:0}
+    .step:not(:last-child):after{content:"→";position:absolute;right:-16px;top:48%;font-size:19px;color:#a79ae5;z-index:2}
+    .journey{padding:22px;margin-top:21px;border:1px solid #e3e1f8;background:#f6f4ff;border-radius:14px;display:flex;align-items:center;gap:14px}
+    .journey .badge{font-size:11px;font-weight:850;background:#e7e1ff;padding:6px 10px;border-radius:7px;color:#5d43c8;flex-shrink:0}.journey p{margin:0;font-size:12.5px;color:#5a647c}
+    .experience{display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);gap:39px;align-items:center}
+    .exp-options{display:grid;gap:10px;margin-top:26px}
+    .exp-option{display:flex;align-items:flex-start;gap:12px;padding:15px;border-radius:13px;text-align:left;border:1px solid #e4e7f1;background:white;color:var(--ink);width:100%;transition:background .2s,border .2s}
+    .exp-option[aria-selected="true"]{border-color:#9e8cf9;background:#f3f0ff;box-shadow:inset 3px 0 #7052e9}
+    .option-number{font-size:11px;color:#6b50e5;font-weight:850;margin-top:2px;min-width:24px}
+    .exp-option strong{display:block;font-size:13.5px;letter-spacing:-.15px}.exp-option small{display:block;font-size:12px;color:#73809b;margin-top:3px;line-height:1.5}
+    .exp-showcase{border-radius:23px;border:1px solid #e3e5f3;background:linear-gradient(155deg,#fcfcff,#f0edff);padding:25px;box-shadow:0 20px 65px rgba(53,48,110,.065);min-height:407px}
+    .exp-showcase-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px}.preview-caption{font-size:11px;font-weight:850;color:#70618a;letter-spacing:.09em;text-transform:uppercase}.preview-pill{font-size:10px;background:white;color:#684ee1;border-radius:40px;padding:5px 10px;border:1px solid #e1dbfa}
+    .preview-window{border:1px solid #e3e5ef;border-radius:14px;background:#fff;padding:23px;min-height:266px;box-shadow:0 8px 27px rgba(52,49,92,.05)}
+    .preview-nav{display:flex;justify-content:space-between;font-size:11px;font-weight:800;color:#6e7593;padding-bottom:17px;border-bottom:1px solid #eff0f5}.preview-nav span{color:#857da6}
+    .preview-main{margin-top:25px;display:grid;grid-template-columns:1.4fr .7fr;gap:18px;align-items:center}
+    .preview-copy h4{font-size:23px;letter-spacing:-.9px;line-height:1.25;margin:0 0 11px}.preview-copy p{font-size:11.5px;line-height:1.65;color:#75819b;margin:0 0 14px}
+    .preview-button{display:inline-flex;background:#6d54ea;padding:9px 13px;border-radius:7px;font-size:10px;font-weight:850;color:#fff}
+    .preview-art{height:126px;border-radius:14px;background:linear-gradient(140deg,#e4dfff,#b3a7ff);display:grid;place-items:center;overflow:hidden;position:relative}
+    .preview-art:before,.preview-art:after{content:"";position:absolute;border:2px solid rgba(255,255,255,.65);width:100px;height:100px;border-radius:20px;transform:rotate(30deg)}.preview-art:after{width:75px;height:75px;transform:rotate(-23deg);background:rgba(255,255,255,.18)}
+    .preview-art strong{z-index:1;font-size:40px;color:white;letter-spacing:-3px}
+    .preview-footer{display:flex;gap:9px;margin-top:14px;font-size:10px;color:#71809a;align-items:center}.preview-footer b{color:#7153e1}
+    .stats-section{background:#fff;border-block:1px solid var(--border)}
+    .stats-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:47px;align-items:center}
+    .stat-list{margin-top:25px;display:grid;gap:11px}
+    .stat-row{display:flex;gap:12px;align-items:flex-start;font-size:13.3px;color:#5e6a84}.stat-row b{color:#6650d9;display:grid;place-items:center;flex-shrink:0;width:23px;height:23px;border-radius:8px;background:#f1edff;font-size:12px}
+    .stat-panel{border:1px solid #e2e6f2;background:#f9faff;border-radius:20px;padding:22px}
+    .panel-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:19px}.panel-top strong{font-size:14px}.panel-top small{font-size:10px;color:#8993aa}
+    .panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .method{background:#fff;border:1px solid #e5e8f2;border-radius:12px;padding:14px;min-height:77px}
+    .method small{font-size:10px;color:#8a94aa;display:block;letter-spacing:.03em}.method strong{font-size:12.2px;display:block;margin-top:5px;line-height:1.3}
+    .mini-signal{display:flex;gap:7px;align-items:center;margin-top:14px;border-radius:10px;background:#e9f8f3;padding:11px;color:#317761;font-weight:750;font-size:11px}
+    .guard-section{background:linear-gradient(180deg,#f8f9fd,#f2f4ff)}
+    .guard-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:44px;align-items:center}
+    .guard-box{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .guard-card{border:1px solid #e3e7f2;border-radius:15px;background:#fff;padding:21px}.guard-card b{font-size:24px;line-height:1;color:#7054dc;display:block;margin-bottom:12px}.guard-card h3{margin-bottom:7px}.guard-card p{font-size:12px;line-height:1.65;color:#77829a;margin:0}
+    .use-cases{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.use-case{padding:25px 21px;background:#fff;border:1px solid #e4e8f2;border-radius:17px}.use-case .number{font-size:11px;color:#7c66de;font-weight:900;margin-bottom:22px}.use-case p{font-size:12.7px;color:#717d96;line-height:1.65;margin:0}
+    .roadmap{background:#fff;border-block:1px solid var(--border)}
+    .roadmap-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px}.future-card{padding:23px;background:#fbfaff;border:1px solid #e7e2fa;border-radius:17px}.future-tag{font-size:9px;font-weight:850;letter-spacing:.12em;text-transform:uppercase;color:#7d63d4;display:inline-block;margin-bottom:16px}.future-card p{font-size:12.7px;color:#6f7b92;margin:0;line-height:1.68}
+    .faq{max-width:810px;margin:auto}.faq details{border-bottom:1px solid #dfe3ee;padding:20px 3px}.faq summary{cursor:pointer;list-style:none;font-weight:750;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:20px}.faq summary::-webkit-details-marker{display:none}.faq summary:after{content:"+";font-size:25px;color:#7156ea;line-height:1}.faq details[open] summary:after{content:"−"}.faq details p{margin:12px 28px 0 0;color:#6d7890;font-size:13px;line-height:1.75}
+    .cta-section{padding:0 0 92px}.cta-block{padding:55px 58px;border-radius:27px;background:radial-gradient(circle at 85% 0,rgba(174,153,255,.35),transparent 35%),linear-gradient(115deg,#31207c,#5841ba 60%,#694bd5);color:#fff;display:flex;justify-content:space-between;gap:28px;align-items:center}.cta-block h2{font-size:clamp(30px,3.1vw,41px);max-width:640px}.cta-block p{color:#dcd6fa;font-size:14px;line-height:1.75;margin:0}.cta-block .btn{background:#fff;color:#5239c7;flex-shrink:0;box-shadow:none}.cta-block .btn:hover{background:#f1edff}
+    .footer{padding:40px 0 28px;background:#fff;border-top:1px solid var(--border)}.footer-top{display:flex;align-items:flex-start;justify-content:space-between;gap:22px}.footer p{font-size:12.5px;color:#7a849b;max-width:430px;margin:17px 0 0}.footer-links{display:flex;gap:20px;color:#58637c;font-size:12px;font-weight:650;flex-wrap:wrap}.footer-bottom{display:flex;justify-content:space-between;gap:15px;margin-top:42px;padding-top:19px;border-top:1px solid #eef0f5;color:#8992a6;font-size:11px;flex-wrap:wrap}
+    a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #bdacff;outline-offset:3px}
+    @media(max-width:1050px){.nav{gap:14px}.header-inner{gap:13px}.hero-grid{gap:27px}.features-grid{grid-template-columns:repeat(2,1fr)}.steps{gap:12px}.experience,.stats-grid,.guard-grid{gap:28px}.use-cases{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:800px){.container{width:min(100% - 38px,670px)}.header-inner{min-height:68px}.menu-toggle{display:flex}.header-actions .btn{display:none}.nav{display:none;position:absolute;top:68px;left:0;right:0;background:#fff;padding:18px 24px 24px;border-bottom:1px solid var(--border);box-shadow:0 20px 35px rgba(25,31,67,.08);flex-direction:column;align-items:flex-start;gap:17px}.nav.open{display:flex}.hero{padding:52px 0 61px}.hero-grid,.experience,.stats-grid,.guard-grid{grid-template-columns:1fr}.hero-grid{gap:44px}.hero h1{max-width:590px}.app-frame{max-width:630px}.trust-flex{grid-template-columns:1fr 1fr;gap:14px}.steps{grid-template-columns:1fr 1fr}.step:nth-child(2):after{display:none}.roadmap-grid{grid-template-columns:1fr}.cta-block{padding:37px;align-items:flex-start;flex-direction:column}.footer-top{flex-direction:column}}
+    @media(max-width:520px){.container{width:calc(100% - 30px)}.hero{padding-top:39px}.hero h1{font-size:39px;letter-spacing:-1.8px}.hero-copy{font-size:15px}.hero-cta .btn{width:100%}.trust-flex{grid-template-columns:1fr 1fr;gap:11px}.trust-item{font-size:11px}.trust-intro{grid-column:1/-1}.features-grid,.steps,.use-cases,.guard-box{grid-template-columns:1fr}.step:after{display:none!important}.feature-card{min-height:auto}.app-frame{padding:6px;border-radius:17px}.console-body{padding:12px}.console-stats{gap:5px}.stat-box{padding:10px 7px}.stat-box strong{font-size:17px}.chart-box{gap:8px;padding:10px}.chart-side{padding-left:8px;min-width:92px}.chart-side strong{font-size:14px}.exp-showcase{padding:14px;min-height:0}.preview-window{padding:14px}.preview-main{gap:9px}.preview-copy h4{font-size:20px}.preview-art{height:105px}.panel-grid{grid-template-columns:1fr}.journey{align-items:flex-start;flex-direction:column}.cta-block{padding:30px 24px;border-radius:20px}.cta-block .btn{width:100%}section.content{padding:70px 0}h2{letter-spacing:-1.2px}.footer-links{gap:14px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+  </style>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"ABExperiment","applicationCategory":"BusinessApplication","operatingSystem":"Web","description":"A/B experimentation, feature flags, traffic allocation, measurement and statistical analysis for digital experiences.","url":"https://abexperiment.com/","publisher":{"@type":"Organization","name":"Dataknobs","url":"https://www.dataknobs.com/"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What can I test with ABExperiment?","acceptedAnswer":{"@type":"Answer","text":"ABExperiment supports experiments for website content, full pages or routes, and feature flags. Broader AI and data-product experiments are part of the platform roadmap."}},{"@type":"Question","name":"How do returning visitors remain in the same variant?","acceptedAnswer":{"@type":"Answer","text":"The browser runtime uses a persistent first-party visitor identity and sticky assignment while its identifiers are available. Clearing browser storage or using another device can create a new identity."}},{"@type":"Question","name":"Does ABExperiment include statistical analysis?","acceptedAnswer":{"@type":"Answer","text":"It includes foundational tests and advanced tools such as Fisher exact, McNemar, bootstrap intervals, effect sizes, sample planning, non-inferiority and multiple-testing correction."}},{"@type":"Question","name":"Can I test Next.js applications?","acceptedAnswer":{"@type":"Answer","text":"ABExperiment has Next.js page and route integration components for delivery under a consistent public URL; production deployment should be validated for the application environment."}}]}
+  </script>
+<link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon.ico" rel="icon" sizes="any"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-16.png" rel="icon" sizes="16x16" type="image/png"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/favicon-180.png" rel="apple-touch-icon" sizes="180x180"/><link href="https://storage.googleapis.com/css-designs/brand-g/dataknobs-periwinkle-indigo/favicon/site.webmanifest" rel="manifest"/><link href="https://storage.googleapis.com/css-designs/purple/kreatewebsites.production.css" rel="stylesheet"/>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-JF94J1W5MC"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JF94J1W5MC');
+</script></head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a aria-label="ABExperiment home" class="brand" href="#top"><span aria-hidden="true" class="brand-mark">A/B</span><span class="brand-text">ABExperiment<small>by Dataknobs</small></span></a>
+    <nav aria-label="Main navigation" class="nav" id="siteNav">
+      <a href="#features">Capabilities</a><a href="#workflow">How it works</a><a href="#experiment-types">Experiment types</a><a href="#statistics">Statistics</a><a href="#use-cases">Use cases</a><a href="#faq">FAQ</a>
+    </nav>
+    <div class="header-actions"><a class="btn small light" href="https://www.dataknobs.com/" rel="noopener noreferrer" target="_blank">Dataknobs</a><a class="btn small primary" href="https://my.abexperiment.com/" rel="noopener noreferrer" target="_blank">Open platform <span aria-hidden="true">↗</span></a><button aria-controls="siteNav" aria-expanded="false" aria-label="Open navigation" class="menu-toggle" id="menuToggle" type="button">☰</button></div>
+  </div>
+</header>
+<main id="main">
+  <section class="hero" id="top">
+    <div class="container hero-grid">
+      <div>
+        <span class="eyebrow">Experimentation &amp; controlled rollouts</span>
+        <h1>Experiment with <span class="gradient-text">confidence.</span> Roll out what works.</h1>
+        <p class="hero-copy">From a new headline to an entirely new product experience, ABExperiment connects traffic allocation, trustworthy measurement, statistical analysis and launch controls in one place.</p>
+        <div class="hero-cta"><a class="btn primary" href="https://my.abexperiment.com/" rel="noopener noreferrer" target="_blank">Start experimenting <span aria-hidden="true">↗</span></a><a class="btn light" href="#features">Explore the platform <span aria-hidden="true">↓</span></a></div>
+        <div class="hero-notes"><span><b aria-hidden="true" class="check">✓</b> Website &amp; feature experiments</span><span><b aria-hidden="true" class="check">✓</b> Sticky traffic assignment</span><span><b aria-hidden="true" class="check">✓</b> Advanced statistical tools</span></div>
+      </div>
+      <div aria-label="Illustrative ABExperiment dashboard preview" class="app-frame">
+        <div class="app-inner">
+          <div class="app-toolbar"><div aria-hidden="true" class="dots"><span></span><span></span><span></span></div><div class="app-breadcrumb">Experiments / checkout-experience-v2</div><span class="chip">Running</span></div>
+          <div class="console-body">
+            <div class="console-heading"><div><strong>Checkout experience · A/B</strong><p>Conversion experiment / Website / Demo data</p></div><span class="mini-label">Overview</span></div>
+            <div class="console-stats"><div class="stat-box"><span class="mini-label">Control</span><strong>12.4%</strong><div class="sub">Illustrative conversion</div></div><div class="stat-box"><span class="mini-label">Challenger</span><strong class="teal">14.1%</strong><div class="sub">Illustrative conversion</div></div><div class="stat-box"><span class="mini-label">Example lift</span><strong class="teal">+1.7pp</strong><div class="sub">Not a live result</div></div></div>
+            <div class="chart-box"><div class="chart-left"><div class="mini-label">Outcome trend</div><svg aria-label="Illustrative trend lines for two variants" class="chart-svg" role="img" viewBox="0 0 285 105"><path d="M0 22 H285 M0 50 H285 M0 78 H285" fill="none" stroke="#eef0f6" stroke-width="1"></path><path d="M0 83 C25 78 38 72 60 69 S100 64 121 61 162 53 183 49 223 41 285 34" fill="none" stroke="#b8aaec" stroke-linecap="round" stroke-width="3"></path><path d="M0 90 C22 87 43 74 63 74 S95 58 122 54 170 47 194 39 241 27 285 12" fill="none" stroke="#6e56e7" stroke-linecap="round" stroke-width="3"></path></svg><div class="legend"><span><i class="l-a"></i>Control A</span><span><i class="l-b"></i>Variant B</span></div></div><div class="chart-side"><div class="mini-label">Health check</div><strong>Healthy*</strong><small>Example status only</small><div class="mini-label" style="margin-top:15px">Confidence</div><small>Review with study rules</small></div></div>
+            <div class="sim-panel"><div class="sim-head"><span>Try an allocation split</span><strong><span id="controlPct">70</span>% A / <span id="challengerPct">30</span>% B</strong></div><input aria-describedby="demoDisclosure" aria-label="Illustrative percentage assigned to variant B" class="range" id="splitRange" max="100" min="0" step="5" type="range" value="30"/><div aria-hidden="true" class="split-track"><span class="split-a" id="splitA" style="width:70%"></span><span class="split-b"></span></div><div class="split-labels"><span>Control allocation</span><span>Challenger allocation</span></div></div>
+            <div class="demo-note" id="demoDisclosure">* Interactive illustration. Numbers and health badges are sample data, not a live experiment or statistical verdict.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="trust-strip"><div class="container trust-flex"><div class="trust-intro">One connected workflow</div><div class="trust-item"><b aria-hidden="true">A</b> Assign consistently</div><div class="trust-item"><b aria-hidden="true">B</b> Measure outcomes</div><div class="trust-item"><b aria-hidden="true">✓</b> Decide with evidence</div></div></div>
+  <section class="content" id="features"><div class="container"><div class="section-heading center"><div class="section-kicker">The platform</div><h2>Everything behind a more reliable experiment</h2><p class="section-lead">More than a traffic splitter. Design the experiment, deliver the right experience, understand the result and maintain control over what happens next.</p></div>
+    <div class="features-grid">
+      <article class="feature-card"><div aria-hidden="true" class="feature-icon">⇄</div><h3>Flexible traffic allocation</h3><p>Set control/challenger shares such as 50/50, 70/30 or 90/10. Gradually increase the challenger without unnecessarily changing existing assignments.</p></article>
+      <article class="feature-card"><div aria-hidden="true" class="feature-icon">◇</div><h3>Sticky visitor assignment</h3><p>Give returning visitors a consistent experience across ordinary page loads and visits while their first-party identifiers remain available.</p></article>
+      <article class="feature-card"><div aria-hidden="true" class="feature-icon">▣</div><h3>Pages and components</h3><p>Compare headlines, calls to action, content blocks, full pages and Next.js routes. Match the delivery approach to the size of the change.</p></article>
+      <article class="feature-card"><div aria-hidden="true" class="feature-icon">⚑</div><h3>Feature-flag experiments</h3><p>Put functionality behind control and challenger treatments. Evaluate flags in the application and make rollout behavior explicit.</p></article>
+      <article class="feature-card"><div aria-hidden="true" class="feature-icon">◎</div><h3>Exposure and outcome events</h3><p>Distinguish the treatment selected from what a user actually saw and the outcome that followed. Keep measurement tied to the right cohort.</p></article>
+      <article class="feature-card"><div aria-hidden="true" class="feature-icon">∑</div><h3>Statistical analysis</h3><p>Use foundational hypothesis tests and advanced tools for paired outcomes, small samples, effects, intervals, sample planning and multiple tests.</p></article>
+      <article class="feature-card"><div aria-hidden="true" class="feature-icon">↗</div><h3>Results and experiment health</h3><p>Track conversion trends, uncertainty, sample progress and sample ratio mismatch, with checks that help flag questionable results.</p></article>
+      <article class="feature-card"><div aria-hidden="true" class="feature-icon">⊘</div><h3>Safety and governance</h3><p>Use controlled access, fallback behavior, QA previews and emergency disable options to protect live customer experiences.</p></article>
+    </div>
+  </div></section>
+  <section class="content how" id="workflow"><div class="container"><div class="section-heading"><div class="section-kicker">From question to decision</div><h2>Run a structured test, not a guessing game.</h2><p class="section-lead">A clear experimentation workflow makes setup repeatable and keeps results connected to the question the team set out to answer.</p></div>
+    <div class="steps"><article class="step"><div class="step-number">01 / DESIGN</div><h3>Define the hypothesis</h3><p>Choose an experience, your control and challenger, the audience and the outcome that matters.</p></article><article class="step"><div class="step-number">02 / ASSIGN</div><h3>Split the traffic</h3><p>Set a deliberate allocation. Returning participants stay on the same treatment.</p></article><article class="step"><div class="step-number">03 / EVALUATE</div><h3>Measure what happened</h3><p>Collect exposures and outcomes. Check sample health, effect size and uncertainty.</p></article><article class="step"><div class="step-number">04 / CONTROL</div><h3>Make the next move</h3><p>Review the evidence, keep testing, stop a risky change or plan the rollout.</p></article></div>
+    <div class="journey"><span class="badge">Product direction</span><p>A guided six-step setup flow covers definition, variants, metrics, statistical planning, decision rules and prelaunch review. Availability of integrated launch-to-decision workflow depends on deployment.</p></div>
+  </div></section>
+  <section class="content" id="experiment-types"><div class="container experience"><div><div class="section-kicker">Test the right layer</div><h2>One experimentation foundation. Different kinds of change.</h2><p class="section-lead">Test a small piece of copy, change a complete experience or release functionality to a controlled audience.</p><div aria-label="Experiment type previews" class="exp-options" role="tablist"><button aria-controls="expPanel" aria-selected="true" class="exp-option" data-type="content" id="tab-content" role="tab" tabindex="0" type="button"><span class="option-number">01</span><span><strong>Content and component tests</strong><small>Headlines, offers, calls to action, sections and layouts.</small></span></button><button aria-controls="expPanel" aria-selected="false" class="exp-option" data-type="page" id="tab-page" role="tab" tabindex="-1" type="button"><span class="option-number">02</span><span><strong>Full-page and route tests</strong><small>Alternative pages under a consistent public URL.</small></span></button><button aria-controls="expPanel" aria-selected="false" class="exp-option" data-type="flag" id="tab-flag" role="tab" tabindex="-1" type="button"><span class="option-number">03</span><span><strong>Feature release tests</strong><small>Enable new behaviors only for an assigned cohort.</small></span></button></div></div>
+  <div aria-labelledby="tab-content" class="exp-showcase" id="expPanel" role="tabpanel" tabindex="0"><div class="exp-showcase-top"><span class="preview-caption">Treatment preview</span><span class="preview-pill" id="previewType">Content test · Variant B</span></div><div class="preview-window"><div class="preview-nav"><strong>example.website</strong><span id="previewNavType">Landing page</span></div><div class="preview-main"><div class="preview-copy"><h4 id="previewTitle">Better experiences start here.</h4><p id="previewText">Compare messaging and calls to action while preserving visitor consistency.</p><span class="preview-button" id="previewButton">Explore the product</span></div><div aria-hidden="true" class="preview-art"><strong id="previewArt">B</strong></div></div></div><div class="preview-footer"><b>●</b><span id="previewFooter">Illustration: a challenger headline and CTA</span></div></div>
+  </div></section>
+  <section class="content stats-section" id="statistics"><div class="container stats-grid"><div><div class="section-kicker">Analysis that informs decisions</div><h2>Beyond a single p-value.</h2><p class="section-lead">The question is not only whether two variants differ. It's also how much they differ, whether the test is appropriate and whether the experiment itself can be trusted.</p><div class="stat-list"><div class="stat-row"><b>✓</b><span>Foundational tests: chi-square, independent and paired t-tests, Mann-Whitney and Wilcoxon.</span></div><div class="stat-row"><b>✓</b><span>Advanced methods: Fisher exact, McNemar, bootstrap confidence intervals, effect size and non-inferiority.</span></div><div class="stat-row"><b>✓</b><span>Plan samples, recommend a test and adjust for multiple testing.</span></div><div class="stat-row"><b>✓</b><span>Review sample ratio mismatch, confidence intervals and operational health alongside results.</span></div></div><div style="margin-top:27px"><a class="btn light" href="https://my.abexperiment.com/tools/sample-size-calculator" rel="noopener noreferrer" target="_blank">Explore statistical tools <span aria-hidden="true">↗</span></a></div></div>
+    <div class="stat-panel"><div class="panel-top"><strong>Advanced Statistics toolkit</strong><small>8 advanced tools</small></div><div class="panel-grid"><div class="method"><small>01 / SELECT</small><strong>Recommend a Test</strong></div><div class="method"><small>02 / PLAN</small><strong>Sample Size Planner</strong></div><div class="method"><small>03 / COMPARE</small><strong>Fisher Exact Test</strong></div><div class="method"><small>04 / PAIRED</small><strong>McNemar Test</strong></div><div class="method"><small>05 / IMPACT</small><strong>Effect Size</strong></div><div class="method"><small>06 / UNCERTAINTY</small><strong>Bootstrap Confidence Interval</strong></div><div class="method"><small>07 / SAFETY</small><strong>Non-inferiority Test</strong></div><div class="method"><small>08 / VALIDITY</small><strong>Multiple-testing Correction</strong></div></div><div class="mini-signal"><span aria-hidden="true">✓</span> Designed for more informative, auditable experiment reviews.</div></div>
+  </div></section>
+  <section class="content guard-section" id="trust"><div class="container guard-grid"><div><div class="section-kicker">Built around trust</div><h2>Results matter only when the experiment is sound.</h2><p class="section-lead">Operational safety and data quality belong next to experiment design. ABExperiment brings those concerns into the experiment workflow, instead of treating them as separate afterthoughts.</p></div><div class="guard-box"><article class="guard-card"><b>01</b><h3>Stable assignments</h3><p>Preserve cohort membership across normal return visits and controlled allocation changes.</p></article><article class="guard-card"><b>02</b><h3>Health signals</h3><p>Use SRM and exposure integrity to identify results that may need investigation.</p></article><article class="guard-card"><b>03</b><h3>Emergency control</h3><p>Fail safely and disable a risky feature without waiting for statistical completion.</p></article><article class="guard-card"><b>04</b><h3>Governed decisions</h3><p>Keep measurements, guardrails and rollout controls connected to a documented decision.</p></article></div></div></section>
+  <section class="content" id="use-cases"><div class="container"><div class="section-heading"><div class="section-kicker">Where teams use it</div><h2>Start with a change that matters.</h2><p class="section-lead">Useful experiments range from a single customer-facing message to the release of a new capability.</p></div><div class="use-cases"><article class="use-case"><div class="number">USE CASE / 01</div><h3>Landing pages &amp; CTAs</h3><p>Compare headlines, pricing messages, signup prompts or conversion flows on a public website.</p></article><article class="use-case"><div class="number">USE CASE / 02</div><h3>New product features</h3><p>Release a new experience behind a feature flag, observe usage and retain emergency control.</p></article><article class="use-case"><div class="number">USE CASE / 03</div><h3>Full-page design changes</h3><p>Compare alternative Next.js routes and page experiences while keeping public navigation consistent.</p></article><article class="use-case"><div class="number">USE CASE / 04</div><h3>Catalog &amp; location UX</h3><p>Experiment with calls to action, discovery paths and location experiences across customer journeys.</p></article></div></div></section>
+  <section class="content roadmap" id="roadmap"><div class="container"><div class="section-heading"><div class="section-kicker">The direction ahead</div><h2>From digital experiences to intelligent systems.</h2><p class="section-lead">The ABExperiment foundation is intended to expand into more kinds of experimentation. The capabilities below are roadmap directions, not claims of generally available features.</p></div><div class="roadmap-grid"><article class="future-card"><span class="future-tag">Roadmap</span><h3>AI prompts &amp; model choices</h3><p>Compare prompt versions, model configurations, quality, latency and cost using offline and online evaluation.</p></article><article class="future-card"><span class="future-tag">Roadmap</span><h3>Agent policies &amp; workflows</h3><p>Study alternative tool choices, handoff rules and safety controls with traceable outcomes.</p></article><article class="future-card"><span class="future-tag">Roadmap</span><h3>Data signals &amp; products</h3><p>Compare versioned scoring methods, pipelines and signals with backtests and governed releases.</p></article></div></div></section>
+  <section class="content" id="faq"><div class="container"><div class="section-heading center"><div class="section-kicker">Frequently asked questions</div><h2>Clear answers before you begin.</h2></div><div class="faq"><details><summary>What can I test with ABExperiment?</summary><p>The current product foundation supports website content and page experiments as well as feature-flag-based functional experiments. The platform's broader roadmap covers AI and data-product experimentation.</p></details><details><summary>How does it keep returning visitors in the same group?</summary><p>The browser runtime uses first-party visitor identifiers stored in browser storage and sticky assignment. If those identifiers are removed or the user changes devices, a new identity may be assigned unless a separate authenticated identity system is configured.</p></details><details><summary>Can I choose a 90/10 rollout instead of a 50/50 split?</summary><p>Yes. Custom traffic allocations are part of the core functionality. New participants can follow the new split while previously assigned participants stay on their existing treatment.</p></details><details><summary>What statistical methods are available?</summary><p>The platform includes baseline rate, sample planning, assumption checks, chi-square, independent and paired t-tests, Mann-Whitney and Wilcoxon, plus an Advanced Statistics suite covering Fisher, McNemar, effect size, bootstrap intervals, non-inferiority and multiple-testing correction.</p></details><details><summary>Does it work for HTML and Next.js websites?</summary><p>HTML snippet integration has been deployed in prior development tests. Next.js page/route proxy components have also been developed; teams should verify the deployed integration for their particular app and routing model.</p></details><details><summary>Can it automatically choose and release a winner?</summary><p>Results, health indicators and decision-oriented components have been developed. Automated promotion should be governed by health, predeclared success criteria, guardrails and appropriate release approval; confirm your deployment's integrated decision and rollout support before enabling it.</p></details><details><summary>Are AI prompt, model and data-signal tests available today?</summary><p>They are product expansion directions. The experimentation architecture is designed to accommodate them, but they should not be treated as generally released modules without a separate implementation and release validation.</p></details></div></div></section>
+  <section class="cta-section"><div class="container"><div class="cta-block"><div><div style="font-size:11px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;color:#d3c8ff;margin-bottom:15px">Build. Test. Learn. Improve.</div><h2>Stop debating the better variant. Start measuring it.</h2><p>Start with your next page, feature or customer journey experiment.</p></div><a class="btn" href="https://my.abexperiment.com/" rel="noopener noreferrer" target="_blank">Open ABExperiment <span aria-hidden="true">↗</span></a></div></div></section>
+</main>
+<footer class="bg-gray-800 text-gray-300">
+<div class="container mx-auto px-6 py-12 lg:px-8">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Company</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/">About Us</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/value-proposition/">Value Proposition</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/about-dataknobs/leadership/">Founder</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-engagement-model.html">Dataknobs Engagement Model</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/enterprise-information-memory-and-knobs.html">Enterprise Information Memory</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/what-are-knobs.html">What are knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-are-levers.html">Knobs and Levers</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-speed-and-governance-balance.html">Knobs for Speed and Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-for-high-information-region.html">Knobs for High Information Region</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/knobs-governance.html">How Knobs provide Governance</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/blog/">Blog</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="mailto:contact@dataknobs.com">Contact Email</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="tel:+14253411222">Contact Phone</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Products_and_Capabilities</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/">Products and Capabilities Overview</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/stocks-ai-assistant/">Stocks AI Assistant</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kreate/">Kreate</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/kontrols/">Kontrols</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/">Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/">EKIP</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/examples-reference/">Knobs Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://stocks-agent.dataknobs.com/">Stocks AI Agent</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/ekip-dataset-coverage-approach.html">EKIP For Dataset Coverage</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/enterprise-knob-intelligence-platform.html">EKIP Platform</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/products/knobs/EKIP/how-ekip-builds-knobs.html">EKIP For Building Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/designing-knobs-for-data-products.html">Data Product Knobs</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/dataknobs-for-cxo.html">Data Product for CxO</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/data-products/how-dataknobs-build-data-products.html">How DataKnobs Build Data Products</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.dataknobs.com/agentic-ai/agentic-ai-development-life-cycle/">Agentic Development Life Cycle</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Folders</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/products/abexperiment/chatbots/">Chatbots</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/products/abexperiment/examples/">Examples</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/products/abexperiment/methods/">Methods</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/products/abexperiment/websites/">Websites</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-lg font-semibold text-white mb-4">Pages</h5>
+<ul class="space-y-2">
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/products/abexperiment/abexperiment-slides.html">Abexperiment Slides</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/products/abexperiment/execute-good-experiments.html">Execute Good Experiments</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/products/abexperiment/good-experiment-vs-bad-experiments.html">Good Experiment Vs Bad Experiments</a></li>
+<li><a class="hover:text-white hover:underline transition-colors duration-200" href="https://www.www.dataknobs.com/products/abexperiment/privacy-policy.html">Privacy Policy</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-8 text-center text-sm text-gray-400">
+<p class="text-sm text-gray-400">Data Products for GenAI and AgentAI</p>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 flex flex-col items-center justify-between sm:flex-row">
+<p class="text-sm text-gray-400">© 2026 DataKnobs for AI. All rights reserved.</p>
+<div class="flex space-x-4 mt-4 sm:mt-0"><a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.facebook.com/dataknobs/">Facebook</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.twitter.com/dataknobs/">Twitter</a> <a class="text-gray-400 hover:text-white transition-colors duration-200" href="https://www.linkedin.com/company/dataknobs/">Linkedin</a></div>
+</div>
+</div>
+</footer>
+<script>
+(function(){
+  'use strict';
+  var slider = document.getElementById('splitRange');
+  var control = document.getElementById('controlPct');
+  var challenger = document.getElementById('challengerPct');
+  var splitA = document.getElementById('splitA');
+  function updateSplit(){var b=Number(slider.value),a=100-b;control.textContent=a;challenger.textContent=b;splitA.style.width=a+'%';slider.setAttribute('aria-valuetext',a+' percent control, '+b+' percent challenger');}
+  if(slider){slider.addEventListener('input',updateSplit);updateSplit();}
+  var experiences={
+    content:{pill:'Content test · Variant B',nav:'Landing page',title:'Better experiences start here.',body:'Compare messaging and calls to action while preserving visitor consistency.',cta:'Explore the product',foot:'Illustration: a challenger headline and CTA',art:'B'},
+    page:{pill:'Page test · Same public URL',nav:'Full-page test',title:'A new way to explore.',body:'Two complete page designs can be assigned without switching the visible destination URL.',cta:'See the experience',foot:'Illustration: a complete alternative page or route',art:'↗'},
+    flag:{pill:'Feature flag · B enabled',nav:'Product feature',title:'Meet the new workspace.',body:'Expose a new capability to a selected group while keeping the control experience available.',cta:'Try the new feature',foot:'Illustration: function enabled for the challenger cohort',art:'✓'}
+  };
+  var tabs=Array.from(document.querySelectorAll('.exp-option'));
+  function activateTab(tab,focus){var t=experiences[tab.dataset.type];if(!t)return;tabs.forEach(function(x){var active=x===tab;x.setAttribute('aria-selected',String(active));x.tabIndex=active?0:-1;});document.getElementById('previewType').textContent=t.pill;document.getElementById('previewNavType').textContent=t.nav;document.getElementById('previewTitle').textContent=t.title;document.getElementById('previewText').textContent=t.body;document.getElementById('previewButton').textContent=t.cta;document.getElementById('previewFooter').textContent=t.foot;document.getElementById('previewArt').textContent=t.art;document.getElementById('expPanel').setAttribute('aria-labelledby',tab.id);if(focus)tab.focus();}
+  tabs.forEach(function(tab,i){tab.addEventListener('click',function(){activateTab(tab,false);});tab.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'||e.key==='Home'||e.key==='End'){e.preventDefault();var next=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;activateTab(tabs[next],true);}});});
+  var menuToggle=document.getElementById('menuToggle'),nav=document.getElementById('siteNav');if(menuToggle&&nav){menuToggle.addEventListener('click',function(){var open=nav.classList.toggle('open');menuToggle.setAttribute('aria-expanded',String(open));menuToggle.setAttribute('aria-label',open?'Close navigation':'Open navigation');menuToggle.textContent=open?'✕':'☰';});nav.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){nav.classList.remove('open');menuToggle.setAttribute('aria-expanded','false');menuToggle.setAttribute('aria-label','Open navigation');menuToggle.textContent='☰';});});}
+  document.getElementById('year').textContent=String(new Date().getFullYear());
+})();
+</script>
+
+
+</body></html>
